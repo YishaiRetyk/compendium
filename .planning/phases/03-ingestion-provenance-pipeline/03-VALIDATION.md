@@ -2,12 +2,12 @@
 phase: 3
 slug: ingestion-provenance-pipeline
 status: draft
-nyquist_compliant: false
-wave_0_complete: false
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-04-10
 ---
 
-# Phase 3 — Validation Strategy
+# Phase 3 -- Validation Strategy
 
 > Per-phase validation contract for feedback sampling during execution.
 
@@ -17,43 +17,44 @@ created: 2026-04-10
 
 | Property | Value |
 |----------|-------|
-| **Framework** | bash + grep + diff (shell-based validation) |
-| **Config file** | none — Wave 0 installs |
-| **Quick run command** | `bash tests/validate-wiki.sh --quick` |
-| **Full suite command** | `bash tests/validate-wiki.sh` |
-| **Estimated runtime** | ~5 seconds |
+| **Framework** | Inline shell commands (grep, test, wc) per task `<verify>` block |
+| **Config file** | none |
+| **Quick run command** | Each task's `<automated>` verify block |
+| **Full suite command** | Run all task verify blocks sequentially |
+| **Estimated runtime** | ~5 seconds per task |
+
+**Note:** This phase uses inline verification commands embedded in each task's `<verify><automated>` block rather than a standalone test harness. Each plan's tasks contain specific grep/test/wc commands that validate wiki structure, provenance markers, frontmatter fields, and content integrity. This approach is appropriate because the phase validates an LLM-executed pipeline (not deterministic code), and the verification targets are known file paths with known content patterns.
 
 ---
 
 ## Sampling Rate
 
-- **After every task commit:** Run `bash tests/validate-wiki.sh --quick`
-- **After every plan wave:** Run `bash tests/validate-wiki.sh`
-- **Before `/gsd:verify-work`:** Full suite must be green
+- **After every task commit:** Run the task's `<automated>` verify block
+- **After every plan wave:** Run all verify blocks for the wave's plans
+- **Before `/gsd:verify-work`:** All task verify blocks must pass
 - **Max feedback latency:** 5 seconds
 
 ---
 
 ## Per-Task Verification Map
 
-| Task ID | Plan | Wave | Requirement | Test Type | Automated Command | File Exists | Status |
-|---------|------|------|-------------|-----------|-------------------|-------------|--------|
-| 03-01-01 | 01 | 1 | INGST-01 | integration | `bash tests/validate-wiki.sh --pass0` | ❌ W0 | ⬜ pending |
-| 03-01-02 | 01 | 1 | INGST-02 | integration | `bash tests/validate-wiki.sh --pass1` | ❌ W0 | ⬜ pending |
-| 03-02-01 | 02 | 1 | PROV-01 | integration | `bash tests/validate-wiki.sh --provenance` | ❌ W0 | ⬜ pending |
-| 03-03-01 | 03 | 2 | CMPL-01 | integration | `bash tests/validate-wiki.sh --compile` | ❌ W0 | ⬜ pending |
-| 03-04-01 | 04 | 2 | CLI-02 | unit | `bash bin/ingest.sh --dry-run` | ❌ W0 | ⬜ pending |
+| Task ID | Plan | Wave | Requirement | Test Type | Automated Command | Status |
+|---------|------|------|-------------|-----------|-------------------|--------|
+| 03-01-01 | 01 | 1 | CMPL-01..07 | integration | `grep -c 'Claim Granularity Rules' AGENTS.md` | pending |
+| 03-01-02 | 01 | 1 | CMPL-01..07 | integration | `grep -c 'Append-Then-Synthesize' AGENTS.md` | pending |
+| 03-02-01 | 02 | 1 | CLI-02 | unit | `bash bin/ingest.sh --help` | pending |
+| 03-03-01 | 03 | 2 | INGST-03..06 | integration | inline verify (source creation + hash) | pending |
+| 03-03-02 | 03 | 2 | PROV-01..04 | integration | inline verify (provenance grep across wiki/) | pending |
+| 03-04-01 | 04 | 3 | INGST-03..06 | integration | inline verify (journal source creation) | pending |
+| 03-04-02 | 04 | 3 | PROV-01..04 | integration | inline verify (paragraph-level provenance grep) | pending |
 
-*Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
+*Status: pending | green | red | flaky*
 
 ---
 
 ## Wave 0 Requirements
 
-- [ ] `tests/validate-wiki.sh` — validation harness for wiki structure, provenance, compilation
-- [ ] `tests/fixtures/` — synthetic test source documents
-
-*If none: "Existing infrastructure covers all phase requirements."*
+No Wave 0 test infrastructure needed. All verification is inline within task `<verify><automated>` blocks using standard shell commands (grep, test, wc, awk). These commands require no installation or setup.
 
 ---
 
@@ -68,11 +69,11 @@ created: 2026-04-10
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references
-- [ ] No watch-mode flags
-- [ ] Feedback latency < 5s
-- [ ] `nyquist_compliant: true` set in frontmatter
+- [x] All tasks have `<automated>` verify blocks
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] No Wave 0 dependencies (inline verification only)
+- [x] No watch-mode flags
+- [x] Feedback latency < 5s
+- [x] `nyquist_compliant: true` set in frontmatter
 
 **Approval:** pending
