@@ -973,3 +973,206 @@ Commit:   reflect(<scope>): <one-line summary>
 - Each entry includes: what was done, which pages were affected, and a brief rationale.
 - The log is parseable with: `grep "^## \[" wiki/log.md | tail -5`
 - Structural reasoning and decision analysis belong in decision record pages (reflect workflow, Section 11.4), NOT in the log. The log records WHAT happened; decision records explain WHY.
+
+## 13. Privacy Routing
+
+All content in the wiki system has a privacy classification that determines whether it may be sent to cloud LLM APIs. The system uses fail-closed semantics: when in doubt, the answer is `local_only`. It is better to under-share than to accidentally send private content to a cloud API.
+
+### Privacy Tiers
+
+- **`local_only`** -- NEVER sent to cloud LLM APIs. Processed only by local models or local tooling.
+- **`cloud_safe`** -- May be sent to cloud LLM APIs for processing.
+
+### Three-Level Precedence
+
+Privacy classification is resolved using a three-level precedence hierarchy (most specific wins):
+
+1. **Explicit `privacy` field in item frontmatter** -- This is the authoritative declaration. If present, it is always respected.
+2. **Enclosing directory default** -- Provides operational convenience. Directories like `sources/local-only/` imply `local_only`; directories like `sources/cloud-safe/` imply `cloud_safe`.
+3. **System default: `local_only`** -- If neither frontmatter nor directory provides a signal, the item is classified as `local_only` (fail-closed).
+
+### Conflict Resolution
+
+If the frontmatter and directory disagree, the **stricter** setting wins. Since `local_only` is always stricter than `cloud_safe`, any conflict resolves to `local_only`. This ensures that an item explicitly marked `local_only` cannot be overridden by a permissive directory, and a restrictive directory cannot be overridden by a permissive frontmatter field.
+
+### Privacy Decision Table
+
+| # | Frontmatter `privacy` | Directory               | Result       | Why                                                    |
+|---|----------------------|-------------------------|-------------|--------------------------------------------------------|
+| 1 | `cloud_safe`         | `sources/cloud-safe/`   | `cloud_safe` | Both agree: cloud_safe                                 |
+| 2 | `local_only`         | `sources/cloud-safe/`   | `local_only` | Frontmatter is stricter, stricter wins                 |
+| 3 | `cloud_safe`         | `sources/local-only/`   | `local_only` | Directory is stricter, stricter wins                   |
+| 4 | (not set)            | `sources/cloud-safe/`   | `cloud_safe` | No frontmatter, directory provides signal              |
+| 5 | (not set)            | `sources/2026/2026-04/` | `local_only` | No frontmatter, no privacy directory signal, system default |
+| 6 | (not set)            | (no directory signal)   | `local_only` | Fail-closed: unknown = local_only                      |
+| 7 | `local_only`         | (no directory signal)   | `local_only` | Explicit local_only confirmed                          |
+
+### Rules for LLM Agents
+
+1. The LLM MUST check privacy classification before sending any content to a cloud API.
+2. If classification cannot be determined, treat as `local_only`.
+3. Never send `local_only` content to cloud LLM APIs under any circumstances.
+4. When creating wiki pages, set the `privacy` field in frontmatter based on the sources used.
+
+### Wiki Page Privacy Inheritance
+
+When a wiki page cites sources with mixed privacy tiers (e.g., one `local_only` source and one `cloud_safe` source), the wiki page inherits `local_only` -- the strictest tier among its contributing sources. A page is only `cloud_safe` if ALL of its contributing sources are `cloud_safe`.
+
+## 14. Scaling Boundaries
+
+**Important:** These are provisional heuristics, not hard boundaries. They are starting points derived from reasoning about likely pain points. Validate and adjust through actual use. The numbers below are approximate -- the real signals are behavioral (the wiki becomes awkward to use in specific ways).
+
+These tiers are additive. Each builds on the previous rather than replacing it.
+
+### Tier 1: Markdown-First Baseline (v1)
+
+This is the starting configuration. Everything is markdown files and YAML frontmatter.
+
+- **Navigation:** `wiki/index.md` is the primary navigation mechanism. The LLM reads it to find pages.
+- **Lint:** Full lint scans all pages in the wiki.
+- **Agent behavior:** Read the full index, scan all pages during lint.
+- **Approximate capacity:** Up to ~100-200 wiki pages, ~50-100 ingested sources.
+- **Pain points at limit:** `index.md` becomes slow to navigate. The LLM's context window fills up scanning the full index. Full lint takes multiple passes or minutes.
+- **Signal you are outgrowing this tier:** `index.md` exceeds ~500 lines. The LLM frequently retrieves pages irrelevant to the query because the index is too dense to scan efficiently.
+
+### Tier 2: Split Index
+
+When the single index becomes unwieldy (approximately a few hundred wiki pages).
+
+- **Change:** Split `wiki/index.md` into per-type or per-domain sub-indexes: `wiki/index-entities.md`, `wiki/index-concepts.md`, `wiki/index-sources.md`, etc. The main `wiki/index.md` becomes a meta-index pointing to sub-indexes.
+- **Agent behavior:** Read the meta-index to determine which sub-index is relevant, then read only that sub-index.
+- **Approximate capacity:** Up to ~500-1000 wiki pages.
+- **Pain points at limit:** Even sub-indexes become large. Cross-type queries require reading multiple sub-indexes. The meta-index itself grows.
+- **Signal to upgrade:** Sub-indexes exceed ~200 entries each. Cross-domain queries are slow because the LLM must read multiple sub-indexes.
+
+### Tier 3: Incremental Lint
+
+When full lint becomes too expensive to run routinely.
+
+- **Change:** Track which pages changed since the last lint (via `git diff` or `log.md` timestamps). Only lint changed pages and their direct neighbors (pages they link to or are linked from).
+- **Agent behavior:** Run `git diff --name-only <last-lint-commit>` to scope the lint to changed files. Expand scope to include pages linked to/from changed pages.
+- **Approximate capacity:** Any size where full lint is impractical.
+- **Pain points at limit:** Neighbor expansion can still be large in highly connected wikis. Deep dependency chains may be missed by incremental lint.
+- **Signal to upgrade:** Lint takes so long that you stop running it, or incremental lint misses issues that a full lint would catch.
+
+### Tier 4: DB-Backed Metadata
+
+When provenance queries, search, or concurrency become awkward in pure markdown.
+
+- **Change:** Add SQLite (or similar lightweight database) for metadata: source registry, provenance index, search index, wikilink graph. Markdown pages remain the human-facing artifact; the database is an acceleration layer.
+- **Agent behavior:** Query the database for source and provenance lookups instead of scanning markdown files. Use the database for search instead of grep.
+- **Approximate capacity:** Thousands of pages and sources.
+- **Pain points:** Requires maintaining synchronization between the database and markdown files. Adds a tooling dependency beyond plain markdown.
+- **Signal to upgrade:** Provenance validation is slow because it requires scanning many files. Search needs more than grep. Multiple agents need concurrent access to the wiki.
+
+## 15. Tooling and Integrations
+
+> This section is informational, not normative. It describes tools the wiki is designed to work with, but does not mandate their installation. The wiki functions as plain markdown files in a git repo regardless of tooling.
+
+### Obsidian (Primary Human Interface)
+
+- **Graph View:** Visualize the wiki's link structure. Only meaningful links appear because Section 8 enforces first-mention linking and prohibits display aliases.
+- **Dataview plugin:** Query frontmatter fields with TABLE/LIST/TASK syntax. All frontmatter fields defined in Section 5 are queryable. Example: `TABLE summary, epistemic_status FROM "wiki/entities" WHERE status = "active"`.
+- **Properties:** Obsidian 1.4+ supports typed frontmatter editing. All base fields render as editable properties in the sidebar.
+- **Aliases:** The `aliases` frontmatter field enables Obsidian to resolve alternative page names automatically, supporting the exact-title wikilink convention (Section 8).
+- **Backlinks:** Obsidian's backlinks panel shows all pages that link to the current page, complementing the `## Related Pages` section.
+
+### Git (Version Control)
+
+- All changes are tracked in git with conventional commits (Section 3).
+- History provides a full audit trail of wiki evolution.
+- Branching is available for experimental restructuring (e.g., major domain reorganization).
+- The activity log (`wiki/log.md`) complements git history with human-readable operation summaries.
+
+### Optional Future Tools (Not Required for v1)
+
+- **Local search engine** (e.g., qmd or similar): Hybrid BM25/vector search for faster query workflow when the wiki grows beyond grep's effectiveness.
+- **Obsidian Web Clipper:** Source acquisition from the web -- clip articles directly into the `sources/` directory.
+- **Marp plugin:** Generate slide decks from wiki content for presentations and reviews.
+
+## 16. Appendices and Examples
+
+### Appendix A: Dataview Query Examples
+
+**List all active entity pages:**
+
+````markdown
+```dataview
+TABLE summary, epistemic_status, updated_at
+FROM "wiki/entities"
+WHERE status = "active"
+SORT updated_at DESC
+```
+````
+
+**List all sources by domain:**
+
+````markdown
+```dataview
+TABLE source_type, ingested_at, content_hash
+FROM "wiki/sources"
+WHERE contains(domains, "ai-research")
+SORT ingested_at DESC
+```
+````
+
+**List stale pages across the entire wiki:**
+
+````markdown
+```dataview
+LIST
+FROM "wiki"
+WHERE epistemic_status = "stale"
+SORT updated_at ASC
+```
+````
+
+**Find pages missing privacy classification:**
+
+````markdown
+```dataview
+LIST
+FROM "wiki"
+WHERE !privacy
+```
+````
+
+**List all pages in a specific domain:**
+
+````markdown
+```dataview
+TABLE title, type, epistemic_status
+FROM "wiki"
+WHERE contains(domains, "ai-research") AND status = "active"
+SORT type ASC
+```
+````
+
+### Appendix B: Commit Message Examples
+
+```
+schema: define base frontmatter fields and page type conventions
+ingest(hinton-interview): add source summary and update entity pages
+ingest(vaswani-attention): create source summary with 3 extracted claims, update attention mechanism page
+query(attention-mechanisms): synthesize comparison of attention variants
+query(ai-safety-timeline): create overview page from 4 existing sources
+lint(wiki): fix 3 orphan pages and 2 broken provenance references
+lint(entities): update 5 stale epistemic_status markers
+reflect(q1-review): restructure AI safety domain after new sources
+reflect(domain-split): separate neuroscience from ai-research domain
+```
+
+### Appendix C: Quick Reference Card
+
+A compact summary of the most critical rules for fast LLM scanning:
+
+1. **Read `wiki/index.md` first, always.** This is the entry point for all wiki operations.
+2. **TL;DR and Key Facts before Detail.** Read shallow sections first; drill into Detail only when needed.
+3. **`[[Exact Title]]` on first mention only.** No display aliases. No repeated links. No wikilinks in frontmatter.
+4. **`[prov:source_id#locator]` for every factual claim.** Every claim needs provenance. No exceptions.
+5. **One commit per logical operation.** One ingest = one commit, even if it touches many files.
+6. **Privacy default: `local_only`.** When in doubt, do not send to cloud APIs.
+7. **All dates: ISO 8601.** `YYYY-MM-DD` or `YYYY-MM-DDTHH:mm:ss`.
+8. **All field names: `snake_case`.** For Dataview compatibility.
+9. **Operations: UPDATE, MERGE, SUPERSEDE, ARCHIVE.** No raw file rewrites. Log every operation.
+10. **See Section 3 "What Agents Must NOT Do"** for the full list of prohibitions.
