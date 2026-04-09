@@ -12,12 +12,14 @@ The wiki is a persistent, compounding artifact — cross-references are already 
 
 ### Validated
 
-(None yet — ship to validate)
+- [x] Agent-agnostic schema (CLAUDE.md / AGENTS.md) that tells any LLM how to maintain the wiki — Validated in Phase 01: schema-structure-conventions
+- [x] Directory structure conventions for raw sources, wiki pages, index, and log — Validated in Phase 01: schema-structure-conventions
+- [x] Typed page schemas: entity pages, concept pages, source summaries, comparisons, with type-specific templates — Validated in Phase 01: schema-structure-conventions
+- [x] Structured operations layer: UPDATE, MERGE, SUPERSEDE, ARCHIVE instead of raw file rewrites — Validated in Phase 01: schema-structure-conventions
+- [x] Progressive disclosure: shallow summaries for navigation, drill-down for detail — Validated in Phase 01: schema-structure-conventions
+- [x] Obsidian integration: graph view compatibility, Dataview frontmatter, Marp slide generation, wikilinks — Validated in Phase 01: schema-structure-conventions
 
 ### Active
-
-- [ ] Agent-agnostic schema (CLAUDE.md / AGENTS.md) that tells any LLM how to maintain the wiki
-- [ ] Directory structure conventions for raw sources, wiki pages, index, and log
 - [ ] Ingest workflow: source classification, extraction, multi-page wiki updates, provenance tracking
 - [ ] Query workflow: index-first search, synthesis with citations, delta compilation back into wiki
 - [ ] Lint workflow: contradiction detection, stale claims, orphan pages, missing cross-references, data gaps
@@ -25,12 +27,8 @@ The wiki is a persistent, compounding artifact — cross-references are already 
 - [ ] Index system: content-oriented catalog with categories, summaries, metadata
 - [ ] Log system: chronological, parseable, append-only activity record
 - [ ] Claim-level provenance: which sources support which claims, freshness tracking
-- [ ] Structured operations layer: UPDATE, MERGE, SUPERSEDE, ARCHIVE instead of raw file rewrites
 - [ ] Compilation pipeline: diff → extract → merge → lint, with optional follow-on passes
-- [ ] Typed page schemas: entity pages, concept pages, source summaries, comparisons, with type-specific templates
 - [ ] Epistemic status markers: sourced, inferred, tentative, stale — per-claim confidence
-- [ ] Progressive disclosure: shallow summaries for navigation, drill-down for detail
-- [ ] Obsidian integration: graph view compatibility, Dataview frontmatter, Marp slide generation, wikilinks
 - [ ] Example wiki pages demonstrating all conventions and page types
 - [ ] CLI helpers for common operations (search, ingest, lint)
 - [ ] Cross-system drift detection between wiki, raw sources, and any external tools
@@ -92,4 +90,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-06 after initialization*
+*Last updated: 2026-04-09 after Phase 01 completion*
