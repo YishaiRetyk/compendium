@@ -63,7 +63,12 @@ Plans:
   3. Ingesting a second source on a related topic updates existing wiki pages with new information rather than creating duplicates, and new cross-references are generated between related pages
   4. The index and activity log are updated after each ingest, and source hashes are stored so stale claims can be detected when sources change
   5. A CLI ingest helper exists that scaffolds the ingest workflow for the user
-**Plans**: TBD
+**Plans:** 4 plans
+Plans:
+- [ ] 03-01-PLAN.md — Encode claim granularity rules (D-01 through D-05) and incremental update policy (D-06 through D-10) into AGENTS.md sections 9, 10, 11.1
+- [ ] 03-02-PLAN.md — CLI ingest helper bash script (bin/ingest.sh) for source file placement and hash computation
+- [ ] 03-03-PLAN.md — First validation ingest: synthetic article on Kahneman's prospect theory (atomic extraction, incremental updates to existing pages)
+- [ ] 03-04-PLAN.md — Second validation ingest: synthetic journal entry (paragraph-level extraction, different source type path)
 
 ### Phase 4: Query & Structured Operations
 **Goal**: Users can ask questions against the wiki and get cited answers that compile back into durable wiki pages, and all wiki mutations use a structured operations vocabulary that is logged with rationale
@@ -109,7 +114,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 |-------|----------------|--------|-----------|
 | 1. Schema, Structure & Conventions | 1/3 | In Progress|  |
 | 2. Page Types, Examples & Navigation | 1/3 | In Progress|  |
-| 3. Ingestion & Provenance Pipeline | 0/TBD | Not started | - |
+| 3. Ingestion & Provenance Pipeline | 0/4 | Not started | - |
 | 4. Query & Structured Operations | 0/TBD | Not started | - |
 | 5. Lint & Quality | 0/TBD | Not started | - |
 | 6. Reflection & Drift Detection | 0/TBD | Not started | - |
