@@ -21,20 +21,20 @@ privacy: cloud_safe
 
 ## Entities
 
-_No entity pages yet._
+- [[Daniel Kahneman]] -- Israeli-American psychologist who won the Nobel Prize in Economics for research on judgment and decision-making (sourced, 2026-04-09)
 
 ## Concepts
 
-_No concept pages yet._
+- [[Cognitive Biases]] -- Systematic patterns of deviation from rationality in judgment, first cataloged by Kahneman and Tversky (mixed, 2026-04-09)
 
 ## Sources
 
-_No source summary pages yet._
+- [[src-2026-04-09-thinking-fast-and-slow-part1]] -- Part 1 of Kahneman's synthesis of decades of research on judgment, heuristics, and cognitive biases (sourced, 2026-04-09)
 
 ## Comparisons
 
-_No comparison pages yet._
+- [[System 1 vs System 2]] -- Comparison of Kahneman's dual-process framework: fast intuitive thinking versus slow deliberate thinking (sourced, 2026-04-09)
 
 ## Overviews
 
-_No overview pages yet._
+- [[Decision Making]] -- Overview of how humans make choices under uncertainty, shaped by cognitive biases and dual-process thinking (mixed, 2026-04-09)
