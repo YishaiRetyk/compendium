@@ -47,7 +47,11 @@ Plans:
   3. Example pages demonstrate every convention: an entity page, a concept page with cross-references and epistemic markers, a source summary with provenance, a comparison page, and populated index/log files
   4. A content index (index.md) exists organized by category with links, summaries, and metadata, and an activity log exists with consistent parseable format
   5. Opening the vault in Obsidian shows working wikilinks, valid Dataview queries, and a meaningful graph view across the example pages
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 02-01-PLAN.md — Five page type templates in schema/templates/ with frontmatter and progressive disclosure sections
+- [ ] 02-02-PLAN.md — Five example pages (Kahneman domain) with cross-references, provenance chains, and epistemic markers
+- [ ] 02-03-PLAN.md — Populated index.md and log.md, AGENTS.md section 6 epistemic syntax documentation
 
 ### Phase 3: Ingestion & Provenance Pipeline
 **Goal**: Real sources can be ingested into the wiki through a documented multi-pass pipeline that creates properly provenanced wiki pages and updates existing pages incrementally
@@ -104,7 +108,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Schema, Structure & Conventions | 1/3 | In Progress|  |
-| 2. Page Types, Examples & Navigation | 0/TBD | Not started | - |
+| 2. Page Types, Examples & Navigation | 0/3 | Not started | - |
 | 3. Ingestion & Provenance Pipeline | 0/TBD | Not started | - |
 | 4. Query & Structured Operations | 0/TBD | Not started | - |
 | 5. Lint & Quality | 0/TBD | Not started | - |
