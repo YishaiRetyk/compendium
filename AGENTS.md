@@ -707,4 +707,269 @@ GOOD: See [[Attention Mechanism]]               (exact canonical title from page
 - First-mention linking prevents link noise in the graph. A page that mentions "attention" 20 times creates only one graph edge to `[[Attention Mechanism]]`, not 20.
 - Red links appear in the graph as unresolved nodes, providing a visual map of knowledge gaps.
 
-<!-- Sections 9-16 follow below -->
+## 9. Structured Operations and Executor Model
+
+All wiki mutations use a formal operations vocabulary. Raw file rewrites are prohibited -- every change goes through one of these four operations with mandatory logging.
+
+### Operations Vocabulary
+
+| Operation    | Verb    | What It Does                                       |
+|-------------|---------|---------------------------------------------------|
+| **UPDATE**  | Modify  | Add new information to an existing page            |
+| **MERGE**   | Combine | Unify two pages covering the same concept          |
+| **SUPERSEDE** | Replace | Mark a page/claim as replaced by newer information |
+| **ARCHIVE** | Retire  | Move outdated content out of active wiki           |
+
+### Operation Definitions
+
+**UPDATE** -- Modify an existing page with new information.
+
+1. Add new claims with provenance markers to the appropriate section of the existing page.
+2. Preserve all existing provenance markers -- do not remove or overwrite them.
+3. Add new source IDs to the `sources` list in frontmatter.
+4. Update `updated_at` in frontmatter to today's date.
+5. If new claims change the evidence balance, update `epistemic_status` accordingly.
+6. Log: `"UPDATE <page_id>: <one-line rationale>"`
+
+**MERGE** -- Combine two pages covering the same concept.
+
+1. Create a new merged page with the union of claims from both pages, preserving all provenance markers.
+2. Set `supersedes` on the new page to list both merged page IDs.
+3. Set `superseded_by` on both old pages to point to the new page ID.
+4. Set `status: superseded` on both old pages.
+5. Replace the body of both old pages with a brief redirect note: `> This page has been merged into [[New Page Title]].`
+6. Update `wiki/index.md`: add the new page, move old pages to "Archived" section (if one exists) or remove them from active listings.
+7. Log: `"MERGE <page_a> + <page_b> -> <new_page>: <rationale>"`
+
+**SUPERSEDE** -- Mark a page or claim as replaced by newer information.
+
+1. Set `superseded_by` on the old page to the replacing page's ID.
+2. Set `status: superseded` on the old page.
+3. Add a note at the top of the old page body: `> This page has been superseded by [[New Page Title]].`
+4. On the new page, set `supersedes` to the old page's ID.
+5. Update `wiki/index.md`: move the old page to "Archived" section or remove from active listings.
+6. Log: `"SUPERSEDE <old_page> -> <new_page>: <rationale>"`
+
+**ARCHIVE** -- Move outdated content out of active wiki.
+
+1. Set `status: archived` on the page.
+2. Remove the page from `wiki/index.md` active listings (move to an "Archived" section if one exists).
+3. The page remains in its directory -- do NOT delete or move files.
+4. Log: `"ARCHIVE <page_id>: <rationale>"`
+
+### Executor Model
+
+The LLM proposes operations. Before applying any operation, it MUST validate:
+
+1. **Target exists:** For UPDATE, SUPERSEDE, and ARCHIVE, the target page must exist.
+2. **Both pages exist and are distinct:** For MERGE, both source pages must exist and must not be the same page.
+3. **Provenance resolves:** All `[prov:...]` references in new content must resolve to known source IDs in `wiki/sources/`.
+4. **Frontmatter is valid:** All required base fields are present and correctly typed (see Section 5 validation checklist).
+5. **Privacy is respected:** No `local_only` content is included in operations that will be sent to cloud APIs.
+
+If validation fails, the LLM MUST NOT apply the operation. Instead, log the validation failure and report it to the user.
+
+Every operation MUST be logged in `wiki/log.md` with: timestamp, operation type, affected page(s), and rationale. See Section 12 for log format.
+
+## 10. Compiler Pipeline (Conceptual Model)
+
+This section describes the conceptual compilation model -- the state machine that source material passes through on its way into the wiki. Section 11 (Workflows) provides the step-by-step operator procedures that implement this model.
+
+The pipeline is a multi-pass process for ingesting a source document:
+
+```
+Source -> [Classify] -> [Diff] -> [Extract] -> [Merge] -> [Lint] -> Wiki
+```
+
+### Pass 0: Classify
+
+Determine the source type before processing.
+
+- **Input:** Raw source document.
+- **Types:** article, paper, transcript, journal entry, data file, image-heavy.
+- **Purpose:** Different source types require different extraction logic (e.g., papers have abstract/methodology/results; transcripts have timestamped segments).
+- **Output:** Source type classification, passed to Pass 2 for type-appropriate extraction.
+
+### Pass 1: Diff
+
+Compare the new source against current wiki state.
+
+- **Input:** Source document + current wiki state (via `wiki/index.md`).
+- **Process:** Read `wiki/index.md` to identify existing pages on related topics. Read the TL;DR and Key Facts of those related pages. Determine what the new source adds that the wiki does not already cover.
+- **Output:** A mental model of new vs. existing knowledge. This is not a file -- it is the LLM's internal understanding of the delta.
+
+### Pass 2: Extract
+
+Pull structured knowledge from the source.
+
+- **Input:** Source document + type classification from Pass 0.
+- **Process:** Apply type-appropriate extraction. Papers get abstract, methodology, results, and conclusions. Transcripts get timestamped claims. Journal entries get reflections and decisions. Extract claims, entities, and relationships, each with a provenance locator (`[prov:source_id#locator]`).
+- **Output:** A source summary page created in `wiki/sources/<source_id>.md` with full frontmatter (including `path`, `content_hash`, `ingested_at`, `source_type`) and all extracted claims with provenance.
+
+### Pass 3: Merge
+
+Integrate extracted knowledge into the wiki.
+
+- **Input:** Extracted claims + current wiki pages.
+- **Process:**
+  - UPDATE existing pages with new claims (using the UPDATE operation from Section 9).
+  - Create new pages for entities or concepts not yet in the wiki, using the appropriate page type template (Section 4).
+  - Generate wikilinks between related pages (first mention only, per Section 8).
+  - MERGE pages if the new source reveals that two existing pages cover the same topic (using the MERGE operation from Section 9).
+- **Output:** Updated and/or new wiki pages with provenance-tracked claims and cross-references.
+
+### Pass 4: Lint
+
+Verify consistency after merge.
+
+- **Input:** All pages modified or created during this ingest.
+- **Checks:**
+  - All new `[prov:...]` markers resolve to valid source IDs in `wiki/sources/`.
+  - All new wikilinks point to existing pages or are intentional red links.
+  - Frontmatter is complete and valid on all modified pages (Section 5 checklist).
+  - No contradictions between new claims and existing claims on the same topic.
+- **Output:** List of issues found (if any). Trivially fixable issues (e.g., missing frontmatter fields) are fixed inline. Non-trivial issues are reported.
+
+### Optional Follow-On Passes
+
+These are not required on every ingest:
+
+- **Summary regeneration:** Rewrite TL;DR and Key Facts sections of affected pages to reflect new information.
+- **Image processing:** Extract information from figures, diagrams, or images in the source.
+- **Structural reorganization:** Split pages that have grown too large, or reorganize domain sections.
+
+## 11. Workflows
+
+These are the operator procedures that implement the conceptual pipeline (Section 10). Each workflow is a complete recipe an LLM agent follows step-by-step. The pipeline describes WHAT conceptually happens; workflows describe HOW to do it.
+
+### 11.1 Ingest Workflow
+
+```
+Trigger:  User places a new source document and requests ingestion
+Inputs:   Source file at sources/YYYY/YYYY-MM/YYYY-MM-DD-slug/ (bundle) or .md (single file)
+Outputs:  Source summary page, updated wiki pages, updated index, updated log
+Commit:   ingest(<source-slug>): <one-line summary>
+```
+
+**Steps:**
+
+1. User places source document in `sources/YYYY/YYYY-MM/YYYY-MM-DD-slug/` (bundle with `source.md` + assets) or `sources/YYYY/YYYY-MM/YYYY-MM-DD-slug.md` (single file).
+2. LLM reads the source document completely.
+3. **Classify** (Pipeline Pass 0): Determine source type -- article, paper, transcript, journal entry, data file, or image-heavy.
+4. **Diff** (Pipeline Pass 1): Read `wiki/index.md`, identify related existing pages, read their TL;DR and Key Facts sections. Determine what this source adds that the wiki does not already cover.
+5. **Extract** (Pipeline Pass 2): Extract claims with provenance locators. Create source summary page at `wiki/sources/<source_id>.md` with full frontmatter including `path`, `content_hash`, `ingested_at`, and `source_type`.
+6. **Merge** (Pipeline Pass 3): Update or create entity/concept/overview pages using UPDATE operations (Section 9). Generate wikilinks on first mention. MERGE pages if the source reveals duplicates.
+7. **Lint** (Pipeline Pass 4): Verify all provenance references resolve, wikilinks are valid, frontmatter is complete on all modified pages.
+8. Update `wiki/index.md` with new and modified pages.
+9. Append entry to `wiki/log.md`: `## [YYYY-MM-DD] ingest | <source title>` with affected pages and rationale.
+10. Commit: `ingest(<source-slug>): <one-line summary>`
+
+**Abort conditions:**
+
+- Source is unreadable or corrupted. Log failure in `wiki/log.md`, do NOT create partial wiki pages.
+- Source duplicates an already-ingested source (check `content_hash` against existing source summary pages). Log the duplicate detection, do NOT re-ingest.
+- Privacy classification cannot be determined. Default to `local_only` and log the classification gap.
+
+### 11.2 Query Workflow
+
+```
+Trigger:  User asks a question about the wiki contents
+Inputs:   User question (natural language)
+Outputs:  Answer with citations, optionally new/updated wiki pages, updated index/log
+Commit:   query(<topic>): <one-line summary>
+```
+
+**Steps:**
+
+1. Read `wiki/index.md` to find pages relevant to the question.
+2. Read TL;DR and Key Facts sections of relevant pages (progressive disclosure -- shallow first).
+3. Read Detail sections only where shallow content is insufficient to answer the question.
+4. Synthesize answer with citations to specific wiki pages and inline provenance markers.
+5. **Mandatory write-back:** If the answer produces useful synthesis that does not already exist in the wiki, write it back as a new or updated wiki page. This is not optional -- queries that produce novel synthesis MUST contribute back to the wiki.
+6. **Delta compilation check:** Are there sources in `wiki/sources/` relevant to this query whose knowledge has not been fully compiled into topic pages? If yes, compile the missing synthesis into appropriate wiki pages.
+7. Update `wiki/index.md` if new pages were created.
+8. Append entry to `wiki/log.md`: `## [YYYY-MM-DD] query | <question summary>` with affected pages.
+9. Commit (only if wiki was modified): `query(<topic>): <one-line summary>`
+
+**Abort conditions:**
+
+- No relevant pages exist AND no sources exist on the topic. Inform the user that the wiki has no information on this topic rather than hallucinating an answer. Log the knowledge gap in `wiki/log.md` so the lint workflow can track it.
+
+### 11.3 Lint Workflow
+
+```
+Trigger:  User requests a health check, or periodically after several ingests
+Inputs:   wiki/ directory (all pages)
+Outputs:  Structured findings report, optionally fixed pages, updated log
+Commit:   lint(<scope>): <one-line summary>
+```
+
+**Steps:**
+
+1. Read `wiki/index.md` for full page inventory.
+2. **Orphan detection:** Find pages with no inbound wikilinks from other wiki pages.
+3. **Missing cross-references:** Identify related pages that should link to each other but do not.
+4. **Stale claims:** Find claims with `checked_at` dates older than a reasonable threshold, or pages with `epistemic_status: stale`.
+5. **Contradiction detection:** Identify claims on the same topic that disagree across different pages.
+6. **Knowledge gaps:** Collect red links (unresolved wikilinks) that appear across multiple pages, suggesting a new page should be created.
+7. **Source coverage gaps:** Identify domains with few sources relative to others.
+8. Report findings in structured format, organized by category (orphans, stale claims, contradictions, gaps).
+9. Suggest new questions to investigate and new sources to look for based on gaps found.
+10. Fix trivially fixable issues: add missing cross-references, update stale `epistemic_status` markers, fix broken provenance references where the correct source is obvious.
+11. Append entry to `wiki/log.md`: `## [YYYY-MM-DD] lint | <scope>` with summary of findings and fixes.
+12. Commit: `lint(<scope>): <one-line summary of findings and fixes>`
+
+**Abort conditions:**
+
+- Wiki is empty (no pages beyond `index.md` and `log.md`). Report that the wiki is empty and skip the lint. Log this in `wiki/log.md`.
+
+### 11.4 Reflect Workflow
+
+```
+Trigger:  After major ingests, reorganizations, or periodic review
+Inputs:   Recent changes (from log.md or git history)
+Outputs:  Decision record page, updated index/log
+Commit:   reflect(<scope>): <one-line summary>
+```
+
+**Steps:**
+
+1. Identify what structural change was made: page merges, topic reorganization, schema updates, domain restructuring, or significant reframing.
+2. Create a decision record page in `wiki/overviews/` with `type: overview` and the following sections: TL;DR -> Decision -> Why -> Alternatives Considered -> Consequences -> Sources.
+3. The decision page documents: what framing was adopted, what it replaced, what alternatives were considered, and why the chosen approach was selected.
+4. Update `wiki/index.md` with the new decision page.
+5. Append entry to `wiki/log.md`: `## [YYYY-MM-DD] reflect | <scope>` with the decision summary.
+6. Commit: `reflect(<scope>): <one-line summary>`
+
+**Abort conditions:**
+
+- No structural changes have been made since the last reflection. Skip and do not create an empty decision record.
+
+## 12. Index and Log
+
+### index.md (Content Index)
+
+- Lives at `wiki/index.md`.
+- Organized by page type: Entities, Concepts, Sources, Comparisons, Overviews.
+- Each entry follows the format: `- [[Page Title]] -- <one-line summary> (<epistemic_status>, <updated_at>)`
+- Updated on every ingest and every query that creates or modifies pages.
+- The LLM reads this FIRST when searching for information (per Section 3 and Section 7).
+- Archived pages are listed separately under an "Archived" heading if any exist.
+- The index is the primary navigation mechanism for both LLMs and humans browsing the wiki.
+
+### log.md (Activity Log)
+
+- Lives at `wiki/log.md`.
+- Chronological, newest entries at the bottom (append-only).
+- Entry format:
+
+```markdown
+## [YYYY-MM-DD] <operation_type> | <description>
+
+<what was done, which pages were affected, brief rationale>
+```
+
+- Valid operation types: `ingest`, `query`, `lint`, `reflect`, `update`, `merge`, `supersede`, `archive`.
+- Each entry includes: what was done, which pages were affected, and a brief rationale.
+- The log is parseable with: `grep "^## \[" wiki/log.md | tail -5`
+- Structural reasoning and decision analysis belong in decision record pages (reflect workflow, Section 11.4), NOT in the log. The log records WHAT happened; decision records explain WHY.
