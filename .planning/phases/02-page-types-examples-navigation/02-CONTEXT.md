@@ -13,36 +13,37 @@ Deliver concrete, fillable page type templates for all five page types, define e
 <decisions>
 ## Implementation Decisions
 
-### Template Format & Location
-- **D-01:** Separate .md template files in `schema/templates/` — one per page type (entity.md, concept.md, source-summary.md, comparison.md, overview.md). Templates are fillable operational tools with placeholder sections and comments.
-- **D-02:** AGENTS.md sections 4.1-4.5 remain as the authoritative specification with worked examples. Templates in schema/templates/ are the operational counterpart — agents copy a template, fill it in.
-- **D-03:** Templates include all required frontmatter fields from D-10 (Phase 1) with placeholder values and type-specific additional fields.
+### Example Page Topics
+- **D-01:** Example pages use the famous thinkers/ideas domain — public, verifiable knowledge. Topics: Daniel Kahneman (entity), Cognitive Biases (concept), a chapter from Thinking Fast and Slow (source summary), System 1 vs System 2 (comparison), Decision Making (overview).
+- **D-02:** Examples must cross-reference each other to demonstrate graph view value — entity links to concepts, concepts link to sources, etc. The graph should show a connected cluster.
+- **D-03:** Example pages serve double duty: satisfy EXMP-01–05 requirements AND act as companion exemplars for the template files (see D-10).
 
-### Example Page Domain & Topics
-- **D-04:** Example pages use the personal knowledge domain — the user's stated first use case. This validates conventions against real intended use rather than abstract/generic examples.
-- **D-05:** Example topics: an entity page (a thinker or author, e.g., "Daniel Kahneman"), a concept page (e.g., "Spaced Repetition"), a source summary (e.g., an article or book chapter), a comparison page (e.g., two learning methodologies), and populated index/log files reflecting these examples.
-- **D-06:** Example pages must demonstrate cross-references between each other — the entity page links to concepts, the concept links to sources, etc. The graph view should show a connected cluster.
+### Epistemic Inline Syntax
+- **D-04:** Per-claim epistemic markers use Dataview inline field syntax: `[epistemic:: sourced]`, `[epistemic:: inferred]`, `[epistemic:: tentative]`, `[epistemic:: stale]`. Queryable via Dataview — enables "find all tentative claims" queries that feed into lint (Phase 5).
+- **D-05:** Provenance stays in custom `[prov:...]` syntax (Phase 1 D-13–D-18). NOT Dataview syntax. Provenance is for traceability (grep/script-parseable), epistemic is for discovery (Dataview-queryable). Different purposes, different tools.
+- **D-06:** The mixed inline grammar (`[prov:...]` + `[epistemic:: ...]`) must be documented explicitly in AGENTS.md section 6 as an intentional design choice, so future agents don't "normalize" to one syntax.
+- **D-07:** Page-level epistemic status stays in frontmatter (`epistemic_status` field per Phase 1 D-10). Inline markers are for claim-level granularity where claims within one page have different confidence levels.
+- **D-08:** Inline pattern: `Claim text. [prov:source_id#locator|support_type] [epistemic:: status]`
 
-### Epistemic Status Inline Syntax
-- **D-07:** Per-claim epistemic markers use Dataview inline field syntax: `[epistemic:: sourced]`, `[epistemic:: inferred]`, `[epistemic:: tentative]`, `[epistemic:: stale]`. This is consistent with the existing Obsidian/Dataview stack (OBSD-02/04) and visible in page content (EPST-02).
-- **D-08:** Page-level epistemic status stays in frontmatter (`epistemic_status` field per D-10). Inline markers are for claim-level granularity where claims within one page have different confidence levels.
-- **D-09:** Epistemic status conventions documented in AGENTS.md (update existing section 6) with examples showing inline usage in context.
+### Index Strategy
+- **D-09:** index.md uses a manual curated list maintained by the agent during ingest operations. Not Dataview queries — curated lists are higher signal, more navigable, portable, and better for LLM comprehension during query workflow (QURY-02).
+- **D-10:** Lint rule (Phase 5) to detect index drift — compare pages existing in wiki/ subdirectories against wikilinks in index.md. Safety net for workflow discipline.
+- **D-11:** Each index entry: wikilink + one-line summary. Organized by category sections matching page types (Entities, Concepts, Sources, Comparisons, Overviews).
 
-### Index Organization
-- **D-10:** index.md uses category sections matching page types (Entities, Concepts, Sources, Comparisons, Overviews) with embedded Dataview queries for dynamic content population.
-- **D-11:** Each category section has a brief description and a Dataview TABLE query that auto-populates from pages in the corresponding wiki/ subdirectory.
-- **D-12:** Manual "pinned" entries allowed above the Dataview query for important pages the user wants highlighted.
+### Template Design
+- **D-12:** Two-layer pattern: primary templates (skeleton + comments) in `schema/templates/`, companion exemplars are the example pages in `wiki/`.
+- **D-13:** Templates are operational — copy, fill, done. Skeleton with section headings, placeholder frontmatter, and brief comments explaining constraints (e.g., "TL;DR must be short enough for fast scanning"). No example content that could leak into real pages.
+- **D-14:** Example pages are reference material — demonstrate what "good" looks like with real density, provenance chains, and epistemic markers in context. Agents can consult them for style/density guidance.
+- **D-15:** One template per page type: `schema/templates/entity.md`, `concept.md`, `source-summary.md`, `comparison.md`, `overview.md`.
 
 ### Log Entry Format
-- **D-13:** Log entries use parseable format: `YYYY-MM-DDTHH:MM:SSZ <operation>: <summary>` — one line per operation.
-- **D-14:** Operation types match AGENTS.md workflow names: `ingest`, `query`, `lint`, `reflect`, `schema`, `update`, `merge`, `supersede`, `archive`.
-- **D-15:** Log is append-only per LOG-01. Entries added at the top (most recent first) for quick scanning.
+- **D-16:** Claude's discretion — parseable format with ISO timestamps and operation types matching AGENTS.md workflow names. Append-only, most recent first.
 
 ### Claude's Discretion
-- Exact example page content (specific claims, facts, provenance markers) — as long as they demonstrate all conventions
-- Template comment style and helper text within templates
-- Dataview query specifics (which fields to display, sort order)
-- Whether to update AGENTS.md section 6 inline or add a subsection
+- Exact example page content (specific claims, facts, provenance markers) — as long as they demonstrate all conventions and cross-reference each other
+- Template comment wording and helper text
+- Log entry exact format details
+- Whether to update AGENTS.md section 6 inline or add a subsection for the mixed grammar documentation
 
 </decisions>
 
@@ -61,7 +62,7 @@ Deliver concrete, fillable page type templates for all five page types, define e
 - `.planning/REQUIREMENTS.md` — Phase 2 requirements: PAGE-01 through PAGE-07, EPST-01 through EPST-03, EXMP-01 through EXMP-05, INDX-01 through INDX-03, LOG-01 through LOG-03
 
 ### Phase 1 Context
-- `.planning/phases/01-schema-structure-conventions/01-CONTEXT.md` — All Phase 1 decisions (D-01 through D-35) that this phase builds on
+- `.planning/phases/01-schema-structure-conventions/01-CONTEXT.md` — All Phase 1 decisions (D-01 through D-35) that this phase builds on. Especially: frontmatter schema (D-10), provenance syntax (D-13–D-18), progressive disclosure format (D-19–D-24).
 
 </canonical_refs>
 
@@ -69,30 +70,30 @@ Deliver concrete, fillable page type templates for all five page types, define e
 ## Existing Code Insights
 
 ### Reusable Assets
-- `AGENTS.md` sections 4.1-4.5 — worked examples for all 5 page types that templates and example pages should be consistent with
-- `wiki/index.md` — stub with frontmatter, needs content population
+- `AGENTS.md` sections 4.1-4.5 — worked examples for all 5 page types that templates and example pages must be consistent with
+- `wiki/index.md` — stub with frontmatter and empty category sections, needs content population
 - `wiki/log.md` — stub with frontmatter, needs content population
 
 ### Established Patterns
-- Progressive disclosure: TL;DR → Key Facts → Detail → Related → Sources (D-19 through D-24)
-- Frontmatter schema: 14 base fields defined (D-10)
-- Provenance syntax: `[prov:source_id#locator]` (D-13)
+- Progressive disclosure: TL;DR → Key Facts → Detail → Related → Sources (Phase 1 D-19 through D-24)
+- Frontmatter schema: 14 base fields defined (Phase 1 D-10)
+- Provenance syntax: `[prov:source_id#locator]` (Phase 1 D-13)
 - Dataview-compatible YAML frontmatter throughout
 
 ### Integration Points
 - Templates in `schema/templates/` referenced by AGENTS.md section 4
 - Example pages in `wiki/entities/`, `wiki/concepts/`, `wiki/sources/`, `wiki/comparisons/`, `wiki/overviews/`
 - Index and log in `wiki/index.md` and `wiki/log.md`
-- AGENTS.md section 6 needs epistemic inline syntax documentation update
+- AGENTS.md section 6 needs update to document mixed inline grammar (D-06)
 
 </code_context>
 
 <specifics>
 ## Specific Ideas
 
-- Example pages should form a mini-cluster that demonstrates the graph view value — all examples cross-reference each other
-- The personal knowledge domain is the first use case — examples should feel like real personal wiki content, not textbook exercises
-- Epistemic inline markers use Dataview syntax for query-ability — e.g., a Dataview query can find all `[epistemic:: tentative]` claims across the wiki
+- Example pages form a connected cluster: Kahneman → Cognitive Biases → Thinking Fast and Slow → System 1 vs 2 → Decision Making — validates graph view conventions
+- Mixed inline grammar is intentional: `[prov:...]` for portable traceability, `[epistemic:: ...]` for Dataview queryability — document explicitly to prevent normalization by future agents
+- Index drift lint rule: compare wiki/ file list against index.md wikilinks — simple, reliable safety net for manual curation
 
 </specifics>
 

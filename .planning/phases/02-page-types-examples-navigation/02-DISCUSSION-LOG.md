@@ -5,34 +5,20 @@
 
 **Date:** 2026-04-09
 **Phase:** 02-page-types-examples-navigation
-**Areas discussed:** Template format, Example page domain, Epistemic inline syntax, Index organization, Log entry format
-**Mode:** auto (all decisions auto-selected)
+**Areas discussed:** Example page topics, Epistemic inline syntax, Index strategy, Template design
 
 ---
 
-## Template Format & Location
+## Example Page Topics
 
 | Option | Description | Selected |
 |--------|-------------|----------|
-| Separate .md files in schema/templates/ | One per page type, fillable with placeholders | ✓ |
-| Embedded in AGENTS.md | Templates as code blocks within the schema | |
-| JSON/YAML schema | Machine-parseable template definitions | |
+| Your actual interests | Personal knowledge topics (psychology, health, etc.) | |
+| Famous thinkers/ideas | Well-known figures and concepts (Kahneman, cognitive biases) | ✓ |
+| Minimal placeholders | Bare minimum content, focus on structure | |
 
-**User's choice:** [auto] Separate .md files in schema/templates/ (recommended default)
-**Notes:** AGENTS.md already has worked examples; templates serve as operational copy-and-fill tools.
-
----
-
-## Example Page Domain
-
-| Option | Description | Selected |
-|--------|-------------|----------|
-| Personal knowledge domain | User's stated first use case — real topics | ✓ |
-| Generic/abstract examples | Lorem ipsum style, domain-agnostic | |
-| Computer science domain | Technical topics familiar to developers | |
-
-**User's choice:** [auto] Personal knowledge domain (recommended default)
-**Notes:** Validates conventions against real intended use rather than abstract exercises.
+**User's choice:** Famous thinkers/ideas
+**Notes:** Easy to verify correctness, no privacy concerns, replaceable when real sources ingested in Phase 3. Specific topics: Kahneman (entity), Cognitive Biases (concept), Thinking Fast and Slow chapter (source), System 1 vs 2 (comparison), Decision Making (overview). User asked about purpose of example pages before deciding — chose based on verifiability and replaceability.
 
 ---
 
@@ -40,47 +26,47 @@
 
 | Option | Description | Selected |
 |--------|-------------|----------|
-| Dataview inline fields | `[epistemic:: sourced]` — consistent with Obsidian/Dataview | ✓ |
-| Custom bracket syntax | `{epistemic:sourced}` — custom but not Dataview-native | |
-| Emoji markers | Visual but not machine-queryable | |
+| Dataview inline fields | `[epistemic:: sourced]` — queryable, Obsidian-native | ✓ |
+| Parenthetical markers | `(sourced)` — plain text, not queryable | |
+| Frontmatter only | Page-level only, no inline (violates EPST-02) | |
 
-**User's choice:** [auto] Dataview inline fields (recommended default)
-**Notes:** Consistent with existing Obsidian/Dataview stack. Enables Dataview queries to find all claims of a given epistemic status.
-
----
-
-## Index Organization
-
-| Option | Description | Selected |
-|--------|-------------|----------|
-| Category sections + Dataview queries | Organized by page type, auto-populated | ✓ |
-| Flat alphabetical list | Simple but less navigable | |
-| Tag-based grouping | Flexible but requires consistent tagging | |
-
-**User's choice:** [auto] Category sections + Dataview queries (recommended default)
-**Notes:** Categories match page type subdirectories. Dataview queries auto-populate as pages grow.
+**User's choice:** Dataview inline fields with explicit mixed grammar design
+**Notes:** User brought advisor input recommending Dataview for epistemic (queryable, feeds into lint) but keeping custom `[prov:...]` for provenance (portable, compact). Mixed grammar must be documented in AGENTS.md section 6 as intentional. Pattern: `Claim. [prov:source#loc|type] [epistemic:: status]`
 
 ---
 
-## Log Entry Format
+## Index Strategy
 
 | Option | Description | Selected |
 |--------|-------------|----------|
-| ISO timestamp + operation + summary | `2026-04-09T10:30:00Z ingest: summary` | ✓ |
-| Markdown table rows | Structured but harder to append | |
-| YAML entries | Machine-parseable but verbose | |
+| Dataview queries | Auto-populated from wiki/ subdirectories | |
+| Manual curated list | Agent maintains entries during ingest | ✓ |
+| Hybrid | Dataview + manual pinned section | |
 
-**User's choice:** [auto] ISO timestamp + operation + summary (recommended default)
-**Notes:** One line per operation, most recent first. Operation types match AGENTS.md workflow names.
+**User's choice:** Manual curated list
+**Notes:** User challenged the Dataview recommendation — fully generated indexes are "comprehensive but usually too noisy and low-signal." Manual curation is higher signal, more navigable, better for LLM query workflow. User added: pair with lint checks for index drift rather than relying only on workflow discipline. Claude agreed and revised recommendation.
+
+---
+
+## Template Design
+
+| Option | Description | Selected |
+|--------|-------------|----------|
+| Skeleton with comments | Minimal structure, placeholder frontmatter, brief constraint comments | ✓ (layer 1) |
+| Filled-in example defaults | Pre-filled with realistic content | |
+| Bare minimum | Just headings and frontmatter, no comments | |
+
+**User's choice:** Two-layer pattern (user-proposed)
+**Notes:** User proposed separating templates (skeleton+comments for copying) from exemplars (fully filled examples for reference). The example pages in wiki/ serve as the companion exemplars — no extra files needed. Agent workflow: read AGENTS.md → copy template → consult example page for style/density → fill in.
 
 ---
 
 ## Claude's Discretion
 
-- Exact example page content (specific claims, facts, provenance markers)
-- Template comment style and helper text
-- Dataview query specifics (fields, sort order)
-- AGENTS.md section 6 update approach
+- Log entry exact format details (parseable, ISO timestamps, operation types)
+- Exact example page content (specific claims and facts)
+- Template comment wording
+- AGENTS.md section 6 update approach for mixed grammar documentation
 
 ## Deferred Ideas
 
