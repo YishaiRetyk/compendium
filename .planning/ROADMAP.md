@@ -31,10 +31,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. All wiki page conventions specify valid Obsidian wikilinks, Dataview-compatible YAML frontmatter, and graph-friendly structure
   4. The schema documents progressive disclosure structure (TL;DR -> key facts -> detail -> sources) and instructs agents to navigate shallow-first
   5. Scaling boundaries and privacy-tiered routing are documented as provisional heuristics in the schema
-**Plans:** 3 plans
+**Plans:** 1/3 plans executed
 Plans:
-- [ ] 01-01-PLAN.md — Directory skeleton and AGENTS.md sections 1-8 with worked examples per page type and negative constraints
-- [ ] 01-02-PLAN.md — AGENTS.md sections 9-16 with structured workflows (trigger/inputs/outputs/commit/abort), privacy decision table, and scaling tiers
+- [x] 01-01-PLAN.md — Directory skeleton and AGENTS.md sections 1-8 with worked examples per page type and negative constraints
+- [x] 01-02-PLAN.md — AGENTS.md sections 9-16 with structured workflows (trigger/inputs/outputs/commit/abort), privacy decision table, and scaling tiers
 - [ ] 01-03-PLAN.md — Strengthened validation (YAML parse, structural, provenance syntax) and human review with 11 explicit pass/fail criteria
 
 ### Phase 2: Page Types, Examples & Navigation
@@ -103,7 +103,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Schema, Structure & Conventions | 0/3 | Planning complete | - |
+| 1. Schema, Structure & Conventions | 1/3 | In Progress|  |
 | 2. Page Types, Examples & Navigation | 0/TBD | Not started | - |
 | 3. Ingestion & Provenance Pipeline | 0/TBD | Not started | - |
 | 4. Query & Structured Operations | 0/TBD | Not started | - |
