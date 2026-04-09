@@ -33,9 +33,9 @@ Decimal phases appear between their surrounding integers in numeric order.
   5. Scaling boundaries and privacy-tiered routing are documented as provisional heuristics in the schema
 **Plans:** 3 plans
 Plans:
-- [ ] 01-01-PLAN.md — Directory skeleton and AGENTS.md sections 1-8 (foundations)
-- [ ] 01-02-PLAN.md — AGENTS.md sections 9-16 (operations, workflows, boundaries)
-- [ ] 01-03-PLAN.md — Automated validation and human review checkpoint
+- [ ] 01-01-PLAN.md — Directory skeleton and AGENTS.md sections 1-8 with worked examples per page type and negative constraints
+- [ ] 01-02-PLAN.md — AGENTS.md sections 9-16 with structured workflows (trigger/inputs/outputs/commit/abort), privacy decision table, and scaling tiers
+- [ ] 01-03-PLAN.md — Strengthened validation (YAML parse, structural, provenance syntax) and human review with 11 explicit pass/fail criteria
 
 ### Phase 2: Page Types, Examples & Navigation
 **Goal**: Complete page type templates, epistemic status conventions, working example pages, and a functional index/log system exist -- everything needed to start ingesting real sources
