@@ -635,6 +635,50 @@ No separate registry file is needed. Source summary pages ARE the registry.
 3. If a source's `content_hash` has changed since `checked_at`, dependent claims SHOULD be reviewed and the page's `epistemic_status` SHOULD be set to `stale`.
 4. The lint workflow checks these rules automatically.
 
+### Inline Epistemic Markers
+
+Per-claim epistemic status uses Dataview inline field syntax, separate from provenance markers.
+
+**Syntax:** `[epistemic:: <status>]`
+
+**Valid statuses:**
+
+| Status | Meaning | When to use |
+|--------|---------|-------------|
+| `sourced` | Directly from a source | Verbatim or close paraphrase with provenance |
+| `inferred` | Synthesized from source(s) | Logical conclusion not explicitly stated in any single source |
+| `tentative` | Weak or contested evidence | Claim may not hold; flag for review |
+| `stale` | Likely outdated | Source has changed, finding superseded, or claim is time-sensitive |
+
+Queryable via Dataview:
+
+```dataview
+TABLE file.name
+FROM "wiki"
+FLATTEN file.lists.text as item
+WHERE contains(item, "[epistemic:: tentative]")
+```
+
+### Page-Level vs Claim-Level Epistemic Status
+
+- **Page-level:** `epistemic_status` frontmatter field (Section 5). Reflects overall page evidence quality: `sourced`, `mixed`, `tentative`, or `stale`.
+- **Claim-level:** Inline `[epistemic:: <status>]` in body text. Applies to individual claims within a page.
+
+A page with `epistemic_status: sourced` may contain individual `[epistemic:: inferred]` claims if the majority is directly sourced. Use `mixed` when the page has a significant proportion of non-sourced claims.
+
+### Mixed Inline Grammar
+
+Two inline syntaxes coexist intentionally in wiki page bodies. Do NOT normalize to a single syntax.
+
+| Syntax | Purpose | Tool |
+|--------|---------|------|
+| `[prov:source_id#locator\|support_type]` | Traceability | grep, scripts |
+| `[epistemic:: status]` | Confidence discovery | Dataview |
+
+**Combined pattern:** `Claim text. [prov:source_id#locator|support_type] [epistemic:: status]`
+
+Not every claim needs both markers. Provenance is omitted when there is no specific source. Epistemic status is recommended on all factual claims.
+
 ## 7. Progressive Disclosure
 
 **Principle:** All wiki pages are structured shallow-to-deep. The top of every page is optimized for fast LLM scanning; the bottom is for human verification and deep reading.
