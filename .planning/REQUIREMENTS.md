@@ -9,45 +9,45 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Schema & Conventions
 
-- [ ] **SCHM-01**: Agent-agnostic schema document (CLAUDE.md / AGENTS.md) that tells any LLM how to maintain the wiki
-- [ ] **SCHM-02**: Schema covers all workflows: ingest, query, lint, reflect
-- [ ] **SCHM-03**: Schema defines page type conventions and when to use each type
-- [ ] **SCHM-04**: Schema defines frontmatter fields and their semantics
-- [ ] **SCHM-05**: Schema defines structured operations vocabulary (UPDATE, MERGE, SUPERSEDE, ARCHIVE)
+- [x] **SCHM-01**: Agent-agnostic schema document (CLAUDE.md / AGENTS.md) that tells any LLM how to maintain the wiki
+- [x] **SCHM-02**: Schema covers all workflows: ingest, query, lint, reflect
+- [x] **SCHM-03**: Schema defines page type conventions and when to use each type
+- [x] **SCHM-04**: Schema defines frontmatter fields and their semantics
+- [x] **SCHM-05**: Schema defines structured operations vocabulary (UPDATE, MERGE, SUPERSEDE, ARCHIVE)
 
 ### Directory Structure
 
-- [ ] **DIRS-01**: Raw sources directory for immutable input documents
-- [ ] **DIRS-02**: Wiki directory for LLM-maintained markdown pages
-- [ ] **DIRS-03**: Clear separation between source layer and wiki layer
-- [ ] **DIRS-04**: Git-tracked repository with meaningful commit conventions
+- [x] **DIRS-01**: Raw sources directory for immutable input documents
+- [x] **DIRS-02**: Wiki directory for LLM-maintained markdown pages
+- [x] **DIRS-03**: Clear separation between source layer and wiki layer
+- [x] **DIRS-04**: Git-tracked repository with meaningful commit conventions
 
 ### Page Templates
 
-- [ ] **PAGE-01**: Entity page template (person, tool, topic) with type-specific sections
-- [ ] **PAGE-02**: Concept page template for ideas, theories, frameworks
-- [ ] **PAGE-03**: Source summary page template with extraction and provenance
-- [ ] **PAGE-04**: Comparison page template for contrasting sources or viewpoints
-- [ ] **PAGE-05**: Overview/synthesis page template for high-level topic summaries
-- [ ] **PAGE-06**: All templates include frontmatter schema (type, title, sources, epistemic status, dates)
-- [ ] **PAGE-07**: All templates use progressive disclosure (TL;DR → key facts → detail → sources)
+- [x] **PAGE-01**: Entity page template (person, tool, topic) with type-specific sections
+- [x] **PAGE-02**: Concept page template for ideas, theories, frameworks
+- [x] **PAGE-03**: Source summary page template with extraction and provenance
+- [x] **PAGE-04**: Comparison page template for contrasting sources or viewpoints
+- [x] **PAGE-05**: Overview/synthesis page template for high-level topic summaries
+- [x] **PAGE-06**: All templates include frontmatter schema (type, title, sources, epistemic status, dates)
+- [x] **PAGE-07**: All templates use progressive disclosure (TL;DR → key facts → detail → sources)
 
 ### Index & Log
 
-- [ ] **INDX-01**: Content index (index.md) cataloging all wiki pages with links, summaries, and metadata
-- [ ] **INDX-02**: Index organized by category (entities, concepts, sources, comparisons, etc.)
-- [ ] **INDX-03**: Index updated on every ingest operation
-- [ ] **LOG-01**: Chronological activity log (log.md) recording all operations
-- [ ] **LOG-02**: Log entries are parseable with consistent prefix format
-- [ ] **LOG-03**: Log covers operational events (ingests, queries, lint passes) — structural reasoning lives in decision records (DCSN-*), not the log
+- [x] **INDX-01**: Content index (index.md) cataloging all wiki pages with links, summaries, and metadata
+- [x] **INDX-02**: Index organized by category (entities, concepts, sources, comparisons, etc.)
+- [x] **INDX-03**: Index updated on every ingest operation
+- [x] **LOG-01**: Chronological activity log (log.md) recording all operations
+- [x] **LOG-02**: Log entries are parseable with consistent prefix format
+- [x] **LOG-03**: Log covers operational events (ingests, queries, lint passes) — structural reasoning lives in decision records (DCSN-*), not the log
 
 ### Example Pages
 
-- [ ] **EXMP-01**: Example entity page demonstrating all conventions
-- [ ] **EXMP-02**: Example concept page with cross-references and epistemic markers
-- [ ] **EXMP-03**: Example source summary with provenance chain
-- [ ] **EXMP-04**: Example comparison page contrasting multiple sources
-- [ ] **EXMP-05**: Example populated index and log files
+- [x] **EXMP-01**: Example entity page demonstrating all conventions
+- [x] **EXMP-02**: Example concept page with cross-references and epistemic markers
+- [x] **EXMP-03**: Example source summary with provenance chain
+- [x] **EXMP-04**: Example comparison page contrasting multiple sources
+- [x] **EXMP-05**: Example populated index and log files
 
 ### Claim-Level Provenance
 
@@ -95,9 +95,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Epistemic Status
 
-- [ ] **EPST-01**: Per-claim epistemic markers: sourced (directly from source), inferred (synthesized), tentative (weak evidence), stale (likely outdated)
-- [ ] **EPST-02**: Markers visible in page content (not just frontmatter)
-- [ ] **EPST-03**: Epistemic status conventions documented in schema
+- [x] **EPST-01**: Per-claim epistemic markers: sourced (directly from source), inferred (synthesized), tentative (weak evidence), stale (likely outdated)
+- [x] **EPST-02**: Markers visible in page content (not just frontmatter)
+- [x] **EPST-03**: Epistemic status conventions documented in schema
 
 ### Contradiction Detection
 
@@ -142,28 +142,28 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Progressive Disclosure
 
-- [ ] **PROG-01**: All wiki pages start with TL;DR / key facts section
-- [ ] **PROG-02**: Detail sections follow progressive depth (summary → analysis → raw data/sources)
-- [ ] **PROG-03**: Schema instructs LLM to read shallow summaries first, drill down only where needed
+- [x] **PROG-01**: All wiki pages start with TL;DR / key facts section
+- [x] **PROG-02**: Detail sections follow progressive depth (summary → analysis → raw data/sources)
+- [x] **PROG-03**: Schema instructs LLM to read shallow summaries first, drill down only where needed
 
 ### CLI Helpers
 
 - [ ] **CLI-01**: Search tool for querying wiki pages (index-based or text search)
-- [ ] **CLI-02**: Ingest helper that scaffolds the ingest workflow
+- [x] **CLI-02**: Ingest helper that scaffolds the ingest workflow
 - [ ] **CLI-03**: Lint helper that runs all lint rules and reports findings
 
 ### Obsidian Integration
 
-- [ ] **OBSD-01**: All wiki pages use valid Obsidian wikilinks for cross-references
-- [ ] **OBSD-02**: All wiki pages have Dataview-compatible YAML frontmatter
-- [ ] **OBSD-03**: Wiki structure is graph-view friendly (meaningful links, not noise)
-- [ ] **OBSD-04**: Frontmatter supports Dataview queries for dynamic tables and lists
+- [x] **OBSD-01**: All wiki pages use valid Obsidian wikilinks for cross-references
+- [x] **OBSD-02**: All wiki pages have Dataview-compatible YAML frontmatter
+- [x] **OBSD-03**: Wiki structure is graph-view friendly (meaningful links, not noise)
+- [x] **OBSD-04**: Frontmatter supports Dataview queries for dynamic tables and lists
 
 ### Privacy & Scaling Boundaries
 
-- [ ] **BNDY-01**: Schema distinguishes markdown-first baseline (v1) from optional scale upgrades (SQLite metadata, split indexes)
-- [ ] **BNDY-02**: Privacy-tiered routing: schema supports marking sources/pages as local-only (never sent to cloud models) vs. cloud-safe
-- [ ] **BNDY-03**: Scaling boundary documented as provisional heuristics: approximate thresholds for splitting index, incremental lint, and optional DB — to be validated through use
+- [x] **BNDY-01**: Schema distinguishes markdown-first baseline (v1) from optional scale upgrades (SQLite metadata, split indexes)
+- [x] **BNDY-02**: Privacy-tiered routing: schema supports marking sources/pages as local-only (never sent to cloud models) vs. cloud-safe
+- [x] **BNDY-03**: Scaling boundary documented as provisional heuristics: approximate thresholds for splitting index, incremental lint, and optional DB — to be validated through use
 
 ## v2 Requirements
 
@@ -210,13 +210,107 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (populated by roadmapper) | | |
+| SCHM-01 | Phase 1 | Complete |
+| SCHM-02 | Phase 1 | Complete |
+| SCHM-03 | Phase 1 | Complete |
+| SCHM-04 | Phase 1 | Complete |
+| SCHM-05 | Phase 1 | Complete |
+| DIRS-01 | Phase 1 | Complete |
+| DIRS-02 | Phase 1 | Complete |
+| DIRS-03 | Phase 1 | Complete |
+| DIRS-04 | Phase 1 | Complete |
+| OBSD-01 | Phase 1 | Complete |
+| OBSD-02 | Phase 1 | Complete |
+| OBSD-03 | Phase 1 | Complete |
+| OBSD-04 | Phase 1 | Complete |
+| PROG-01 | Phase 1 | Complete |
+| PROG-02 | Phase 1 | Complete |
+| PROG-03 | Phase 1 | Complete |
+| BNDY-01 | Phase 1 | Complete |
+| BNDY-02 | Phase 1 | Complete |
+| BNDY-03 | Phase 1 | Complete |
+| PAGE-01 | Phase 2 | Complete |
+| PAGE-02 | Phase 2 | Complete |
+| PAGE-03 | Phase 2 | Complete |
+| PAGE-04 | Phase 2 | Complete |
+| PAGE-05 | Phase 2 | Complete |
+| PAGE-06 | Phase 2 | Complete |
+| PAGE-07 | Phase 2 | Complete |
+| EPST-01 | Phase 2 | Complete |
+| EPST-02 | Phase 2 | Complete |
+| EPST-03 | Phase 2 | Complete |
+| EXMP-01 | Phase 2 | Complete |
+| EXMP-02 | Phase 2 | Complete |
+| EXMP-03 | Phase 2 | Complete |
+| EXMP-04 | Phase 2 | Complete |
+| EXMP-05 | Phase 2 | Complete |
+| INDX-01 | Phase 2 | Complete |
+| INDX-02 | Phase 2 | Complete |
+| INDX-03 | Phase 2 | Complete |
+| LOG-01 | Phase 2 | Complete |
+| LOG-02 | Phase 2 | Complete |
+| LOG-03 | Phase 2 | Complete |
+| INGST-01 | Phase 3 | Pending |
+| INGST-02 | Phase 3 | Pending |
+| INGST-03 | Phase 3 | Pending |
+| INGST-04 | Phase 3 | Pending |
+| INGST-05 | Phase 3 | Pending |
+| INGST-06 | Phase 3 | Pending |
+| CMPL-01 | Phase 3 | Pending |
+| CMPL-02 | Phase 3 | Pending |
+| CMPL-03 | Phase 3 | Pending |
+| CMPL-04 | Phase 3 | Pending |
+| CMPL-05 | Phase 3 | Pending |
+| CMPL-06 | Phase 3 | Pending |
+| CMPL-07 | Phase 3 | Pending |
+| PROV-01 | Phase 3 | Pending |
+| PROV-02 | Phase 3 | Pending |
+| PROV-03 | Phase 3 | Pending |
+| PROV-04 | Phase 3 | Pending |
+| PROV-05 | Phase 3 | Pending |
+| CLI-02 | Phase 3 | Complete |
+| QURY-01 | Phase 4 | Pending |
+| QURY-02 | Phase 4 | Pending |
+| QURY-03 | Phase 4 | Pending |
+| QURY-04 | Phase 4 | Pending |
+| QURY-05 | Phase 4 | Pending |
+| SOPS-01 | Phase 4 | Pending |
+| SOPS-02 | Phase 4 | Pending |
+| SOPS-03 | Phase 4 | Pending |
+| SOPS-04 | Phase 4 | Pending |
+| SOPS-05 | Phase 4 | Pending |
+| SOPS-06 | Phase 4 | Pending |
+| CLI-01 | Phase 4 | Pending |
+| CNTR-01 | Phase 5 | Pending |
+| CNTR-02 | Phase 5 | Pending |
+| CNTR-03 | Phase 5 | Pending |
+| STALE-01 | Phase 5 | Pending |
+| STALE-02 | Phase 5 | Pending |
+| STALE-03 | Phase 5 | Pending |
+| STALE-04 | Phase 5 | Pending |
+| GAP-01 | Phase 5 | Pending |
+| GAP-02 | Phase 5 | Pending |
+| LINT-01 | Phase 5 | Pending |
+| LINT-02 | Phase 5 | Pending |
+| LINT-03 | Phase 5 | Pending |
+| LINT-04 | Phase 5 | Pending |
+| LINT-05 | Phase 5 | Pending |
+| LINT-06 | Phase 5 | Pending |
+| LINT-07 | Phase 5 | Pending |
+| CLI-03 | Phase 5 | Pending |
+| DCSN-01 | Phase 6 | Pending |
+| DCSN-02 | Phase 6 | Pending |
+| DCSN-03 | Phase 6 | Pending |
+| DRFT-01 | Phase 6 | Pending |
+| DRFT-02 | Phase 6 | Pending |
+| DRFT-03 | Phase 6 | Pending |
+| DRFT-04 | Phase 6 | Pending |
 
 **Coverage:**
-- v1 requirements: 70 total
-- Mapped to phases: 0
-- Unmapped: 70 ⚠️
+- v1 requirements: 95 total
+- Mapped to phases: 95
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-06*
-*Last updated: 2026-04-06 after initial definition*
+*Last updated: 2026-04-06 after roadmap creation*
