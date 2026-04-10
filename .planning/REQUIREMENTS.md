@@ -55,22 +55,22 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **PROV-02**: Each claim links to the specific source passage(s) that support it
 - [ ] **PROV-03**: Provenance metadata includes source ID, passage reference, and extraction date
 - [ ] **PROV-04**: Source hash/version stored with claims so that when a source changes, dependent claims can be detected and marked stale automatically
-- [ ] **PROV-05**: Provenance conventions documented in schema with inline syntax (e.g. Dataview inline fields)
+- [x] **PROV-05**: Provenance conventions documented in schema with inline syntax (e.g. Dataview inline fields)
 
 ### Compiler Pipeline
 
-- [ ] **CMPL-01**: Multi-pass compilation pipeline: diff → extract → merge → lint
-- [ ] **CMPL-02**: Diff pass — identify what new information a source adds relative to existing wiki state
-- [ ] **CMPL-03**: Extract pass — pull claims, entities, and relationships from source with provenance
-- [ ] **CMPL-04**: Merge pass — integrate extracted knowledge into existing wiki pages, creating new pages where needed
-- [ ] **CMPL-05**: Lint pass — verify consistency, cross-references, and integrity after merge
-- [ ] **CMPL-06**: Optional follow-on passes for summaries, images, or restructuring
-- [ ] **CMPL-07**: Pipeline documented step-by-step in schema as the canonical ingest workflow
+- [x] **CMPL-01**: Multi-pass compilation pipeline: diff → extract → merge → lint
+- [x] **CMPL-02**: Diff pass — identify what new information a source adds relative to existing wiki state
+- [x] **CMPL-03**: Extract pass — pull claims, entities, and relationships from source with provenance
+- [x] **CMPL-04**: Merge pass — integrate extracted knowledge into existing wiki pages, creating new pages where needed
+- [x] **CMPL-05**: Lint pass — verify consistency, cross-references, and integrity after merge
+- [x] **CMPL-06**: Optional follow-on passes for summaries, images, or restructuring
+- [x] **CMPL-07**: Pipeline documented step-by-step in schema as the canonical ingest workflow
 
 ### Ingestion
 
-- [ ] **INGST-01**: Source classification (article, paper, journal entry, transcript, image-heavy, data file)
-- [ ] **INGST-02**: Type-appropriate extraction logic per source classification
+- [x] **INGST-01**: Source classification (article, paper, journal entry, transcript, image-heavy, data file)
+- [x] **INGST-02**: Type-appropriate extraction logic per source classification
 - [ ] **INGST-03**: Per-source summary page created with claim-level provenance (per PROV-01/02)
 - [ ] **INGST-04**: Existing wiki pages updated when new source adds relevant information
 - [ ] **INGST-05**: Cross-references (wikilinks) generated between related pages
@@ -250,24 +250,24 @@ Which phases cover which requirements. Updated during roadmap creation.
 | LOG-01 | Phase 2 | Complete |
 | LOG-02 | Phase 2 | Complete |
 | LOG-03 | Phase 2 | Complete |
-| INGST-01 | Phase 3 | Pending |
-| INGST-02 | Phase 3 | Pending |
+| INGST-01 | Phase 3 | Complete |
+| INGST-02 | Phase 3 | Complete |
 | INGST-03 | Phase 3 | Pending |
 | INGST-04 | Phase 3 | Pending |
 | INGST-05 | Phase 3 | Pending |
 | INGST-06 | Phase 3 | Pending |
-| CMPL-01 | Phase 3 | Pending |
-| CMPL-02 | Phase 3 | Pending |
-| CMPL-03 | Phase 3 | Pending |
-| CMPL-04 | Phase 3 | Pending |
-| CMPL-05 | Phase 3 | Pending |
-| CMPL-06 | Phase 3 | Pending |
-| CMPL-07 | Phase 3 | Pending |
+| CMPL-01 | Phase 3 | Complete |
+| CMPL-02 | Phase 3 | Complete |
+| CMPL-03 | Phase 3 | Complete |
+| CMPL-04 | Phase 3 | Complete |
+| CMPL-05 | Phase 3 | Complete |
+| CMPL-06 | Phase 3 | Complete |
+| CMPL-07 | Phase 3 | Complete |
 | PROV-01 | Phase 3 | Pending |
 | PROV-02 | Phase 3 | Pending |
 | PROV-03 | Phase 3 | Pending |
 | PROV-04 | Phase 3 | Pending |
-| PROV-05 | Phase 3 | Pending |
+| PROV-05 | Phase 3 | Complete |
 | CLI-02 | Phase 3 | Complete |
 | QURY-01 | Phase 4 | Pending |
 | QURY-02 | Phase 4 | Pending |
