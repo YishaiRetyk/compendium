@@ -775,6 +775,8 @@ All wiki mutations use a formal operations vocabulary. Raw file rewrites are pro
 5. If new claims change the evidence balance, update `epistemic_status` accordingly.
 6. Log: `"UPDATE <page_id>: <one-line rationale>"`
 
+For the full incremental update policy governing how new claims integrate with existing content during ingestion, see Section 10 Pass 3 (Append-Then-Synthesize).
+
 **MERGE** -- Combine two pages covering the same concept.
 
 1. Create a new merged page with the union of claims from both pages, preserving all provenance markers.
@@ -878,6 +880,21 @@ Integrate extracted knowledge into the wiki.
   - MERGE pages if the new source reveals that two existing pages cover the same topic (using the MERGE operation from Section 9).
 - **Output:** Updated and/or new wiki pages with provenance-tracked claims and cross-references.
 
+#### Incremental Update Policy: Append-Then-Synthesize
+
+The default policy for living wiki pages (entities, concepts, overviews, comparisons):
+
+1. **Append in the detail layer:** Add new claims into the appropriate detail sections, preserving all existing material. Never silently delete existing claims. Insert new claims at the end of the relevant section with their provenance markers.
+2. **Mark superseded or stale claims per current schema conventions:** When new information contradicts or replaces an existing claim, mark the old claim as superseded or stale using the epistemic and provenance syntax currently documented in the schema (see Section 6), and add a short note pointing to the superseding claim. Never remove the old claim -- the provenance trail must remain visible. Phase 5 will formalize the exact contradiction and staleness semantics; until then, follow current schema conventions and keep the old claim visible.
+3. **Re-synthesize the summary layer:** After appending new detail, rewrite the TL;DR and Key Facts sections so they reflect the complete current state of the page -- all claims, old and new. This is the only place where rewriting is expected on every update.
+4. **Record framing shifts:** If new material fundamentally changes a page's framing or interpretation, record the shift in a decision/reflection entry (see Section 11.4) rather than hiding it inside prose edits.
+
+**Exceptions:**
+- **Logs and source summary pages:** Strict append-only. These are records, not living synthesis. Never rewrite existing log entries or source summary content.
+- **Full section rewrite:** Reserved for exceptional cases only -- severe page drift, extensive duplication, or fundamentally broken earlier structure. When performed, log the rationale as a decision record.
+
+**Mantra:** "Append in the detail layer, synthesize in the summary layer, supersede explicitly when needed."
+
 ### Pass 4: Lint
 
 Verify consistency after merge.
@@ -918,7 +935,7 @@ Commit:   ingest(<source-slug>): <one-line summary>
 3. **Classify** (Pipeline Pass 0): Determine source type -- article, paper, transcript, journal entry, data file, or image-heavy.
 4. **Diff** (Pipeline Pass 1): Read `wiki/index.md`, identify related existing pages, read their TL;DR and Key Facts sections. Determine what this source adds that the wiki does not already cover.
 5. **Extract** (Pipeline Pass 2): Extract claims with provenance locators, applying the claim granularity rules from Section 10 Pass 2 based on the source type classified in step 3. Create source summary page at `wiki/sources/<source_id>.md` with full frontmatter including `path`, `content_hash`, `ingested_at`, and `source_type`.
-6. **Merge** (Pipeline Pass 3): Update or create entity/concept/overview pages using UPDATE operations (Section 9). Generate wikilinks on first mention. MERGE pages if the source reveals duplicates.
+6. **Merge** (Pipeline Pass 3): Update or create entity/concept/overview pages using UPDATE operations (Section 9) and the append-then-synthesize policy (Section 10 Pass 3). Generate wikilinks on first mention. MERGE pages if the source reveals duplicates.
 7. **Lint** (Pipeline Pass 4): Verify all provenance references resolve, wikilinks are valid, frontmatter is complete on all modified pages.
 8. Update `wiki/index.md` with new and modified pages.
 9. Append entry to `wiki/log.md`: `## [YYYY-MM-DD] ingest | <source title>` with affected pages and rationale.
