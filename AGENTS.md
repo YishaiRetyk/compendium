@@ -830,7 +830,8 @@ Source -> [Classify] -> [Diff] -> [Extract] -> [Merge] -> [Lint] -> Wiki
 Determine the source type before processing.
 
 - **Input:** Raw source document.
-- **Types:** article, paper, transcript, journal entry, data file, image-heavy.
+- **Types:** article, paper, book-chapter, transcript, journal entry, data file, image-heavy.
+- **Note:** `book-chapter` is the canonical source type for book content. Full books MUST be ingested as a sequence of `book-chapter` sources (one per chapter or coherent section). An older source summary (src-2026-04-09-thinking-fast-and-slow-part1) previously used `source_type: book`; that value is being normalized to `book-chapter` in this plan. Agents MUST use `book-chapter` going forward; `book` is no longer accepted.
 - **Purpose:** Different source types require different extraction logic (e.g., papers have abstract/methodology/results; transcripts have timestamped segments).
 - **Output:** Source type classification, passed to Pass 2 for type-appropriate extraction.
 
@@ -849,6 +850,21 @@ Pull structured knowledge from the source.
 - **Input:** Source document + type classification from Pass 0.
 - **Process:** Apply type-appropriate extraction. Papers get abstract, methodology, results, and conclusions. Transcripts get timestamped claims. Journal entries get reflections and decisions. Extract claims, entities, and relationships, each with a provenance locator (`[prov:source_id#locator]`).
 - **Output:** A source summary page created in `wiki/sources/<source_id>.md` with full frontmatter (including `path`, `content_hash`, `ingested_at`, `source_type`) and all extracted claims with provenance.
+
+#### Claim Granularity Rules
+
+Source classification (Pass 0) drives extraction depth. The guiding heuristic: **"the smallest unit that preserves meaningful provenance without making the page unreadable."**
+
+| Source Type | Default Granularity | Guidance |
+|-------------|-------------------|----------|
+| article, paper, report, technical doc | Atomic claims | One provenance marker per distinct assertion. Split when a paragraph contains multiple independently important assertions. |
+| book-chapter, essay | Atomic for factual/conceptual claims; paragraph-level for broader interpretive passages | Important factual claims get individual provenance. Interpretive or argumentative passages that form a single coherent point stay grouped. |
+| transcript, meeting notes, journal entry | Paragraph-level or utterance-level clusters | Group by natural conversation turns or reflection units. Individual sentences rarely stand alone as claims. |
+| image-heavy, mixed media | Tied to specific image, caption, or observation | Each image or visual element that contributes a distinct claim gets its own provenance marker referencing the image locator. |
+
+**Bias toward atomic:** Across all source types, prefer atomic granularity for durable factual and conceptual claims. The split/group decision:
+- **Split** when a paragraph contains multiple independently important assertions that future readers might cite separately.
+- **Keep grouped** when a passage is only useful as one bundled observation and splitting would lose context.
 
 ### Pass 3: Merge
 
@@ -901,7 +917,7 @@ Commit:   ingest(<source-slug>): <one-line summary>
 2. LLM reads the source document completely.
 3. **Classify** (Pipeline Pass 0): Determine source type -- article, paper, transcript, journal entry, data file, or image-heavy.
 4. **Diff** (Pipeline Pass 1): Read `wiki/index.md`, identify related existing pages, read their TL;DR and Key Facts sections. Determine what this source adds that the wiki does not already cover.
-5. **Extract** (Pipeline Pass 2): Extract claims with provenance locators. Create source summary page at `wiki/sources/<source_id>.md` with full frontmatter including `path`, `content_hash`, `ingested_at`, and `source_type`.
+5. **Extract** (Pipeline Pass 2): Extract claims with provenance locators, applying the claim granularity rules from Section 10 Pass 2 based on the source type classified in step 3. Create source summary page at `wiki/sources/<source_id>.md` with full frontmatter including `path`, `content_hash`, `ingested_at`, and `source_type`.
 6. **Merge** (Pipeline Pass 3): Update or create entity/concept/overview pages using UPDATE operations (Section 9). Generate wikilinks on first mention. MERGE pages if the source reveals duplicates.
 7. **Lint** (Pipeline Pass 4): Verify all provenance references resolve, wikilinks are valid, frontmatter is complete on all modified pages.
 8. Update `wiki/index.md` with new and modified pages.

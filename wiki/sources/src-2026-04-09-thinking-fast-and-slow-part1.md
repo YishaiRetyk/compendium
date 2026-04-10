@@ -23,7 +23,7 @@ path: sources/2026/2026-04/2026-04-09-thinking-fast-and-slow-part1/source.md
 url: ""
 content_hash: "sha256:a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2"
 ingested_at: 2026-04-09
-source_type: book
+source_type: book-chapter
 ---
 
 ## TL;DR
