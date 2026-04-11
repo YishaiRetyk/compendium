@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: Ready to execute
-stopped_at: Completed 03-01-PLAN.md
-last_updated: "2026-04-10T14:35:32.769Z"
+stopped_at: Completed 03-03-PLAN.md
+last_updated: "2026-04-11T20:26:40Z"
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 11
-  completed_plans: 8
+  completed_plans: 9
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-04-09)
 ## Current Position
 
 Phase: 03 (ingestion-provenance-pipeline) — EXECUTING
-Plan: 3 of 5
+Plan: 4 of 5
 
 ## Performance Metrics
 
@@ -54,6 +54,7 @@ Plan: 3 of 5
 | Phase 02 P03 | 1min | 2 tasks | 3 files |
 | Phase 03 P02 | 2min | 1 tasks | 1 files |
 | Phase 03 P01 | 2min | 2 tasks | 2 files |
+| Phase 03 P03 | 10min | 3 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -85,6 +86,10 @@ Recent decisions affecting current work:
 - [Phase 03]: Claim granularity follows smallest-unit-that-preserves-provenance heuristic, source-type driven
 - [Phase 03]: Incremental updates use append-then-synthesize: append detail, re-synthesize summary, supersede explicitly
 - [Phase 03]: Stale/supersede wording deliberately softened to defer formal contradiction semantics to Phase 5
+- [Phase 03]: Diff pass must drive page selection — plans list candidates but merge targets are decided from the actual diff, not pre-declared
+- [Phase 03]: Prospect theory and loss aversion each warrant their own concept pages (3+ independent claims, natural home for downstream bias families); cognitive-biases.md restructured around heuristic-origin vs loss-aversion-origin families
+- [Phase 03]: Ingest log entries use explicit UPDATED: / CREATED: lines with per-page rationale so the diff-pass reasoning is preserved alongside the structural outcome
+- [Phase 03]: Biographical drift on entity pages is forbidden during source-ingest validation — only concretely sourced factual additions allowed, no fabricated dates/awards
 
 ### Pending Todos
 
@@ -97,6 +102,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-10T14:35:21.898Z
-Stopped at: Completed 03-01-PLAN.md
+Last session: 2026-04-11T20:26:40Z
+Stopped at: Completed 03-03-PLAN.md
 Resume file: None

@@ -67,7 +67,7 @@ Plans:
 Plans:
 - [x] 03-01-PLAN.md — Encode claim granularity rules (D-01–D-05), append-then-synthesize update policy (D-06–D-10), and normalize book-chapter source type into AGENTS.md (sections 9, 10, 11.1)
 - [x] 03-02-PLAN.md — CLI ingest helper bash script (bin/ingest.sh) with collision handling, slug validation, and documented UTC date policy
-- [ ] 03-03-PLAN.md — First validation ingest: synthetic article on Kahneman's prospect theory (atomic extraction, diff-driven merge, optional new concept pages, semantic review checklist)
+- [x] 03-03-PLAN.md — First validation ingest: synthetic article on Kahneman's prospect theory (atomic extraction, diff-driven merge, optional new concept pages, semantic review checklist)
 - [ ] 03-04-PLAN.md — Second validation ingest: synthetic journal entry with clean privacy separation (new local_only personal-decision-patterns page, decision-making.md stays cloud_safe)
 - [ ] 03-05-PLAN.md — Phase-level verification checklist covering diff-driven merge, privacy separation, provenance preservation across both ingests
 

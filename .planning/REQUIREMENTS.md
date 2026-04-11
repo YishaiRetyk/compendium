@@ -51,10 +51,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Claim-Level Provenance
 
-- [ ] **PROV-01**: Provenance attaches to individual claims/propositions, not just pages
-- [ ] **PROV-02**: Each claim links to the specific source passage(s) that support it
-- [ ] **PROV-03**: Provenance metadata includes source ID, passage reference, and extraction date
-- [ ] **PROV-04**: Source hash/version stored with claims so that when a source changes, dependent claims can be detected and marked stale automatically
+- [x] **PROV-01**: Provenance attaches to individual claims/propositions, not just pages
+- [x] **PROV-02**: Each claim links to the specific source passage(s) that support it
+- [x] **PROV-03**: Provenance metadata includes source ID, passage reference, and extraction date
+- [x] **PROV-04**: Source hash/version stored with claims so that when a source changes, dependent claims can be detected and marked stale automatically
 - [x] **PROV-05**: Provenance conventions documented in schema with inline syntax (e.g. Dataview inline fields)
 
 ### Compiler Pipeline
@@ -71,10 +71,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **INGST-01**: Source classification (article, paper, journal entry, transcript, image-heavy, data file)
 - [x] **INGST-02**: Type-appropriate extraction logic per source classification
-- [ ] **INGST-03**: Per-source summary page created with claim-level provenance (per PROV-01/02)
-- [ ] **INGST-04**: Existing wiki pages updated when new source adds relevant information
-- [ ] **INGST-05**: Cross-references (wikilinks) generated between related pages
-- [ ] **INGST-06**: Index and log updated after each ingest
+- [x] **INGST-03**: Per-source summary page created with claim-level provenance (per PROV-01/02)
+- [x] **INGST-04**: Existing wiki pages updated when new source adds relevant information
+- [x] **INGST-05**: Cross-references (wikilinks) generated between related pages
+- [x] **INGST-06**: Index and log updated after each ingest
 
 ### Query & Delta Compilation
 
@@ -252,10 +252,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | LOG-03 | Phase 2 | Complete |
 | INGST-01 | Phase 3 | Complete |
 | INGST-02 | Phase 3 | Complete |
-| INGST-03 | Phase 3 | Pending |
-| INGST-04 | Phase 3 | Pending |
-| INGST-05 | Phase 3 | Pending |
-| INGST-06 | Phase 3 | Pending |
+| INGST-03 | Phase 3 | Complete |
+| INGST-04 | Phase 3 | Complete |
+| INGST-05 | Phase 3 | Complete |
+| INGST-06 | Phase 3 | Complete |
 | CMPL-01 | Phase 3 | Complete |
 | CMPL-02 | Phase 3 | Complete |
 | CMPL-03 | Phase 3 | Complete |
@@ -263,10 +263,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CMPL-05 | Phase 3 | Complete |
 | CMPL-06 | Phase 3 | Complete |
 | CMPL-07 | Phase 3 | Complete |
-| PROV-01 | Phase 3 | Pending |
-| PROV-02 | Phase 3 | Pending |
-| PROV-03 | Phase 3 | Pending |
-| PROV-04 | Phase 3 | Pending |
+| PROV-01 | Phase 3 | Complete |
+| PROV-02 | Phase 3 | Complete |
+| PROV-03 | Phase 3 | Complete |
+| PROV-04 | Phase 3 | Complete |
 | PROV-05 | Phase 3 | Complete |
 | CLI-02 | Phase 3 | Complete |
 | QURY-01 | Phase 4 | Pending |
