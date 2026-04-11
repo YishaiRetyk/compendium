@@ -1,0 +1,31 @@
+# Personal Decision Journal — 2026-04-10
+
+A morning entry after a week of trying to actually apply the decision-making material I have been reading. Less book-report, more honest accounting.
+
+## para:1 — Morning reflection
+
+I have been reading about cognitive biases for years and it has done approximately nothing for how I actually decide things in the moment. This week I tried something different: instead of trying to "be less biased," I picked three specific frameworks and forced myself to run each one on one real decision. Anchoring on the salary conversation. System 1 vs System 2 on a purchase I almost made on autopilot. Loss aversion on a project I have been refusing to quit. The result is not that I suddenly decide rationally. The result is that I caught myself three times, which is three more than last week, and the catches all felt the same: a quiet physical flinch, and then a moment where the decision that felt inevitable thirty seconds ago stopped feeling inevitable. I want to write this down before I forget what the flinch feels like from the inside.
+
+## para:2 — The salary negotiation
+
+On Tuesday I had a conversation about a contract rate for a side project. The other side opened with a number that was about twenty percent below what I had privately decided was fair. My immediate internal reaction was to counter with something in the middle — that is, to accept their number as the frame and negotiate inside it. I actually started typing the middle number into the reply. Then I remembered the anchoring material and I stopped. I deleted what I had typed, went for a walk, and came back and counter-offered with my own number — slightly above what I thought was fair, because I was now explicitly trying to reset the anchor. The interesting thing is not that I got a better rate in the end, though I did. The interesting thing is how strong the pull was to just accept their frame. It did not feel like a bias. It felt like politeness. Politeness and anchoring seem to live in the same place in my head and I did not know that.
+
+## para:3 — The autopilot purchase
+
+Thursday night I was about to buy a productivity app I had seen recommended three times that week. I had the checkout page open. The price was reasonable. I was fifteen seconds from clicking. Then I noticed that I had zero memory of deciding to want this app — the desire had just appeared, fully formed, between seeing the third recommendation and opening the checkout page. That is System 1 running the show with no oversight. I did not rebel against it. I just asked System 2 a specific question: "Is there a problem I am trying to solve here, and if so what is it?" I could not answer. I closed the tab. I notice that the test I am reaching for is not "is this a bias" but "can I explain the want." The want-explanation question is a better handle for me than the bias-identification question, which I find genuinely hard to run in real time.
+
+## para:4 — The project I will not quit
+
+The harder one. I have a side project I started eight months ago. It is not going well. Every month I convince myself it is one more feature away from being interesting. I tried to apply a pre-mortem this week — imagine it is six months from now and the project has completely failed, and write down why. The reasons I wrote down were all reasons I already knew. Nothing new surfaced. What did surface was that I am not keeping it going because I think it will work. I am keeping it going because shutting it down would crystallize the eight months as a loss, and as long as it is still running the loss is only on paper. That is textbook loss aversion in my own behavior and I did not recognize it until I wrote the pre-mortem. I still have not shut the project down. But I know now that the reason I am not shutting it down is not the reason I have been telling myself.
+
+## para:5 — Choice overload and decision fatigue
+
+Separate observation from the week. On days when I have more than about four or five meaningful decisions to make, the quality of the later decisions noticeably drops — I reach for defaults, I postpone, I snap at small things. On Wednesday I had nine such decisions stacked up and by the afternoon I was making choices I would not stand behind if I saw someone else make them. There is a version of this framework I have read about called decision fatigue, and the practical move it suggests is to batch low-stakes decisions, pre-commit when possible, and protect one or two slots for the decisions that actually matter. I have not systematized this yet but I can feel the shape of what the systematization would look like: a small number of pre-made defaults for the recurring stuff, and explicit deliberation reserved for the things that aren't recurring.
+
+## para:6 — What I want to adopt
+
+Three concrete changes I want to make in the next two weeks. First, run a five-minute pre-mortem on anything I have been calling "definitely going to do" for more than a month — the pre-mortem test catches projects I am sunk into, not projects I am freshly considering. Second, before any purchase over a small threshold, force myself to articulate the problem I am solving, in one sentence, out loud. If I cannot, I do not buy. Third, cap meaningful decisions at four per day; anything over four gets deferred to tomorrow or delegated to a pre-committed default. None of these are novel ideas. What is novel is that I am treating them as interventions on my own behavior rather than as things I have read about.
+
+## para:7 — Closing note
+
+The meta-observation from the week is that the frameworks only work when I can feel the flinch. The flinch is the tell. Before this week I was looking for biases by introspecting on my reasoning, which is the wrong layer — by the time the reasoning is happening, System 1 has already handed System 2 a pre-formed conclusion to rationalize. The thing I am trying to train is noticing the flinch earlier, in the moment before the decision feels inevitable. That is the only intervention point I have found that actually works on me, and I only found it by trying to apply this stuff to my own real decisions this week. I should probably keep a running log of flinches.
