@@ -5,7 +5,7 @@ type: overview
 status: active
 summary: "Master catalog of all wiki pages organized by type."
 created_at: 2026-04-09
-updated_at: 2026-04-10
+updated_at: 2026-04-12
 sources: []
 epistemic_status: sourced
 tags:
@@ -33,6 +33,7 @@ privacy: cloud_safe
 
 - [[src-2026-04-09-thinking-fast-and-slow-part1]] -- Part 1 of Kahneman's synthesis of decades of research on judgment, heuristics, and cognitive biases (sourced, 2026-04-09)
 - [[src-2026-04-10-kahneman-prospect-theory]] -- Magazine-style overview of prospect theory, loss aversion, reference dependence, probability weighting, and applied uses in finance, medicine, and public policy (sourced, 2026-04-10)
+- [[src-2026-04-10-personal-decision-journal]] -- Personal journal entry on applying cognitive decision-making frameworks to real-life choices (sourced, 2026-04-10, **local_only**)
 
 ## Comparisons
 
@@ -40,4 +41,5 @@ privacy: cloud_safe
 
 ## Overviews
 
-- [[Decision Making]] -- Overview of how humans make choices under uncertainty, shaped by cognitive biases and dual-process thinking (mixed, 2026-04-10)
+- [[Decision Making]] -- Overview of how humans make choices under uncertainty, shaped by cognitive biases and dual-process thinking (mixed, 2026-04-12)
+- [[personal-decision-patterns]] -- Personal experiential patterns in applying decision-making frameworks to real life (sourced, 2026-04-10, **local_only**)

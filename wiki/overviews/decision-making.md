@@ -5,7 +5,7 @@ type: overview
 status: active
 summary: "Overview of how humans make choices under uncertainty, shaped by cognitive biases and dual-process thinking"
 created_at: 2026-04-09
-updated_at: 2026-04-10
+updated_at: 2026-04-12
 sources:
   - src-2026-04-09-thinking-fast-and-slow-part1
   - src-2026-04-10-kahneman-prospect-theory
@@ -59,6 +59,7 @@ The "nudge" lineage draws directly on prospect theory rather than generically on
 - [[Prospect Theory]]
 - [[Loss Aversion]]
 - [[Bounded Rationality]]
+- [[personal-decision-patterns]] -- personal experiential patterns (local_only)
 
 ## Sources
 
