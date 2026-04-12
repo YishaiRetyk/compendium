@@ -63,12 +63,12 @@ Plans:
   3. Ingesting a second source on a related topic updates existing wiki pages with new information rather than creating duplicates, and new cross-references are generated between related pages
   4. The index and activity log are updated after each ingest, and source hashes are stored so stale claims can be detected when sources change
   5. A CLI ingest helper exists that scaffolds the ingest workflow for the user
-**Plans:** 5 plans
+**Plans:** 4/5 plans executed
 Plans:
 - [x] 03-01-PLAN.md — Encode claim granularity rules (D-01–D-05), append-then-synthesize update policy (D-06–D-10), and normalize book-chapter source type into AGENTS.md (sections 9, 10, 11.1)
 - [x] 03-02-PLAN.md — CLI ingest helper bash script (bin/ingest.sh) with collision handling, slug validation, and documented UTC date policy
 - [x] 03-03-PLAN.md — First validation ingest: synthetic article on Kahneman's prospect theory (atomic extraction, diff-driven merge, optional new concept pages, semantic review checklist)
-- [ ] 03-04-PLAN.md — Second validation ingest: synthetic journal entry with clean privacy separation (new local_only personal-decision-patterns page, decision-making.md stays cloud_safe)
+- [x] 03-04-PLAN.md — Second validation ingest: synthetic journal entry with clean privacy separation (new local_only personal-decision-patterns page, decision-making.md stays cloud_safe)
 - [ ] 03-05-PLAN.md — Phase-level verification checklist covering diff-driven merge, privacy separation, provenance preservation across both ingests
 
 ### Phase 4: Query & Structured Operations
@@ -115,7 +115,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 |-------|----------------|--------|-----------|
 | 1. Schema, Structure & Conventions | 1/3 | In Progress|  |
 | 2. Page Types, Examples & Navigation | 1/3 | In Progress|  |
-| 3. Ingestion & Provenance Pipeline | 0/5 | Not started | - |
+| 3. Ingestion & Provenance Pipeline | 4/5 | In Progress|  |
 | 4. Query & Structured Operations | 0/TBD | Not started | - |
 | 5. Lint & Quality | 0/TBD | Not started | - |
 | 6. Reflection & Drift Detection | 0/TBD | Not started | - |

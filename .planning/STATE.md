@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: Ready to execute
-stopped_at: Completed 03-03-PLAN.md
-last_updated: "2026-04-11T20:26:40Z"
+stopped_at: Completed 03-04-PLAN.md
+last_updated: "2026-04-12T07:45:37.254Z"
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 11
-  completed_plans: 9
+  completed_plans: 10
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-04-09)
 ## Current Position
 
 Phase: 03 (ingestion-provenance-pipeline) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 
 ## Performance Metrics
 
@@ -55,6 +55,7 @@ Plan: 4 of 5
 | Phase 03 P02 | 2min | 1 tasks | 1 files |
 | Phase 03 P01 | 2min | 2 tasks | 2 files |
 | Phase 03 P03 | 10min | 3 tasks | 10 files |
+| Phase 03 P04 | 5min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -90,6 +91,9 @@ Recent decisions affecting current work:
 - [Phase 03]: Prospect theory and loss aversion each warrant their own concept pages (3+ independent claims, natural home for downstream bias families); cognitive-biases.md restructured around heuristic-origin vs loss-aversion-origin families
 - [Phase 03]: Ingest log entries use explicit UPDATED: / CREATED: lines with per-page rationale so the diff-pass reasoning is preserved alongside the structural outcome
 - [Phase 03]: Biographical drift on entity pages is forbidden during source-ingest validation — only concretely sourced factual additions allowed, no fabricated dates/awards
+- [Phase 03]: Privacy separation via dedicated local_only page rather than merging into cloud_safe overview (option a from review feedback)
+- [Phase 03]: Paragraph-level granularity (7 clusters) for journal entries vs atomic claims for articles validates adaptive extraction
+- [Phase 03]: personal-decision-patterns.md created as local_only overview page type for experiential claims synthesis
 
 ### Pending Todos
 
@@ -102,6 +106,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-11T20:26:40Z
-Stopped at: Completed 03-03-PLAN.md
+Last session: 2026-04-12T07:45:37.251Z
+Stopped at: Completed 03-04-PLAN.md
 Resume file: None
