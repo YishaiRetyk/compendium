@@ -1028,25 +1028,110 @@ Commit:   ingest(<source-slug>): <one-line summary>
 ```
 Trigger:  User asks a question about the wiki contents
 Inputs:   User question (natural language)
-Outputs:  Answer with citations, optionally new/updated wiki pages, updated index/log
+Outputs:  Cited answer, optionally new/updated wiki pages, updated index/log
 Commit:   query(<topic>): <one-line summary>
 ```
 
 **Steps:**
 
-1. Read `wiki/index.md` to find pages relevant to the question.
-2. Read TL;DR and Key Facts sections of relevant pages (progressive disclosure -- shallow first).
-3. Read Detail sections only where shallow content is insufficient to answer the question.
-4. Synthesize answer with citations to specific wiki pages and inline provenance markers.
-5. **Mandatory write-back:** If the answer produces useful synthesis that does not already exist in the wiki, write it back as a new or updated wiki page. This is not optional -- queries that produce novel synthesis MUST contribute back to the wiki.
-6. **Delta compilation check:** Are there sources in `wiki/sources/` relevant to this query whose knowledge has not been fully compiled into topic pages? If yes, compile the missing synthesis into appropriate wiki pages.
-7. Update `wiki/index.md` if new pages were created.
-8. Append entry to `wiki/log.md`: `## [YYYY-MM-DD] query | <question summary>` with affected pages.
-9. Commit (only if wiki was modified): `query(<topic>): <one-line summary>`
+1. **Search** -- Read `wiki/index.md` to find pages relevant to the question. Optionally use `bin/search.sh` to identify candidates.
+2. **Shallow read** -- Read TL;DR and Key Facts sections of relevant pages (progressive disclosure -- shallow first).
+3. **Deep read** -- Read Detail sections only where shallow content is insufficient to answer the question.
+4. **Synthesize** -- Compose answer with citations to specific wiki pages and inline provenance markers.
+5. **Write-back decision** -- Determine whether the answer should be written back to the wiki (see Write-Back Rules below).
+6. **Delta compilation** -- Check for uncompiled or stale sources relevant to this query (see Delta Compilation below).
+7. **Apply write-back** -- If write-back is triggered, apply using structured operations (Section 9). Run `bin/validate-op.sh` before applying each operation.
+8. Update `wiki/index.md` if new pages were created or existing pages were significantly modified.
+9. Append entry to `wiki/log.md` (see Query Log Entry Format below).
+10. Commit (only if wiki was modified): `query(<topic>): <one-line summary>`
+
+#### Write-Back Rules
+
+Write-back is **mandatory** when the answer produces novel or durable synthesis. It is NOT optional -- queries that produce reusable knowledge MUST contribute back to the wiki.
+
+**Write back when the answer produces at least one of:**
+- A new claim not already captured in the wiki
+- A new connection between existing pages or sources
+- A meaningful reframing or synthesis of existing material
+- A reusable artifact (comparison, overview, decision note)
+- A correction to an existing page's framing or status
+
+**Do NOT write back for:**
+- Pure lookups of facts already present in the wiki
+- Reformatted restatements of a single existing page
+- Transient conversational answers with no durable value
+
+**Page targeting:** Use page ownership, not query origin.
+- If an existing page clearly owns the topic being synthesized, UPDATE that page.
+- If no single page cleanly owns the synthesis, or the output is a distinct reusable artifact (comparison, overview, reflection), CREATE a new page.
+- New pages are typed by semantic role (entity, concept, comparison, overview) -- NEVER by workflow origin. There is no "query result" page type.
+
+#### Privacy Inheritance for Write-Back
+
+**Deterministic rule (from Section 13, restated here for clarity):** If ANY source contributing to the synthesis has `privacy: local_only`, the write-back target page MUST have `privacy: local_only`. A page is only `cloud_safe` if ALL contributing sources are `cloud_safe`. This is not a judgment call -- it is a mechanical check.
+
+**How to apply:**
+1. Collect all source IDs referenced in the synthesized answer (from provenance markers and the `sources` frontmatter list of pages read).
+2. Check each source's `privacy` field.
+3. If ANY source is `local_only`, the write-back target is `local_only`.
+4. If updating an existing `cloud_safe` page with `local_only`-derived content: STOP. Either (a) create a separate `local_only` page for the sensitive synthesis, or (b) change the existing page to `local_only` if appropriate.
+5. Run `bin/validate-op.sh` -- it enforces this rule mechanically (Check 4).
+
+#### Delta Compilation
+
+Before or during answer synthesis, check whether relevant sources have uncompiled material:
+
+1. Read source summary pages referenced by or related to the query topic.
+2. Check `compilation_status` field (Section 5): if `pending`, `partial`, or `stale`, the source has uncompiled material.
+3. **Query-scoped compilation (default):** Compile only claims from uncompiled sources that are relevant to the current question. Log remaining uncompiled material for later pickup.
+4. **Full-source compilation (exception):** Only when the source is central to many pages, query-scoped extraction would be wasteful, or the user explicitly requests a fuller refresh.
+5. After compiling, update the source summary page: set `compilation_status` to `compiled` (or `partial` if not all claims were compiled), update `compiled_against_hash`, and extend `compiled_targets`.
+
+**Detecting uncompiled material:** Primary mechanism is the `compilation_status` field on source summary pages. Secondary verification: check whether source claims actually appear in target topic pages via provenance markers.
+
+#### Query Log Entry Format
+
+Append to `wiki/log.md`:
+
+```markdown
+## [YYYY-MM-DD] query | <question summary>
+
+answer: <one-line summary of the answer>
+write_back: <WRITE-BACK: trigger met -> UPDATE/CREATE page_id> OR <NO-WRITE-BACK: reason>
+delta_compiled: <source_ids compiled, or "none">
+pages_affected: <list of page IDs modified or created, or "none">
+```
+
+The write-back decision MUST be logged -- structured and terse, stating which trigger was met or why write-back was skipped. This enables auditing.
+
+**Ordering:** The workflow executes linearly: (1) answer with citations, (2) delta compile if needed, (3) write back results. Write-back happens ONCE at the end, not recursively.
 
 **Abort conditions:**
 
 - No relevant pages exist AND no sources exist on the topic. Inform the user that the wiki has no information on this topic rather than hallucinating an answer. Log the knowledge gap in `wiki/log.md` so the lint workflow can track it.
+
+#### Worked Example
+
+**Question:** "What cognitive biases are related to loss aversion?"
+
+1. **Search:** `bin/search.sh "loss aversion"` returns `wiki/concepts/loss-aversion.md`, `wiki/concepts/cognitive-biases.md`, `wiki/concepts/prospect-theory.md`.
+2. **Shallow read:** Read TL;DR of all three pages. loss-aversion.md covers the core bias. cognitive-biases.md lists bias families. prospect-theory.md frames loss aversion within PT.
+3. **Deep read:** Read Detail section of cognitive-biases.md to find bias family relationships.
+4. **Synthesize:** Answer cites all three pages with provenance markers.
+5. **Write-back decision:** The answer connects loss aversion to specific bias families (anchoring, status quo bias, endowment effect) in a way not explicitly articulated in any single page. Trigger: "new connection between existing pages." Decision: UPDATE `wiki/concepts/loss-aversion.md` to add a "Related Biases" subsection.
+6. **Delta compilation:** Check sources. `src-2026-04-10-kahneman-prospect-theory.md` has `compilation_status: compiled`. No delta needed.
+7. **Apply:** Run `bin/validate-op.sh UPDATE wiki/concepts/loss-aversion.md` -> PASS. Apply UPDATE using append-then-synthesize policy.
+8. **Index:** No new pages created, but loss-aversion.md summary in index updated to reflect new subsection.
+9. **Log:**
+   ```
+   ## [2026-04-15] query | What cognitive biases are related to loss aversion?
+
+   answer: Loss aversion connects to anchoring, status quo bias, and endowment effect through shared heuristic-origin mechanisms
+   write_back: WRITE-BACK: new connection between existing pages -> UPDATE loss-aversion
+   delta_compiled: none
+   pages_affected: loss-aversion
+   ```
+10. **Commit:** `query(loss-aversion): add related biases connections`
 
 ### 11.3 Lint Workflow
 
