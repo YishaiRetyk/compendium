@@ -69,7 +69,7 @@ Plans:
 - [x] 03-02-PLAN.md — CLI ingest helper bash script (bin/ingest.sh) with collision handling, slug validation, and documented UTC date policy
 - [x] 03-03-PLAN.md — First validation ingest: synthetic article on Kahneman's prospect theory (atomic extraction, diff-driven merge, optional new concept pages, semantic review checklist)
 - [x] 03-04-PLAN.md — Second validation ingest: synthetic journal entry with clean privacy separation (new local_only personal-decision-patterns page, decision-making.md stays cloud_safe)
-- [ ] 03-05-PLAN.md — Phase-level verification checklist covering diff-driven merge, privacy separation, provenance preservation across both ingests
+- [x] 03-05-PLAN.md — Phase-level verification checklist covering diff-driven merge, privacy separation, provenance preservation across both ingests
 
 ### Phase 4: Query & Structured Operations
 **Goal**: Users can ask questions against the wiki and get cited answers that compile back into durable wiki pages, and all wiki mutations use a structured operations vocabulary that is logged with rationale
