@@ -106,6 +106,17 @@ Plans:
   4. Drift detection is integrated into the lint workflow so it runs as part of regular health checks
 **Plans**: TBD
 
+## Backlog
+
+### Phase 999.1: Brownfield Vault Initialization (BACKLOG)
+
+**Goal:** Workflow to scan an existing Obsidian vault with non-conforming pages and bring them into compliance: schema inference, bulk frontmatter injection, provenance bootstrapping (mark pre-existing content), index auto-generation, template application, and conformance linting with auto-fix. Cross-cuts Phase 1-5 concerns. Best built after v1.0 systems are proven. Trigger: user wants to apply the wiki system to an existing vault rather than starting from scratch.
+**Requirements:** TBD
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (promote with /gsd:review-backlog when ready)
+
 ## Progress
 
 **Execution Order:**
