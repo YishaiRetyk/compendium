@@ -23,15 +23,15 @@ The wiki is a persistent, compounding artifact — cross-references are already 
 - [x] Example wiki pages demonstrating all conventions and page types — Validated in Phase 02: page-types-examples-navigation
 - [x] Index system: content-oriented catalog with categories, summaries, metadata — Validated in Phase 02: page-types-examples-navigation
 - [x] Log system: chronological, parseable, append-only activity record — Validated in Phase 02: page-types-examples-navigation
+- [x] Ingest workflow: source classification, extraction, multi-page wiki updates, provenance tracking — Validated in Phase 03: ingestion-provenance-pipeline
+- [x] Claim-level provenance: which sources support which claims, freshness tracking — Validated in Phase 03: ingestion-provenance-pipeline
+- [x] Compilation pipeline: diff → extract → merge → lint, with optional follow-on passes — Validated in Phase 03: ingestion-provenance-pipeline
+- [x] CLI helpers for common operations (search, ingest, lint) — Validated in Phase 03: ingestion-provenance-pipeline (ingest helper)
 
 ### Active
-- [ ] Ingest workflow: source classification, extraction, multi-page wiki updates, provenance tracking
 - [ ] Query workflow: index-first search, synthesis with citations, delta compilation back into wiki
 - [ ] Lint workflow: contradiction detection, stale claims, orphan pages, missing cross-references, data gaps
 - [ ] Reflect workflow: decision records, structural reasoning, reframing history
-- [ ] Claim-level provenance: which sources support which claims, freshness tracking
-- [ ] Compilation pipeline: diff → extract → merge → lint, with optional follow-on passes
-- [ ] CLI helpers for common operations (search, ingest, lint)
 - [ ] Cross-system drift detection between wiki, raw sources, and any external tools
 
 ### Out of Scope
@@ -91,4 +91,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-09 after Phase 02 completion*
+*Last updated: 2026-04-11 after Phase 03 completion*
