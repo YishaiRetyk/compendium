@@ -19,6 +19,9 @@ url: ""
 content_hash: ""
 ingested_at:
 source_type:
+compilation_status:
+compiled_against_hash: ""
+compiled_targets: []
 ---
 
 <!-- FORBIDDEN PATTERNS (see AGENTS.md section 3):

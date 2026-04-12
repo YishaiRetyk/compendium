@@ -26,6 +26,15 @@ url: ""
 content_hash: "sha256:3dc81e24f5873bfc3d010d52ba63d754f3f0eae090e0d0671784b4704bcd2b3c"
 ingested_at: 2026-04-10
 source_type: article
+compilation_status: compiled
+compiled_against_hash: "sha256:3dc81e24f5873bfc3d010d52ba63d754f3f0eae090e0d0671784b4704bcd2b3c"
+compiled_targets:
+  - daniel-kahneman
+  - cognitive-biases
+  - system-1-vs-system-2
+  - decision-making
+  - prospect-theory
+  - loss-aversion
 ---
 
 ## TL;DR

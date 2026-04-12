@@ -26,6 +26,11 @@ url: ""
 content_hash: "sha256:cc535d138d427a9297d65e7ebf73418f6af5009e164e1f6a3391c4f26fab90a7"
 ingested_at: 2026-04-10
 source_type: journal entry
+compilation_status: compiled
+compiled_against_hash: "sha256:cc535d138d427a9297d65e7ebf73418f6af5009e164e1f6a3391c4f26fab90a7"
+compiled_targets:
+  - personal-decision-patterns
+  - decision-making
 ---
 
 ## TL;DR
