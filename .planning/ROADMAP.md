@@ -81,13 +81,14 @@ Plans:
   3. Delta compilation works: querying a topic where new sources exist but haven't been fully compiled triggers compilation of only the missing synthesis
   4. Wiki mutations use UPDATE, MERGE, SUPERSEDE, and ARCHIVE operations, each logged with rationale, and a deterministic executor/validator applies them
   5. A CLI search helper exists for querying wiki pages via index-based or text search
-**Plans:** 5 plans
+**Plans:** 6 plans
 Plans:
-- [ ] 04-01-PLAN.md — Compilation status tracking fields in AGENTS.md section 5, retroactive ingest workflow update in section 11.1, backfill existing source pages and template
-- [ ] 04-02-PLAN.md — CLI search helper (bin/search.sh) with index lookup, full-text grep, and query-mode prompt scaffolding
-- [ ] 04-03-PLAN.md — Deterministic operations validator (bin/validate-op.sh) with 5 mechanical checks per AGENTS.md section 9
-- [ ] 04-04-PLAN.md — AGENTS.md section 11.2 query workflow rewrite with write-back rules and delta compilation, section 9 validator reference, section 12 operation log format
-- [ ] 04-05-PLAN.md — End-to-end query workflow validation with human review of all Phase 4 deliverables
+- [ ] 04-01-PLAN.md — Compilation status tracking fields with state transition rules in AGENTS.md section 5, retroactive ingest workflow update in section 11.1, backfill existing source pages and template
+- [ ] 04-02-PLAN.md — CLI search helper (bin/search.sh) with index lookup, full-text grep, query-mode prompt scaffolding, and deterministic output contracts per mode
+- [ ] 04-03-PLAN.md — Deterministic operations validator (bin/validate-op.sh) with 5 mechanical checks, per-operation rules, schema compliance, and privacy inheritance checking
+- [ ] 04-04-PLAN.md — AGENTS.md section 11.2 query workflow rewrite with write-back rules, delta compilation, deterministic privacy inheritance, and worked end-to-end example
+- [ ] 04-05-PLAN.md — AGENTS.md section 9 executor model with validator reference and per-operation preconditions/postconditions, section 12 structured operation log format
+- [ ] 04-06-PLAN.md — End-to-end validation matrix (3 scenarios: no-write-back, write-back, privacy-sensitive) with human review of all Phase 4 deliverables
 
 ### Phase 5: Lint & Quality
 **Goal**: The wiki has a comprehensive health-check system that detects contradictions, stale claims, orphan pages, missing cross-references, and knowledge gaps on demand
@@ -133,6 +134,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 1. Schema, Structure & Conventions | 1/3 | In Progress|  |
 | 2. Page Types, Examples & Navigation | 1/3 | In Progress|  |
 | 3. Ingestion & Provenance Pipeline | 4/5 | In Progress|  |
-| 4. Query & Structured Operations | 0/5 | Not started | - |
+| 4. Query & Structured Operations | 0/6 | Not started | - |
 | 5. Lint & Quality | 0/TBD | Not started | - |
 | 6. Reflection & Drift Detection | 0/TBD | Not started | - |
