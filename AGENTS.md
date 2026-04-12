@@ -853,6 +853,42 @@ If validation fails, the LLM MUST NOT apply the operation. Instead, log the vali
 
 Every operation MUST be logged in `wiki/log.md` with: timestamp, operation type, affected page(s), and rationale. See Section 12 for log format.
 
+#### Deterministic Enforcement
+
+In addition to LLM self-validation, a deterministic bash validator provides mechanical enforcement:
+
+```
+bin/validate-op.sh <OPERATION> <target_path> [<second_path>]
+```
+
+The LLM MUST run `bin/validate-op.sh` before applying any operation. The validator performs the same 5 checks listed above using file system inspection and YAML parsing — no LLM judgment involved. If the validator returns FAIL, the operation MUST NOT be applied.
+
+**Batch validation:** When a workflow proposes multiple operations (e.g., an ingest that UPDATEs several pages), validate ALL operations before applying ANY. If any single validation fails, abort the entire batch. This prevents partial application of interdependent changes.
+
+#### Per-Operation Preconditions and Postconditions
+
+Each operation type has specific rules beyond the 5 global checks:
+
+**UPDATE**
+- Precondition: Target page exists and has `status: active` (do not UPDATE archived or superseded pages — un-archive or un-supersede first).
+- Postcondition: `updated_at` field is set to today's date. `sources` list includes any new source IDs. Provenance markers are added for new claims.
+- Privacy: If new content derives from `local_only` sources but target is `cloud_safe`, STOP — see Section 13 and query workflow Section 11.2 privacy rules.
+
+**MERGE**
+- Precondition: Both pages exist, are distinct, and both have `status: active`.
+- Postcondition: One surviving page contains the combined content. The other page has `status: superseded` and `superseded_by` set to the surviving page's ID. `sources` lists from both pages are merged (union). All provenance markers from both pages are preserved.
+- Privacy: If either source page is `local_only`, the surviving page MUST be `local_only`.
+
+**SUPERSEDE**
+- Precondition: Target page exists, has `status: active`, and `superseded_by` is empty/null.
+- Postcondition: Target page has `status: superseded` and `superseded_by` set to the replacing page's ID. The replacing page has `supersedes` set to the target's ID.
+- Note: The replacing page must already exist or be created in the same batch.
+
+**ARCHIVE**
+- Precondition: Target page exists and has `status: active` (do not archive already-archived pages).
+- Postcondition: Target page has `status: archived`. `updated_at` set to today's date. Page remains in its directory but is excluded from active index queries.
+- Note: Archive is reversible — change `status` back to `active` to un-archive.
+
 ## 10. Compiler Pipeline (Conceptual Model)
 
 This section describes the conceptual compilation model -- the state machine that source material passes through on its way into the wiki. Section 11 (Workflows) provides the step-by-step operator procedures that implement this model.
@@ -1086,10 +1122,50 @@ Commit:   reflect(<scope>): <one-line summary>
 <what was done, which pages were affected, brief rationale>
 ```
 
-- Valid operation types: `ingest`, `query`, `lint`, `reflect`, `update`, `merge`, `supersede`, `archive`.
+- Valid operation types: workflow-level (`ingest`, `query`, `lint`, `reflect`) and structured operations (`UPDATE`, `MERGE`, `SUPERSEDE`, `ARCHIVE`). Structured operations use the extended format below.
 - Each entry includes: what was done, which pages were affected, and a brief rationale.
 - The log is parseable with: `grep "^## \[" wiki/log.md | tail -5`
 - Structural reasoning and decision analysis belong in decision record pages (reflect workflow, Section 11.4), NOT in the log. The log records WHAT happened; decision records explain WHY.
+
+#### Structured Operation Log Entries
+
+When logging individual structured operations (UPDATE, MERGE, SUPERSEDE, ARCHIVE), use this extended format:
+
+```markdown
+## [YYYY-MM-DD] OPERATION | target_page
+
+source: source_id
+result: what changed (e.g., "added 3 claims, refreshed TL;DR")
+reason: one-line rationale
+```
+
+This format extends the base log entry format with structured sub-fields for machine-parseability. It applies to individual operations, NOT to workflow-level entries. Workflow-level entries (ingest, query, lint, reflect) use the base format with their own sub-fields as defined in Section 11.
+
+**Examples:**
+
+```markdown
+## [2026-04-15] UPDATE | prospect-theory
+
+source: src-2026-04-15-new-article
+result: added 2 claims on probability weighting, refreshed TL;DR
+reason: new source provides empirical evidence for probability distortion parameters
+```
+
+```markdown
+## [2026-04-15] MERGE | cognitive-biases
+
+source: n/a (structural reorganization)
+result: merged anchoring-bias into cognitive-biases, added anchoring subsection
+reason: anchoring-bias page had <3 claims, better as subsection of parent concept
+```
+
+```markdown
+## [2026-04-15] SUPERSEDE | old-kahneman-summary
+
+source: src-2026-04-15-comprehensive-biography
+result: marked old-kahneman-summary as superseded by daniel-kahneman
+reason: new comprehensive source makes old summary redundant
+```
 
 ## 13. Privacy Routing
 
