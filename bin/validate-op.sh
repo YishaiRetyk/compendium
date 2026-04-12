@@ -124,7 +124,7 @@ check_provenance() {
     local failed=0
     # Extract all [prov:source_id#...] markers (handles both simple and extended syntax)
     local src_ids
-    src_ids=$(grep -oP '\[prov:([^#\]]+)' "$file" 2>/dev/null | sed 's/\[prov://' | sort -u) || true
+    src_ids=$(grep -oP '\[prov:([^#\]]+)#' "$file" 2>/dev/null | sed 's/\[prov://;s/#$//' | sort -u) || true
     if [ -z "$src_ids" ]; then
         echo "PASS (no provenance markers found)"
         return 0
