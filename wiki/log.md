@@ -53,3 +53,24 @@ Ingested personal journal entry on applying cognitive frameworks to everyday dec
 Privacy separation verification: grepping the wiki for provenance markers pointing at the journal source returns only the source summary page and personal-decision-patterns.md. No cloud_safe page carries a provenance marker or frontmatter reference to the journal source. decision-making.md remains privacy: cloud_safe.
 
 Granularity comparison: journal entry = 7 paragraph-level clusters; Plan 03 article ingest = 20 atomic claims. This confirms the source-type-driven granularity difference.
+
+## [2026-04-12] query | How does prospect theory explain irrational financial decisions?
+
+answer: Prospect theory explains irrational financial decisions through three mechanisms: reference dependence (evaluating outcomes relative to a status quo rather than absolute value), loss aversion (losses hurt ~2x more than equivalent gains), and probability distortion (overweighting small probabilities, underweighting large ones). These produce predictable irrationalities like the disposition effect (selling winners too early, holding losers too long) and status quo bias in investment portfolios.
+write_back: NO-WRITE-BACK: reformulated restatement of existing prospect-theory.md and loss-aversion.md pages -- no novel claims or connections produced
+delta_compiled: none (all referenced sources have compilation_status: compiled)
+pages_affected: none
+
+## [2026-04-12] query | Compare heuristic-origin vs loss-aversion-origin cognitive biases
+
+answer: The wiki's cognitive-biases page already distinguishes two bias families: (1) heuristic-origin biases (anchoring, availability, representativeness) arising from System 1's reliance on mental shortcuts, and (2) loss-aversion-origin biases (endowment effect, status quo bias, disposition effect) explained downstream of prospect theory's asymmetric value function rather than by heuristic shortcuts.
+write_back: NO-WRITE-BACK: the heuristic-origin vs loss-aversion-origin categorization is already explicitly stated in cognitive-biases.md TL;DR and Detail sections -- no novel synthesis produced
+delta_compiled: none (all referenced sources have compilation_status: compiled)
+pages_affected: none
+
+## [2026-04-12] query | What personal decision patterns have I recorded?
+
+answer: The wiki records personal decision patterns in the local_only page personal-decision-patterns.md, sourced from a personal journal entry. Key patterns: (1) frameworks work by training the ability to notice a pre-decision physical "flinch," not by improving after-the-fact reasoning, (2) salary anchoring used as a politeness mechanism, (3) an "explain the want" heuristic, (4) sunk-cost pre-mortem self-diagnosis, (5) personal decision-fatigue threshold awareness, and (6) committed action items for practice.
+write_back: NO-WRITE-BACK: pure lookup of existing local_only content in personal-decision-patterns.md -- no novel synthesis. Note: all contributing sources (src-2026-04-10-personal-decision-journal) are privacy: local_only; any write-back would require local_only target per Section 13 inheritance rule.
+delta_compiled: none (src-2026-04-10-personal-decision-journal has compilation_status: compiled)
+pages_affected: none
