@@ -528,7 +528,42 @@ url: "https://..."                  # Original URL if applicable
 content_hash: "sha256:abc123..."    # SHA-256 hash for staleness detection
 ingested_at: YYYY-MM-DD            # When source was processed
 source_type: article|paper|transcript|journal|data|image
+
+# Compilation tracking
+compilation_status: pending         # pending | partial | compiled | stale
+compiled_against_hash: ""           # SHA-256 of source content at last compilation
+compiled_targets: []                # Wiki page IDs that received compiled claims
 ```
+
+### Compilation Tracking Fields (Source Summary Pages)
+
+Source summary pages carry three additional fields that track whether their extracted claims have been compiled into topic pages. These fields enable delta compilation (compiling only new or changed sources) and stale-source detection.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `compilation_status` | enum | Compilation lifecycle: `pending` (new, uncompiled), `partial` (some claims merged), `compiled` (all claims merged into topic pages), `stale` (source content changed since last compilation) |
+| `compiled_against_hash` | string | SHA-256 hash of source content at time of last compilation. Copied from `content_hash` when compilation completes. When `content_hash` changes on re-ingest and no longer matches `compiled_against_hash`, status resets to `stale`. |
+| `compiled_targets` | list | YAML list of wiki page IDs (the `id` field value, not file paths) that received claims from this source during compilation. Example: `[prospect-theory, loss-aversion, daniel-kahneman]` |
+
+#### Compilation Status Transition Rules
+
+The following transitions are the ONLY valid state changes. Any other transition is a bug.
+
+| From | To | Trigger | Who Sets It |
+|------|----|---------|-------------|
+| (new source) | `pending` | Source ingested, before merge pass | Ingest workflow step 5 (extract) |
+| `pending` | `compiled` | All extracted claims merged into topic pages | Ingest workflow step 6a |
+| `pending` | `partial` | Some claims merged, others deferred | Ingest workflow step 6a |
+| `partial` | `compiled` | Remaining claims compiled (via query delta or manual) | Query workflow step 6 or follow-up ingest |
+| `compiled` | `stale` | `content_hash` changed on re-ingest (no longer matches `compiled_against_hash`) | Ingest workflow on re-ingest detection |
+| `stale` | `compiled` | Re-compilation completed against new content | Query workflow step 6 or follow-up ingest |
+| `stale` | `partial` | Partial re-compilation completed | Query workflow step 6 |
+
+**Invariants:**
+- `compiled_against_hash` is ALWAYS equal to `content_hash` when `compilation_status` is `compiled`.
+- `compiled_against_hash` differs from `content_hash` when `compilation_status` is `stale`.
+- `compiled_targets` is empty ONLY when `compilation_status` is `pending`.
+- Pages missing `compilation_status` (pre-Phase-4 legacy) are treated as `compiled` by tooling.
 
 ### Frontmatter Validation Checklist
 
@@ -545,6 +580,7 @@ When creating or updating any wiki page, verify:
 9. `summary` is a single quoted string, not multi-line
 10. `id` matches the filename (without `.md` extension)
 11. For `type: source` pages: `path`, `content_hash`, `ingested_at`, and `source_type` are present
+12. For `type: source` pages: `compilation_status` is one of: `pending`, `partial`, `compiled`, `stale`
 
 ## 6. Provenance, Epistemics, and Staleness
 
@@ -936,6 +972,10 @@ Commit:   ingest(<source-slug>): <one-line summary>
 4. **Diff** (Pipeline Pass 1): Read `wiki/index.md`, identify related existing pages, read their TL;DR and Key Facts sections. Determine what this source adds that the wiki does not already cover.
 5. **Extract** (Pipeline Pass 2): Extract claims with provenance locators, applying the claim granularity rules from Section 10 Pass 2 based on the source type classified in step 3. Create source summary page at `wiki/sources/<source_id>.md` with full frontmatter including `path`, `content_hash`, `ingested_at`, and `source_type`.
 6. **Merge** (Pipeline Pass 3): Update or create entity/concept/overview pages using UPDATE operations (Section 9) and the append-then-synthesize policy (Section 10 Pass 3). Generate wikilinks on first mention. MERGE pages if the source reveals duplicates.
+   - 6a. After merge is complete, update the source summary page's compilation tracking fields:
+     - Set `compilation_status` to `compiled` if all extracted claims were merged into topic pages, or `partial` if some claims were deferred.
+     - Set `compiled_against_hash` to the current `content_hash` value.
+     - Set `compiled_targets` to the list of wiki page IDs that received claims from this source (page IDs only, not paths).
 7. **Lint** (Pipeline Pass 4): Verify all provenance references resolve, wikilinks are valid, frontmatter is complete on all modified pages.
 8. Update `wiki/index.md` with new and modified pages.
 9. Append entry to `wiki/log.md`: `## [YYYY-MM-DD] ingest | <source title>` with affected pages and rationale.
