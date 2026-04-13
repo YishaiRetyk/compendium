@@ -80,3 +80,21 @@ pages_affected: none
 findings: 0 total (0 errors, 0 warnings, 0 info)
 auto_fixes: 0 applied
 report: wiki/maintenance/lint-report.md
+
+## [2026-04-13] lint | wiki health check
+
+findings: 4 total (0 errors, 2 warnings, 2 info)
+auto_fixes: 0 applied
+report: wiki/maintenance/lint-report.md
+
+## [2026-04-13] lint | wiki health check
+
+findings: 4 total (0 errors, 2 warnings, 2 info)
+auto_fixes: 0 applied
+report: wiki/maintenance/lint-report.md
+
+## [2026-04-13] lint | wiki health check
+
+findings: 4 total (0 errors, 2 warnings, 2 info)
+auto_fixes: 0 applied
+report: wiki/maintenance/lint-report.md
