@@ -21,6 +21,8 @@ superseded_by:
 privacy: cloud_safe
 aliases:
   - Kahneman Prospect Theory Article
+has_contradictions: false
+knowledge_domain: science
 path: sources/2026/2026-04/2026-04-10-kahneman-prospect-theory/source.md
 url: ""
 content_hash: "sha256:3dc81e24f5873bfc3d010d52ba63d754f3f0eae090e0d0671784b4704bcd2b3c"

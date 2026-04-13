@@ -21,6 +21,8 @@ superseded_by:
 privacy: cloud_safe
 aliases:
   - Loss-Aversion
+has_contradictions: false
+knowledge_domain: science
 ---
 
 ## TL;DR

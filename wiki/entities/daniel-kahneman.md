@@ -22,6 +22,8 @@ superseded_by:
 privacy: cloud_safe
 aliases:
   - Kahneman
+has_contradictions: false
+knowledge_domain: biography
 ---
 
 ## TL;DR

@@ -23,6 +23,8 @@ privacy: cloud_safe
 aliases:
   - System 1 vs 2
   - Dual Process Theory Comparison
+has_contradictions: false
+knowledge_domain: science
 ---
 
 ## TL;DR

@@ -21,6 +21,8 @@ supersedes:
 superseded_by:
 privacy: local_only
 aliases: []
+has_contradictions: false
+knowledge_domain: personal-goals
 ---
 
 ## TL;DR

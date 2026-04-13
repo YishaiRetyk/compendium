@@ -19,6 +19,8 @@ superseded_by:
 privacy: cloud_safe
 aliases:
   - Thinking Fast and Slow Part 1
+has_contradictions: false
+knowledge_domain: science
 path: sources/2026/2026-04/2026-04-09-thinking-fast-and-slow-part1/source.md
 url: ""
 content_hash: "sha256:a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2"

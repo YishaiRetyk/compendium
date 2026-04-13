@@ -21,6 +21,8 @@ superseded_by:
 privacy: local_only
 aliases:
   - Decision Journal Entry
+has_contradictions: false
+knowledge_domain: personal-goals
 path: sources/2026/2026-04/2026-04-10-personal-decision-journal/source.md
 url: ""
 content_hash: "sha256:cc535d138d427a9297d65e7ebf73418f6af5009e164e1f6a3391c4f26fab90a7"

@@ -21,6 +21,8 @@ superseded_by:
 privacy: cloud_safe
 aliases:
   - Prospect Theory (Kahneman-Tversky)
+has_contradictions: false
+knowledge_domain: science
 ---
 
 ## TL;DR

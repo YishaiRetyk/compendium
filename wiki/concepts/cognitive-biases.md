@@ -23,6 +23,8 @@ privacy: cloud_safe
 aliases:
   - Cognitive Bias
   - Heuristic Biases
+has_contradictions: false
+knowledge_domain: science
 ---
 
 ## TL;DR
