@@ -79,8 +79,8 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Query & Delta Compilation
 
 - [ ] **QURY-01**: Question answering against the wiki with citations to specific pages and sources
-- [ ] **QURY-02**: Index-first search — LLM reads index to find relevant pages, then drills into them
-- [ ] **QURY-03**: Delta compilation at query time — compare current wiki coverage against relevant sources, compile only the missing synthesis exposed by the query
+- [x] **QURY-02**: Index-first search — LLM reads index to find relevant pages, then drills into them
+- [x] **QURY-03**: Delta compilation at query time — compare current wiki coverage against relevant sources, compile only the missing synthesis exposed by the query
 - [ ] **QURY-04**: Mandatory write-back — useful query outputs become durable wiki updates (new or updated pages), not ephemeral chat
 - [ ] **QURY-05**: Query workflow documented step-by-step in schema
 
@@ -148,7 +148,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### CLI Helpers
 
-- [ ] **CLI-01**: Search tool for querying wiki pages (index-based or text search)
+- [x] **CLI-01**: Search tool for querying wiki pages (index-based or text search)
 - [x] **CLI-02**: Ingest helper that scaffolds the ingest workflow
 - [ ] **CLI-03**: Lint helper that runs all lint rules and reports findings
 
@@ -270,8 +270,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PROV-05 | Phase 3 | Complete |
 | CLI-02 | Phase 3 | Complete |
 | QURY-01 | Phase 4 | Pending |
-| QURY-02 | Phase 4 | Pending |
-| QURY-03 | Phase 4 | Pending |
+| QURY-02 | Phase 4 | Complete |
+| QURY-03 | Phase 4 | Complete |
 | QURY-04 | Phase 4 | Pending |
 | QURY-05 | Phase 4 | Pending |
 | SOPS-01 | Phase 4 | Pending |
@@ -280,7 +280,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SOPS-04 | Phase 4 | Pending |
 | SOPS-05 | Phase 4 | Pending |
 | SOPS-06 | Phase 4 | Pending |
-| CLI-01 | Phase 4 | Pending |
+| CLI-01 | Phase 4 | Complete |
 | CNTR-01 | Phase 5 | Pending |
 | CNTR-02 | Phase 5 | Pending |
 | CNTR-03 | Phase 5 | Pending |

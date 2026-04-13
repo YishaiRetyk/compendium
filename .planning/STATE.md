@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: Ready to plan
-stopped_at: Phase 4 context gathered
-last_updated: "2026-04-12T14:56:50.795Z"
+stopped_at: Completed 04-02-PLAN.md
+last_updated: "2026-04-13T11:20:54.759Z"
 progress:
   total_phases: 7
-  completed_phases: 3
-  total_plans: 11
-  completed_plans: 11
+  completed_phases: 4
+  total_plans: 17
+  completed_plans: 17
 ---
 
 # Project State
@@ -19,7 +19,7 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-09)
 
 **Core value:** The wiki is a persistent, compounding artifact -- cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested.
-**Current focus:** Phase 03 — ingestion-provenance-pipeline
+**Current focus:** Phase 04 — query-structured-operations
 
 ## Current Position
 
@@ -57,6 +57,8 @@ Plan: Not started
 | Phase 03 P03 | 10min | 3 tasks | 10 files |
 | Phase 03 P04 | 5min | 3 tasks | 6 files |
 | Phase 03 P05 | 2min | 2 tasks | 1 files |
+| Phase 04 P01 | 3min | 2 tasks | 5 files |
+| Phase 04 P02 | 3min | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -96,6 +98,10 @@ Recent decisions affecting current work:
 - [Phase 03]: Paragraph-level granularity (7 clusters) for journal entries vs atomic claims for articles validates adaptive extraction
 - [Phase 03]: personal-decision-patterns.md created as local_only overview page type for experiential claims synthesis
 - [Phase 03]: Phase-level verification covers 8 cross-plan checks that per-plan verification cannot address individually
+- [Phase 04]: Compilation status transitions are explicit and enumerated -- any unlisted transition is a bug
+- [Phase 04]: Pre-Phase-4 legacy pages missing compilation_status treated as compiled by tooling
+- [Phase 04]: Step 6a added as sub-step within existing merge step to avoid renumbering ingest workflow
+- [Phase 04]: Output contracts are deterministic per mode: default (header + path -- TL;DR + footer), --paths-only (bare paths), --query (bounded prompt block)
 
 ### Pending Todos
 
@@ -108,6 +114,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-12T14:56:50.792Z
-Stopped at: Phase 4 context gathered
-Resume file: .planning/phases/04-query-structured-operations/04-CONTEXT.md
+Last session: 2026-04-12T20:29:00.860Z
+Stopped at: Completed 04-02-PLAN.md
+Resume file: None
