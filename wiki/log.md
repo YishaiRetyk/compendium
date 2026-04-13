@@ -74,3 +74,9 @@ answer: The wiki records personal decision patterns in the local_only page perso
 write_back: NO-WRITE-BACK: pure lookup of existing local_only content in personal-decision-patterns.md -- no novel synthesis. Note: all contributing sources (src-2026-04-10-personal-decision-journal) are privacy: local_only; any write-back would require local_only target per Section 13 inheritance rule.
 delta_compiled: none (src-2026-04-10-personal-decision-journal has compilation_status: compiled)
 pages_affected: none
+
+## [2026-04-13] lint | wiki health check
+
+findings: 0 total (0 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki/maintenance/lint-report.md
