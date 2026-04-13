@@ -495,6 +495,8 @@ superseded_by:                     # ID of page that replaces this (if any)
 privacy: local_only|cloud_safe     # Privacy routing tier
 aliases:                           # Alternative names for Obsidian resolution
   - Alternate Name
+has_contradictions: false       # true when page contains [contradiction:...] markers
+knowledge_domain: ""            # Primary decay-rate bucket (maps to Section 6 decay table)
 ---
 ```
 
@@ -517,6 +519,8 @@ aliases:                           # Alternative names for Obsidian resolution
 | `superseded_by` | string | ID of the page that replaces this one. Null if not applicable. |
 | `privacy` | enum | `local_only` (never send to cloud APIs) or `cloud_safe` (can be sent to cloud APIs). |
 | `aliases` | list | Alternative names for Obsidian automatic resolution. Obsidian resolves `[[Alias]]` to the canonical page. |
+| `has_contradictions` | boolean | `true` when any claim on the page has a `[contradiction:...]` marker. Independent of `epistemic_status` -- a `sourced` page can have contradictions. May be set by lint workflow OR by any workflow that inserts contradiction markers (ingest, query). The lint mechanically syncs this field: if `[contradiction:]` markers exist in the body, `has_contradictions` MUST be `true`; if no markers exist, it MUST be `false`. |
+| `knowledge_domain` | string | Primary knowledge domain for staleness decay rate calculation. This is the **staleness policy bucket**, distinct from the `domains` field which is a topical classification list. A page may have `domains: [psychology, economics]` but `knowledge_domain: science` because both topics decay at the science rate. Maps to the decay rate table in Section 6. One of: `software`, `science`, `biography`, `personal-goals`, or a custom domain. Empty string if not yet classified. |
 
 ### Source Summary Additional Fields
 
@@ -581,6 +585,8 @@ When creating or updating any wiki page, verify:
 10. `id` matches the filename (without `.md` extension)
 11. For `type: source` pages: `path`, `content_hash`, `ingested_at`, and `source_type` are present
 12. For `type: source` pages: `compilation_status` is one of: `pending`, `partial`, `compiled`, `stale`
+13. `has_contradictions` is a boolean (`true` or `false`)
+14. `knowledge_domain` is a non-empty string for pages with provenance-backed claims
 
 ## 6. Provenance, Epistemics, and Staleness
 
@@ -714,6 +720,68 @@ Two inline syntaxes coexist intentionally in wiki page bodies. Do NOT normalize 
 **Combined pattern:** `Claim text. [prov:source_id#locator|support_type] [epistemic:: status]`
 
 Not every claim needs both markers. Provenance is omitted when there is no specific source. Epistemic status is recommended on all factual claims.
+
+### Domain-Based Decay Rate Table
+
+Claims inherit temporal relevance from their source publication dates. Different knowledge domains decay at different rates. The lint workflow uses this table to flag stale claims mechanically.
+
+| Domain | Base Decay Period | Rationale |
+|--------|-------------------|-----------|
+| `software` | 180 days (6 months) | Libraries, APIs, and tooling change rapidly |
+| `science` | 730 days (2 years) | Replication and meta-analysis cycles |
+| `biography` | 1825 days (5 years) | Biographical facts change slowly |
+| `personal-goals` | 90 days (3 months) | Goals evolve with life circumstances |
+| (default) | 365 days (1 year) | Fallback for unclassified domains |
+
+**Epistemic status modifiers** (per D-08): Tentative and inferred claims decay faster than their domain default. Multiply the base decay period by the modifier:
+
+| Epistemic Status | Modifier | Effect |
+|------------------|----------|--------|
+| `sourced` | 1.0 | Base rate |
+| `mixed` | 0.85 | 15% faster decay |
+| `inferred` | 0.75 | 33% faster decay |
+| `tentative` | 0.5 | Twice as fast decay |
+
+**Hash override** (per D-09): If a source page's `content_hash` differs from `compiled_against_hash`, ALL claims linked to that source via `[prov:]` markers are immediately stale regardless of decay window.
+
+**Date fallback chain** for staleness calculation: When `checked_at` is missing from a provenance marker, use (in order): (1) the source page's `ingested_at` date, (2) the wiki page's `updated_at` date.
+
+### Contradiction Inline Syntax
+
+When two different sources assert conflicting claims about the same subject/attribute (per D-01), the contradiction is flagged inline on the affected claim(s):
+
+```
+[contradiction:source_a_id#locator vs source_b_id#locator]
+```
+
+Example:
+
+```markdown
+Loss aversion coefficient is approximately 2.0 [prov:src-2026-04-10-kahneman-prospect-theory#sec:core-findings|direct|2026-04-10] [contradiction:src-2026-04-10-kahneman-prospect-theory#sec:core-findings vs src-2026-05-01-newer-study#sec:results]
+```
+
+Rules:
+- Contradiction markers sit alongside provenance markers on the affected claim
+- Both source references in the contradiction marker MUST resolve to known sources in `wiki/sources/`
+- The lint does NOT decide which source is correct -- it surfaces the disagreement
+- Pages with any contradiction marker must have `has_contradictions: true` in frontmatter (lint syncs this mechanically)
+- Contradictions are severity: **warning** (source disagreement is expected in scholarship)
+- Semantic conflicts without provenance grounding are out of scope for v1 (per D-02)
+
+### Staleness Auto-Fix Rules
+
+The lint workflow applies mechanical staleness fixes (per D-12):
+
+**Claim-level auto-fix:** When a claim's provenance date exceeds its domain decay threshold (adjusted by epistemic modifier), the lint adds `[epistemic:: stale]` after the claim's provenance marker cluster. Rules for marker placement:
+- One `[epistemic:: stale]` marker per claim -- do not duplicate if already present
+- Place immediately after the last `[prov:...]` marker on the claim line
+- If the claim already has `[epistemic:: sourced]` or `[epistemic:: inferred]`, replace it with `[epistemic:: stale]`
+- A "claim" is defined as a single bullet point or paragraph containing `[prov:]` markers
+- This operation is deterministic and reversible (removing the stale marker restores prior state)
+
+**Page-level status:** The lint only auto-updates page-level `epistemic_status` to `stale` when the rollup clearly warrants it (per D-13): all material claims are stale, OR the TL;DR/Key Facts section contains materially stale claims. Default: do NOT auto-change page-level status.
+
+**Logging:** All auto-fix staleness changes are logged in `wiki/maintenance/lint-report.md` and `wiki/log.md` (per D-14).
 
 ## 7. Progressive Disclosure
 
@@ -1142,20 +1210,35 @@ Outputs:  Structured findings report, optionally fixed pages, updated log
 Commit:   lint(<scope>): <one-line summary>
 ```
 
+**Severity Tiers** (per D-17):
+
+| Severity | Meaning | Examples |
+|----------|---------|----------|
+| `error` | Must fix -- broken references, invalid structure | Broken provenance refs, missing source pages, YAML parse failures, invalid frontmatter enum values |
+| `warning` | Should fix -- quality degradation | Stale claims, orphan pages, contradictions, missing cross-references |
+| `info` | Nice to know -- improvement opportunities | Knowledge gaps, sparse coverage, suggested questions |
+
+**Auto-Fix Boundary** (per D-18, D-19):
+
+Auto-fix (mechanical, deterministic, reversible): updating stale claim markers per decay table, syncing `has_contradictions` frontmatter boolean to match presence of `[contradiction:]` markers in body.
+
+Report-only (no auto-fix): contradictions, knowledge gaps, orphan pages, missing cross-references, page restructuring, any fix requiring judgment.
+
 **Steps:**
 
-1. Read `wiki/index.md` for full page inventory.
-2. **Orphan detection:** Find pages with no inbound wikilinks from other wiki pages.
-3. **Missing cross-references:** Identify related pages that should link to each other but do not.
-4. **Stale claims:** Find claims with `checked_at` dates older than a reasonable threshold, or pages with `epistemic_status: stale`.
-5. **Contradiction detection:** Identify claims on the same topic that disagree across different pages.
-6. **Knowledge gaps:** Collect red links (unresolved wikilinks) that appear across multiple pages, suggesting a new page should be created.
-7. **Source coverage gaps:** Identify domains with few sources relative to others.
-8. Report findings in structured format, organized by category (orphans, stale claims, contradictions, gaps).
-9. Suggest new questions to investigate and new sources to look for based on gaps found.
-10. Fix trivially fixable issues: add missing cross-references, update stale `epistemic_status` markers, fix broken provenance references where the correct source is obvious.
-11. Append entry to `wiki/log.md`: `## [YYYY-MM-DD] lint | <scope>` with summary of findings and fixes.
-12. Commit: `lint(<scope>): <one-line summary of findings and fixes>`
+1. Read `wiki/index.md` for full page inventory. Build resolution map: for each wiki page, collect filename, id, title, and aliases (case-insensitive matching).
+2. **YAML frontmatter validation:** Parse all page frontmatter, check required fields, validate enum values against Section 5 schema. Severity: error for parse failures or missing required fields.
+3. **Provenance validation:** Verify all `[prov:]` references resolve to known source IDs in `wiki/sources/`. Verify locator syntax. Severity: error for broken refs.
+4. **Orphan detection:** Find pages with no inbound wikilinks from other wiki pages (using resolution map for alias-aware, case-insensitive matching). Exclude index.md, log.md, lint-report.md. Severity: warning. Report-only.
+5. **Missing cross-references:** Identify pages sharing 2+ domains AND 2+ tags that lack mutual wikilinks. Only flag for active pages (not archived/superseded). Severity: warning. Report-only.
+6. **Stale claims:** Compute staleness using domain decay rate table (Section 6), epistemic modifier, and hash override. Date fallback chain: `checked_at` -> `ingested_at` -> `updated_at`. Severity: warning. Auto-fix: add/update `[epistemic:: stale]` markers per Staleness Auto-Fix Rules.
+7. **Potential contradiction candidates:** Flag wiki page sections where claims carry `[prov:]` markers from 2+ different source_ids AND the section is NOT on a page of type `comparison` or `overview` (these are inherently multi-source by design). Mark as "potential contradiction candidates for agent review." The lint does NOT assert these ARE contradictions -- the LLM agent running the lint workflow reviews flagged sections and promotes confirmed disagreements to `[contradiction:]` inline markers. Severity: warning. Report-only.
+8. **`has_contradictions` sync:** Verify that `has_contradictions` frontmatter matches actual presence of `[contradiction:]` markers in the body. Auto-fix: set `true` if markers present, `false` if no markers present.
+9. **Knowledge gaps (red links):** Collect unresolved wikilinks. Flag when: appears on 2+ distinct pages, OR appears in TL;DR/Key Facts section of any page (per D-20). Severity: info. Report-only. Suggest investigative question per D-23.
+10. **Source coverage gaps:** Compare domain source counts. Flag domains with materially fewer sources than median. Only run when wiki has 5+ distinct knowledge_domain values with at least 3 having 2+ source pages (maturity guardrail per D-22). Use `knowledge_domain` consistently for both page classification and source counting. Severity: info. Report-only. Suggest investigative question per D-23.
+11. Compile findings into `wiki/maintenance/lint-report.md` organized by severity then category. Include total counts and per-category breakdowns.
+12. Append entry to `wiki/log.md`: `## [YYYY-MM-DD] lint | <scope>` with summary of findings counts and auto-fixes applied.
+13. Commit: `lint(<scope>): <one-line summary of findings and fixes>`
 
 **Abort conditions:**
 
