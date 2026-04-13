@@ -689,6 +689,155 @@ if should_run('contradiction') or should_run('yaml'):
                     pass
 
 # ---------------------------------------------------------------------------
+# Check 8: Knowledge gap detection -- red links (AGENTS.md section 11.3 step 9)
+# ---------------------------------------------------------------------------
+
+TLDR_KEY_FACTS_RE = re.compile(r'^##\s+(TL;DR|Key Facts)\s*$', re.MULTILINE)
+NEXT_H2_RE = re.compile(r'^##\s+', re.MULTILINE)
+
+if should_run('gap'):
+    print("  Checking for knowledge gaps (red links)...", file=sys.stderr)
+
+    # Reuse the resolution_map from orphan detection if available, otherwise rebuild
+    if 'resolution_map' not in dir():
+        resolution_map = {}
+        for fpath, fm, body, err in all_pages:
+            if fm is None:
+                continue
+            pid = fm.get('id', '')
+            if not pid:
+                continue
+            variants = set()
+            variants.add(pid.lower())
+            if fm.get('title'):
+                variants.add(fm['title'].lower())
+            for alias in (fm.get('aliases') or []):
+                if alias:
+                    variants.add(str(alias).lower())
+            for v in variants:
+                resolution_map.setdefault(v, set()).add(pid)
+
+    # Collect all unresolved wikilinks with page context
+    # unresolved_links: target_lower -> { 'pages': set of page_ids, 'in_tldr_keyfacts': bool }
+    unresolved_links = {}
+
+    for fpath, fm, body, err in all_pages:
+        if fm is None or body is None:
+            continue
+        linker_id = fm.get('id', '')
+        wikilinks = WIKILINK_RE.findall(body)
+
+        # Identify TL;DR and Key Facts section boundaries
+        tldr_kf_ranges = []
+        for m in TLDR_KEY_FACTS_RE.finditer(body):
+            section_start = m.end()
+            # Find next ## heading
+            next_h2 = NEXT_H2_RE.search(body, section_start)
+            section_end = next_h2.start() if next_h2 else len(body)
+            tldr_kf_ranges.append((m.start(), section_end))
+
+        for target in wikilinks:
+            target_lower = target.strip().lower()
+            # Check if it resolves
+            if target_lower in resolution_map:
+                continue
+            # Also check special files (index, log)
+            if target_lower in ('index', 'log', 'lint-report'):
+                continue
+
+            if target_lower not in unresolved_links:
+                unresolved_links[target_lower] = {'pages': set(), 'in_tldr_keyfacts': False, 'raw': target.strip()}
+
+            unresolved_links[target_lower]['pages'].add(linker_id)
+
+            # Check if this link appears in a TL;DR or Key Facts section
+            # Find the position of this wikilink in the body
+            link_pattern = re.compile(r'\[\[' + re.escape(target) + r'(?:\|[^\]]+)?\]\]')
+            for lm in link_pattern.finditer(body):
+                for (rs, re_end) in tldr_kf_ranges:
+                    if rs <= lm.start() < re_end:
+                        unresolved_links[target_lower]['in_tldr_keyfacts'] = True
+                        break
+
+    # Flag red links per D-20 rules
+    for target_lower, info in sorted(unresolved_links.items()):
+        page_count = len(info['pages'])
+        in_special = info['in_tldr_keyfacts']
+        raw_target = info['raw']
+
+        should_flag = (page_count >= 2) or in_special
+
+        if should_flag:
+            page_list = ', '.join(sorted(info['pages']))
+            question = f'What is {raw_target} and how does it relate to the pages that reference it?'
+            add_finding('info', 'gap', f'red-link:{raw_target}',
+                        f'Unresolved wikilink on {page_count} pages: {page_list}. '
+                        f'Suggested question: {question}')
+
+# ---------------------------------------------------------------------------
+# Check 9: Sparse source coverage (AGENTS.md section 11.3 step 10)
+# ---------------------------------------------------------------------------
+
+if should_run('gap'):
+    print("  Checking for sparse source coverage...", file=sys.stderr)
+
+    # Collect knowledge_domain values from all pages and count sources per domain
+    domain_source_count = {}  # knowledge_domain -> count of source pages with that domain
+    all_domains = set()
+
+    for fpath, fm, body, err in all_pages:
+        if fm is None:
+            continue
+        kd = fm.get('knowledge_domain', '')
+        if kd:
+            all_domains.add(kd)
+
+    # Count source pages per knowledge_domain
+    for fpath, fm, body, err in all_pages:
+        if fm is None:
+            continue
+        if fm.get('type') != 'source':
+            continue
+        kd = fm.get('knowledge_domain', '')
+        if kd:
+            domain_source_count[kd] = domain_source_count.get(kd, 0) + 1
+
+    # Ensure all domains have an entry (even if 0 sources)
+    for d in all_domains:
+        if d not in domain_source_count:
+            domain_source_count[d] = 0
+
+    # Maturity guardrail (per D-22): 5+ domains, 3+ with 2+ sources
+    total_domains = len(all_domains)
+    domains_with_2plus = sum(1 for c in domain_source_count.values() if c >= 2)
+
+    if total_domains < 5 or domains_with_2plus < 3:
+        add_finding('info', 'gap', 'maturity',
+                    f'Sparse coverage check skipped: wiki needs 5+ domains with 3+ having 2+ sources '
+                    f'(currently {total_domains} domains, {domains_with_2plus} meet threshold)')
+    else:
+        # Compute median source count
+        counts = sorted(domain_source_count.values())
+        mid = len(counts) // 2
+        if len(counts) % 2 == 0:
+            median = (counts[mid - 1] + counts[mid]) / 2
+        else:
+            median = counts[mid]
+
+        threshold = median / 2
+
+        for domain in sorted(domain_source_count.keys()):
+            count = domain_source_count[domain]
+            if count < threshold or count == 0:
+                if count == 0:
+                    question = f'What are your key interests or references in {domain}?'
+                else:
+                    question = f'What additional perspectives on {domain} would strengthen coverage?'
+                add_finding('info', 'gap', f'sparse:{domain}',
+                            f'Domain "{domain}" has {count} sources vs median {median}. '
+                            f'Consider: {question}')
+
+# ---------------------------------------------------------------------------
 # Sort findings and write to temp file
 # ---------------------------------------------------------------------------
 
