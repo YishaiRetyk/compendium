@@ -100,7 +100,12 @@ Plans:
   3. Claims inherit temporal relevance from source dates, different knowledge types decay at configurable rates, and the lint flags claims older than their threshold
   4. The lint identifies topics mentioned frequently but lacking dedicated pages, and categories with sparse source coverage
   5. A CLI lint helper exists that runs all lint rules and reports findings, and the lint workflow is documented step-by-step in the schema
-**Plans**: TBD
+**Plans:** 4 plans
+Plans:
+- [ ] 05-01-PLAN.md — AGENTS.md schema extensions: decay rate table, contradiction syntax, severity tiers, new frontmatter fields (has_contradictions, knowledge_domain), backfill existing pages
+- [ ] 05-02-PLAN.md — bin/lint.sh core scaffold with structural checks (orphan, cross-ref, provenance, YAML), staleness detection, and lint report generation
+- [ ] 05-03-PLAN.md — bin/lint.sh contradiction detection and knowledge gap detection (red links, sparse coverage, question suggestions)
+- [ ] 05-04-PLAN.md — End-to-end validation: full lint run on existing wiki, coverage verification, and human review
 
 ### Phase 6: Reflection & Drift Detection
 **Goal**: The wiki maintains structural self-awareness through decision records that capture why changes were made, and detects drift between the wiki, raw sources, and external tools
@@ -135,5 +140,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 2. Page Types, Examples & Navigation | 1/3 | In Progress|  |
 | 3. Ingestion & Provenance Pipeline | 4/5 | In Progress|  |
 | 4. Query & Structured Operations | 0/6 | Not started | - |
-| 5. Lint & Quality | 0/TBD | Not started | - |
+| 5. Lint & Quality | 0/4 | Not started | - |
 | 6. Reflection & Drift Detection | 0/TBD | Not started | - |
