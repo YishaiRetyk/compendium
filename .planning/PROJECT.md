@@ -27,9 +27,11 @@ The wiki is a persistent, compounding artifact — cross-references are already 
 - [x] Claim-level provenance: which sources support which claims, freshness tracking — Validated in Phase 03: ingestion-provenance-pipeline
 - [x] Compilation pipeline: diff → extract → merge → lint, with optional follow-on passes — Validated in Phase 03: ingestion-provenance-pipeline
 - [x] CLI helpers for common operations (search, ingest, lint) — Validated in Phase 03: ingestion-provenance-pipeline (ingest helper)
+- [x] Query workflow: index-first search, synthesis with citations, delta compilation back into wiki — Validated in Phase 04: query-structured-operations
+- [x] Structured operations enforcement: deterministic validator (bin/validate-op.sh), per-operation preconditions/postconditions, batch validation — Validated in Phase 04: query-structured-operations
+- [x] CLI search helper (bin/search.sh) with index lookup, full-text grep, and query mode — Validated in Phase 04: query-structured-operations
 
 ### Active
-- [ ] Query workflow: index-first search, synthesis with citations, delta compilation back into wiki
 - [ ] Lint workflow: contradiction detection, stale claims, orphan pages, missing cross-references, data gaps
 - [ ] Reflect workflow: decision records, structural reasoning, reframing history
 - [ ] Cross-system drift detection between wiki, raw sources, and any external tools
