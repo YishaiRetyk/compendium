@@ -561,6 +561,134 @@ if should_run('stale'):
                 f.write('\n'.join(new_lines))
 
 # ---------------------------------------------------------------------------
+# Check 6: Contradiction candidate detection (AGENTS.md section 11.3 step 7)
+# ---------------------------------------------------------------------------
+
+CONTRADICTION_MARKER_RE = re.compile(r'\[contradiction:([^\]]+)\]')
+SECTION_HEADING_RE = re.compile(r'^(#{2,3})\s+(.+)$', re.MULTILINE)
+
+if should_run('contradiction'):
+    print("  Checking for contradiction candidates...", file=sys.stderr)
+
+    for fpath, fm, body, err in all_pages:
+        if fm is None or body is None:
+            continue
+
+        page_type = fm.get('type', '')
+        rel = os.path.relpath(fpath)
+
+        # Skip comparison and overview pages -- inherently multi-source by design
+        if page_type in ('comparison', 'overview'):
+            continue
+
+        # Parse body into sections (## or ### headings)
+        # Each section: (heading_text, section_body)
+        sections = []
+        headings = list(SECTION_HEADING_RE.finditer(body))
+
+        if not headings:
+            # Entire body is one section
+            sections.append(('(top-level)', body))
+        else:
+            # Content before first heading
+            if headings[0].start() > 0:
+                sections.append(('(top-level)', body[:headings[0].start()]))
+            for idx, match in enumerate(headings):
+                heading_text = match.group(2).strip()
+                start = match.end()
+                end = headings[idx + 1].start() if idx + 1 < len(headings) else len(body)
+                sections.append((heading_text, body[start:end]))
+
+        # Collect existing contradiction markers to avoid re-flagging acknowledged pairs
+        existing_pairs = set()
+        for cm in CONTRADICTION_MARKER_RE.finditer(body):
+            # Parse "source_a#loc vs source_b#loc"
+            parts = cm.group(1).split(' vs ')
+            if len(parts) == 2:
+                src_a = parts[0].split('#')[0].strip()
+                src_b = parts[1].split('#')[0].strip()
+                normalized = tuple(sorted([src_a, src_b]))
+                existing_pairs.add(normalized)
+
+        # For each section, extract provenance source_ids
+        for heading_text, section_body in sections:
+            prov_matches = PROV_RE.findall(section_body)
+            source_ids = set()
+            for source_id, locator, support_type, checked_at in prov_matches:
+                source_ids.add(source_id)
+
+            if len(source_ids) < 2:
+                continue
+
+            # Generate pairs of source_ids, check if already acknowledged
+            sorted_ids = sorted(source_ids)
+            for i_idx in range(len(sorted_ids)):
+                for j_idx in range(i_idx + 1, len(sorted_ids)):
+                    pair = (sorted_ids[i_idx], sorted_ids[j_idx])
+                    if pair in existing_pairs:
+                        continue
+                    add_finding('warning', 'contradiction', rel,
+                                f'Potential contradiction candidate in section "{heading_text}": '
+                                f'claims from {pair[0]} and {pair[1]} (agent review needed)')
+
+# ---------------------------------------------------------------------------
+# Check 7: has_contradictions frontmatter sync (AGENTS.md section 11.3 step 8)
+# ---------------------------------------------------------------------------
+
+if should_run('contradiction') or should_run('yaml'):
+    print("  Checking has_contradictions sync...", file=sys.stderr)
+
+    for fpath, fm, body, err in all_pages:
+        if fm is None or body is None:
+            continue
+        rel = os.path.relpath(fpath)
+
+        # Count [contradiction:...] markers in body
+        markers = CONTRADICTION_MARKER_RE.findall(body)
+        marker_count = len(markers)
+        has_field = fm.get('has_contradictions', False)
+
+        if marker_count > 0 and not has_field:
+            add_finding('warning', 'contradiction-sync', rel,
+                        f'has_contradictions should be true (found {marker_count} [contradiction:] markers)')
+            if do_fix and not dry_run:
+                try:
+                    content = open(fpath, encoding='utf-8').read()
+                    # Replace has_contradictions: false with true
+                    content = re.sub(
+                        r'^(has_contradictions:\s*)false\s*$',
+                        r'\g<1>true',
+                        content, flags=re.MULTILINE
+                    )
+                    # Handle missing field -- add before closing ---
+                    if 'has_contradictions' not in content.split('---')[1]:
+                        pass  # field already exists if page passed yaml check
+                    with open(fpath, 'w', encoding='utf-8') as f:
+                        f.write(content)
+                    add_finding('info', 'autofix', rel,
+                                'Set has_contradictions to true')
+                except Exception:
+                    pass
+
+        elif marker_count == 0 and has_field:
+            add_finding('warning', 'contradiction-sync', rel,
+                        'has_contradictions should be false (no [contradiction:] markers found)')
+            if do_fix and not dry_run:
+                try:
+                    content = open(fpath, encoding='utf-8').read()
+                    content = re.sub(
+                        r'^(has_contradictions:\s*)true\s*$',
+                        r'\g<1>false',
+                        content, flags=re.MULTILINE
+                    )
+                    with open(fpath, 'w', encoding='utf-8') as f:
+                        f.write(content)
+                    add_finding('info', 'autofix', rel,
+                                'Set has_contradictions to false')
+                except Exception:
+                    pass
+
+# ---------------------------------------------------------------------------
 # Sort findings and write to temp file
 # ---------------------------------------------------------------------------
 
