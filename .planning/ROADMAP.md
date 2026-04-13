@@ -102,9 +102,9 @@ Plans:
   5. A CLI lint helper exists that runs all lint rules and reports findings, and the lint workflow is documented step-by-step in the schema
 **Plans:** 4 plans
 Plans:
-- [ ] 05-01-PLAN.md — AGENTS.md schema extensions: decay rate table, contradiction syntax, severity tiers, new frontmatter fields (has_contradictions, knowledge_domain), backfill existing pages
-- [ ] 05-02-PLAN.md — bin/lint.sh core scaffold with structural checks (orphan, cross-ref, provenance, YAML), staleness detection, and lint report generation
-- [ ] 05-03-PLAN.md — bin/lint.sh contradiction detection and knowledge gap detection (red links, sparse coverage, question suggestions)
+- [x] 05-01-PLAN.md — AGENTS.md schema extensions: decay rate table, contradiction syntax, severity tiers, new frontmatter fields (has_contradictions, knowledge_domain), backfill existing pages
+- [x] 05-02-PLAN.md — bin/lint.sh core scaffold with structural checks (orphan, cross-ref, provenance, YAML), staleness detection, and lint report generation
+- [x] 05-03-PLAN.md — bin/lint.sh contradiction detection and knowledge gap detection (red links, sparse coverage, question suggestions)
 - [ ] 05-04-PLAN.md — End-to-end validation: full lint run on existing wiki, coverage verification, and human review
 
 ### Phase 6: Reflection & Drift Detection

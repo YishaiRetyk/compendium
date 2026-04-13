@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: Ready to plan
-stopped_at: Phase 5 context gathered
-last_updated: "2026-04-13T14:31:27.810Z"
+stopped_at: Completed 05-04-PLAN.md
+last_updated: "2026-04-13T19:58:38.463Z"
 progress:
   total_phases: 7
-  completed_phases: 4
-  total_plans: 17
-  completed_plans: 17
+  completed_phases: 5
+  total_plans: 21
+  completed_plans: 21
 ---
 
 # Project State
@@ -19,7 +19,7 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-09)
 
 **Core value:** The wiki is a persistent, compounding artifact -- cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested.
-**Current focus:** Phase 04 — query-structured-operations
+**Current focus:** Phase 05 — lint-quality
 
 ## Current Position
 
@@ -59,6 +59,10 @@ Plan: Not started
 | Phase 03 P05 | 2min | 2 tasks | 1 files |
 | Phase 04 P01 | 3min | 2 tasks | 5 files |
 | Phase 04 P02 | 3min | 2 tasks | 1 files |
+| Phase 05 P01 | 3min | 2 tasks | 11 files |
+| Phase 05 P02 | 4min | 2 tasks | 3 files |
+| Phase 05 P03 | 2min | 2 tasks | 1 files |
+| Phase 05 P04 | 1min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -102,6 +106,12 @@ Recent decisions affecting current work:
 - [Phase 04]: Pre-Phase-4 legacy pages missing compilation_status treated as compiled by tooling
 - [Phase 04]: Step 6a added as sub-step within existing merge step to avoid renumbering ingest workflow
 - [Phase 04]: Output contracts are deterministic per mode: default (header + path -- TL;DR + footer), --paths-only (bare paths), --query (bounded prompt block)
+- [Phase 05]: knowledge_domain is the staleness policy bucket, distinct from domains which is topical classification
+- [Phase 05]: Contradiction detection excludes comparison and overview page types (inherently multi-source)
+- [Phase 05]: Auto-fix limited to stale markers and has_contradictions sync; contradictions, gaps, orphans are report-only
+- [Phase 05]: Single python3 block for all lint checks (efficiency); env vars for heredoc arg passing; exit 0 for findings
+- [Phase 05]: Contradiction candidates use section-level provenance grouping with lexicographic pair normalization
+- [Phase 05]: Zero-error wiki validates schema implementation quality from phases 1-4
 
 ### Pending Todos
 
@@ -114,6 +124,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-13T14:31:27.804Z
-Stopped at: Phase 5 context gathered
-Resume file: .planning/phases/05-lint-quality/05-CONTEXT.md
+Last session: 2026-04-13T19:48:53.076Z
+Stopped at: Completed 05-04-PLAN.md
+Resume file: None
