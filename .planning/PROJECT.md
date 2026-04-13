@@ -30,9 +30,9 @@ The wiki is a persistent, compounding artifact — cross-references are already 
 - [x] Query workflow: index-first search, synthesis with citations, delta compilation back into wiki — Validated in Phase 04: query-structured-operations
 - [x] Structured operations enforcement: deterministic validator (bin/validate-op.sh), per-operation preconditions/postconditions, batch validation — Validated in Phase 04: query-structured-operations
 - [x] CLI search helper (bin/search.sh) with index lookup, full-text grep, and query mode — Validated in Phase 04: query-structured-operations
+- [x] Lint workflow: contradiction detection, stale claims, orphan pages, missing cross-references, data gaps — Validated in Phase 05: lint-quality
 
 ### Active
-- [ ] Lint workflow: contradiction detection, stale claims, orphan pages, missing cross-references, data gaps
 - [ ] Reflect workflow: decision records, structural reasoning, reframing history
 - [ ] Cross-system drift detection between wiki, raw sources, and any external tools
 
@@ -93,4 +93,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-11 after Phase 03 completion*
+*Last updated: 2026-04-13 after Phase 05 completion*
