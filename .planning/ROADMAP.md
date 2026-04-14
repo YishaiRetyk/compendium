@@ -116,7 +116,11 @@ Plans:
   2. The reflect workflow is documented in the schema and produces decision records that are navigable in Obsidian
   3. The system detects when raw sources have no wiki pages, when wiki pages reference missing sources, and when drift exists between wiki and broader toolchain (Obsidian vault, Zotero, cloud/local)
   4. Drift detection is integrated into the lint workflow so it runs as part of regular health checks
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 06-01-PLAN.md — Decision record page type: template, example page, AGENTS.md sections 4.6/5/12, index category
+- [ ] 06-02-PLAN.md — Drift detection in bin/lint.sh: 5 drift checks, decision page validation, category-labeled report
+- [ ] 06-03-PLAN.md — Reflect workflow: AGENTS.md section 11.4 three-tier model, section 9 inline hooks, section 11.3 drift steps, checkpoint state file, human verification
 
 ## Backlog
 
@@ -141,4 +145,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 3. Ingestion & Provenance Pipeline | 4/5 | In Progress|  |
 | 4. Query & Structured Operations | 0/6 | Not started | - |
 | 5. Lint & Quality | 0/4 | Not started | - |
-| 6. Reflection & Drift Detection | 0/TBD | Not started | - |
+| 6. Reflection & Drift Detection | 0/3 | Not started | - |
