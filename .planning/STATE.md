@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Shareability
-status: Ready to execute
-stopped_at: "07-05 Task 5 CHECKPOINT: awaiting human action (TMPL-01 template toggle + TMPL-11 orphan-branch release smoke with git rev-list --all --count == 1)"
-last_updated: "2026-04-15T21:45:39.526Z"
+status: Phase 07 complete
+stopped_at: "Completed 07-05-PLAN.md — Phase 7 (neutral-template-foundation) done (5/5 plans)"
+last_updated: "2026-04-15T22:30:00.000Z"
 progress:
-  total_phases: 5
-  completed_phases: 0
+  total_phases: 6
+  completed_phases: 1
   total_plans: 5
-  completed_plans: 4
+  completed_plans: 5
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-15)
 
 **Core value:** The wiki is a persistent, compounding artifact -- cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested.
-**Current focus:** Phase 07 — neutral-template-foundation
+**Current focus:** Phase 07 complete — ready for Phase 08 (Two-Track Setup: Wizard + Manual)
 
 ## Current Position
 
-Phase: 07 (neutral-template-foundation) — EXECUTING
-Plan: 5 of 5
+Phase: 07 (neutral-template-foundation) — COMPLETE (5/5 plans)
+Next: Phase 08 (two-track-setup-wizard-manual) — not yet planned
 
 ## Performance Metrics
 
@@ -70,6 +70,7 @@ Plan: 5 of 5
 | Phase 07 P02 | 12min | 2 tasks | 19 files |
 | Phase 07 P03 | 5min | 2 tasks | 11 files |
 | Phase 07 P04 | 4min | 2 tasks | 24 files |
+| Phase 07 P05 | 65min | 5 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -152,6 +153,12 @@ Recent decisions affecting current work:
 - [Phase 07]: [Phase 07-04] <org>/<repo> angle-bracket placeholder used 7× across README/LICENSE/quickstart/release.md; no your-org/USER-REPO forms (D-02 template-wide convention)
 - [Phase 07-neutral-template-foundation]: NEUT-08 (personal-vault denylist coverage) deferred to a follow-up PR per user decision 'approved — minimal'; v1.1 ships with the Kahneman-only category (NEUT-06). Creator-specific personal terms will be added after a separate .planning/notes/ + git-history suggest-denylist pass is reviewed.
 - [Phase 07-neutral-template-foundation]: 07-05 Task 2 Rule 1/2 auto-fix: bin/check-neutrality.sh gained three exemptions to make 'kahneman' denylist pass against real repo — (1) SELF_REFERENTIAL_EXEMPT skips bin/check-neutrality.sh itself; (2) line-level strip of sanctioned 'examples/kahneman/...' path refs (mirrors 07-03/07-04 precedent); (3) frontmatter neutrality_exempt: true per-file skip (mirrors bin/lint.sh example:true from 07-02). Applied neutrality_exempt to wiki/decisions/dr-2026-04-15-kahneman-to-examples.md (that record IS about Kahneman relocation).
+- [Phase 07-05]: bin/release.sh uses fresh-temp-dir allowlist staging (never worktree mutation) — safe-by-construction per REVIEWS.md HIGH #1; allowlist is the authoritative public-file set, adding a public file is an explicit code change.
+- [Phase 07-05]: .github/workflows/neutrality.yml uses pull_request = hard gate + push = advisory. Real enforcement is branch-protection required status check 'neutrality'; push trigger exists only for informational early-warning.
+- [Phase 07-05]: TMPL-11 verified live — bash bin/release.sh --remote <throwaway> --apply produced single-commit history (git rev-list --all --count == 1 PASS) with denylist 8/8 absent and allowlist 6/6 present on fresh clone.
+- [Phase 07-05]: TMPL-01 mechanics proven on throwaway YishaiRetyk/template-smoke-test — is_template: true toggled + branch protection requires 'neutrality' status check. Real public template repo name deferred to operator decision; runbook at docs/reference/release.md is sufficient for name-pick.
+- [Phase 07-05]: release.sh local_only regex tightened (fix 21e0445) to exclude AGENTS.md enum-documentation contexts; release.md smoke grep excludes --exclude=release.md to skip the runbook's own self-reference (fix a1b2afd).
+- [Phase 07-05]: NEUT-08 deferred to a follow-up PR; 861-line deterministic --suggest-denylist candidate output preserved at .planning/backlog-neutrality-denylist-candidate.txt for later hand-curated review.
 
 ### Pending Todos
 
@@ -174,6 +181,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-15T21:45:39.523Z
-Stopped at: 07-05 Task 5 CHECKPOINT: awaiting human action (TMPL-01 template toggle + TMPL-11 orphan-branch release smoke with git rev-list --all --count == 1)
+Last session: 2026-04-15T22:30:00.000Z
+Stopped at: Completed 07-05-PLAN.md — Phase 7 (neutral-template-foundation) done (5/5 plans). Ready for /gsd:plan-phase 8 (two-track-setup-wizard-manual).
 Resume file: None

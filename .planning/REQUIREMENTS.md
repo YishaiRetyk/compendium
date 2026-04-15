@@ -12,7 +12,7 @@ Numbering continues from v1.0. New REQ-ID prefixes: `TMPL`, `NEUT`, `WZRD`, `MAN
 
 ### Template Repo Structure (TMPL)
 
-- [ ] **TMPL-01**: Repository is configured as a GitHub Template (green "Use this template" button)
+- [x] **TMPL-01**: Repository is configured as a GitHub Template (green "Use this template" button) — mechanically verified on throwaway YishaiRetyk/template-smoke-test (is_template: true + branch-protection status check 'neutrality'); real public repo name deferred to operator decision
 - [x] **TMPL-02**: Repo ships with top-level `README.md` containing a ≤60-second pitch + link to `docs/quickstart.md`
 - [x] **TMPL-03**: Repo ships with `LICENSE` file (MIT or Apache-2.0)
 - [x] **TMPL-04**: `.gitignore` pre-configured for Obsidian (`.obsidian/workspace*.json`, `.obsidian/cache`, `.trash/`) and `.brownfield/`
@@ -22,7 +22,7 @@ Numbering continues from v1.0. New REQ-ID prefixes: `TMPL`, `NEUT`, `WZRD`, `MAN
 - [x] **TMPL-08**: `/docs/reference/` contains `schema-tour.md`, `brownfield.md`, `privacy-model.md`, `ci.md`, `examples.md`
 - [x] **TMPL-09**: Top-level `PRIVACY.md` page surfacing the local_only / cloud_safe convention
 - [x] **TMPL-10**: `CLAUDE.md` exists at repo root alongside `AGENTS.md` (symlink or identical content — agent-agnostic from filename up)
-- [ ] **TMPL-11**: Release process uses orphan-branch publish so v1.0 personal git history does not ship (pitfall C-1 mitigation)
+- [x] **TMPL-11**: Release process uses orphan-branch publish so v1.0 personal git history does not ship (pitfall C-1 mitigation) — verified live: `bin/release.sh --apply` on throwaway produced `git rev-list --all --count == 1` PASS
 
 ### Neutralization & Examples (NEUT)
 
@@ -31,9 +31,9 @@ Numbering continues from v1.0. New REQ-ID prefixes: `TMPL`, `NEUT`, `WZRD`, `MAN
 - [x] **NEUT-03**: `AGENTS.md` sections that need examples add `See: examples/kahneman/...` pointers instead of inlining
 - [x] **NEUT-04**: New optional frontmatter field `example: true` documented in `AGENTS.md §5`; `bin/lint.sh EXCLUDE_DIRS` honors `examples/` and/or `example: true`
 - [x] **NEUT-05**: `examples/kahneman/README.md` explains why the cluster is preserved and how to use it as a reference
-- [ ] **NEUT-06**: CI neutrality gate: grep-based check that **public control-plane surfaces** (`AGENTS.md`, `CLAUDE.md`, `README.md`, `PRIVACY.md`, `/docs/**`, `.github/**`, `wiki/**`, `bin/**`) contain zero Kahneman-specific strings; `examples/kahneman/**` is explicitly excluded from the check as the permitted home for Kahneman content (runs on every PR) (pitfall C-1)
+- [x] **NEUT-06**: CI neutrality gate: grep-based check that **public control-plane surfaces** (`AGENTS.md`, `CLAUDE.md`, `README.md`, `PRIVACY.md`, `/docs/**`, `.github/**`, `wiki/**`, `bin/**`) contain zero Kahneman-specific strings; `examples/kahneman/**` is explicitly excluded from the check as the permitted home for Kahneman content (runs on every PR) (pitfall C-1)
 - [x] **NEUT-07**: Decision record `dr-YYYY-MM-DD-kahneman-to-examples.md` committed (SUPERSEDE-class structural reorg per §11.4)
-- [ ] **NEUT-08**: CI personal-content denylist check covering domain terms from the creator's private vault, runs on PR diff restricted to public control-plane paths (excludes `examples/kahneman/**`) (pitfall C-1 mitigation)
+- [ ] **NEUT-08** *(deferred — partial)*: CI personal-content denylist check covering domain terms from the creator's private vault, runs on PR diff restricted to public control-plane paths (excludes `examples/kahneman/**`) (pitfall C-1 mitigation). **Status:** Infrastructure shipped (bin/check-neutrality.sh supports denylist gating on public paths); personal-term denylist entries deferred to a follow-up PR per user decision "approved — minimal". Candidate material preserved at `.planning/backlog-neutrality-denylist-candidate.txt` (861-line deterministic --suggest-denylist output) for later hand-curated review.
 
 ### Guided Setup Wizard (WZRD)
 
@@ -160,7 +160,7 @@ Explicitly excluded from v1.1. Documented to prevent scope creep.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TMPL-01 | Phase 7 | Pending |
+| TMPL-01 | Phase 7 | Complete |
 | TMPL-02 | Phase 7 | Complete |
 | TMPL-03 | Phase 7 | Complete |
 | TMPL-04 | Phase 7 | Complete |
@@ -170,15 +170,15 @@ Explicitly excluded from v1.1. Documented to prevent scope creep.
 | TMPL-08 | Phase 7 | Complete |
 | TMPL-09 | Phase 7 | Complete |
 | TMPL-10 | Phase 7 | Complete |
-| TMPL-11 | Phase 7 | Pending |
+| TMPL-11 | Phase 7 | Complete |
 | NEUT-01 | Phase 7 | Complete |
 | NEUT-02 | Phase 7 | Complete |
 | NEUT-03 | Phase 7 | Complete |
 | NEUT-04 | Phase 7 | Complete |
 | NEUT-05 | Phase 7 | Complete |
-| NEUT-06 | Phase 7 | Pending |
+| NEUT-06 | Phase 7 | Complete |
 | NEUT-07 | Phase 7 | Complete |
-| NEUT-08 | Phase 7 | Pending |
+| NEUT-08 | Phase 7 | Deferred (partial — infrastructure shipped, denylist entries pending follow-up PR) |
 | DEBT-03 | Phase 7 | Complete |
 | WZRD-01 | Phase 8 | Pending |
 | WZRD-02 | Phase 8 | Pending |

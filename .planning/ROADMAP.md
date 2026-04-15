@@ -21,7 +21,7 @@
 
 ### 🚧 v1.1 Shareability (Phases 7–12)
 
-- [ ] **Phase 7: Neutral Template Foundation** — Public orphan-branch template, Kahneman → `examples/`, neutrality CI gate, `requirements-sync` mechanical check.
+- [x] **Phase 7: Neutral Template Foundation** — Public orphan-branch template, Kahneman → `examples/`, neutrality CI gate, `requirements-sync` mechanical check. (5/5 plans complete 2026-04-15)
 - [ ] **Phase 8: Two-Track Setup (Wizard + Manual)** — `bin/init-wizard.sh` plus byte-equivalent manual track, co-shipped to prevent drift.
 - [ ] **Phase 9: Collaborative PR Workflow + CI Lint Gate** — Git-based PR workflow, `log.md` contributor field, `bin/lint.sh --ci --format json` severity policy, privacy-leak guard.
 - [ ] **Phase 10: Brownfield Scan + Bootstrap** — `bin/brownfield.sh scan|bootstrap` with `bootstrap_stage` sentinel, ruamel.yaml round-trip, byte-exact fixture tests.
@@ -46,7 +46,7 @@ Plans:
 - [x] 07-02-PLAN.md — Relocate Kahneman cluster to examples/, shrink wiki to skeleton, extend lint EXCLUDE_DIRS, commit NEUT-07 decision record
 - [x] 07-03-PLAN.md — Neutralize AGENTS.md + produce schema/AGENTS.template.md + CLAUDE.md byte-dup + pre-commit hook
 - [x] 07-04-PLAN.md — Top-level scaffolding (README, LICENSE, PRIVACY, .gitignore) + docs/ four-track skeleton + release runbook
-- [ ] 07-05-PLAN.md — bin/check-neutrality.sh + human-reviewed denylist + bin/release.sh + neutrality CI workflow
+- [x] 07-05-PLAN.md — bin/check-neutrality.sh + human-reviewed denylist + bin/release.sh + neutrality CI workflow
 
 ### Phase 8: Two-Track Setup (Wizard + Manual)
 **Goal**: A new adopter can reach a working personalized `AGENTS.md` by either running `bin/init-wizard.sh` or hand-editing per `docs/manual-setup.md` — and both paths produce a byte-identical end state.
@@ -130,7 +130,7 @@ Plans:
 | 4. Query & Structured Operations | v1.0 | 6/6 | Complete | 2026-04-13 |
 | 5. Lint & Quality | v1.0 | 4/4 | Complete | 2026-04-14 |
 | 6. Reflection & Drift Detection | v1.0 | 3/3 | Complete | 2026-04-15 |
-| 7. Neutral Template Foundation | v1.1 | 0/5 | Not started | - |
+| 7. Neutral Template Foundation | v1.1 | 5/5 | Complete | 2026-04-15 |
 | 8. Two-Track Setup (Wizard + Manual) | v1.1 | 0/0 | Not started | - |
 | 9. Collaborative PR Workflow + CI Lint Gate | v1.1 | 0/0 | Not started | - |
 | 10. Brownfield Scan + Bootstrap | v1.1 | 0/0 | Not started | - |
