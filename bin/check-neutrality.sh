@@ -55,6 +55,18 @@ Extraction rule:
   - Preserve hyphenated slugs as single tokens
   - Sort lexicographically within each source group
 
+Scan-mode exemptions:
+  - Directories named `examples/` are pruned (D-06 — sole sanctioned home
+    for reference-example clusters).
+  - Files listed in the scanner's SELF_REFERENTIAL_EXEMPT set are skipped
+    (the scanner itself must describe the denylist by name to do its job).
+  - Lines whose only match occurs inside a sanctioned `examples/kahneman/...`
+    path reference are exempted (pointer lines like `See: examples/kahneman/...`
+    are legitimate — mirrors 07-03/07-04 test precedent).
+  - Markdown files with `neutrality_exempt: true` in frontmatter are skipped
+    per-page (reserved for meta/schema records that legitimately discuss
+    neutralization history, e.g. the Kahneman-to-examples decision record).
+
 Exit codes:
   0  clean (or suggest/show-stopwords completed)
   1  script failure (missing denylist in scan mode, bad args)
@@ -144,6 +156,34 @@ def load_denylist(path):
             terms.append(s.lower())
     return terms
 
+# Exempt paths that MUST reference the denylist terms by name to do their job
+# (the scanner itself talks about what it filters).
+SELF_REFERENTIAL_EXEMPT = {
+    "bin/check-neutrality.sh",
+}
+
+# Line-level sanctioned-path exemption (mirrors 07-03 test_agents_neutralized.sh
+# and 07-04 test_no_kahneman_in_public_docs.sh precedent): strip sanctioned
+# `examples/kahneman/...` path references from the line before term matching, so
+# legitimate `See: examples/kahneman/...` pointers don't trip the gate.
+SANCTIONED_PATH_RE = re.compile(r"examples/kahneman[a-z0-9._/-]*", re.IGNORECASE)
+
+def parse_frontmatter_block(text):
+    """Return raw frontmatter string or None."""
+    if not text.startswith("---"):
+        return None
+    end = text.find("\n---", 3)
+    if end == -1:
+        return None
+    return text[3:end].strip()
+
+def has_neutrality_exempt(text):
+    """True if file frontmatter sets `neutrality_exempt: true`."""
+    fm = parse_frontmatter_block(text)
+    if fm is None:
+        return False
+    return bool(re.search(r"^neutrality_exempt:\s*true\b", fm, re.M | re.I))
+
 def scan():
     terms = load_denylist(DENYLIST)
     if terms is None:
@@ -169,16 +209,25 @@ def scan():
             _, ext = os.path.splitext(t)
             if ext and ext.lower() not in (".md", ".sh", ".yml", ".yaml", ".txt", ".json", ".py", ".toml", ".ini", ".cfg"):
                 continue
+            rel_path = os.path.relpath(t, ROOT)
+            # Skip self-referential scanner paths (must describe denylist by name).
+            if rel_path in SELF_REFERENTIAL_EXEMPT:
+                continue
             try:
                 with open(t, "r", encoding="utf-8", errors="replace") as f:
-                    for i, line in enumerate(f, 1):
-                        lc = line.lower()
-                        for term in terms:
-                            if term in lc:
-                                rel_path = os.path.relpath(t, ROOT)
-                                hits.append({"path": rel_path, "line": i, "term": term})
+                    text = f.read()
             except OSError:
                 continue
+            # Page-level exemption via frontmatter (applies to .md only).
+            if ext.lower() == ".md" and has_neutrality_exempt(text):
+                continue
+            for i, line in enumerate(text.splitlines(), 1):
+                # Line-level exemption: strip sanctioned examples/kahneman/ path
+                # references from the line before term matching.
+                scrubbed = SANCTIONED_PATH_RE.sub("", line).lower()
+                for term in terms:
+                    if term in scrubbed:
+                        hits.append({"path": rel_path, "line": i, "term": term})
     hits.sort(key=lambda h: (h["path"], h["line"], h["term"]))
     if FORMAT == "json":
         print(json.dumps(hits, indent=2))

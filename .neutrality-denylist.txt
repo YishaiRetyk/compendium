@@ -1,0 +1,10 @@
+# Category: Kahneman reference example terms (NEUT-06)
+# Kahneman content lives legitimately in examples/kahneman/** only.
+kahneman
+daniel kahneman
+prospect theory
+loss aversion
+thinking fast and slow
+system 1
+system 2
+cognitive biases
