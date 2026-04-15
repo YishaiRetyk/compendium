@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Ready to execute
-stopped_at: Completed 06-02-PLAN.md
-last_updated: "2026-04-15T06:09:54.166Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 06-03-PLAN.md
+last_updated: "2026-04-15T07:43:41.464Z"
 progress:
   total_phases: 7
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 24
-  completed_plans: 23
+  completed_plans: 24
 ---
 
 # Project State
@@ -65,6 +65,7 @@ Plan: 3 of 3
 | Phase 05 P04 | 1min | 2 tasks | 2 files |
 | Phase 06 P01 | 4min | 2 tasks | 4 files |
 | Phase 06 P02 | 5min | 2 tasks | 1 files |
+| Phase 06 P03 | 3min | 3 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -120,6 +121,9 @@ Recent decisions affecting current work:
 - [Phase 06]: decision_history is an optional back-link field, not part of BASE_FIELDS
 - [Phase 06]: Content-hash drift auto-fix gated behind --fix flag (same pattern as stale markers)
 - [Phase 06]: Lint report groups findings by category within severity for drift visibility
+- [Phase 06]: Inline decision record hooks include explicit skip criteria (trivial merges, routine stale-claim supersessions) to prevent record inflation
+- [Phase 06]: Reflect checkpoint advances even on no-op passes to avoid re-scanning clean history
+- [Phase 06]: Log.md (intent) vs git log (file changes) deduplication rule: log.md is primary trigger, git-only changes signal unrecorded work
 
 ### Pending Todos
 
@@ -132,6 +136,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-15T06:09:54.164Z
-Stopped at: Completed 06-02-PLAN.md
+Last session: 2026-04-15T07:43:41.461Z
+Stopped at: Completed 06-03-PLAN.md
 Resume file: None

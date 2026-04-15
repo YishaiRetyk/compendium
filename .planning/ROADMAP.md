@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 3: Ingestion & Provenance Pipeline** - Source ingestion workflow, multi-pass compilation pipeline, claim-level provenance, and ingest CLI helper
 - [ ] **Phase 4: Query & Structured Operations** - Question answering with delta compilation, structured operations (UPDATE/MERGE/SUPERSEDE/ARCHIVE), and search CLI helper
 - [ ] **Phase 5: Lint & Quality** - Contradiction detection, staleness tracking, knowledge gap detection, full lint workflow, and lint CLI helper
-- [ ] **Phase 6: Reflection & Drift Detection** - Decision records, reflect workflow, and cross-system drift detection
+- [x] **Phase 6: Reflection & Drift Detection** - Decision records, reflect workflow, and cross-system drift detection (completed 2026-04-15)
 
 ## Phase Details
 
@@ -116,11 +116,11 @@ Plans:
   2. The reflect workflow is documented in the schema and produces decision records that are navigable in Obsidian
   3. The system detects when raw sources have no wiki pages, when wiki pages reference missing sources, and when drift exists between wiki and broader toolchain (Obsidian vault, Zotero, cloud/local)
   4. Drift detection is integrated into the lint workflow so it runs as part of regular health checks
-**Plans:** 3 plans
+**Plans:** 3/3 plans complete
 Plans:
 - [x] 06-01-PLAN.md — Decision record page type: template, example page, AGENTS.md sections 4.6/5/12, index category
 - [x] 06-02-PLAN.md — Drift detection in bin/lint.sh: 5 drift checks, decision page validation, category-labeled report
-- [ ] 06-03-PLAN.md — Reflect workflow: AGENTS.md section 11.4 three-tier model, section 9 inline hooks, section 11.3 drift steps, checkpoint state file, human verification
+- [x] 06-03-PLAN.md — Reflect workflow: AGENTS.md section 11.4 three-tier model, section 9 inline hooks, section 11.3 drift steps, checkpoint state file, human verification
 
 ## Backlog
 
@@ -145,4 +145,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 3. Ingestion & Provenance Pipeline | 4/5 | In Progress|  |
 | 4. Query & Structured Operations | 0/6 | Not started | - |
 | 5. Lint & Quality | 0/4 | Not started | - |
-| 6. Reflection & Drift Detection | 0/3 | Not started | - |
+| 6. Reflection & Drift Detection | 3/3 | Complete   | 2026-04-15 |

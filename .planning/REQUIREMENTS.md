@@ -121,7 +121,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **DCSN-01**: Reflection entries recording why structural changes were made to the wiki
 - [x] **DCSN-02**: Decision records capture what framing was adopted, what it replaced, and alternatives considered
-- [ ] **DCSN-03**: Reflect workflow documented in schema
+- [x] **DCSN-03**: Reflect workflow documented in schema
 
 ### Lint & Maintenance
 
@@ -300,7 +300,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CLI-03 | Phase 5 | Complete |
 | DCSN-01 | Phase 6 | Complete |
 | DCSN-02 | Phase 6 | Complete |
-| DCSN-03 | Phase 6 | Pending |
+| DCSN-03 | Phase 6 | Complete |
 | DRFT-01 | Phase 6 | Complete |
 | DRFT-02 | Phase 6 | Complete |
 | DRFT-03 | Phase 6 | Complete |
