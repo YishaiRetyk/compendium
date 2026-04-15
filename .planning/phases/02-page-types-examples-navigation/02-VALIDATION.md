@@ -38,12 +38,12 @@ created: 2026-04-09
 
 | Task ID | Plan | Wave | Requirements | Test Type | Automated Command | Status |
 |---------|------|------|-------------|-----------|-------------------|--------|
-| 02-01-T1 | 01 | 1 | PAGE-01, PAGE-02, PAGE-06, PAGE-07 | grep structural | `grep -c "^---" schema/templates/entity.md && grep "^type:" schema/templates/entity.md && grep -c "## TL;DR" schema/templates/entity.md` | ⬜ pending |
-| 02-01-T2 | 01 | 1 | PAGE-03, PAGE-04, PAGE-05 | grep structural | `grep -c "^---" schema/templates/source-summary.md && grep "^type:" schema/templates/comparison.md && grep "## Comparison Table" schema/templates/comparison.md` | ⬜ pending |
-| 02-02-T1 | 02 | 2 | EXMP-01, EXMP-02, EPST-01, EPST-02 | test + grep | `test -f wiki/entities/daniel-kahneman.md && grep -c "\[epistemic::" wiki/entities/daniel-kahneman.md && grep -c "\[prov:" wiki/concepts/cognitive-biases.md` | ⬜ pending |
-| 02-02-T2 | 02 | 2 | EXMP-03, EXMP-04 | test + grep | `test -f wiki/sources/src-*thinking-fast*.md && grep -c "\[\[" wiki/comparisons/system-1-vs-system-2.md && grep "## Comparison Table" wiki/comparisons/system-1-vs-system-2.md` | ⬜ pending |
-| 02-03-T1 | 03 | 3 | EXMP-05, INDX-01, INDX-02, INDX-03, LOG-01, LOG-02, LOG-03 | grep + wc | `grep -c "\[\[" wiki/index.md && grep -P "^\d{4}-\d{2}-\d{2}" wiki/log.md && grep "^## " wiki/index.md` | ⬜ pending |
-| 02-03-T2 | 03 | 3 | EPST-03, PAGE-06 | grep | `grep "### Inline Epistemic Markers" AGENTS.md && grep "### Mixed Inline Grammar" AGENTS.md` | ⬜ pending |
+| 02-01-T1 | 01 | 1 | PAGE-01, PAGE-02, PAGE-06, PAGE-07 | grep structural | `grep -c "^---" schema/templates/entity.md && grep "^type:" schema/templates/entity.md && grep -c "## TL;DR" schema/templates/entity.md` | ✅ green |
+| 02-01-T2 | 01 | 1 | PAGE-03, PAGE-04, PAGE-05 | grep structural | `grep -c "^---" schema/templates/source-summary.md && grep "^type:" schema/templates/comparison.md && grep "## Comparison Table" schema/templates/comparison.md` | ✅ green |
+| 02-02-T1 | 02 | 2 | EXMP-01, EXMP-02, EPST-01, EPST-02 | test + grep | `test -f wiki/entities/daniel-kahneman.md && grep -c "\[epistemic::" wiki/entities/daniel-kahneman.md && grep -c "\[prov:" wiki/concepts/cognitive-biases.md` | ✅ green |
+| 02-02-T2 | 02 | 2 | EXMP-03, EXMP-04 | test + grep | `ls wiki/sources/src-*thinking-fast*.md && grep -c "\[\[" wiki/comparisons/system-1-vs-system-2.md && grep "## Comparison Table" wiki/comparisons/system-1-vs-system-2.md` | ✅ green |
+| 02-03-T1 | 03 | 3 | EXMP-05, INDX-01, INDX-02, INDX-03, LOG-01, LOG-02, LOG-03 | grep + wc | `grep -c "\[\[" wiki/index.md && grep -cP "^## \[\d{4}-\d{2}-\d{2}\]" wiki/log.md && grep "^## " wiki/index.md` | ✅ green |
+| 02-03-T2 | 03 | 3 | EPST-03, PAGE-06 | grep | `grep "### Inline Epistemic Markers" AGENTS.md && grep "### Mixed Inline Grammar" AGENTS.md` | ✅ green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -75,3 +75,18 @@ Existing infrastructure covers all phase requirements. All validation uses inlin
 - [x] `nyquist_compliant: true` set in frontmatter
 
 **Approval:** approved 2026-04-09
+
+---
+
+## Validation Audit 2026-04-15
+
+| Metric | Count |
+|--------|-------|
+| Gaps found | 2 |
+| Resolved | 2 |
+| Escalated | 0 |
+
+**Findings:**
+- 02-03-T1 LOG-01/02/03: regex `^\d{4}-\d{2}-\d{2}` did not match actual log format `## [YYYY-MM-DD]`. Fixed to `^## \[\d{4}-\d{2}-\d{2}\]` (matches 14 entries).
+- 02-02-T2 EXMP-03: `test -f` does not expand globs. Replaced with `ls` (resolves to `src-2026-04-09-thinking-fast-and-slow-part1.md`).
+- All 6 task verification commands now run green. Phase remains `nyquist_compliant: true`.
