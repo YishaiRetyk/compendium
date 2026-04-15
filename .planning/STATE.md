@@ -134,6 +134,12 @@ None yet.
 - Research flags Phase 3 (ingest prompts) and Phase 5 (contradiction detection) as areas needing empirical iteration
 - REQUIREMENTS.md stated 70 requirements but actual count is 95 -- traceability section corrected
 
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260415-fvc | fix DRFT-02 error | 2026-04-15 | ad33cb7 | [260415-fvc-fix-drft-02-error](./quick/260415-fvc-fix-drft-02-error/) |
+
 ## Session Continuity
 
 Last session: 2026-04-15T07:43:41.461Z
