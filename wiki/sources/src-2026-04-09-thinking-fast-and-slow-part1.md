@@ -23,11 +23,11 @@ has_contradictions: false
 knowledge_domain: science
 path: sources/2026/2026-04/2026-04-09-thinking-fast-and-slow-part1/source.md
 url: ""
-content_hash: "sha256:a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2"
+content_hash: "sha256:db640860c05b118bf595ad60cd4918a21abe80b7b0f50441feea6ab0da9ecbda"
 ingested_at: 2026-04-09
 source_type: book-chapter
 compilation_status: compiled
-compiled_against_hash: "sha256:a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2"
+compiled_against_hash: "sha256:db640860c05b118bf595ad60cd4918a21abe80b7b0f50441feea6ab0da9ecbda"
 compiled_targets:
   - daniel-kahneman
   - cognitive-biases
