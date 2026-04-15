@@ -1283,13 +1283,13 @@ The write-back decision MUST be logged -- structured and terse, stating which tr
 
 **Question:** "What cognitive biases are related to loss aversion?"
 
-1. **Search:** `bin/search.sh "loss aversion"` returns `wiki/concepts/loss-aversion.md`, `wiki/concepts/cognitive-biases.md`, `wiki/concepts/prospect-theory.md`.
+1. **Search:** `bin/search.sh "loss aversion"` returns matching concept and overview pages under `wiki/concepts/` (see `examples/kahneman/concepts/` for a worked reference cluster).
 2. **Shallow read:** Read TL;DR of all three pages. loss-aversion.md covers the core bias. cognitive-biases.md lists bias families. prospect-theory.md frames loss aversion within PT.
 3. **Deep read:** Read Detail section of cognitive-biases.md to find bias family relationships.
 4. **Synthesize:** Answer cites all three pages with provenance markers.
-5. **Write-back decision:** The answer connects loss aversion to specific bias families (anchoring, status quo bias, endowment effect) in a way not explicitly articulated in any single page. Trigger: "new connection between existing pages." Decision: UPDATE `wiki/concepts/loss-aversion.md` to add a "Related Biases" subsection.
+5. **Write-back decision:** The answer connects loss aversion to specific bias families (anchoring, status quo bias, endowment effect) in a way not explicitly articulated in any single page. Trigger: "new connection between existing pages." Decision: UPDATE the relevant concept page to add a "Related Biases" subsection.
 6. **Delta compilation:** Check sources. `src-2026-04-10-kahneman-prospect-theory.md` has `compilation_status: compiled`. No delta needed.
-7. **Apply:** Run `bin/validate-op.sh UPDATE wiki/concepts/loss-aversion.md` -> PASS. Apply UPDATE using append-then-synthesize policy.
+7. **Apply:** Run `bin/validate-op.sh UPDATE wiki/concepts/<page>.md` -> PASS. Apply UPDATE using append-then-synthesize policy.
 8. **Index:** No new pages created, but loss-aversion.md summary in index updated to reflect new subsection.
 9. **Log:**
    ```
