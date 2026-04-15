@@ -43,3 +43,7 @@ privacy: cloud_safe
 
 - [[Decision Making]] -- Overview of how humans make choices under uncertainty, shaped by cognitive biases and dual-process thinking (mixed, 2026-04-12)
 - [[personal-decision-patterns]] -- Personal experiential patterns in applying decision-making frameworks to real life (sourced, 2026-04-10, **local_only**)
+
+## Decisions
+
+- [[dr-2026-04-14-phase6-decision-type]] -- Decision records are a dedicated page type with their own template, directory, and index category (sourced, 2026-04-14)

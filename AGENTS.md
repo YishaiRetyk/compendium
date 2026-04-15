@@ -470,6 +470,85 @@ Current challenges include interpretability, energy consumption, safety alignmen
 - [[src-2026-04-02-lstm-survey]]: "A Survey of LSTM and GRU Architectures" (2026-04-02)
 ```
 
+### 4.6 Decision (`type: decision`)
+
+Decision records capture why structural changes were made to the wiki. They answer the question: "Why is the wiki shaped this way?" Create a decision record when future-you would reasonably ask that question.
+
+**When to use:**
+
+- Page merges or splits
+- Schema updates (new fields, changed conventions)
+- Domain reorganization (moving pages between categories)
+- Significant reframing of a concept or topic
+- Major supersession (SUPERSEDE of a key page or concept)
+- Contradiction-resolution decisions (structural resolution, not the contradiction itself)
+
+**Directory:** `wiki/decisions/`
+
+**File naming:** `dr-YYYY-MM-DD-slug.md`. The `dr-` prefix prevents ID collisions with other page types. The date provides natural chronological sorting. The slug provides human readability.
+
+**ID convention:** Same as filename without `.md` extension: `dr-YYYY-MM-DD-slug`. Use lowercase, hyphen-separated slugs. The ID is used in `decision_history` on affected pages.
+
+**Frontmatter (in addition to base fields):**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `trigger_type` | enum | Yes | One of: `merge`, `split`, `schema-update`, `domain-reorg`, `reframing`, `contradiction-resolution` |
+| `affected_pages` | list | Yes | YAML list of page IDs (the `id` field value) of pages affected by this decision. Empty list `[]` is valid for inaugural or infrastructure-only records. |
+
+**Section ordering (all required):**
+
+1. ## TL;DR
+2. ## Decision
+3. ## Why -- Must state what framing was adopted and what it replaced.
+4. ## Alternatives Considered -- Must list alternatives and why they were rejected.
+5. ## Consequences
+6. ## Affected Pages -- Wikilinks to affected pages with how each was affected.
+7. ## Sources
+
+**Epistemic pattern:** Decision records use `epistemic_status: sourced` (the decision itself is the source of truth). They do NOT participate in staleness tracking or contradiction detection -- a decision is a historical fact, not a claim that can become stale.
+
+**`decision_history` back-link:** Pages affected by a decision gain a `decision_history` field in their frontmatter -- a YAML list of decision record IDs. This field is optional (not part of BASE_FIELDS); it is added when the first decision references a page. A visible "Decision History" section in the page body is optional -- include only when the history is meaningful for readers.
+
+**Worked example:**
+
+```markdown
+---
+id: dr-2026-04-14-phase6-decision-type
+title: "Introduce Decision Record Page Type"
+type: decision
+status: active
+summary: "Decision records are a dedicated page type (type: decision) with their own template, directory (wiki/decisions/), and index category, rather than overloading the overview type."
+created_at: 2026-04-14
+updated_at: 2026-04-14
+sources: []
+epistemic_status: sourced
+tags:
+  - meta
+  - schema
+domains:
+  - wiki-infrastructure
+privacy: cloud_safe
+knowledge_domain: software
+trigger_type: schema-update
+affected_pages: []
+---
+
+## TL;DR
+
+Decision records get a dedicated `type: decision` page type with their own template, directory, and index category, replacing the prior convention of storing them as overview pages.
+
+## Decision
+
+Created `wiki/decisions/` as a first-class content directory, `schema/templates/decision.md` as the canonical template, and added `decision` to the `type` enum. Decision records use a fixed section ordering and introduce two type-specific frontmatter fields (`trigger_type`, `affected_pages`).
+
+## Why
+
+The previous reflect workflow stored decision records as overview pages in `wiki/overviews/`, conflating structural reasoning with topic synthesis. The framing adopted is "decision records as a first-class page type." The framing it replaced is "decision records overloaded onto the overview type."
+
+(...remaining sections: Alternatives Considered, Consequences, Affected Pages, Sources.)
+```
+
 ## 5. Frontmatter Schema
 
 ### Base Fields (Required on Every Wiki Page)
@@ -478,7 +557,7 @@ Current challenges include interpretability, energy consumption, safety alignmen
 ---
 id: slug-style-identifier          # Unique page ID, kebab-case
 title: "Human Readable Title"      # Canonical page title
-type: entity|concept|source|comparison|overview
+type: entity|concept|source|comparison|overview|decision
 status: active|stale|superseded|archived
 summary: "One-sentence description for index scanning."
 created_at: YYYY-MM-DD            # ISO 8601
@@ -506,7 +585,7 @@ knowledge_domain: ""            # Primary decay-rate bucket (maps to Section 6 d
 |-------|------|-------------|
 | `id` | string | Unique identifier in kebab-case. Used in `sources` lists and `[prov:]` markers. Must match the filename (without `.md`). |
 | `title` | string | Human-readable canonical title. Wikilinks resolve to this value. |
-| `type` | enum | Page type: `entity`, `concept`, `source`, `comparison`, `overview`. Determines section structure. |
+| `type` | enum | Page type: `entity`, `concept`, `source`, `comparison`, `overview`, `decision`. Determines section structure. |
 | `status` | enum | Lifecycle state: `active` (current), `stale` (may be outdated), `superseded` (replaced by another page), `archived` (no longer relevant). |
 | `summary` | string | One sentence. Used for index scanning and Dataview table previews. Must be a single quoted string, not multi-line. |
 | `created_at` | date | ISO 8601 date when the page was first created. |
@@ -569,12 +648,29 @@ The following transitions are the ONLY valid state changes. Any other transition
 - `compiled_targets` is empty ONLY when `compilation_status` is `pending`.
 - Pages missing `compilation_status` (pre-Phase-4 legacy) are treated as `compiled` by tooling.
 
+### Decision Record Additional Fields
+
+Decision record pages (`type: decision`) include these additional frontmatter fields:
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `trigger_type` | enum | Yes | What prompted this decision: `merge`, `split`, `schema-update`, `domain-reorg`, `reframing`, `contradiction-resolution` |
+| `affected_pages` | list | Yes | YAML list of page IDs affected by this decision. Used for bidirectional navigation via `decision_history` on those pages. |
+
+### Optional Back-Link Field
+
+Any page type may include this field when referenced by a decision record:
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `decision_history` | list | No | YAML list of decision record IDs (e.g., `[dr-2026-04-14-slug]`). Added when a decision record lists this page in `affected_pages`. NOT a base field -- absence is valid. When present, must be a YAML list of strings. |
+
 ### Frontmatter Validation Checklist
 
 When creating or updating any wiki page, verify:
 
 1. All base fields are present (id, title, type, status, summary, created_at, updated_at, sources, epistemic_status, tags, domains, supersedes, superseded_by, privacy, aliases)
-2. `type` is one of: `entity`, `concept`, `source`, `comparison`, `overview`
+2. `type` is one of: `entity`, `concept`, `source`, `comparison`, `overview`, `decision`
 3. `status` is one of: `active`, `stale`, `superseded`, `archived`
 4. `epistemic_status` is one of: `sourced`, `mixed`, `tentative`, `stale`
 5. `privacy` is one of: `local_only`, `cloud_safe`
@@ -587,6 +683,9 @@ When creating or updating any wiki page, verify:
 12. For `type: source` pages: `compilation_status` is one of: `pending`, `partial`, `compiled`, `stale`
 13. `has_contradictions` is a boolean (`true` or `false`)
 14. `knowledge_domain` is a non-empty string for pages with provenance-backed claims
+15. For `type: decision` pages: `trigger_type` is one of: `merge`, `split`, `schema-update`, `domain-reorg`, `reframing`, `contradiction-resolution`
+16. For `type: decision` pages: `affected_pages` is present and is a YAML list of string IDs
+17. If `decision_history` is present on any page: it is a YAML list of string IDs
 
 ## 6. Provenance, Epistemics, and Staleness
 
@@ -1271,7 +1370,7 @@ Commit:   reflect(<scope>): <one-line summary>
 ### index.md (Content Index)
 
 - Lives at `wiki/index.md`.
-- Organized by page type: Entities, Concepts, Sources, Comparisons, Overviews.
+- Organized by page type: Entities, Concepts, Sources, Comparisons, Overviews, Decisions.
 - Each entry follows the format: `- [[Page Title]] -- <one-line summary> (<epistemic_status>, <updated_at>)`
 - Updated on every ingest and every query that creates or modifies pages.
 - The LLM reads this FIRST when searching for information (per Section 3 and Section 7).
