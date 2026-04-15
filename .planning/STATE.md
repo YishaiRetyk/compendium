@@ -2,11 +2,11 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Shareability
-status: Defining requirements
-stopped_at: Milestone v1.1 started
-last_updated: "2026-04-15T12:30:00.000Z"
+status: Roadmap created — ready for Phase 7 planning
+stopped_at: Roadmap for v1.1 Phases 7-12 created; 78/78 requirements mapped
+last_updated: "2026-04-15T12:37:10.000Z"
 progress:
-  total_phases: 0
+  total_phases: 6
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -19,14 +19,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-15)
 
 **Core value:** The wiki is a persistent, compounding artifact -- cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested.
-**Current focus:** v1.1 Shareability — defining requirements
+**Current focus:** v1.1 Shareability — roadmap created (Phases 7–12), ready to plan Phase 7.
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 7 (Neutral Template Foundation) — not started
 Plan: —
-Status: Defining requirements
-Last activity: 2026-04-15 — Milestone v1.1 started
+Status: Roadmap created; awaiting `/gsd:plan-phase 7`
+Last activity: 2026-04-15 — Roadmap written for v1.1 (6 phases, 78/78 requirements mapped)
 
 ## Performance Metrics
 
@@ -76,6 +76,16 @@ Last activity: 2026-04-15 — Milestone v1.1 started
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
+- [v1.1 Roadmap] 6 phases (7–12) derived from 78 v1.1 requirements (standard granularity); backlog Phase 999.1 superseded (absorbed into Phases 10–11).
+- [v1.1 Roadmap] DEBT-03 (`requirements-sync.sh`) placed in Phase 7 so all subsequent phases benefit from mechanical traceability check (retrospective lesson, pitfall m-4).
+- [v1.1 Roadmap] Phase 7 gates release via orphan-branch runbook + neutrality/denylist CI (pitfall C-1 mitigation).
+- [v1.1 Roadmap] Brownfield split across two phases (10=scan+bootstrap, 11=suggest+verify) to absorb highest-risk surface (pitfalls C-2, C-3) in isolation.
+- [v1.1 Roadmap] `ruamel.yaml` accepted as the single new runtime dep in Phase 10 (BRWN-06) — narrowly scoped to bootstrap round-trip, revises "zero new deps" STACK finding.
+- [v1.1 Roadmap] Wizard + Manual co-ship in Phase 8 with byte-equality CI (MANUAL-06) to prevent track drift (pitfalls M-1/M-3).
+- [v1.1 Roadmap] Contradiction stays warning-only in CI per CI-03 reconciliation; `local_only` privacy guard scoped to public paths only per CI-07.
+- [v1.1 Roadmap] No single-command brownfield chain-runner in v1.1 (deferred to v1.2 BRWNAPPLY-01); v1.1 migration scripts are user-invoked per-class.
+- [v1.1 Roadmap] Zero claim-level schema expansion for imported content — page-level `bootstrap_stage` carries the lineage (BRWN-07, BRWN-15).
+- [v1.1 Roadmap] Phase 12 is a v1.0-debt verification gate (Obsidian render, Codex agent-parity, write-back scenario), not cosmetic polish.
 - Roadmap: 6 phases derived from 95 v1 requirements (standard granularity)
 - Roadmap: CLI helpers distributed across phases 3-5 where their functionality is most relevant
 - Roadmap: Epistemic status placed in Phase 2 (with templates) per research advice that it's foundational to trustworthiness
@@ -133,6 +143,9 @@ None yet.
 
 ### Blockers/Concerns
 
+- Phase 10 needs a YAML-lib spike during planning (ruamel.yaml vs PyYAML order-loss tradeoff); treat ruamel.yaml as the single accepted new runtime dep in Phase 10.
+- Phase 12 depends on Codex (or another non-Claude agent) being accessible; agent-parity tolerance rules need a spike before Phase 12 can green.
+- Phase 12 Obsidian/Dataview render verification may require manual checklist with screenshots if headless Obsidian automation is not available in 2026.
 - Research flags Phase 3 (ingest prompts) and Phase 5 (contradiction detection) as areas needing empirical iteration
 - REQUIREMENTS.md stated 70 requirements but actual count is 95 -- traceability section corrected
 
@@ -145,6 +158,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-15T07:43:41.461Z
-Stopped at: Completed 06-03-PLAN.md
+Last session: 2026-04-15T12:37:10.000Z
+Stopped at: Roadmap created for v1.1 (Phases 7–12)
 Resume file: None

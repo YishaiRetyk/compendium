@@ -31,9 +31,9 @@ Numbering continues from v1.0. New REQ-ID prefixes: `TMPL`, `NEUT`, `WZRD`, `MAN
 - [ ] **NEUT-03**: `AGENTS.md` sections that need examples add `See: examples/kahneman/...` pointers instead of inlining
 - [ ] **NEUT-04**: New optional frontmatter field `example: true` documented in `AGENTS.md §5`; `bin/lint.sh EXCLUDE_DIRS` honors `examples/` and/or `example: true`
 - [ ] **NEUT-05**: `examples/kahneman/README.md` explains why the cluster is preserved and how to use it as a reference
-- [ ] **NEUT-06**: CI neutrality gate: grep-based check that `AGENTS.md` contains zero Kahneman-specific strings (runs on every PR) (pitfall C-1)
+- [ ] **NEUT-06**: CI neutrality gate: grep-based check that **public control-plane surfaces** (`AGENTS.md`, `CLAUDE.md`, `README.md`, `PRIVACY.md`, `/docs/**`, `.github/**`, `wiki/**`, `bin/**`) contain zero Kahneman-specific strings; `examples/kahneman/**` is explicitly excluded from the check as the permitted home for Kahneman content (runs on every PR) (pitfall C-1)
 - [ ] **NEUT-07**: Decision record `dr-YYYY-MM-DD-kahneman-to-examples.md` committed (SUPERSEDE-class structural reorg per §11.4)
-- [ ] **NEUT-08**: CI personal-content denylist check covering domain terms from the creator's private vault, runs on PR diff (pitfall C-1 mitigation)
+- [ ] **NEUT-08**: CI personal-content denylist check covering domain terms from the creator's private vault, runs on PR diff restricted to public control-plane paths (excludes `examples/kahneman/**`) (pitfall C-1 mitigation)
 
 ### Guided Setup Wizard (WZRD)
 
@@ -88,8 +88,8 @@ Numbering continues from v1.0. New REQ-ID prefixes: `TMPL`, `NEUT`, `WZRD`, `MAN
 - [ ] **BRWN-03**: `bin/brownfield.sh bootstrap` is idempotent — running twice is a no-op
 - [ ] **BRWN-04**: `bootstrap` touches only mechanical transforms: sentinel frontmatter (empty values + `bootstrap_stage: bootstrapped`), SHA hashing of source files, `index.md`/`log.md` skeletons if absent, YAML quoting/ordering normalization
 - [ ] **BRWN-05**: `bootstrap` preserves user page bodies verbatim — only frontmatter and scaffolding files are touched (migration-tool rule #1)
-- [ ] **BRWN-06**: `bootstrap` uses `ruamel.yaml` round-trip parsing to preserve comments and key order (pitfall C-2/M-10 mitigation)
-- [ ] **BRWN-07**: New frontmatter field `bootstrap_stage` (enum `raw|bootstrapped|verified`) documented in `AGENTS.md §5`. Semantics carry beyond bootstrap completion — `verified` persists on imported pages permanently, serving as the page-level marker for "content predates the LLM ingest pipeline" (feeds search, audit, and any future provenance tooling that needs the imported-vs-LLM-generated distinction).
+- [ ] **BRWN-06**: `bootstrap` uses `ruamel.yaml` round-trip parsing to preserve comments and key order (pitfall C-2/M-10 mitigation). This introduces the single new runtime dependency in v1.1 (Python 3 + `ruamel.yaml`), scoped to the brownfield path only. Wizard, ingest, search, and lint remain bash + stdlib python3+pyyaml. The dependency must be surfaced in `docs/quickstart.md` and `docs/reference/brownfield.md` so users know brownfield is not bash-native.
+- [ ] **BRWN-07**: New frontmatter field `bootstrap_stage` (enum `raw|bootstrapped|verified`) documented in `AGENTS.md §5` as a narrowly-scoped **brownfield onboarding sentinel** — explicitly NOT a substitute for the claim-level + source-linked provenance model (PROV-01..05). The field tracks migration state; `verified` persists on imported pages as a page-level marker for "content predates the LLM ingest pipeline" and may inform search/audit, but the authoritative provenance mechanism remains claim-level `[prov::...]` markers + source summary pages.
 - [ ] **BRWN-08**: `bin/lint.sh` downgrades allowlist findings (unknown `type`, empty `knowledge_domain`, missing `sources`, `epistemic_status: tentative`) from `error` to `info` when `bootstrap_stage: bootstrapped`
 - [ ] **BRWN-09**: `bin/lint.sh` new `brownfield` category reports counts of pages still in `bootstrapped` state; warns on pages `bootstrapped` older than 30 days
 - [ ] **BRWN-10**: `bin/ingest.sh` strips `bootstrap_stage` if encountered on normal ingest (prevents pollution)
@@ -158,16 +158,92 @@ Explicitly excluded from v1.1. Documented to prevent scope creep.
 
 ## Traceability
 
-Filled by roadmapper during phase creation.
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (pending roadmap) | — | — |
+| TMPL-01 | Phase 7 | Pending |
+| TMPL-02 | Phase 7 | Pending |
+| TMPL-03 | Phase 7 | Pending |
+| TMPL-04 | Phase 7 | Pending |
+| TMPL-05 | Phase 7 | Pending |
+| TMPL-06 | Phase 7 | Pending |
+| TMPL-07 | Phase 7 | Pending |
+| TMPL-08 | Phase 7 | Pending |
+| TMPL-09 | Phase 7 | Pending |
+| TMPL-10 | Phase 7 | Pending |
+| TMPL-11 | Phase 7 | Pending |
+| NEUT-01 | Phase 7 | Pending |
+| NEUT-02 | Phase 7 | Pending |
+| NEUT-03 | Phase 7 | Pending |
+| NEUT-04 | Phase 7 | Pending |
+| NEUT-05 | Phase 7 | Pending |
+| NEUT-06 | Phase 7 | Pending |
+| NEUT-07 | Phase 7 | Pending |
+| NEUT-08 | Phase 7 | Pending |
+| DEBT-03 | Phase 7 | Pending |
+| WZRD-01 | Phase 8 | Pending |
+| WZRD-02 | Phase 8 | Pending |
+| WZRD-03 | Phase 8 | Pending |
+| WZRD-04 | Phase 8 | Pending |
+| WZRD-05 | Phase 8 | Pending |
+| WZRD-06 | Phase 8 | Pending |
+| WZRD-07 | Phase 8 | Pending |
+| WZRD-08 | Phase 8 | Pending |
+| WZRD-09 | Phase 8 | Pending |
+| WZRD-10 | Phase 8 | Pending |
+| WZRD-11 | Phase 8 | Pending |
+| MANUAL-01 | Phase 8 | Pending |
+| MANUAL-02 | Phase 8 | Pending |
+| MANUAL-03 | Phase 8 | Pending |
+| MANUAL-04 | Phase 8 | Pending |
+| MANUAL-05 | Phase 8 | Pending |
+| MANUAL-06 | Phase 8 | Pending |
+| COLAB-01 | Phase 9 | Pending |
+| COLAB-02 | Phase 9 | Pending |
+| COLAB-03 | Phase 9 | Pending |
+| COLAB-04 | Phase 9 | Pending |
+| COLAB-05 | Phase 9 | Pending |
+| COLAB-06 | Phase 9 | Pending |
+| COLAB-07 | Phase 9 | Pending |
+| COLAB-08 | Phase 9 | Pending |
+| CI-01 | Phase 9 | Pending |
+| CI-02 | Phase 9 | Pending |
+| CI-03 | Phase 9 | Pending |
+| CI-04 | Phase 9 | Pending |
+| CI-05 | Phase 9 | Pending |
+| CI-06 | Phase 9 | Pending |
+| CI-07 | Phase 9 | Pending |
+| CI-08 | Phase 9 | Pending |
+| CI-09 | Phase 9 | Pending |
+| BRWN-01 | Phase 10 | Pending |
+| BRWN-02 | Phase 10 | Pending |
+| BRWN-03 | Phase 10 | Pending |
+| BRWN-04 | Phase 10 | Pending |
+| BRWN-05 | Phase 10 | Pending |
+| BRWN-06 | Phase 10 | Pending |
+| BRWN-07 | Phase 10 | Pending |
+| BRWN-08 | Phase 10 | Pending |
+| BRWN-09 | Phase 10 | Pending |
+| BRWN-10 | Phase 10 | Pending |
+| BRWN-21 | Phase 10 | Pending |
+| BRWN-11 | Phase 11 | Pending |
+| BRWN-12 | Phase 11 | Pending |
+| BRWN-13 | Phase 11 | Pending |
+| BRWN-14 | Phase 11 | Pending |
+| BRWN-15 | Phase 11 | Pending |
+| BRWN-16 | Phase 11 | Pending |
+| BRWN-17 | Phase 11 | Pending |
+| BRWN-18 | Phase 11 | Pending |
+| BRWN-19 | Phase 11 | Pending |
+| BRWN-20 | Phase 11 | Pending |
+| DEBT-01 | Phase 12 | Pending |
+| DEBT-02 | Phase 12 | Pending |
+| DEBT-04 | Phase 12 | Pending |
 
 **Coverage:**
 - v1.1 requirements: 78 total (TMPL: 11, NEUT: 8, WZRD: 11, MANUAL: 6, COLAB: 8, CI: 9, BRWN: 21, DEBT: 4)
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 78
+- Mapped to phases: 78 (Phase 7: 20, Phase 8: 17, Phase 9: 17, Phase 10: 11, Phase 11: 10, Phase 12: 3)
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-15 — v1.1 Shareability milestone*
+*Roadmap traceability filled: 2026-04-15 — 6 phases (7–12)*
