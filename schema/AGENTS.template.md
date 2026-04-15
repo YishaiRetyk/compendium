@@ -29,6 +29,8 @@ The LLM Wiki Compiler is a personal knowledge management system with three layer
 
 Workflows for each operation are defined in Section 11 of this document.
 
+This file (`{{AGENT_FILENAME}}`) is the canonical agent spec; the wizard selects `AGENTS.md` or `CLAUDE.md` per the user's agent choice.
+
 ## 2. Directory Structure
 
 ```
@@ -583,7 +585,8 @@ privacy: local_only|cloud_safe     # Privacy routing tier
 aliases:                           # Alternative names for Obsidian resolution
   - Alternate Name
 has_contradictions: false       # true when page contains [contradiction:...] markers
-knowledge_domain: ""            # Primary decay-rate bucket (maps to Section 6 decay table)
+knowledge_domain: "{{PRIMARY_DOMAIN}}"   # Primary decay-rate bucket (set by wizard from user's domain)
+privacy_default: {{DEFAULT_PRIVACY}}     # Illustrative wizard-supplied default privacy tier (see `privacy` above for the actual enum field)
 example: false                  # Optional; true for reference-only pages (examples/). Lint skips these.
 ---
 ```
@@ -841,6 +844,8 @@ Claims inherit temporal relevance from their source publication dates. Different
 | `biography` | 1825 days (5 years) | Biographical facts change slowly |
 | `personal-goals` | 90 days (3 months) | Goals evolve with life circumstances |
 | (default) | 365 days (1 year) | Fallback for unclassified domains |
+
+The default staleness decay profile is `{{DECAY_PROFILE}}` (set by the wizard from the user's chosen decay profile name).
 
 **Epistemic status modifiers** (per D-08): Tentative and inferred claims decay faster than their domain default. Multiply the base decay period by the modifier:
 
