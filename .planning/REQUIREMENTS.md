@@ -101,37 +101,37 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Contradiction Detection
 
-- [ ] **CNTR-01**: Lint rule that identifies when sources disagree on the same claim
-- [ ] **CNTR-02**: Contradictions surfaced with both sides cited
-- [ ] **CNTR-03**: Contradictions flagged in affected wiki pages
+- [x] **CNTR-01**: Lint rule that identifies when sources disagree on the same claim
+- [x] **CNTR-02**: Contradictions surfaced with both sides cited
+- [x] **CNTR-03**: Contradictions flagged in affected wiki pages
 
 ### Staleness & Temporal Decay
 
-- [ ] **STALE-01**: Claims inherit temporal relevance from source publication dates
-- [ ] **STALE-02**: Lint rule flags claims older than a configurable threshold
-- [ ] **STALE-03**: Different knowledge types decay at different rates (e.g. scientific findings vs. software versions vs. personal goals)
-- [ ] **STALE-04**: Decay rate conventions documented in schema per knowledge domain
+- [x] **STALE-01**: Claims inherit temporal relevance from source publication dates
+- [x] **STALE-02**: Lint rule flags claims older than a configurable threshold
+- [x] **STALE-03**: Different knowledge types decay at different rates (e.g. scientific findings vs. software versions vs. personal goals)
+- [x] **STALE-04**: Decay rate conventions documented in schema per knowledge domain
 
 ### Knowledge Gaps
 
-- [ ] **GAP-01**: Lint rule identifies topics mentioned frequently but lacking dedicated pages
-- [ ] **GAP-02**: Lint rule identifies categories with sparse source coverage relative to others
+- [x] **GAP-01**: Lint rule identifies topics mentioned frequently but lacking dedicated pages
+- [x] **GAP-02**: Lint rule identifies categories with sparse source coverage relative to others
 
 ### Decision Records
 
-- [ ] **DCSN-01**: Reflection entries recording why structural changes were made to the wiki
-- [ ] **DCSN-02**: Decision records capture what framing was adopted, what it replaced, and alternatives considered
+- [x] **DCSN-01**: Reflection entries recording why structural changes were made to the wiki
+- [x] **DCSN-02**: Decision records capture what framing was adopted, what it replaced, and alternatives considered
 - [ ] **DCSN-03**: Reflect workflow documented in schema
 
 ### Lint & Maintenance
 
-- [ ] **LINT-01**: Lint workflow that health-checks the wiki on demand
-- [ ] **LINT-02**: Detect orphan pages (no inbound links)
-- [ ] **LINT-03**: Detect missing cross-references (related pages not linked)
-- [ ] **LINT-04**: Detect stale claims (per STALE-01/02)
-- [ ] **LINT-05**: Detect contradictions (per CNTR-01/02/03)
-- [ ] **LINT-06**: Suggest new questions to investigate and new sources to look for
-- [ ] **LINT-07**: Lint workflow documented step-by-step in schema
+- [x] **LINT-01**: Lint workflow that health-checks the wiki on demand
+- [x] **LINT-02**: Detect orphan pages (no inbound links)
+- [x] **LINT-03**: Detect missing cross-references (related pages not linked)
+- [x] **LINT-04**: Detect stale claims (per STALE-01/02)
+- [x] **LINT-05**: Detect contradictions (per CNTR-01/02/03)
+- [x] **LINT-06**: Suggest new questions to investigate and new sources to look for
+- [x] **LINT-07**: Lint workflow documented step-by-step in schema
 
 ### Cross-System Drift Detection
 
@@ -150,7 +150,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **CLI-01**: Search tool for querying wiki pages (index-based or text search)
 - [x] **CLI-02**: Ingest helper that scaffolds the ingest workflow
-- [ ] **CLI-03**: Lint helper that runs all lint rules and reports findings
+- [x] **CLI-03**: Lint helper that runs all lint rules and reports findings
 
 ### Obsidian Integration
 
@@ -281,25 +281,25 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SOPS-05 | Phase 4 | Pending |
 | SOPS-06 | Phase 4 | Pending |
 | CLI-01 | Phase 4 | Complete |
-| CNTR-01 | Phase 5 | Pending |
-| CNTR-02 | Phase 5 | Pending |
-| CNTR-03 | Phase 5 | Pending |
-| STALE-01 | Phase 5 | Pending |
-| STALE-02 | Phase 5 | Pending |
-| STALE-03 | Phase 5 | Pending |
-| STALE-04 | Phase 5 | Pending |
-| GAP-01 | Phase 5 | Pending |
-| GAP-02 | Phase 5 | Pending |
-| LINT-01 | Phase 5 | Pending |
-| LINT-02 | Phase 5 | Pending |
-| LINT-03 | Phase 5 | Pending |
-| LINT-04 | Phase 5 | Pending |
-| LINT-05 | Phase 5 | Pending |
-| LINT-06 | Phase 5 | Pending |
-| LINT-07 | Phase 5 | Pending |
-| CLI-03 | Phase 5 | Pending |
-| DCSN-01 | Phase 6 | Pending |
-| DCSN-02 | Phase 6 | Pending |
+| CNTR-01 | Phase 5 | Complete |
+| CNTR-02 | Phase 5 | Complete |
+| CNTR-03 | Phase 5 | Complete |
+| STALE-01 | Phase 5 | Complete |
+| STALE-02 | Phase 5 | Complete |
+| STALE-03 | Phase 5 | Complete |
+| STALE-04 | Phase 5 | Complete |
+| GAP-01 | Phase 5 | Complete |
+| GAP-02 | Phase 5 | Complete |
+| LINT-01 | Phase 5 | Complete |
+| LINT-02 | Phase 5 | Complete |
+| LINT-03 | Phase 5 | Complete |
+| LINT-04 | Phase 5 | Complete |
+| LINT-05 | Phase 5 | Complete |
+| LINT-06 | Phase 5 | Complete |
+| LINT-07 | Phase 5 | Complete |
+| CLI-03 | Phase 5 | Complete |
+| DCSN-01 | Phase 6 | Complete |
+| DCSN-02 | Phase 6 | Complete |
 | DCSN-03 | Phase 6 | Pending |
 | DRFT-01 | Phase 6 | Pending |
 | DRFT-02 | Phase 6 | Pending |
