@@ -1,229 +1,245 @@
 # Project Research Summary
 
 **Project:** LLM Wiki Compiler
-**Domain:** LLM-maintained personal knowledge compilation system
-**Researched:** 2026-04-06
-**Confidence:** MEDIUM
+**Milestone:** v1.1 Shareability
+**Domain:** LLM-maintained Obsidian wiki compiler → shareable starter kit (template repo, two-track setup, PR workflow, brownfield onboarding)
+**Researched:** 2026-04-15
+**Confidence:** MEDIUM-HIGH
 
 ## Executive Summary
 
-The LLM Wiki Compiler is a fundamentally novel system in the personal knowledge management space: not a chat interface over documents, not a RAG system, but a *compiler* that transforms curated sources into a persistent, structured wiki maintained by LLM agents. Every existing tool (NotebookLM, Khoj, Quivr, Mem, Obsidian AI plugins) treats AI as an ephemeral assistant that answers questions. This project's differentiator is that the wiki is the artifact — knowledge compounds across sessions, claims carry provenance and epistemic status, and the LLM follows a schema specification rather than improvising. The recommended implementation is file-based and local: Obsidian for reading, git for provenance and transactions, Node.js/TypeScript CLI tools for the compilation pipeline, and markdown schema files (CLAUDE.md/AGENTS.md) as the compiler specification that any capable LLM agent can follow.
+v1.1 turns the v1.0 personal-use starter into a cloneable public template that a technically-comfortable Obsidian user can adopt in under an hour — either via a guided bash wizard or a documented manual-edit track — and onboard an existing vault through a staged brownfield path. The four research tracks converge on a single posture: **add zero new runtime dependencies**, extend the v1.0 primitives (AGENTS.md, `bin/lint.sh`, frontmatter schema, structured ops) additively, and treat the strict mechanical-vs-judgment boundary in brownfield as the defining architectural bet. The whole milestone ships on bash + python3 + pyyaml + git + GitHub Actions; every addition is a new bash script, a new markdown file, or a new (optional) frontmatter field.
 
-The architecture follows a strict three-layer compiler model: immutable sources as input, typed wiki pages as compiled output, and a schema directory as the build configuration. The critical path is schema first, then ingestion, then cross-referencing and compilation. The Dataview plugin for Obsidian is essential infrastructure — it powers dashboards, indexes, and metadata queries without requiring a separate database. The entire stack has no servers, no databases, and no runtime services beyond the LLM API calls themselves.
+The dominant risk is **adoption-killing first impressions** — either (a) creator-specific content (Kahneman, personal journal, `local_only` leakage) surviving into the "neutral" template, or (b) `bin/brownfield.sh bootstrap` silently corrupting a real Obsidian vault on first run. Both land before any other v1.1 feature can be trusted. The second-order risk is that v1.0 debt (deferred Obsidian/Dataview render verification, untested Codex agent-parity, REQUIREMENTS.md bookkeeping drift) threads through v1.1's Dataview-visible frontmatter additions and template-vs-manual consistency gates — if those debts aren't paid, v1.1 ships on an unverified substrate.
 
-The dominant risk is building too much too soon. All five critical pitfalls (hallucination, context window limits, schema drift, provenance rot, over-engineering) share a common mitigation: start minimal, validate with real use, and treat the schema as living code rather than a complete specification. Provenance tracking and epistemic status markers are not Phase 2 polish — they are foundational to the system's trustworthiness and must be in Phase 1. The project should resist the temptation to define 6 page types, 8 epistemic markers, and full automation before the first 30 pages have been ingested and validated.
+Recommended shape: **five phases, ~8–10 plans**. Phase 1 does the neutrality/Kahneman-relocation work and ships a safe public repo. Phase 2 builds the wizard + manual track against that neutral substrate. Phase 3 lands the git PR workflow + CI lint gate. Phase 4 delivers brownfield (the largest single surface), split into bootstrap-first then suggest/verify. Phase 5 is a verification gate that explicitly closes v1.0 debt — Obsidian/Dataview render, Codex agent-parity, and a mechanical requirements-sync check — before v1.1 is declared complete.
 
 ## Key Findings
 
 ### Recommended Stack
 
-This system has no application stack in the traditional sense. The "stack" is: markdown processing libraries for CLI tooling, Obsidian plugins for the reading interface, and git for persistence and provenance. Node.js with the unified/remark ecosystem is the only mature toolkit for programmatic round-trip markdown manipulation — Python alternatives are parsers only, not AST transform-and-serialize tools. TypeScript typed interfaces for frontmatter schemas catch drift at compile time, which is essential given that schema consistency is the system's primary operational challenge.
+Zero new runtime dependencies. Every v1.1 deliverable runs on the fixed v1.0 baseline (bash ≥ 4, python3 + PyYAML inline, git, Obsidian-compatible markdown). See [STACK.md](./STACK.md).
 
-**Core technologies:**
-- **unified/remark ecosystem** (Node.js): round-trip markdown AST processing — the only mature option for programmatic wiki manipulation
-- **gray-matter**: frontmatter parsing — battle-tested, 25M+ weekly downloads, handles edge cases
-- **Obsidian + Dataview plugin**: reading interface and metadata query engine — Dataview is non-negotiable; it replaces a database
-- **TypeScript + tsx**: typed frontmatter schemas and zero-build-step CLI scripts — catches schema drift at compile time
-- **git + simple-git**: version control, provenance, and transaction mechanism — git IS the database for history and rollback
-- **ripgrep + index files**: search layer for v1 — structured index files plus fast CLI search; no embedding DB needed
-- **CLAUDE.md / AGENTS.md schema files**: the compiler specification — natural language instructions that any LLM follows; no agent framework needed
+**Core technologies (all existing):**
+- **bash `read` + case-statement menus** — wizard UI; rejected gum/whiptail/dialog/click as they break clone-and-go.
+- **GitHub template-repository setting + `.github/` config files** (CODEOWNERS, PR/issue templates, CONTRIBUTING.md, SECURITY.md) — native GitHub UX; rejected cookiecutter/copier.
+- **GitHub Actions `ubuntu-latest` with `actions/checkout@v6` + `actions/setup-python@v6`** — single ~20-line `.github/workflows/lint.yml` invoking `bin/lint.sh`.
+- **Plain markdown in `/docs/`** (four tracks: quickstart, guided-setup, manual-setup, reference) — no SSG. **Critical finding:** MkDocs Material entered maintenance mode Nov 2025; Insiders repo deleted May 2026 — pre-wiring it would bet on an unmaintained project. Docusaurus deferred until v1.2 has a scoped hosted-docs decision.
+- **Plain markdown brownfield report** at `.brownfield/REPORT.md` + per-class idempotent migration scripts at `.brownfield/migrations/NNN-<slug>-<sha8>.sh` — pattern confirmed across notion2obsidian, obsidian-vault-manager, obsidian-export.
 
-Note: All version numbers from research (unified ~11.x, gray-matter ~4.0.3, etc.) should be verified with `npm view [package] version` before committing to package.json, as web search was unavailable during research.
+**Stack confidence:** HIGH on all five additions (verified 2026 via Context7/WebSearch for action versions, Ubuntu 24.04 rollout, MkDocs Material maintenance status, gum/whiptail availability, brownfield tool patterns).
 
 ### Expected Features
 
-The fundamental distinction this system must maintain is *compilation* vs *RAG*. A RAG system re-derives answers per query from raw documents. This system builds a persistent compiled artifact that compounds knowledge, tracks provenance per claim, and explicitly handles knowledge evolution (UPDATE, MERGE, SUPERSEDE, ARCHIVE). Features that blur this distinction — chat interfaces, embedding-based search, auto-ingestion from web feeds — are anti-features.
+Six feature buckets, ordered by dependency. See [FEATURES.md](./FEATURES.md).
 
 **Must have (table stakes):**
-- Source ingestion with classification — without this, no input
-- Summarization with claim-level source provenance — without provenance, the wiki is untrustworthy
-- Cross-referencing via `[[wikilinks]]` — core Obsidian value proposition
-- Incremental updates — new source updates existing pages rather than regenerating everything
-- Structured index and append-only activity log — navigation and auditability
-- Obsidian-compatible output — valid frontmatter, Dataview-queryable metadata, graph-friendly links
-- Epistemic status markers (sourced/inferred/tentative) — the primary defense against hallucination becoming invisible
+- **B1 — Template-based GitHub starter repo** — "Use this template" button, empty `wiki/` with `index.md`/`log.md` skeletons, `.gitignore` for Obsidian noise, `LICENSE`, four-track `/docs/`, `examples/kahneman/` preserved intact.
+- **B6 — Domain-agnostic AGENTS.md** — Kahneman examples replaced by generic placeholders; `examples/` holds the validated worked cluster.
+- **B2 — Guided wizard** — bash prompts for domain, privacy defaults, LLM agent; writes personalized AGENTS.md; idempotent; `--non-interactive` with answers file; `.wizard-answers.yaml` for upgrade path.
+- **B3 — Manual setup track** — `/docs/manual-setup.md` walkthrough that produces byte-identical end state to the wizard.
+- **B4 — Git PR workflow** — `CONTRIBUTING.md`, PR template, CI lint gate, log.md `contributor::` Dataview inline field, `local_only` leak grep check.
+- **B5 — `bin/brownfield.sh scan|bootstrap|suggest|verify`** — dry-run default, `bootstrap_stage` sentinel, content-hashed migrations, staged judgment-heavy scripts.
 
 **Should have (differentiators):**
-- Typed page schemas (entity, concept, source-summary, comparison) with templates
-- Structured operations vocabulary (CREATE, UPDATE, SUPERSEDE, ARCHIVE) — logged after the fact, not prescribed before
-- Contradiction detection across related pages
-- Staleness tracking with `last_verified` dates
-- Knowledge gap detection
-- Progressive disclosure structure (summary + key facts + detail + sources) on every page
-- Decision records / reflection when wiki structure changes
+- Diátaxis mapping in `/docs/README.md` (tutorial/how-to/reference/explanation).
+- Lint `--format json` + `--ci` mode with severity policy per category.
+- PR lint comment with clickable annotations (`::error file=...,line=...::`).
+- Provenance-bootstrap marks imported content with `[inferred:bootstrap]` epistemic tag.
+- Agent-parity fixture (Claude Code vs Codex) — closes v1.0 flag.
 
-**Defer to v2+:**
-- Automated compilation pipeline CLI (orchestrate ingest -> compile -> lint)
-- Semantic search / embedding-based RAG layer
-- Cross-system drift detection
-- Category-split indexes (needed only at 200+ pages)
-- Advanced lint rules
+**Defer (post-v1.1 backlog):**
+- Obsidian plugin distribution, one-command `curl|bash` installer, hosted docs site — already in PROJECT.md out-of-scope.
+- Brownfield `--apply` for judgment-heavy ops — explicitly v1.2.
+- `bin/upgrade.sh` for template-fork upgrades — document ownership boundary now, implement later.
+- Multi-domain example stubs, second-domain starter, CLA bot, auto-merge.
 
 ### Architecture Approach
 
-The system is a three-layer compiler: sources (immutable input) -> compilation pipeline (diff, extract, merge, lint, index) -> wiki pages (typed compiled output). The schema directory contains the "build configuration" — page templates, workflow definitions, and operation specifications — that tells the LLM compiler how to transform sources. This mental model is operationally critical because it makes invariants clear: agents never modify sources, wiki pages are always re-derivable from sources plus schema, and the schema itself is configuration that agents follow rather than content they produce.
+Seven integration decisions, all extending v1.0 primitives additively. AGENTS.md stays at repo root (SCHM-01). See [ARCHITECTURE.md](./ARCHITECTURE.md).
 
 **Major components:**
-1. **Schema layer** (CLAUDE.md/AGENTS.md + schema/ directory) — compiler specification; hub-and-spoke design with top-level overview pointing to workflow and template files
-2. **Source store** (sources/ directory, immutable) — input layer; agents read only, never write
-3. **Compilation pipeline** (LLM agent following schema workflows) — diff detection, claim extraction, page merging, lint, index update
-4. **Wiki pages** (wiki/ directory, typed by page type) — compiled output; entity, concept, summary, comparison, guide, and meta pages
-5. **Index + Log** (wiki/meta/) — index as regenerable cache of page metadata; log as append-only audit trail with in-progress/complete markers
-6. **Git** — transaction mechanism, provenance, diff detection; commit after each operation cycle
+1. **`schema/AGENTS.template.md` + `bin/init-wizard.sh`** — template substitution over canonical AGENTS.md using ≤6 named placeholders (`{{PRIMARY_DOMAIN}}`, `{{DEFAULT_PRIVACY}}`, `{{AGENT_FILENAME}}`, `{{DECAY_PROFILE}}`, `{{EXAMPLE_CLUSTER_REF}}`). `.wizard-answers.yaml` powers upgrades. **Rejected:** layered `AGENTS.local.md` override (violates single-schema SCHM-01) and pure generator (loses diffability).
+2. **`examples/kahneman/`** — full move with wikilink rewrite; new optional frontmatter `example: true`; `EXCLUDE_DIRS` in lint gains `examples`. SUPERSEDE-class decision record required.
+3. **`contributor::` Dataview inline field in log.md** — not YAML, not header-line; `bin/ingest.sh --contributor` flag auto-detects from `git config user.email`.
+4. **`bootstrap_stage` optional frontmatter enum** (`raw|bootstrapped|verified`) — lint downgrades allowlisted findings to info when present; separates procedural from semantic state.
+5. **`.brownfield/applied.log` with sha256 operation hashes** — content-hashed migration filenames (`NNN-<slug>-<sha8>.sh`); deterministic, re-runnable, idempotent-in-effect.
+6. **`bin/lint.sh --format json --ci --skip-category`** — structural checks stay errors in PR mode; drift-external/stale/gap downgrade; `contradiction` stays error; JSON output feeds GitHub annotation shim.
+7. **`/docs/` flat with `/docs/reference/` subdirectory** — four top-level docs + six reference docs; AGENTS.md stays at root (operator schema); `/docs/` is user docs.
 
-**Key patterns:**
-- Frontmatter-as-provenance: all metadata co-located with content for Dataview compatibility; no sidecar files, no SQLite
-- Agent-agnostic schema: natural language instructions with exact examples, not code; works with Claude Code, Codex, or any future agent
-- Progressive disclosure page structure: summary -> key facts -> detail -> open questions -> sources; enables index-first navigation without a database
-- Operations as descriptive log entries, not prescriptive workflow gates: agent does the work, logs what happened using operation vocabulary
+**New frontmatter fields (both additive, default absent):** `example: boolean`, `bootstrap_stage: raw|bootstrapped|verified`.
+
+**New CLI:** `bin/init-wizard.sh`, `bin/brownfield.sh`; flags on existing scripts: `bin/ingest.sh --contributor`, `bin/lint.sh --format|--ci|--skip-category`.
 
 ### Critical Pitfalls
 
-1. **Silent hallucination** — prevent with extract-then-compile mode (verbatim extraction before synthesis), mandatory claim-level source pointers, epistemic markers from day one, and broken-link lint on every commit. Spot-check the first 10 ingestions manually.
+See [PITFALLS.md](./PITFALLS.md) for the full 4 critical + 12 moderate + 8 minor taxonomy.
 
-2. **Context window collapse at scale** — prevent by designing index-first navigation from Phase 1. Never design workflows requiring the full wiki to be loaded. The index must be regenerable and maintained incrementally. Set explicit page-count thresholds in the schema.
-
-3. **Over-engineering before validation** — start with exactly 3 page types (source summary, entity, concept), 3 epistemic markers (sourced, inferred, uncertain), and a simple ingest checklist. Review schema against actual usage after 30 pages. Prune unused features.
-
-4. **Schema drift across agents/sessions** — prevent with exact YAML examples (not descriptions) in the schema, complete page templates with every field filled in, canonical example pages, and a frontmatter audit lint pass. Test new agents with a controlled ingest and diff against known-good output.
-
-5. **Provenance link rot** — sources must be immutable once ingested; cite by file path plus git commit hash at ingestion time; source reorganization must be a formal operation that updates all citations; broken-citation lint on every commit.
+1. **C-1 Creator-content leakage into "neutral" template** — Kahneman/journal/`local_only` survives into template root via incomplete moves or git history. Prevention: `bin/check-neutrality.sh` denylist CI gate; publish from orphan branch (fresh `git init`, never history-rewrite from v1.0 repo); empty starter vault. **Must block release.**
+2. **C-2 Brownfield bootstrap silently corrupts existing frontmatter** — YAML edge cases (tabs, Dataview inline, BOM, CRLF, multi-doc) + key collisions silently mangle vaults on first run. Prevention: mandatory `--dry-run` default; pre-flight `yaml.safe_load` gate; `check_key_collision` refusal; `brownfield-fixtures/` golden-output CI; `--backup` ON by default. Highest-risk surface in v1.1.
+3. **C-3 Idempotency violations** — second bootstrap run re-injects sentinels / duplicates skeletons / renumbers migrations. Prevention: `test_bootstrap_idempotent` zero-byte diff on second run; content-hashed migration names; timestamp-free sentinels; skeleton markers guarding injection.
+4. **C-4 PR lint gate simultaneously too strict and too loose** — whole-vault rules (orphan, cross-ref) fail on partial PR context; contributors `--no-verify` around it. Prevention: `--pr` vs `--full` two-mode lint; merge-base comparison; severity escalation policy; expected-contradiction escape hatch; gap detection exempts PR-new topics.
+5. **M-10 Dataview queries break on new empty-value frontmatter** — bootstrap-injected fields match existence-check queries; user's dashboards regress silently. Prevention: schema-documented sentinels (`unknown`/`[]`/absent, never `""`); `examples/dataview-fixtures/` with known-good queries; `docs/reference/dataview-impact.md`; **close v1.0's deferred Phase 4 Obsidian/Dataview verification here**.
+6. **M-12 Multi-agent interpretation drift (Claude Code vs Codex)** — natural-language schema interprets differently across agents; `log.md` diverges silently. Prevention: `test_agent_parity` canonical ingest fixture; deterministic gates do real enforcement (expand lint/validate-op); `schema/agent-notes/{claude-code,codex}.md` addendums; **close v1.0's agent-agnostic flag by running full v1.0 workflows with Codex against Kahneman cluster**.
 
 ## Implications for Roadmap
 
-Based on research, the dependency graph is clear and the build order is bottom-up. The schema must exist before any workflow. The index must exist before scale. Provenance must be established before the wiki is trusted. Lint must exist before contradictions can be detected. Automation must wait until the manual process is validated.
+### Cross-Doc Agreement on Build Order
 
-### Phase 1: Foundation — Schema, Structure, and Templates
+Stack, Features, and Architecture **all independently converge** on the same sequence. Pitfalls add sequencing constraints (C-1 gates release; C-2/C-3 front-load brownfield risk; M-10/M-12 gate milestone completion).
 
-**Rationale:** Nothing else can be built without the schema, directory structure, and page templates. This is the compiler specification. All subsequent work depends on these conventions existing and being tested. Pitfalls 3 (over-engineering), 4 (schema drift), and 7 (Obsidian compatibility) are all Phase 1 risks.
+| Step | Consensus Across Docs |
+|------|----------------------|
+| 1. Kahneman relocation + neutral AGENTS.md + template repo scaffolding first | FEATURES B1+B6; ARCHITECTURE Decision 2+1; PITFALLS C-1 |
+| 2. Wizard depends on neutral AGENTS.md substrate | FEATURES B2→B6; ARCHITECTURE Decision 1 after 2; PITFALLS M-1 (wizard-template drift) |
+| 3. Manual track co-designed with wizard (shared answers schema) | FEATURES B3 co-ships with B2; PITFALLS M-3 (track divergence) |
+| 4. CI + PR workflow depend on neutral repo existing but are otherwise independent | FEATURES B4 independent; ARCHITECTURE Decision 6 after 4; PITFALLS C-4 |
+| 5. Brownfield is largest/last and benefits from stable lint `--ci` | FEATURES B5 last; ARCHITECTURE Decisions 4+5; PITFALLS C-2/C-3/M-9/M-11 |
+| 6. Docs written against stable features | FEATURES in MVP notes; ARCHITECTURE Decision 7 last; PITFALLS M-3 |
+| 7. Verification gate closes v1.0 debt | All four docs flag this independently |
 
-**Delivers:** A working Obsidian vault with established conventions: directory structure (sources/, wiki/, schema/), 3 page type templates (source summary, entity, concept), frontmatter schema with provenance and epistemic fields, CLAUDE.md/AGENTS.md hub-and-spoke schema, activity log format, index system, and canonical example pages demonstrating every convention.
+**Minor disagreement:** ARCHITECTURE puts Decision 3 (`contributor::`) at order 6 (after PR workflow), while FEATURES suggests B4 as an independent early-ish slice. Resolution: land the schema amendment + `bin/ingest.sh --contributor` flag with the PR workflow phase; don't pre-extract it.
 
-**Addresses:** Agent-agnostic schema, Obsidian compatibility, source immutability invariant, directory conventions, index and log system, git-as-transaction pattern.
+### Top 7 Decisions That Shape Phase Boundaries
 
-**Avoids:** Over-engineering (start with 3 page types, 3 epistemic markers), schema drift (exact YAML examples, complete templates, lint from day one), Obsidian breakage (test every template in Obsidian before declaring complete).
+1. **Template release is an orphan-branch `git init`, not a history-rewrite.** (C-1) Gates everything downstream; forces a dedicated scaffolding phase.
+2. **Kahneman moves to `examples/` with `example: true` frontmatter and `EXCLUDE_DIRS` lint carve-out — before the wizard touches AGENTS.md.** (ARCH Decision 2; FEATURES B1+B6 co-ship) Single phase boundary.
+3. **Wizard uses template substitution over the canonical AGENTS.md (placeholders), not a parallel template file.** (ARCH Decision 1; PITFALLS M-1) Prevents wizard-vs-manual drift by construction.
+4. **Wizard and manual track ship together with byte-equality CI test.** (FEATURES B2+B3; PITFALLS M-3) Single phase.
+5. **PR lint introduces `--format json --ci` + severity policy table before brownfield uses `verify`.** (ARCH Decision 6 before brownfield `verify`; PITFALLS C-4) Sequences PR workflow before brownfield.
+6. **Brownfield splits into two phases: `scan` + `bootstrap` first (mechanical, highest-risk), then `suggest` + `verify`.** (FEATURES complexity note; PITFALLS C-2/C-3 concentrate on bootstrap) Split brownfield across two phases, not one.
+7. **Final verification phase is a v1.0-debt closure gate, not cosmetic polish.** (PITFALLS M-10, M-12, m-4, m-5, m-6; PROJECT.md Active list) Must be a named phase, not slipped into the last plan.
 
-**Research flag:** Standard patterns — this phase follows well-established Obsidian vault and compiler-design conventions. No additional research needed.
+### Pitfall-Driven Sequencing Changes
 
-### Phase 2: Core Compilation — Ingestion and Source Summaries
+Explicit callouts where PITFALLS research changes naive ordering:
 
-**Rationale:** Once the schema exists, the first priority is getting real sources into the system and producing wiki pages from them. This is where the system starts delivering value and where hallucination risk is highest. The ingest workflow must enforce extract-then-compile mode and mandatory provenance from the first ingestion.
+- **C-1 forces a release-gate CI check (`bin/check-neutrality.sh`) in the first phase**, before any public push. Without this, all downstream phases build on a potentially-leaky substrate.
+- **C-2/C-3 justify splitting brownfield** — `bootstrap` carries the highest-risk surface in the whole milestone, deserving its own phase with full attention; `suggest`/`verify` can be a second phase.
+- **M-10 requires the final verification phase to actually open Obsidian** and exercise Dataview queries on both fresh-starter and post-bootstrap fixtures — not just run `bin/lint.sh`. Schedule headless-Obsidian tooling research early if needed.
+- **M-12 requires a canonical ingest fixture runnable under both Claude Code and Codex** before v1.1 completion — this is the v1.0 agent-agnostic flag finally closing.
+- **m-4 (REQUIREMENTS.md drift) says build `requirements-sync` command in the first phase of v1.1**, not the last, so later phases benefit from it.
+- **m-5 (partial Nyquist) says run `/gsd:validate-phase` at each phase transition**, not at milestone end — process fix, not feature.
 
-**Delivers:** A working ingest workflow that classifies and moves sources to sources/{type}/, extracts claims into a structured intermediate format, creates source summary pages with claim-level provenance, creates or updates entity and concept pages, updates the index, and commits everything as an atomic git operation.
+### v1.0 Debt Items That MUST Land in v1.1
 
-**Addresses:** Source ingestion, summarization with provenance, basic cross-referencing, incremental updates (new source updates existing pages rather than regenerating), activity log, broken-link lint.
+Three items from PROJECT.md "Active" + retrospective are non-negotiable gates on v1.1 completion:
 
-**Avoids:** Hallucination (extract-then-compile, mandatory source pointers, spot-check first 10 ingestions), provenance rot (immutability enforced, citations include source file path, lint validates on every commit), orphan state from partial failures (git-as-transaction, in-progress/complete log markers, idempotent pipeline stages).
+1. **Obsidian render / Dataview query verification** (deferred from Phase 4; surfaced in PITFALLS M-10 and m-6, PROJECT.md Active list, PROJECT.md Key Decisions "⚠️ Revisit"). Resolution: final verification phase opens Obsidian (automated via Obsidian CLI/headless if available, else documented manual checklist with screenshots) against fresh-starter and post-bootstrap fixtures. `examples/dataview-fixtures/` with golden row counts per query.
+2. **Codex agent-parity validation** (PROJECT.md "only Claude Code exercised in v1.0"; PITFALLS M-12). Resolution: `test_agent_parity` fixture — a canonical ingest scenario with expected page diff; run under both agents; diff output against golden reference; document findings in `docs/reference/agent-parity.md`. Gate v1.1 completion on this existing.
+3. **Mechanical REQUIREMENTS.md sync check** (retrospective recommendation; PITFALLS m-4). Resolution: `requirements-sync` command compares each phase's VERIFICATION.md Observable Truths against REQUIREMENTS.md status; auto-flips or fails. Build in **Phase 1** so all subsequent phases benefit.
 
-**Research flag:** May benefit from a focused research pass on extract-then-compile prompt engineering patterns and idempotent LLM operation design. The ingest prompt structure is the highest-stakes prompt in the system.
+All three are named in the phase plan below.
 
-### Phase 3: Wiki Compilation — Cross-References and Structured Operations
+### Suggested Phase Structure
 
-**Rationale:** After the first batch of sources are ingested and summarized, the compilation layer — where multiple sources synthesize into coherent entity and concept pages — becomes the focus. This is where the system diverges from simple summarization and becomes a knowledge compiler.
+#### Phase 1: Neutral Template Foundation
+**Rationale:** C-1 gates every other phase; neutral AGENTS.md is the substrate the wizard edits and the PR workflow enforces. Pair with the `requirements-sync` tooling so m-4 never recurs.
+**Delivers:** public template repo on orphan branch; Kahneman → `examples/`; neutral AGENTS.md with placeholders; `example` frontmatter field + lint `EXCLUDE_DIRS`; `.gitignore`, `.gitattributes`, LICENSE, README, four-track `/docs/` skeleton; `bin/check-neutrality.sh` CI gate; `requirements-sync` command.
+**Addresses:** FEATURES B1, B6; ARCHITECTURE Decision 2; v1.0 debt item #3.
+**Avoids:** C-1, m-2 (example staleness), m-4.
 
-**Delivers:** Entity and concept pages synthesized from multiple source summaries, automatic `[[wikilink]]` generation between related pages, structured operations vocabulary fully defined and in use (CREATE, UPDATE, SUPERSEDE, ARCHIVE logged after the fact), comparison page type added when first real comparison need arises, and cross-reference lint (bidirectional link checking).
+#### Phase 2: Two-Track Setup (Wizard + Manual)
+**Rationale:** Wizard and manual must ship together to prevent drift (M-3). Template-substitution architecture (Decision 1) avoids wizard-vs-canonical drift (M-1). Depends on Phase 1's neutral substrate.
+**Delivers:** `bin/init-wizard.sh` (bash `read` prompts, two-phase collect→confirm→write, `.wizard-answers.yaml`, `--non-interactive`, `--dry-run`, `--resume`); `schema/AGENTS.template.md` with ≤6 placeholders; `/docs/guided-setup.md`, `/docs/manual-setup.md`, `/docs/quickstart.md`; `test_wizard_output_matches_manual` byte-equality CI.
+**Addresses:** FEATURES B2, B3; ARCHITECTURE Decision 1.
+**Avoids:** M-1, M-2, M-3, m-1 (bash-only explicitly documented).
 
-**Addresses:** Persistent compiled artifact (THE core differentiator), typed page schemas, structured operations vocabulary, progressive disclosure page structure.
+#### Phase 3: Git PR Workflow + CI Lint Gate
+**Rationale:** Independent of the wizard; unlocks the shareability thesis. Introduces `--format json --ci` that brownfield `verify` will consume (Decision 6 before Decision 5 downstream).
+**Delivers:** `.github/workflows/lint.yml`, `.github/CODEOWNERS`, `.github/PULL_REQUEST_TEMPLATE.md`, `.github/ISSUE_TEMPLATE/*.yml`, `.github/CONTRIBUTING.md`, `.github/SECURITY.md`; `bin/lint.sh --format json --ci --skip-category` with severity-policy table; `bin/ingest.sh --contributor` + `log.md` `contributor::` inline field; `check_no_local_only_in_commit` gate; merge-base lint comparison; PR comment annotation shim.
+**Addresses:** FEATURES B4; ARCHITECTURE Decisions 3, 6.
+**Avoids:** C-4, M-5, M-6, M-7, M-8, m-7.
 
-**Avoids:** Structured operations as straitjacket (operations are descriptive/logged, not prescriptive/gated), broken wikilinks accumulating (lint on every ingest), page fragmentation (MERGE and SUPERSEDE when pages overlap).
+#### Phase 4a: Brownfield Scan + Bootstrap
+**Rationale:** Highest-risk surface in v1.1 (C-2, C-3). Deserves its own phase. Must land `--dry-run` default, backups, key-collision refusal, idempotency tests, and byte-exact fixtures before any judgment-heavy work.
+**Delivers:** `bin/brownfield.sh scan` (classification report with confidence signals, unknown list with reasons, dry-run only); `bin/brownfield.sh bootstrap` (mechanical-only: sentinel `bootstrap_stage`, SHA hashing, index.md/log.md skeletons, YAML normalization via order-preserving loader); `.brownfield/REPORT.md` + `.brownfield/backups/` + `.brownfield/applied.log`; `bootstrap_stage` frontmatter field + lint downgrade logic; `brownfield-fixtures/` golden-output CI; `test_bootstrap_idempotent`; transformation manifest doc.
+**Addresses:** FEATURES B5 (scan + bootstrap); ARCHITECTURE Decisions 4, 5.
+**Avoids:** C-2, C-3, M-9, M-11, m-8.
 
-**Research flag:** Standard patterns — wikilink generation and cross-reference linting follow established Obsidian/remark-wiki-link patterns.
+#### Phase 4b: Brownfield Suggest + Verify
+**Rationale:** Staged judgment-heavy migration scripts; needs Phase 3's `lint --ci` stable. Split from 4a so bootstrap risk is fully absorbed first.
+**Delivers:** `bin/brownfield.sh suggest` generating four-class content-hashed migration scripts (`01-page-typing`, `02-provenance-bootstrap`, `03-cross-link-inference`, `04-privacy-classification`); `[inferred:bootstrap]` epistemic sub-marker; `bin/brownfield.sh verify` shelling to `bin/lint.sh --ci`; `/docs/reference/brownfield.md` with mechanical-vs-judgment architecture.
+**Addresses:** FEATURES B5 (suggest + verify).
+**Avoids:** C-3 carry-forward, M-9.
 
-### Phase 4: Quality Layer — Epistemic Status, Contradiction Detection, and Staleness
-
-**Rationale:** Once the wiki has 30+ pages from multiple sources, the quality layer becomes meaningful. Contradiction detection requires multiple pages covering related topics. Staleness tracking requires pages that have aged. This phase transforms the wiki from a reliable store into a *trustworthy* store.
-
-**Delivers:** Claim-level epistemic status markers enforced on all pages (backfill earlier pages), contradiction detection lint workflow, staleness tracking with `last_verified` dates and freshness categories, knowledge gap detection ("you have 8 sources mentioning X but no concept page for X"), and Dataview dashboards for stale pages and open contradictions.
-
-**Addresses:** Epistemic status markers, contradiction detection, staleness tracking, knowledge gap detection, decision records.
-
-**Avoids:** Stale claims without expiry signals (freshness metadata + lint rules), context window collapse (lint scoped to related-page clusters, not full wiki scan).
-
-**Research flag:** Contradiction detection prompt design is novel territory — no established patterns. Needs a focused research pass or empirical iteration during this phase.
-
-### Phase 5: Structural Intelligence — Reflection and Schema Maturation
-
-**Rationale:** After enough real use, structural patterns emerge: pages that need merging, decisions that need documenting, schema fields that were never used vs. fields that are desperately missing. This phase formalizes the patterns that emerged from Phases 1-4 and adds the reflective layer.
-
-**Delivers:** Decision records when structural changes occur (MERGE decisions, page reorganization), schema review and pruning based on actual log usage data, MERGE operation formally tested and documented, comparison page type in regular use, and consideration of the index-split optimization if wiki has exceeded ~150 pages.
-
-**Addresses:** Decision records / reflection, schema maturation, MERGE and SUPERSEDE operations in full use.
-
-**Avoids:** Index bottleneck (split if needed), schema bloat (prune unused fields based on log data).
-
-**Research flag:** Standard patterns — this phase is primarily operational refinement, not new technology.
-
-### Phase 6: Automation (v2 Territory)
-
-**Rationale:** Only automate what the manual process has validated. The CLI compilation pipeline should be built when the ingest workflow is so well-understood that it can be expressed as deterministic steps. Do not build this in Phase 1-2.
-
-**Delivers:** CLI tool (Node.js/TypeScript/commander) that orchestrates ingest -> extract -> merge -> lint -> index -> commit, category-split indexes if wiki has scaled beyond 200 pages, and potentially semantic search if index-first search proves insufficient.
-
-**Addresses:** Automated compilation pipeline, scaled index architecture, CLI tooling from STACK.md.
-
-**Avoids:** Automating too early (the manual process must be proven first).
-
-**Research flag:** CLI tool design follows standard patterns (commander, simple-git, glob). Semantic search layer (if needed) would require a new research pass on embedding approaches for personal-scale wikis.
+#### Phase 5: Docs Finalization + Verification Gate (v1.0 Debt Closure)
+**Rationale:** Docs written against stable features (ARCHITECTURE Decision 7 last); verification is an explicit gate closing v1.0 debt, not cosmetic polish.
+**Delivers:** `/docs/reference/{schema-tour,brownfield,privacy-model,ci,examples,agent-parity,dataview-impact,merge-conflicts,attribution,ownership}.md`; `bin/doctest-docs.sh` fresh-clone smoke test; `examples/dataview-fixtures/` with golden queries; Obsidian render verification (headless or documented manual checklist) on fresh-starter + post-bootstrap fixtures; `test_agent_parity` fixture run under Claude Code + Codex with diff report; final `requirements-sync` reconciliation across all v1.1 phases.
+**Addresses:** FEATURES B1 differentiators; ARCHITECTURE Decision 7; v1.0 debt items #1 and #2.
+**Avoids:** M-3, M-10, M-12, m-3, m-5, m-6.
 
 ### Phase Ordering Rationale
 
-- Schema before content: no wiki page should be created before the templates and conventions are tested in Obsidian. One badly-formed template used at scale creates massive cleanup work.
-- Provenance from the first ingestion: retrofitting claim-level provenance onto an existing wiki is painful; it must be established in the ingest workflow from day one.
-- Manual before automated: every phase of the compilation pipeline should be manually validated before the next phase is added. Phase 6 automation should only be built when Phases 2-5 are stable.
-- Quality layer after content layer: contradiction detection and staleness tracking require multiple sourced pages to be meaningful. Building the lint workflows in Phase 1 produces false comfort (no contradictions when there are no pages).
-- Index-first design from day one: even though context window collapse only manifests at scale, the workflows must assume index-first navigation from Phase 1. Retrofitting is prohibitive.
+- **Phase 1 before all others** because C-1 (creator-content leakage) blocks release and every downstream phase assumes a neutral substrate.
+- **Phase 2 before Phase 3** because the wizard exercises the schema that PR workflow enforces; reversed order would build the lint gate against a Kahneman-flavored file and then immediately change it.
+- **Phase 3 before Phase 4b** because brownfield `verify` consumes `bin/lint.sh --ci`; that flag surface must be stable.
+- **Phase 4a before Phase 4b** to absorb the highest-risk surface (bootstrap) in isolation — C-2 and C-3 can't be retrofitted cleanly.
+- **Phase 5 last** because docs and verification both need everything else stable; also both Obsidian/Dataview verification and Codex agent-parity require the full v1.1 feature surface to exercise.
+
+Approximate plans per phase: [Phase 1: 1.5], [Phase 2: 2.5], [Phase 3: 1.5], [Phase 4a: 2], [Phase 4b: 1.5], [Phase 5: 1.5]. Total ≈ 10.5 plans, matching FEATURES' 8–10 estimate with verification-phase expansion.
 
 ### Research Flags
 
-Phases needing deeper research during planning:
-- **Phase 2 (Ingest workflow):** Extract-then-compile prompt engineering is the highest-stakes prompt in the system. A focused research pass on structured claim extraction prompts and idempotent LLM operation patterns is recommended before finalizing the ingest workflow specification.
-- **Phase 4 (Contradiction detection):** No established patterns for automated contradiction detection in personal knowledge wikis. Needs empirical iteration or targeted research.
+Phases likely needing deeper `/gsd:research-phase` during planning:
 
-Phases with standard patterns (skip research-phase):
-- **Phase 1 (Foundation):** Obsidian vault conventions, hub-and-spoke schema design, and frontmatter patterns are well-documented.
-- **Phase 3 (Cross-references):** remark-wiki-link and Obsidian wikilink conventions are standard.
-- **Phase 5 (Structural intelligence):** Operational refinement, no new technology.
-- **Phase 6 (Automation):** commander/simple-git CLI patterns are standard; semantic search research only if index-first proves insufficient.
+- **Phase 4a (Brownfield Scan + Bootstrap):** Highest-novelty surface; YAML round-trip preservation via `ruamel.yaml` vs `PyYAML` (M-11) needs a spike; Obsidian-vault edge-case fixture enumeration needs community search; the strict mechanical-vs-judgment boundary has no exact prior art per FEATURES sources (treat as architectural bet).
+- **Phase 5 (Verification gate):** Headless Obsidian / Obsidian CLI automation status in 2026 is unverified — may need to fall back to documented manual checklist with screenshots. Agent-parity fixture design (what exactly is byte-compared; what's the tolerance) needs spike.
+
+Phases with standard patterns (skip or minimal research):
+
+- **Phase 1 (Template foundation):** Well-documented GitHub template-repo conventions; Diátaxis framework is canonical; orphan-branch release is a known git recipe.
+- **Phase 2 (Wizard):** bash `read` prompt patterns are mature; copier's `answers.yml` pattern is the reference.
+- **Phase 3 (PR workflow):** GitHub Actions + `bin/lint.sh` wiring is mechanical; severity-policy table design follows from v1.0's existing category system.
+- **Phase 4b (Suggest + verify):** Reuses Phase 4a infrastructure; judgment-heavy heuristics are content-specific but architecturally routine.
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | MEDIUM | Core technologies (unified, gray-matter, Obsidian/Dataview, git) are HIGH confidence. Exact package versions unverified — web search unavailable; run `npm view [package] version` before committing to package.json. |
-| Features | MEDIUM | Competitive landscape analysis (NotebookLM, Khoj, Quivr) is based on training data through early 2025 and may be outdated. The RAG vs. compilation conceptual distinction is HIGH confidence. Feature prioritization is HIGH confidence based on the project's stated goals. |
-| Architecture | MEDIUM | Three-layer compiler model and component design are well-reasoned from adjacent domains (static site generators, compilers, Obsidian conventions). Novel combination — no direct reference architecture exists. Patterns need validation through use. |
-| Pitfalls | HIGH | Core pitfalls (hallucination, context limits, schema drift, over-engineering, provenance rot) are extensively documented in LLM system design and knowledge management literature. Specific mitigation strategies are MEDIUM confidence pending validation. |
+| Stack | HIGH | All five additions verified 2026 (Context7/WebSearch): action versions, Ubuntu 24.04, MkDocs Material maintenance status, gum/whiptail availability, brownfield tool patterns. Zero-new-dep policy follows directly from milestone constraint. |
+| Features | MEDIUM-HIGH | HIGH on Diátaxis, copier/cookiecutter patterns, docs-as-code PR workflows (multiple canonical sources agree). MEDIUM on specific Obsidian-starter conventions and brownfield tool ecosystem (active space, churns). The strict mechanical-vs-judgment boundary is a novel architectural bet, not a convention. |
+| Architecture | MEDIUM-HIGH | HIGH on frontmatter extensibility, lint severity mechanism, log.md inline-field compatibility (all precedented in v1.0). MEDIUM on placeholder-vs-layered-override (Decision 1 — worth a decision record at Phase 2 start), flat-vs-nested `/docs/`, applied-log-vs-checksumming idempotency. LOW on wizard 3-way merge for schema upgrades (post-v1.1 spike). |
+| Pitfalls | MEDIUM-HIGH | Grounded in prior-art (yeoman/copier/create-react-app, Dataview issues, Git-wiki experience) plus concrete v1.0 retrospective evidence (REQUIREMENTS drift, deferred Obsidian verification, untested Codex path). Specific prevention mechanisms named as checks/flags/docs sections. Headless-Obsidian automation status is the main unresolved unknown. |
 
-**Overall confidence:** MEDIUM — sufficient for roadmap creation. The architecture and pitfalls are well-understood; the specific schema design and prompt engineering details need empirical validation.
+**Overall confidence:** MEDIUM-HIGH. The posture is solid; the bets are named; the debts are scheduled.
 
 ### Gaps to Address
 
-- **Package versions:** All npm package versions are from training data (cutoff mid-2025). Verify with `npm view [package] version` before writing package.json. See STACK.md version verification table.
-- **Dataview inline field syntax:** The exact ergonomics of Obsidian Dataview's inline field syntax (`[key::value]` vs `field:: value`) for claim-level annotation need hands-on testing. This affects how provenance markers work in page bodies.
-- **remark-wiki-link maintenance status:** Should be verified before committing to it. If the package is stale, a custom wikilink regex (3 lines) is a viable fallback.
-- **Ingest prompt design:** The extract-then-compile prompt for claim extraction is the most consequential prompt in the system. No established reference prompts exist — this needs empirical testing in Phase 2.
-- **Contradiction detection approach:** No established patterns for automated contradiction detection across a personal wiki. Phase 4 should treat this as exploratory, not as implementation of a known pattern.
-- **Competitor feature currency:** NotebookLM and other tools iterated rapidly in 2025-2026. The competitive landscape analysis may be outdated. Validate against current product pages before finalizing differentiator messaging.
+- **Headless Obsidian / Dataview render automation in 2026** — may not exist in a form suitable for CI. If not: documented manual checklist with screenshots as the v1.0-debt closure for M-10/m-6. Decide during Phase 5 planning.
+- **Wizard schema-version upgrade path** (ARCH LOW confidence) — 3-way merge mechanism for `bin/init-wizard.sh --upgrade` unspecified. Acceptable: ship v1.1 without `--upgrade`; document `docs/reference/ownership.md` boundary (template-owned vs user-owned files); implement `bin/upgrade.sh` in v1.2.
+- **`.obsidianignore` vs separate vault for `examples/`** (ARCH gap) — needs Obsidian verification during Phase 1. Graph-view contamination is the concrete failure; verify with real Obsidian open.
+- **Codex availability and agent-parity test design** (PITFALLS M-12) — requires access to Codex; fixture tolerance rules ("what counts as a parity diff?") need a spike before Phase 5 can green.
+- **YAML round-trip library choice** (PITFALLS M-11) — `ruamel.yaml` preserves order and comments but is a new runtime dep; conflicts with zero-new-dep posture. Either accept `ruamel.yaml` as the single exception (Phase 4a decision), or constrain bootstrap to transformations that PyYAML's order-loss doesn't break. Decide at Phase 4a planning.
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- Obsidian Dataview plugin — https://github.com/blacksmithgu/obsidian-dataview — dominant Obsidian plugin, core infrastructure
-- ripgrep — https://github.com/BurntSushi/ripgrep — standard CLI search tool
-- git — version control, transaction mechanism, provenance
+
+- v1.0 internal artifacts: `AGENTS.md` (1,178 lines, 16 sections), `bin/lint.sh`, `bin/ingest.sh`, `bin/search.sh`, `bin/validate-op.sh`, `wiki/kahneman*`, `REQUIREMENTS.md`, Phase 1–6 VERIFICATION docs, v1.0 retrospective.
+- [Diátaxis framework](https://diataxis.fr/start-here/) — canonical.
+- [Copier documentation](https://copier.readthedocs.io/en/stable/comparisons/) — scaffolding patterns.
+- [actions/checkout](https://github.com/actions/checkout), [actions/setup-python](https://github.com/actions/setup-python) — v6 verified 2026-04.
+- [Ubuntu 24.04 GH-runner PSA](https://discourse.ubuntu.com/t/psa-for-folks-using-python-in-github-action-runners-and-ubuntu-latest-label/48654).
+- [GitHub Docs — PR templates, CODEOWNERS, template-repository setting](https://docs.github.com/en).
+- [kepano/kepano-obsidian](https://github.com/kepano/kepano-obsidian) — canonical Obsidian starter.
 
 ### Secondary (MEDIUM confidence)
-- unified/remark ecosystem — https://unifiedjs.com/ — markdown AST processing; versions unverified
-- gray-matter — https://github.com/jonschlinkert/gray-matter — frontmatter parsing
-- markdownlint-cli2 — https://github.com/DavidAnson/markdownlint-cli2 — markdown linting
-- NotebookLM feature analysis — training data through early 2025
-- Khoj, Quivr feature analysis — training data through early 2025
-- Compiler architecture principles, static site generator patterns, Zettelkasten/evergreen notes patterns — general knowledge
+
+- [Material for MkDocs alternatives](https://squidfunk.github.io/mkdocs-material/alternatives/) — maintenance-mode context.
+- [MkDocs vs Docusaurus 2026 — Damavis](https://blog.damavis.com/en/mkdocs-vs-docusaurus-for-technical-documentation/).
+- [Cookiecutter article — Wiley 2026](https://onlinelibrary.wiley.com/doi/full/10.1002/spe.70024).
+- [notion2obsidian](https://github.com/bitbonsai/notion2obsidian), [obsidian-vault-manager](https://github.com/mpfilbin/obsidian-vault-manager), [obsidian-export](https://github.com/zoni/obsidian-export) — brownfield patterns.
+- [natelandau/obsidian-metadata](https://github.com/natelandau/obsidian-metadata), [HananoshikaYomaru/Obsidian-Frontmatter-Generator](https://github.com/HananoshikaYomaru/Obsidian-Frontmatter-Generator) — frontmatter migration.
+- [charmbracelet/gum](https://github.com/charmbracelet/gum) — rejected TUI option.
+- [Sequin Diátaxis adoption](https://blog.sequinstream.com/we-fixed-our-documentation-with-the-diataxis-framework/).
 
 ### Tertiary (LOW confidence)
-- Mem.ai features — training data, may have changed significantly
-- Obsidian plugin ecosystem — plugin versions and features change frequently; validate specific plugin capabilities in current Obsidian version
+
+- [14 example Obsidian vaults roundup — forum](https://forum.obsidian.md/t/14-example-vaults-from-around-the-web-kepano-nick-milo-the-sweet-setup-and-more/81788).
+- [Obsidian forum: bulk restructure YAML frontmatter](https://forum.obsidian.md/t/how-to-bulk-restructure-yaml-frontmatter/40169) — community patterns, varying quality.
+- Strict mechanical-vs-judgment boundary in brownfield: no exact prior art found; treat as architectural bet.
 
 ---
-*Research completed: 2026-04-06*
+*Research completed: 2026-04-15*
 *Ready for roadmap: yes*

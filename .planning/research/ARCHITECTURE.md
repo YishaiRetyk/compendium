@@ -1,484 +1,300 @@
-# Architecture Research
+# ARCHITECTURE: v1.1 Shareability Integration
 
-**Domain:** LLM-maintained personal wiki / knowledge compilation system
-**Researched:** 2026-04-06
-**Confidence:** MEDIUM (novel domain -- no established reference architectures; drawing from compiler design, knowledge management systems, Obsidian conventions, and LLM agent patterns)
+**Researched:** 2026-04-15
+**Mode:** Project architecture (subsequent milestone, integration-focused)
+**Overall confidence:** MEDIUM-HIGH (grounded in existing v1.0 code/schema; judgments about UX tradeoffs are opinion, marked where so)
 
-## System Overview
+Each decision below gives: recommendation, integration points, new vs modified, failure modes, build-order slot.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                     SCHEMA LAYER (Agent Instructions)            │
-│  ┌──────────┐  ┌──────────────┐  ┌─────────────┐               │
-│  │ AGENTS.md│  │ Page Schemas │  │  Workflow    │               │
-│  │/CLAUDE.md│  │ (templates)  │  │  Definitions │               │
-│  └──────────┘  └──────────────┘  └─────────────┘               │
-├─────────────────────────────────────────────────────────────────┤
-│                   COMPILATION PIPELINE                           │
-│                                                                  │
-│  ┌────────┐   ┌─────────┐   ┌───────┐   ┌──────┐   ┌───────┐  │
-│  │  DIFF  │──>│ EXTRACT │──>│ MERGE │──>│ LINT │──>│ INDEX │  │
-│  └────────┘   └─────────┘   └───────┘   └──────┘   └───────┘  │
-│       ^                                       │                  │
-│       │            ┌───────────┐              v                  │
-│       └────────────│ REFLECT   │<─────────────┘                  │
-│                    └───────────┘                                  │
-├─────────────────────────────────────────────────────────────────┤
-│                      WIKI LAYER (Output)                         │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────────┐    │
-│  │ Entity   │  │ Concept  │  │ Summary  │  │ Comparison   │    │
-│  │ Pages    │  │ Pages    │  │ Pages    │  │ Pages        │    │
-│  └──────────┘  └──────────┘  └──────────┘  └──────────────┘    │
-│  ┌──────────┐  ┌──────────────────────┐                         │
-│  │  Index   │  │  Log (append-only)   │                         │
-│  └──────────┘  └──────────────────────┘                         │
-├─────────────────────────────────────────────────────────────────┤
-│                    SOURCE LAYER (Input, Immutable)               │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐       │
-│  │ Articles │  │ Journal  │  │ Podcasts │  │ Papers   │       │
-│  │          │  │ Entries  │  │ / Notes  │  │          │       │
-│  └──────────┘  └──────────┘  └──────────┘  └──────────┘       │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-### Three-Layer Architecture
-
-The system is a **compiler**, not an application. Sources are input; the wiki is compiled output; the schema is the compiler specification. This mental model is critical because it makes the system's invariants clear:
-
-1. **Sources are immutable.** They never change after ingest. Like source code files.
-2. **Wiki pages are derived artifacts.** They can always be re-derived from sources + schema. Like compiled binaries.
-3. **The schema is the build configuration.** It tells the compiler (LLM) how to transform sources into wiki pages.
-
-This is analogous to a static site generator (sources = content, schema = config/templates, wiki = build output) but the "build step" is an LLM rather than a deterministic program.
-
-### Component Responsibilities
-
-| Component | Responsibility | Implementation |
-|-----------|----------------|----------------|
-| **Schema** | Define page types, workflows, operations, conventions | CLAUDE.md / AGENTS.md + template files |
-| **Source Store** | Hold immutable raw documents | `sources/` directory with subdirectories by type |
-| **Diff Engine** | Detect what changed since last compilation | Git diff on sources dir, or new-file detection |
-| **Extractor** | Pull structured claims/facts from raw sources | LLM reads source, outputs structured extractions |
-| **Merger** | Integrate extracted facts into existing wiki pages | LLM reads existing page + new facts, produces updated page |
-| **Linter** | Check consistency, find contradictions, flag staleness | LLM reads related pages, checks against rules in schema |
-| **Indexer** | Maintain catalog of all pages with metadata | LLM updates index file after page changes |
-| **Reflector** | Record structural decisions, trigger reframes | LLM writes decision records when structure changes |
-| **Log** | Chronological record of all operations | Append-only markdown file |
-| **Wiki Pages** | The compiled knowledge artifact | Typed markdown pages with frontmatter |
-
-## Recommended Project Structure
-
-```
-life/                              # Repository root
-├── CLAUDE.md                      # Agent schema (symlink or canonical)
-├── AGENTS.md                      # Agent schema (symlink or canonical)
-│
-├── sources/                       # IMMUTABLE input layer
-│   ├── articles/                  # Web articles, blog posts
-│   ├── books/                     # Book notes, highlights
-│   ├── journal/                   # Personal journal entries
-│   ├── podcasts/                  # Podcast/video notes
-│   ├── papers/                    # Academic papers, studies
-│   ├── conversations/             # Chat logs, interview notes
-│   └── _inbox/                    # Unsorted incoming sources
-│
-├── wiki/                          # COMPILED output layer
-│   ├── entities/                  # People, orgs, products, places
-│   ├── concepts/                  # Ideas, frameworks, mental models
-│   ├── summaries/                 # Per-source digests
-│   ├── comparisons/               # X vs Y analysis pages
-│   ├── guides/                    # How-to, process pages
-│   ├── meta/                      # Pages about the wiki itself
-│   │   ├── INDEX.md               # Master catalog of all pages
-│   │   ├── LOG.md                 # Append-only activity log
-│   │   └── decisions/             # Structural decision records
-│   └── _staging/                  # Pages under construction
-│
-├── schema/                        # COMPILER CONFIGURATION
-│   ├── workflows/                 # Step-by-step agent instructions
-│   │   ├── ingest.md              # How to process new sources
-│   │   ├── query.md               # How to answer questions
-│   │   ├── lint.md                # How to check consistency
-│   │   └── reflect.md             # How to record decisions
-│   ├── templates/                 # Page type templates
-│   │   ├── entity.md              # Entity page template
-│   │   ├── concept.md             # Concept page template
-│   │   ├── summary.md             # Source summary template
-│   │   └── comparison.md          # Comparison page template
-│   └── operations.md             # UPDATE/MERGE/SUPERSEDE/ARCHIVE specs
-│
-└── .planning/                     # Project planning (not wiki content)
-```
-
-### Structure Rationale
-
-- **`sources/` separate from `wiki/`:** Enforces immutability boundary. Sources never modified by agents. Clear input/output separation like a compiler.
-- **`wiki/` subdivided by page type:** Enables targeted operations ("lint all entity pages"), keeps directory sizes manageable, matches Obsidian vault organization conventions.
-- **`schema/` as its own directory:** Schema is neither source nor output -- it's configuration. Separating it makes the three-layer architecture explicit and avoids agents accidentally modifying their own instructions during wiki operations.
-- **`_inbox/` in sources:** Drop zone for unprocessed sources. The ingest workflow moves classified sources to their proper subdirectory.
-- **`_staging/` in wiki:** Pages that are being constructed but not yet ready for the main wiki. Prevents half-built pages from appearing in searches and index.
-- **`meta/` in wiki:** Index, log, and decision records are wiki-adjacent but not knowledge content. Grouping them keeps the main wiki directories clean.
-
-## Architectural Patterns
-
-### Pattern 1: Frontmatter-as-Provenance (use this, not sidecar files)
-
-**What:** Store all metadata -- provenance, epistemic status, page type, sources, timestamps -- in YAML frontmatter within each markdown file.
-
-**When to use:** Always for v1. This is the right default.
-
-**Why frontmatter over alternatives:**
-
-| Approach | Pros | Cons | Verdict |
-|----------|------|------|---------|
-| **Frontmatter** | Co-located with content; Obsidian Dataview compatible; git-trackable; no sync issues; agents see metadata when reading file | Frontmatter can grow large for heavily-sourced pages; YAML parsing edge cases | **Use this** |
-| **Sidecar files** (page.md + page.meta.yaml) | Separates concerns; metadata can grow independently | Double the files; sync issues (rename page, forget sidecar); agents must read two files; Obsidian doesn't natively surface sidecar data | Don't use |
-| **SQLite** | Fast queries; relational joins; handles scale well | Not human-readable; merge conflicts in binary; breaks git diffing; agents can't easily read/write; Obsidian integration requires plugin | Don't use for v1 |
-| **Inline markers** (<!-- source: ... -->) | Zero frontmatter overhead | Not queryable by Dataview; fragile parsing; mixes metadata with content | Don't use |
-
-**Frontmatter schema example:**
-
-```yaml
----
-type: entity                    # Page type: entity|concept|summary|comparison|guide
-title: "Huberman Lab Protocols"
-aliases: [huberman protocols]
-created: 2026-04-06
-updated: 2026-04-06
-sources:
-  - path: sources/podcasts/huberman-sleep-2024.md
-    claims: [sleep-timing, light-exposure]
-  - path: sources/articles/examine-melatonin.md
-    claims: [melatonin-dosing]
-epistemic_status: sourced       # sourced|inferred|tentative|stale
-confidence: high                # high|medium|low
-tags: [health, sleep, protocols]
-supersedes: []                  # Pages this replaced
----
-```
-
-**Scaling concern:** When a page has 50+ source references, frontmatter gets long. Mitigation: keep `sources` as a list of paths with claim IDs; the claim details live in the page body with inline markers like `[sourced: sleep-timing]`. This keeps frontmatter as an index and body as the detail.
-
-### Pattern 2: Structured Operations (not raw file rewrites)
-
-**What:** Define a vocabulary of operations (UPDATE, MERGE, SUPERSEDE, ARCHIVE) that agents use instead of arbitrary file edits. Each operation has preconditions, steps, and post-conditions defined in `schema/operations.md`.
-
-**When to use:** Every time an agent modifies the wiki.
-
-**Trade-offs:** Adds overhead to every operation (agent must check preconditions, follow steps, update log). But prevents the primary failure mode: agents silently losing information during rewrites.
-
-**Operations vocabulary:**
-
-| Operation | When | What Happens |
-|-----------|------|-------------|
-| **UPDATE** | New information for existing page | Read page, merge new claims, preserve existing claims, bump `updated`, log |
-| **MERGE** | Two pages cover the same topic | Create unified page, SUPERSEDE both originals, update all inbound links |
-| **SUPERSEDE** | Page replaced by another | Add `superseded_by` to frontmatter, move to archive, update index |
-| **ARCHIVE** | Page no longer relevant | Add `archived: true` and `archive_reason`, remove from active index |
-| **CREATE** | New topic identified | Check for existing page first, use template, add to index, log |
-
-**Key rule:** No operation should silently drop claims. UPDATE must preserve existing sourced claims unless explicitly contradicted by a newer source (in which case the contradiction is noted, not silently resolved).
-
-### Pattern 3: Progressive Disclosure via Page Structure
-
-**What:** Every wiki page follows a consistent structure that supports both quick scanning and deep reading. The pattern is: **summary line -> key facts -> detailed sections -> provenance**.
-
-**When to use:** All wiki pages.
-
-**Template:**
-
-```markdown
----
-(frontmatter)
 ---
 
-# Title
+## Decision 1: Personalized `AGENTS.md` generation — template substitution, NOT layered override
 
-> **Summary:** One-sentence summary of this page's core content.
+**Recommendation:** (a) **Template substitution** over the canonical `AGENTS.md` using a small set of named placeholders (`{{PRIMARY_DOMAIN}}`, `{{DEFAULT_PRIVACY}}`, `{{AGENT_FILENAME}}`, `{{DECAY_PROFILE}}`, `{{EXAMPLE_CLUSTER_REF}}`), emitted by a generator (`bin/init-wizard.sh`) that reads `/schema/AGENTS.template.md` + answers from interactive prompts.
 
-## Key Facts
-- Fact 1 [sourced: claim-id-1]
-- Fact 2 [sourced: claim-id-2]
-- Fact 3 [inferred]
+**Reject (b) layered core + `AGENTS.local.md` override:** v1.0 explicitly routes all agents to a single schema document (AGENTS.md section 3 LLM Navigation Rule; SCHM-01 agent-agnostic). A "read both files, local wins on conflict" contract adds a precedence rule that every agent must obey — that is exactly the complexity SCHM-01 rejects.
 
-## Detail Sections
-(Full content organized by topic)
+**Reject (c) pure generator producing a novel file:** loses diffability — users who upgrade lose track of what their personalizations actually were.
 
-### Subtopic A
-Content with [[wikilinks]] to related pages...
+**Integration points:**
+- **New file:** `schema/AGENTS.template.md`
+- **New script:** `bin/init-wizard.sh` (interactive prompts → renders template → writes `AGENTS.md` or `CLAUDE.md` at repo root)
+- **New file:** `.wizard-answers.yaml` (records inputs that produced current AGENTS.md — powers upgrades)
+- **Modified:** Section 3 gains a note that `AGENTS.md` is a rendered instance
+- **New frontmatter field:** none (AGENTS.md is not a wiki page)
 
-## Open Questions
-- Unresolved question 1
-- Unresolved question 2
+**Schema upgrade propagation:** Template header carries `schema_version: "1.1.0"`. `bin/init-wizard.sh --upgrade` re-renders new template using `.wizard-answers.yaml` and produces 3-way merge vs. current AGENTS.md.
 
-## Sources
-- [[source-summary-1]] -- claims: claim-id-1, claim-id-2
-- [[source-summary-2]] -- claims: claim-id-3
-```
+**Failure modes:**
+- Too many placeholders → template becomes unreadable. Keep ≤ 6.
+- Hand-edits despite guidance → upgrade path painful. Mitigation: `bin/lint.sh --schema-drift` diffs rendered template vs current AGENTS.md.
+- Layered-override not foreclosed — AGENTS.local.md could be added in v1.2 without breaking v1.1.
 
-**Rationale:** The summary + key facts section serves as the "shallow" layer for navigation and index-first search. An agent answering a question can read just frontmatter + key facts from many pages before deciding which to read in full. This is how progressive disclosure works without a database or API -- it's structural.
+**v1.0 primitives reused:** AGENTS.md structure (16 sections), bash+inline-python3, 16-field frontmatter schema (unaffected).
 
-### Pattern 4: Agent-Agnostic Schema Design
-
-**What:** The schema (CLAUDE.md / AGENTS.md) must be a specification, not code. It tells any LLM what to do using natural language instructions, page templates with examples, and explicit operation definitions. No agent-specific tool calls, no framework-specific syntax.
-
-**Design principles:**
-
-1. **Instruction, not implementation.** Say "read the source file and extract claims in this format" not "call the extract_claims() function."
-2. **Examples over rules.** Show a before/after of an UPDATE operation rather than listing abstract rules.
-3. **One canonical file, symlinked.** Maintain one `schema/AGENTS.md` and symlink to `CLAUDE.md` at root. Avoids drift between agent-specific copies.
-4. **Workflow references, not inline workflows.** The main schema file points to `schema/workflows/ingest.md` etc. This keeps the top-level file navigable and lets workflows be independently updated.
-5. **Test with the dumbest agent.** If the schema works with a less capable model, it works with all of them. Write instructions that are unambiguous without requiring sophisticated reasoning.
-
-## Data Flow
-
-### Ingest Flow (New Source Arrives)
-
-```
-Human drops file in sources/_inbox/
-    |
-    v
-[DIFF] Agent detects new file in _inbox/
-    |
-    v
-[CLASSIFY] Agent reads source, determines type
-    |         (article/journal/podcast/etc.)
-    |
-    v
-[MOVE] Source moved to sources/{type}/
-    |
-    v
-[EXTRACT] Agent reads source, produces:
-    |        - Structured claims with IDs
-    |        - Identified entities, concepts
-    |        - Cross-references to existing wiki pages
-    |
-    v
-[ROUTE] For each extracted item, determine target:
-    |     - Existing page? -> UPDATE
-    |     - New topic? -> CREATE
-    |     - Overlapping pages? -> MERGE candidate
-    |
-    v
-[MERGE/CREATE/UPDATE] Execute operations on wiki pages
-    |
-    v
-[INDEX] Update wiki/meta/INDEX.md
-    |
-    v
-[LOG] Append to wiki/meta/LOG.md
-    |
-    v
-[LINT] (optional follow-on) Check affected pages for:
-         - Contradictions with other pages
-         - Missing cross-references
-         - Stale claims
-```
-
-### Query Flow (Human Asks a Question)
-
-```
-Human asks question
-    |
-    v
-[INDEX SEARCH] Agent reads INDEX.md to find relevant pages
-    |             (progressive disclosure: metadata first)
-    |
-    v
-[SHALLOW READ] Agent reads frontmatter + Key Facts
-    |             from candidate pages
-    |
-    v
-[DEEP READ] Agent reads full content of most relevant pages
-    |
-    v
-[SYNTHESIZE] Agent composes answer with citations
-    |            to wiki pages (which cite sources)
-    |
-    v
-[DELTA CHECK] Did synthesis reveal new knowledge?
-    |            - New connections between concepts?
-    |            - Gaps in existing pages?
-    |
-    v
-[COMPILE BACK] (optional) UPDATE wiki pages with
-                 newly synthesized knowledge
-```
-
-### Lint Flow (Consistency Check)
-
-```
-Triggered by: schedule, post-ingest, human request
-    |
-    v
-[SCOPE] Determine lint scope:
-    |     - Single page? Set of pages? Full wiki?
-    |
-    v
-[READ] Load pages in scope + their declared sources
-    |
-    v
-[CHECK] For each page, verify:
-    |     - All source references still valid?
-    |     - Claims consistent across related pages?
-    |     - Cross-references bidirectional?
-    |     - Epistemic statuses current?
-    |     - Any orphan pages (no inbound links)?
-    |
-    v
-[REPORT] Produce lint report:
-    |      - Contradictions found
-    |      - Stale claims flagged
-    |      - Missing links identified
-    |      - Orphan pages listed
-    |
-    v
-[FIX] (optional) Auto-fix safe issues:
-       - Add missing backlinks
-       - Update stale timestamps
-       - Flag (but don't resolve) contradictions
-```
-
-## Scaling Considerations
-
-| Scale | Pages | Architecture Adjustments |
-|-------|-------|--------------------------|
-| **Small** | ~50 | Single INDEX.md works fine. Agent can read entire index in one pass. Lint can scan all pages. No performance concerns. |
-| **Medium** | ~200-500 | INDEX.md needs categories/sections. Agent should use progressive disclosure (read index, then frontmatter, then full pages). Lint should be scoped to recently-changed pages or specific categories. |
-| **Large** | ~1000+ | INDEX.md should become a directory of index files by category. Consider a generated `_catalog.json` for fast programmatic search (v2). Lint must be incremental -- only pages changed since last lint run. May need a dependency graph to know which pages to re-lint when a source changes. |
-
-### Scaling Priorities
-
-1. **First bottleneck: Index size.** At ~200 pages, a single INDEX.md becomes too large for an agent to process in one pass. **Fix:** Split into category indexes (e.g., `wiki/meta/index/health.md`, `wiki/meta/index/psychology.md`). The main INDEX.md becomes a table of contents pointing to category indexes.
-
-2. **Second bottleneck: Lint scope.** At ~500 pages, full-wiki lint becomes impractical (too many LLM calls). **Fix:** Incremental linting. Track "last linted" timestamp per page in frontmatter. Only lint pages modified since last lint, plus their direct neighbors (pages they link to or that link to them).
-
-3. **Third bottleneck: Agent context window.** At ~1000+ pages, even reading frontmatter from all pages exceeds context. **Fix:** Two-stage search. First, scan category indexes (small files with page titles + one-line summaries). Second, read frontmatter of matched pages. This is the progressive disclosure pattern applied to the agent's own search process.
-
-4. **Fourth bottleneck (v2 territory): Compilation time.** When a source touches 20+ pages, the ingest flow takes many LLM calls. **Fix:** Parallelizable operations. The extract step is independent per source. The merge step can be parallelized per target page (as long as two sources don't target the same page simultaneously). This is where CLI tooling and a job queue would help.
-
-## Anti-Patterns
-
-### Anti-Pattern 1: Monolithic Agent Instructions
-
-**What people do:** Put everything -- all workflows, all templates, all rules, all examples -- in a single massive CLAUDE.md file.
-
-**Why it's wrong:** LLM context is precious. A 5000-line instruction file means the agent spends most of its context window on instructions rather than content. Also makes updates error-prone.
-
-**Do this instead:** Use a hub-and-spoke schema. The main CLAUDE.md/AGENTS.md is a ~200-line overview with explicit references to `schema/workflows/*.md` and `schema/templates/*.md`. The agent reads the top-level file first, then loads only the workflow relevant to the current task.
-
-### Anti-Pattern 2: Treating Wiki Pages as Append-Only
-
-**What people do:** Always add new information to the bottom of a page, never restructure.
-
-**Why it's wrong:** Pages become incoherent over time. Contradictions accumulate. The page stops being a useful compilation and becomes a chronological dump.
-
-**Do this instead:** Every UPDATE operation should re-synthesize the affected sections, not just append. The agent reads the existing section, integrates the new claim, and rewrites the section to be coherent. The chronological record belongs in the LOG, not in the page.
-
-### Anti-Pattern 3: Storing Provenance Separately from Content
-
-**What people do:** Keep a separate provenance database or sidecar files that map claims to sources.
-
-**Why it's wrong:** Provenance drifts from content. When the page is edited, the provenance file is forgotten. Two-file sync is the most common failure mode in document systems.
-
-**Do this instead:** Inline claim markers (`[sourced: claim-id]`) next to the actual claims, with the source mapping in frontmatter. Everything travels together. If you move text, the marker moves with it.
-
-### Anti-Pattern 4: Over-Engineering the Schema Before Using It
-
-**What people do:** Spend weeks designing the perfect ontology, page type hierarchy, and metadata schema before writing a single wiki page.
-
-**Why it's wrong:** You don't know what metadata you actually need until you've ingested 20+ sources and written 30+ pages. Premature schema design leads to fields nobody uses and missing fields you desperately need.
-
-**Do this instead:** Start with minimal frontmatter (type, title, created, updated, sources). Add fields when you discover a concrete need. The schema is a living document -- treat it like code that gets refactored, not a specification that must be complete before implementation.
-
-### Anti-Pattern 5: Letting Agents Modify Sources
-
-**What people do:** Allow agents to "clean up" or "standardize" source documents.
-
-**Why it's wrong:** Sources are the ground truth. If an agent modifies a source, you lose the ability to re-derive the wiki from original sources. You also lose the ability to audit whether the agent's extraction was accurate.
-
-**Do this instead:** Sources are read-only for agents. If a source needs cleanup, the human does it. The agent's job is extraction and compilation, not source editing.
-
-## Integration Points
-
-### Obsidian Integration
-
-| Feature | Integration Pattern | Notes |
-|---------|---------------------|-------|
-| **Graph view** | Use `[[wikilinks]]` for all cross-references | Graph view works automatically. Entity/concept pages become natural graph hubs. |
-| **Dataview** | Structured frontmatter with consistent field names | Enables queries like "all entity pages updated in last 7 days" or "all pages with epistemic_status: stale" |
-| **Search** | Progressive disclosure structure (summary + key facts at top) | Obsidian search results show first lines -- make sure they're informative |
-| **Tags** | Use `tags:` in frontmatter, not inline #tags | Cleaner, queryable via Dataview, doesn't clutter body text |
-| **Marp** | Guide pages can include Marp slide separators | Only for presentation-oriented pages, not all pages |
-
-### Git Integration
-
-| Feature | Integration Pattern | Notes |
-|---------|---------------------|-------|
-| **Change tracking** | Commit after each ingest/lint cycle | Git history serves as an audit trail of all wiki changes |
-| **Diff detection** | `git diff sources/` to detect new/changed sources | The DIFF step in the pipeline can use git rather than custom tracking |
-| **Branching** | Not needed for v1 | Single-user system; linear history is fine |
-
-### LLM Agent Integration
-
-| Boundary | Communication | Notes |
-|----------|---------------|-------|
-| Human -> Agent | Natural language commands + file drops in _inbox | No structured API needed for v1 |
-| Agent -> Wiki | File reads and writes following operation specs | Agent reads schema, follows workflows, writes files |
-| Agent -> Log | Append-only writes to LOG.md | Every operation logged with timestamp, operation type, affected pages |
-
-## Build Order (Dependency Graph)
-
-The system has clear dependency layers. Build bottom-up:
-
-```
-Phase 1: Foundation
-  [Directory Structure] + [Minimal Schema] + [Page Templates]
-  No dependencies. Must exist before anything else.
-
-Phase 2: Core Pipeline
-  [Ingest Workflow] depends on: templates, directory structure
-  [Source Summaries] depends on: ingest workflow
-  Needs Phase 1. This is where the system starts producing value.
-
-Phase 3: Wiki Compilation
-  [Entity/Concept Pages] depends on: source summaries, templates
-  [Cross-references] depends on: multiple wiki pages existing
-  [Index] depends on: wiki pages existing
-  Needs Phase 2. This is where compilation (not just summarization) begins.
-
-Phase 4: Quality Layer
-  [Lint Workflow] depends on: wiki pages with provenance
-  [Epistemic Status] depends on: claims having source references
-  [Contradiction Detection] depends on: multiple pages covering related topics
-  Needs Phase 3. Cannot lint what doesn't exist yet.
-
-Phase 5: Structural Intelligence
-  [Reflect Workflow] depends on: enough history to reflect on
-  [MERGE/SUPERSEDE/ARCHIVE ops] depends on: pages that need restructuring
-  [Decision Records] depends on: structural decisions being made
-  Needs Phase 4. Structural operations emerge from experience, not upfront design.
-
-Phase 6: Scale & Automation (v2)
-  [Category Indexes] depends on: enough pages to categorize
-  [Incremental Lint] depends on: lint workflow + scale pressure
-  [CLI Helpers] depends on: stable workflows to automate
-  Needs Phase 5. Don't automate until the manual process is proven.
-```
-
-**Critical path:** Phase 1 -> Phase 2 -> Phase 3. Get sources in, get summaries out, get cross-referenced pages built. Everything else is refinement.
-
-**Parallel opportunities:** Within Phase 2, the ingest workflow for different source types (articles vs journal vs podcasts) can be developed independently. Within Phase 3, entity pages and concept pages can be developed in parallel.
-
-## Sources
-
-- Compiler architecture principles (input -> transform -> output pipeline; separation of specification from implementation)
-- Static site generator patterns (content + config -> build output; Hugo, Jekyll, Astro)
-- Obsidian community conventions for vault organization, frontmatter schemas, Dataview usage
-- Knowledge management system design (Zettelkasten principles of atomicity and cross-referencing; Andy Matuschak's evergreen notes pattern)
-- LLM agent design patterns (hub-and-spoke instruction design; progressive context loading; structured output formats)
-- Note: All sources are from training data. No live verification was possible (web search unavailable). Confidence is MEDIUM -- the architectural patterns are well-established in adjacent domains but this specific combination (LLM + compiler + personal wiki) is novel.
+**Build order:** AFTER Kahneman move (Decision 2).
 
 ---
-*Architecture research for: LLM Wiki Compiler*
-*Researched: 2026-04-06*
+
+## Decision 2: Kahneman → `examples/` — move + rewrite wikilinks + example-mode banner
+
+**Recommendation:** (A) **Move to `examples/kahneman/` with full wikilink rewrite**, plus `examples/kahneman/README.md` banner and frontmatter field `example: true`. Starter `wiki/` ships empty except `index.md` and `log.md` skeletons.
+
+**Reject (B) leave in wiki/ with banner:** contaminates Obsidian graph view (OBSD-03). Banner doesn't stop Dataview queries.
+
+**Reject (C) symlinks:** breaks Windows, breaks git on some configs, breaks Obsidian vault indexing.
+
+**Integration points:**
+- **New directory:** `examples/kahneman/{entities,concepts,sources,comparisons,overviews}/`
+- **Modified files:** all 7 Kahneman pages move; internal wikilinks preserved
+- **Modified:** `wiki/index.md` stripped → "no content yet — see `examples/kahneman/index.md`"
+- **Modified:** `wiki/log.md` Kahneman entries move to `examples/kahneman/log.md` (preserves §12 append-only invariant)
+- **Modified:** `wiki/decision-making.md` + other overviews — rewrite Related Pages into `examples/kahneman/...`
+- **New frontmatter field:** `example: true` (boolean, optional, default false)
+- **Modified AGENTS.md sections:** §2 (add `examples/`), §5 (new `example` field), §15 (Obsidian config / `.obsidianignore`), §16 (replace Kahneman-specific Dataview examples)
+- **Modified lint:** `EXCLUDE_DIRS` in `bin/lint.sh` gains `'examples'` when `example: true` present or dir is `examples/`
+
+**Decision record required:** SUPERSEDE-class structural reorganization per §11.4. Emit `dr-YYYY-MM-DD-kahneman-to-examples.md`.
+
+**Failure modes:**
+- Example pages still appear in graph view: ship default `.obsidianignore` / workspace config.
+- Users can't find Dataview examples: `examples/kahneman/` is canonical tour.
+- PR lint complains about example orphans: EXCLUDE_DIRS prevents this.
+
+**v1.0 primitives reused:** SUPERSEDE, decision records, lint EXCLUDE_DIRS, frontmatter extensibility (precedent: `has_contradictions`, `knowledge_domain`).
+
+**Build order:** **FIRST feature in v1.1 after scaffolding.**
+
+---
+
+## Decision 3: `contributor` field in log.md — inline Dataview field
+
+**Recommendation:** Add `contributor:: <github-handle>` as **Dataview inline field on its own line** after the entry header, alongside existing per-entry sub-fields.
+
+**Rejected:**
+- Per-entry YAML block — breaks log.md's "single top-level YAML" structure.
+- Header-line change — breaks `bin/lint.sh` grep convention `^## \[`.
+
+**Why Dataview inline:** AGENTS.md §6 already uses `[prov::...]`, `[epistemic::...]`. `contributor::` is a semantic extension. Dataview indexes automatically. Existing parsers unaffected.
+
+**Integration points:**
+- **Modified AGENTS.md §12:** add optional `contributor::` convention
+- **Modified AGENTS.md §11.1:** ingest reads `git config user.name` or `--contributor` flag
+- **Modified bin/ingest.sh:** accept `--contributor`, auto-detect from `git config user.email`, omit if single-author
+- **Modified bin/lint.sh:** new optional check — `contributor::` handles appear in git commit authors (low-severity warning)
+- **New CLI flag:** `bin/ingest.sh --contributor <handle>`
+- **No new frontmatter field**
+
+**Failure modes:**
+- Handles drift from GitHub usernames — lint catches this. Git authorship is ground truth.
+- Private forks — field optional.
+
+**v1.0 primitives reused:** inline Dataview syntax (§6), log.md append-only (§12), `bin/ingest.sh` flag extensibility.
+
+**Build order:** Mid-v1.1, AFTER Decision 6 (PR workflow).
+
+---
+
+## Decision 4: Brownfield bootstrap sentinels — `bootstrap_stage` field
+
+**Recommendation:** Introduce **`bootstrap_stage`** as optional frontmatter field with values `raw|bootstrapped|verified|null`. `bin/brownfield.sh bootstrap` sets `bootstrap_stage: bootstrapped` alongside placeholders (`type: unknown`, `epistemic_status: tentative`, `knowledge_domain: ""`).
+
+Lint becomes aware: when `bootstrap_stage: bootstrapped`, downgrade allowlist findings (unknown `type`, empty `knowledge_domain`, missing `sources`, `epistemic_status: tentative`) from `error` to `info`, tagged "brownfield — pending `suggest`."
+
+**Why dedicated field vs special `type` value:**
+- Cleaner separation: `type` stays semantic, `bootstrap_stage` procedural.
+- Avoids growing every page-type table.
+- Green-field vaults never set it — no noise.
+
+**Integration points:**
+- **New frontmatter field:** `bootstrap_stage` (optional, enum `raw|bootstrapped|verified`)
+- **Modified AGENTS.md §5:** add field + new subsection "Brownfield fields — optional"
+- **Modified AGENTS.md §2:** document `.brownfield/`
+- **Modified bin/lint.sh:** `BASE_FIELDS` unchanged; severity downgrade logic + new `brownfield` category
+- **New CLI script:** `bin/brownfield.sh`
+
+**Failure modes:**
+- Forgotten sentinel → lint warns on pages `bootstrapped` older than 30 days.
+- `bin/ingest.sh` strips the field if encountered on normal ingest.
+- Relaxed lint hides real errors: allowlist narrow; other errors full severity.
+
+**v1.0 primitives reused:** severity-tiered lint, frontmatter extensibility, AGENTS.md §5 pattern.
+
+**Build order:** Concurrent with Decision 5.
+
+---
+
+## Decision 5: Brownfield idempotency — checksum-keyed `.brownfield/applied.log`
+
+**Recommendation:** Each migration script contains a **stable content hash** (sha256 of operation payload, NOT whole file). On run:
+1. Compute operation hash
+2. Check `.brownfield/applied.log` for `<hash> <iso-date> <script-name>`
+3. If present: print "already applied, skipping", exit 0
+4. If absent: execute, append line to applied.log
+
+**Rejected:**
+- Marker frontmatter on target files — one migration touches many pages.
+- Per-target checksumming — fragile when user hand-edits between runs.
+- Pure inherent idempotency — breaks for multi-step ops.
+
+**Integration points:**
+- **New directory:** `.brownfield/` (git-ignored default; opt-in commit)
+- **New files:** `.brownfield/REPORT.md`, `.brownfield/migrations/*.sh`, `.brownfield/applied.log`
+- **Convention:** migration header must contain `# op_hash: <sha256>`
+- **Modified AGENTS.md §2:** add `.brownfield/`
+- **New AGENTS.md §11.5 Brownfield Workflow:** document scan/bootstrap/suggest/verify, idempotency contract, mechanical/judgment boundary
+
+**Failure modes:**
+- Deleted applied.log → re-run. Mitigation: migrations idempotent-in-effect too (field-present-skip).
+- Different hashes for "same" migration when page list changes → CORRECT; new migration is genuinely different.
+
+**v1.0 primitives reused:** bash+inline-python3, sha256 (already used for `content_hash`), append-only log.
+
+**Build order:** Alongside Decision 4. `suggest` after `scan`+`bootstrap`; `verify` last.
+
+---
+
+## Decision 6: PR lint gate — `--format=json|text` flag, JSON for CI
+
+**Recommendation:** Add `--format <text|json>` to `bin/lint.sh` (default `text`). JSON output: array `{severity, category, path, line?, message}` matching existing `add_finding()` tuple. New `.github/workflows/lint.yml` runs `bin/lint.sh --format json` + annotation shim emitting `::error file=...,line=...::`.
+
+**Lints adjusted for PR-friendliness:**
+- **`drift-external` (DRFT-03):** needs local Zotero/Obsidian state. Add `--skip-category drift-external`; CI uses it.
+- **`stale`:** downgrade to warning in CI mode.
+- **`gap`:** warnings only, not blockers.
+- **`contradiction`:** keep as error.
+- **`yaml`, `orphan`, `crossref`, `provenance`:** keep as blockers.
+
+**Integration points:**
+- **Modified bin/lint.sh:** `--format`, `--ci`, `--skip-category` flags; JSON mode; severity-by-category policy table
+- **New file:** `.github/workflows/lint.yml`
+- **New file:** `.github/PULL_REQUEST_TEMPLATE.md`
+- **Modified AGENTS.md §11.3:** new "CI mode" subsection
+- **Modified AGENTS.md §15:** Git/GitHub integration note
+
+**Failure modes:**
+- Non-GitHub hosts — JSON output platform-neutral; only YAML workflow is GitHub-specific. Document in `/docs/reference/ci.md`.
+- Lint rule changes break PRs — version lint (`bin/lint.sh --version`), allow pinning.
+- Noisy gap warnings — default inline annotations error-only.
+
+**v1.0 primitives reused:** entire lint framework (Phase 5), severity tiering, category groupings, `add_finding()`.
+
+**Build order:** After Decisions 4+5 (shares severity-policy table).
+
+---
+
+## Decision 7: Four-track `/docs/` — flat files, AGENTS.md stays at repo root
+
+**Recommendation:** `/docs/` flat with four files + `/docs/reference/` subdirectory. **AGENTS.md stays at repo root.**
+
+```
+/
+├── AGENTS.md                       (operator schema — unchanged)
+├── CLAUDE.md                       (symlink or duplicate — agent-agnostic)
+├── README.md                       (pitch + link to docs/quickstart.md)
+├── docs/
+│   ├── quickstart.md               (5-minute clone-and-ingest)
+│   ├── guided-setup.md             (wizard walkthrough)
+│   ├── manual-setup.md             (hand-edit track)
+│   └── reference/
+│       ├── index.md
+│       ├── schema-tour.md          (human intro to AGENTS.md)
+│       ├── brownfield.md           (brownfield.sh user guide)
+│       ├── privacy-model.md        (fail-closed semantics)
+│       ├── ci.md                   (PR workflow + lint gate)
+│       └── examples.md             (tour of examples/kahneman/)
+```
+
+**Why AGENTS.md stays at root:** every agent looks at project root (SCHM-01). AGENTS.md is operator doc; /docs/ is user doc.
+
+**Integration points:**
+- **New directory:** `docs/` + `docs/reference/`
+- **New files:** 4 top-level + 6 reference docs
+- **Modified README.md**
+- **Unchanged:** AGENTS.md location, wiki/ structure, bin/ scripts
+
+**Failure modes:**
+- Confusion /docs/ vs wiki/: README makes distinction loud. /docs/ never has frontmatter.
+- Four-track naming drifts from wizard UI: wizard uses exact filenames.
+- Reference duplicates AGENTS.md and drifts: link by anchor, don't restate.
+
+**v1.0 primitives reused:** repo-root schema convention, markdown-only docs, Obsidian-compatible markdown.
+
+**Build order:** Last in v1.1. Exception: `docs/quickstart.md` placeholder can ship first.
+
+---
+
+## Cross-Cutting: Build Order Summary
+
+| Order | Feature | Rationale | Depends on |
+|-------|---------|-----------|------------|
+| 1 | **Decision 2** — Kahneman → examples/ | All features reference starter vault state | Nothing |
+| 2 | **Decision 1** — AGENTS.md template + wizard | Template authored against Kahneman-free baseline | Decision 2 |
+| 3 | **Decision 4** — Brownfield sentinels + lint relaxation | New field + severity mechanism reused in 6 | Shares lint changes with 6 |
+| 4 | **Decision 5** — Brownfield idempotency | Needs Decision 4's field conventions | Decision 4 |
+| 5 | **Decision 6** — PR lint gate | Builds on severity-policy from Decision 4 | Decision 4 |
+| 6 | **Decision 3** — `contributor::` in log.md | Only meaningful once PR workflow exists | Decision 6 |
+| 7 | **Decision 7** — `/docs/` four-track | Docs written against stable features | Decisions 1–6 |
+
+---
+
+## Cross-Cutting: AGENTS.md Edit Map
+
+| Section | Change | Driven By |
+|---------|--------|-----------|
+| §1 Overview | `/docs/` is user-facing companion | Decision 7 |
+| §2 Directory Structure | Add `examples/`, `.brownfield/`, `docs/` | Decisions 2, 5, 7 |
+| §3 Navigation | AGENTS.md is a rendered template | Decision 1 |
+| §5 Frontmatter | New optional `example`, `bootstrap_stage` fields | Decisions 2, 4 |
+| §6 Provenance/Epistemics | No change | Decision 3 |
+| §11.1 Ingest | `bin/ingest.sh --contributor` flag | Decision 3 |
+| §11.3 Lint | New CI-mode subsection, severity policy, JSON output | Decision 6 |
+| §11.5 Brownfield (NEW) | Full scan/bootstrap/suggest/verify workflow | Decisions 4, 5 |
+| §12 Index and Log | `contributor::` optional field | Decision 3 |
+| §15 Tooling | Git/GitHub PR workflow integration | Decision 6 |
+| §16 Appendices | Replace Kahneman Dataview examples | Decision 2 |
+
+---
+
+## Cross-Cutting: New Frontmatter Fields
+
+| Field | Values | Required? | Owner | Introduced By |
+|-------|--------|-----------|-------|---------------|
+| `example` | boolean | optional (default false) | example pages | Decision 2 |
+| `bootstrap_stage` | enum `raw\|bootstrapped\|verified` | optional | brownfield workflow | Decision 4 |
+
+Both **additive**. No existing field semantics change.
+
+---
+
+## Cross-Cutting: New CLI / Flags
+
+| Script/Flag | Purpose | Decision |
+|-------------|---------|----------|
+| `bin/init-wizard.sh` (NEW) | Interactive template rendering → personalized AGENTS.md | 1 |
+| `bin/init-wizard.sh --upgrade` | Re-render on schema version bump | 1 |
+| `bin/brownfield.sh scan\|bootstrap\|suggest\|verify` (NEW) | Brownfield vault onboarding | 4, 5 |
+| `bin/ingest.sh --contributor <handle>` | PR-author attribution in log.md | 3 |
+| `bin/lint.sh --format json` | CI-consumable output | 6 |
+| `bin/lint.sh --ci` | Severity-downgrade policy | 6 |
+| `bin/lint.sh --skip-category drift-external` | Skip cross-tool drift in CI | 6 |
+
+---
+
+## Confidence & Gaps
+
+**HIGH confidence:**
+- Frontmatter extensibility pattern — precedent from Phase 5.
+- Lint severity/category mechanism.
+- Log.md inline field compatibility.
+- AGENTS.md at root for agent-agnosticism.
+
+**MEDIUM confidence:**
+- Placeholder vs layered override (Decision 1) — worth a decision record.
+- Flat vs nested `/docs/`.
+- Applied-log vs checksumming for brownfield idempotency.
+
+**LOW confidence / gaps:**
+- `bin/init-wizard.sh --upgrade` 3-way merge mechanism — needs spike.
+- `.obsidianignore` vs separate vault for examples/ — needs Obsidian verification (v1.0 revisit flag).
+- Multi-agent validation (Codex) against v1.1 workflows — gate on Decision 1.
