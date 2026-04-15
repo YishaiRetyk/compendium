@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Shareability
 status: Ready to execute
-stopped_at: Completed 07-04-PLAN.md
-last_updated: "2026-04-15T20:41:20.212Z"
+stopped_at: "07-05 Task 5 CHECKPOINT: awaiting human action (TMPL-01 template toggle + TMPL-11 orphan-branch release smoke with git rev-list --all --count == 1)"
+last_updated: "2026-04-15T21:45:39.526Z"
 progress:
   total_phases: 5
   completed_phases: 0
@@ -150,6 +150,8 @@ Recent decisions affecting current work:
 - [Phase 07]: [Phase 07-04] test_no_kahneman_in_public_docs.sh exempts lines that only reference the sanctioned examples/kahneman/ directory path (mirrors 07-03 test_agents_neutralized.sh pointer-exemption precedent)
 - [Phase 07]: [Phase 07-04] docs/reference/release.md is NOT a stub — it is the full orphan-branch runbook with --dry-run/--apply/check-neutrality.sh pre-flight/Rollback; 07-05 release.sh and check-neutrality.sh implement exactly this contract
 - [Phase 07]: [Phase 07-04] <org>/<repo> angle-bracket placeholder used 7× across README/LICENSE/quickstart/release.md; no your-org/USER-REPO forms (D-02 template-wide convention)
+- [Phase 07-neutral-template-foundation]: NEUT-08 (personal-vault denylist coverage) deferred to a follow-up PR per user decision 'approved — minimal'; v1.1 ships with the Kahneman-only category (NEUT-06). Creator-specific personal terms will be added after a separate .planning/notes/ + git-history suggest-denylist pass is reviewed.
+- [Phase 07-neutral-template-foundation]: 07-05 Task 2 Rule 1/2 auto-fix: bin/check-neutrality.sh gained three exemptions to make 'kahneman' denylist pass against real repo — (1) SELF_REFERENTIAL_EXEMPT skips bin/check-neutrality.sh itself; (2) line-level strip of sanctioned 'examples/kahneman/...' path refs (mirrors 07-03/07-04 precedent); (3) frontmatter neutrality_exempt: true per-file skip (mirrors bin/lint.sh example:true from 07-02). Applied neutrality_exempt to wiki/decisions/dr-2026-04-15-kahneman-to-examples.md (that record IS about Kahneman relocation).
 
 ### Pending Todos
 
@@ -172,6 +174,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-15T20:41:08.687Z
-Stopped at: Completed 07-04-PLAN.md
+Last session: 2026-04-15T21:45:39.523Z
+Stopped at: 07-05 Task 5 CHECKPOINT: awaiting human action (TMPL-01 template toggle + TMPL-11 orphan-branch release smoke with git rev-list --all --count == 1)
 Resume file: None
