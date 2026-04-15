@@ -40,7 +40,13 @@
   3. User opens `examples/kahneman/` and finds the full 7-page cluster preserved with internal wikilinks intact and a README explaining it is a reference example; `bin/lint.sh` does not warn on it because `EXCLUDE_DIRS`/`example: true` are honored.
   4. A PR that reintroduces Kahneman terminology into `AGENTS.md`, or any personal-vault denylist term into public paths, fails CI via the neutrality + denylist grep gate.
   5. User runs `bin/requirements-sync.sh` and sees a mechanical diff between `VERIFICATION.md` truths and `REQUIREMENTS.md` checkbox status; any drift is flagged before merge.
-**Plans**: TBD
+**Plans:** 5 plans
+Plans:
+- [ ] 07-01-PLAN.md — DEBT-03 requirements-sync.sh + Wave 0 test harness
+- [ ] 07-02-PLAN.md — Relocate Kahneman cluster to examples/, shrink wiki to skeleton, extend lint EXCLUDE_DIRS, commit NEUT-07 decision record
+- [ ] 07-03-PLAN.md — Neutralize AGENTS.md + produce schema/AGENTS.template.md + CLAUDE.md byte-dup + pre-commit hook
+- [ ] 07-04-PLAN.md — Top-level scaffolding (README, LICENSE, PRIVACY, .gitignore) + docs/ four-track skeleton + release runbook
+- [ ] 07-05-PLAN.md — bin/check-neutrality.sh + human-reviewed denylist + bin/release.sh + neutrality CI workflow
 
 ### Phase 8: Two-Track Setup (Wizard + Manual)
 **Goal**: A new adopter can reach a working personalized `AGENTS.md` by either running `bin/init-wizard.sh` or hand-editing per `docs/manual-setup.md` — and both paths produce a byte-identical end state.
@@ -124,7 +130,7 @@
 | 4. Query & Structured Operations | v1.0 | 6/6 | Complete | 2026-04-13 |
 | 5. Lint & Quality | v1.0 | 4/4 | Complete | 2026-04-14 |
 | 6. Reflection & Drift Detection | v1.0 | 3/3 | Complete | 2026-04-15 |
-| 7. Neutral Template Foundation | v1.1 | 0/0 | Not started | - |
+| 7. Neutral Template Foundation | v1.1 | 0/5 | Not started | - |
 | 8. Two-Track Setup (Wizard + Manual) | v1.1 | 0/0 | Not started | - |
 | 9. Collaborative PR Workflow + CI Lint Gate | v1.1 | 0/0 | Not started | - |
 | 10. Brownfield Scan + Bootstrap | v1.1 | 0/0 | Not started | - |
