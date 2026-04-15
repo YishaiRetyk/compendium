@@ -42,7 +42,7 @@
   5. User runs `bin/requirements-sync.sh` and sees a mechanical diff between `VERIFICATION.md` truths and `REQUIREMENTS.md` checkbox status; any drift is flagged before merge.
 **Plans:** 5 plans
 Plans:
-- [ ] 07-01-PLAN.md — DEBT-03 requirements-sync.sh + Wave 0 test harness
+- [x] 07-01-PLAN.md — DEBT-03 requirements-sync.sh + Wave 0 test harness
 - [ ] 07-02-PLAN.md — Relocate Kahneman cluster to examples/, shrink wiki to skeleton, extend lint EXCLUDE_DIRS, commit NEUT-07 decision record
 - [ ] 07-03-PLAN.md — Neutralize AGENTS.md + produce schema/AGENTS.template.md + CLAUDE.md byte-dup + pre-commit hook
 - [ ] 07-04-PLAN.md — Top-level scaffolding (README, LICENSE, PRIVACY, .gitignore) + docs/ four-track skeleton + release runbook

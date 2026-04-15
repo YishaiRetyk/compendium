@@ -109,7 +109,7 @@ Numbering continues from v1.0. New REQ-ID prefixes: `TMPL`, `NEUT`, `WZRD`, `MAN
 
 - [ ] **DEBT-01**: Obsidian render verification — open generated wiki in Obsidian, confirm wikilinks resolve and Dataview queries render correctly (deferred from v1.0 Phase 4)
 - [ ] **DEBT-02**: Codex (or other non-Claude) agent-parity: run v1.0 ingest workflow end-to-end against Kahneman example cluster using a second agent; document diffs; set agent-parity tolerance
-- [ ] **DEBT-03**: `bin/requirements-sync.sh` mechanical check: compares `VERIFICATION.md` truths against `REQUIREMENTS.md` status checkboxes; flags drift (retrospective lesson)
+- [x] **DEBT-03**: `bin/requirements-sync.sh` mechanical check: compares `VERIFICATION.md` truths against `REQUIREMENTS.md` status checkboxes; flags drift (retrospective lesson)
 - [ ] **DEBT-04**: Genuine write-back query scenario executed end-to-end (Phase 4 validation scenario that produced NO-WRITE-BACK in v1.0 re-run)
 
 ## v2 Requirements
@@ -179,7 +179,7 @@ Explicitly excluded from v1.1. Documented to prevent scope creep.
 | NEUT-06 | Phase 7 | Pending |
 | NEUT-07 | Phase 7 | Pending |
 | NEUT-08 | Phase 7 | Pending |
-| DEBT-03 | Phase 7 | Pending |
+| DEBT-03 | Phase 7 | Complete |
 | WZRD-01 | Phase 8 | Pending |
 | WZRD-02 | Phase 8 | Pending |
 | WZRD-03 | Phase 8 | Pending |
