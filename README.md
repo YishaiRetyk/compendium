@@ -21,7 +21,7 @@ README.md                 This file
 LICENSE                   MIT
 PRIVACY.md                Tier model (local_only vs cloud_safe)
 wiki/                     Your compiled knowledge vault (starts empty)
-examples/kahneman/        Reference example cluster (Daniel Kahneman, behavioral economics)
+examples/                 Reference example clusters (bundled sample domain)
 bin/                      CLI helpers (ingest.sh, lint.sh, search.sh, ...)
 docs/                     Quickstart, guided/manual setup, reference
 schema/                   AGENTS.template.md (wizard source)
