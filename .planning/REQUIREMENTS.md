@@ -135,10 +135,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Cross-System Drift Detection
 
-- [ ] **DRFT-01**: Detect when raw sources exist but have no corresponding wiki pages
-- [ ] **DRFT-02**: Detect when wiki pages reference sources that no longer exist
-- [ ] **DRFT-03**: Detect drift between wiki and broader toolchain (Obsidian vault state, Zotero libraries, cloud/local file divergence)
-- [ ] **DRFT-04**: Drift check integrated into lint workflow
+- [x] **DRFT-01**: Detect when raw sources exist but have no corresponding wiki pages
+- [x] **DRFT-02**: Detect when wiki pages reference sources that no longer exist
+- [x] **DRFT-03**: Detect drift between wiki and broader toolchain (Obsidian vault state, Zotero libraries, cloud/local file divergence)
+- [x] **DRFT-04**: Drift check integrated into lint workflow
 
 ### Progressive Disclosure
 
@@ -301,10 +301,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DCSN-01 | Phase 6 | Complete |
 | DCSN-02 | Phase 6 | Complete |
 | DCSN-03 | Phase 6 | Pending |
-| DRFT-01 | Phase 6 | Pending |
-| DRFT-02 | Phase 6 | Pending |
-| DRFT-03 | Phase 6 | Pending |
-| DRFT-04 | Phase 6 | Pending |
+| DRFT-01 | Phase 6 | Complete |
+| DRFT-02 | Phase 6 | Complete |
+| DRFT-03 | Phase 6 | Complete |
+| DRFT-04 | Phase 6 | Complete |
 
 **Coverage:**
 - v1 requirements: 95 total

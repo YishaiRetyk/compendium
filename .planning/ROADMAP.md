@@ -119,7 +119,7 @@ Plans:
 **Plans:** 3 plans
 Plans:
 - [x] 06-01-PLAN.md — Decision record page type: template, example page, AGENTS.md sections 4.6/5/12, index category
-- [ ] 06-02-PLAN.md — Drift detection in bin/lint.sh: 5 drift checks, decision page validation, category-labeled report
+- [x] 06-02-PLAN.md — Drift detection in bin/lint.sh: 5 drift checks, decision page validation, category-labeled report
 - [ ] 06-03-PLAN.md — Reflect workflow: AGENTS.md section 11.4 three-tier model, section 9 inline hooks, section 11.3 drift steps, checkpoint state file, human verification
 
 ## Backlog
