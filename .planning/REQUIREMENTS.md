@@ -16,7 +16,7 @@ Numbering continues from v1.0. New REQ-ID prefixes: `TMPL`, `NEUT`, `WZRD`, `MAN
 - [ ] **TMPL-02**: Repo ships with top-level `README.md` containing a ≤60-second pitch + link to `docs/quickstart.md`
 - [ ] **TMPL-03**: Repo ships with `LICENSE` file (MIT or Apache-2.0)
 - [ ] **TMPL-04**: `.gitignore` pre-configured for Obsidian (`.obsidian/workspace*.json`, `.obsidian/cache`, `.trash/`) and `.brownfield/`
-- [ ] **TMPL-05**: Starter `wiki/` ships with `index.md` and `log.md` skeletons only (no content)
+- [x] **TMPL-05**: Starter `wiki/` ships with `index.md` and `log.md` skeletons only (no content)
 - [ ] **TMPL-06**: `/docs/` exists with four top-level tracks: `quickstart.md`, `guided-setup.md`, `manual-setup.md`, `reference/index.md`
 - [ ] **TMPL-07**: `/docs/README.md` names the Diátaxis mapping explicitly (quickstart=tutorial, guided/manual=how-to, reference=reference+explanation)
 - [ ] **TMPL-08**: `/docs/reference/` contains `schema-tour.md`, `brownfield.md`, `privacy-model.md`, `ci.md`, `examples.md`
@@ -26,13 +26,13 @@ Numbering continues from v1.0. New REQ-ID prefixes: `TMPL`, `NEUT`, `WZRD`, `MAN
 
 ### Neutralization & Examples (NEUT)
 
-- [ ] **NEUT-01**: Kahneman cluster (all 7 pages + sources) moved from `wiki/` to `examples/kahneman/`, internal wikilinks preserved
+- [x] **NEUT-01**: Kahneman cluster (all 7 pages + sources) moved from `wiki/` to `examples/kahneman/`, internal wikilinks preserved
 - [ ] **NEUT-02**: `AGENTS.md` illustrative content rewritten with generic placeholders (no Kahneman, prospect-theory, loss-aversion strings)
 - [ ] **NEUT-03**: `AGENTS.md` sections that need examples add `See: examples/kahneman/...` pointers instead of inlining
-- [ ] **NEUT-04**: New optional frontmatter field `example: true` documented in `AGENTS.md §5`; `bin/lint.sh EXCLUDE_DIRS` honors `examples/` and/or `example: true`
-- [ ] **NEUT-05**: `examples/kahneman/README.md` explains why the cluster is preserved and how to use it as a reference
+- [x] **NEUT-04**: New optional frontmatter field `example: true` documented in `AGENTS.md §5`; `bin/lint.sh EXCLUDE_DIRS` honors `examples/` and/or `example: true`
+- [x] **NEUT-05**: `examples/kahneman/README.md` explains why the cluster is preserved and how to use it as a reference
 - [ ] **NEUT-06**: CI neutrality gate: grep-based check that **public control-plane surfaces** (`AGENTS.md`, `CLAUDE.md`, `README.md`, `PRIVACY.md`, `/docs/**`, `.github/**`, `wiki/**`, `bin/**`) contain zero Kahneman-specific strings; `examples/kahneman/**` is explicitly excluded from the check as the permitted home for Kahneman content (runs on every PR) (pitfall C-1)
-- [ ] **NEUT-07**: Decision record `dr-YYYY-MM-DD-kahneman-to-examples.md` committed (SUPERSEDE-class structural reorg per §11.4)
+- [x] **NEUT-07**: Decision record `dr-YYYY-MM-DD-kahneman-to-examples.md` committed (SUPERSEDE-class structural reorg per §11.4)
 - [ ] **NEUT-08**: CI personal-content denylist check covering domain terms from the creator's private vault, runs on PR diff restricted to public control-plane paths (excludes `examples/kahneman/**`) (pitfall C-1 mitigation)
 
 ### Guided Setup Wizard (WZRD)
@@ -164,20 +164,20 @@ Explicitly excluded from v1.1. Documented to prevent scope creep.
 | TMPL-02 | Phase 7 | Pending |
 | TMPL-03 | Phase 7 | Pending |
 | TMPL-04 | Phase 7 | Pending |
-| TMPL-05 | Phase 7 | Pending |
+| TMPL-05 | Phase 7 | Complete |
 | TMPL-06 | Phase 7 | Pending |
 | TMPL-07 | Phase 7 | Pending |
 | TMPL-08 | Phase 7 | Pending |
 | TMPL-09 | Phase 7 | Pending |
 | TMPL-10 | Phase 7 | Pending |
 | TMPL-11 | Phase 7 | Pending |
-| NEUT-01 | Phase 7 | Pending |
+| NEUT-01 | Phase 7 | Complete |
 | NEUT-02 | Phase 7 | Pending |
 | NEUT-03 | Phase 7 | Pending |
-| NEUT-04 | Phase 7 | Pending |
-| NEUT-05 | Phase 7 | Pending |
+| NEUT-04 | Phase 7 | Complete |
+| NEUT-05 | Phase 7 | Complete |
 | NEUT-06 | Phase 7 | Pending |
-| NEUT-07 | Phase 7 | Pending |
+| NEUT-07 | Phase 7 | Complete |
 | NEUT-08 | Phase 7 | Pending |
 | DEBT-03 | Phase 7 | Complete |
 | WZRD-01 | Phase 8 | Pending |

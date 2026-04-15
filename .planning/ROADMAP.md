@@ -43,7 +43,7 @@
 **Plans:** 5 plans
 Plans:
 - [x] 07-01-PLAN.md — DEBT-03 requirements-sync.sh + Wave 0 test harness
-- [ ] 07-02-PLAN.md — Relocate Kahneman cluster to examples/, shrink wiki to skeleton, extend lint EXCLUDE_DIRS, commit NEUT-07 decision record
+- [x] 07-02-PLAN.md — Relocate Kahneman cluster to examples/, shrink wiki to skeleton, extend lint EXCLUDE_DIRS, commit NEUT-07 decision record
 - [ ] 07-03-PLAN.md — Neutralize AGENTS.md + produce schema/AGENTS.template.md + CLAUDE.md byte-dup + pre-commit hook
 - [ ] 07-04-PLAN.md — Top-level scaffolding (README, LICENSE, PRIVACY, .gitignore) + docs/ four-track skeleton + release runbook
 - [ ] 07-05-PLAN.md — bin/check-neutrality.sh + human-reviewed denylist + bin/release.sh + neutrality CI workflow

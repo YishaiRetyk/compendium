@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Shareability
 status: Ready to execute
-stopped_at: Completed 07-01-PLAN.md
-last_updated: "2026-04-15T20:15:09.770Z"
+stopped_at: Completed 07-02-PLAN.md
+last_updated: "2026-04-15T20:24:43.156Z"
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 5
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-04-15)
 ## Current Position
 
 Phase: 07 (neutral-template-foundation) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 
 ## Performance Metrics
 
@@ -67,6 +67,7 @@ Plan: 2 of 5
 | Phase 06 P02 | 5min | 2 tasks | 1 files |
 | Phase 06 P03 | 3min | 3 tasks | 2 files |
 | Phase 07 P01 | 6min | 2 tasks | 6 files |
+| Phase 07 P02 | 12min | 2 tasks | 19 files |
 
 ## Accumulated Context
 
@@ -138,6 +139,9 @@ Recent decisions affecting current work:
 - [Phase 07]: [Phase 07]: bin/requirements-sync.sh advisory-default with --strict gate; 5-col markdown table includes Note column for human-readable rationale
 - [Phase 07]: [Phase 07]: Duplicate REQ-IDs across VERIFICATION.md files use lexicographic last-write-wins with stderr WARN
 - [Phase 07]: [Phase 07]: VERIFICATION.md parser tolerates bare bullets, [x]/[ ] checkboxes, emoji prefixes, and **bold** REQ-IDs
+- [Phase 07]: [Phase 07]: Kahneman cluster relocated to examples/; wiki/ reduced to TMPL-05 skeleton; local_only creator content deleted
+- [Phase 07]: [Phase 07]: NEUT-07 decision record uses canonical AGENTS.md §4.6 schema with all BASE_FIELDS (including supersedes/superseded_by/aliases/has_contradictions)
+- [Phase 07]: [Phase 07]: bin/lint.sh EXCLUDE_DIRS += examples; per-file example: true skip; WIKI_ROOT env var reuses 07-01 fixture-override pattern
 
 ### Pending Todos
 
@@ -160,6 +164,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-15T20:15:09.764Z
-Stopped at: Completed 07-01-PLAN.md
+Last session: 2026-04-15T20:24:43.154Z
+Stopped at: Completed 07-02-PLAN.md
 Resume file: None
