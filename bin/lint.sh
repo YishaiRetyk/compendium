@@ -860,6 +860,133 @@ if should_run('gap'):
                             f'Consider: {question}')
 
 # ---------------------------------------------------------------------------
+# Check 10: Drift detection (DRFT-01, DRFT-02, DRFT-03, DRFT-04)
+# ---------------------------------------------------------------------------
+
+if should_run('drift') or should_run('all'):
+    import hashlib
+
+    project_root = os.path.dirname(os.path.abspath(wiki_dir.rstrip('/')))
+    sources_dir = os.path.join(project_root, 'sources')
+
+    # --- DRFT-01: Unrepresented sources ---
+    # Walk sources/ for .md files, check each has a wiki source summary page
+    print("  Check 10a: Unrepresented sources (DRFT-01)...", file=sys.stderr)
+    wiki_source_paths = set()
+    for sp, sfm, sbody in source_pages:
+        if sfm and 'path' in sfm:
+            wiki_source_paths.add(sfm['path'])
+
+    if os.path.isdir(sources_dir):
+        for root, dirs, files in os.walk(sources_dir):
+            for fname in files:
+                if fname.endswith('.md'):
+                    raw_path = os.path.join(root, fname)
+                    rel_path = os.path.relpath(raw_path, project_root)
+                    if rel_path not in wiki_source_paths:
+                        add_finding('warning', 'drift', rel_path,
+                                    'Raw source has no wiki source summary page')
+
+    # --- DRFT-02: Missing source files ---
+    # For each source summary page, verify the file at path exists
+    print("  Check 10b: Missing source files (DRFT-02)...", file=sys.stderr)
+    for sp, sfm, sbody in source_pages:
+        if sfm is None:
+            continue
+        rel = os.path.relpath(sp)
+        source_path_field = sfm.get('path', '')
+        if not source_path_field:
+            continue
+        abs_source = os.path.join(project_root, source_path_field)
+        if not os.path.exists(abs_source):
+            add_finding('error', 'drift', rel,
+                        f'Source file missing: {source_path_field}')
+
+    # --- Content-hash drift (D-13, D-14) ---
+    # Recompute SHA-256 of raw source, compare against stored content_hash
+    # Auto-fix (compilation_status -> stale) ONLY when --fix is passed (do_fix and not dry_run)
+    # This follows the same gating pattern as stale marker auto-fixes (line 533).
+    print("  Check 10c: Content-hash drift...", file=sys.stderr)
+    for sp, sfm, sbody in source_pages:
+        if sfm is None:
+            continue
+        rel = os.path.relpath(sp)
+        stored_hash = sfm.get('content_hash', '')
+        source_path_field = sfm.get('path', '')
+        if not stored_hash or not source_path_field:
+            continue
+        abs_source = os.path.join(project_root, source_path_field)
+        if not os.path.exists(abs_source):
+            continue  # Already reported as DRFT-02 above
+        h = hashlib.sha256()
+        with open(abs_source, 'rb') as f:
+            for chunk in iter(lambda: f.read(8192), b''):
+                h.update(chunk)
+        current_hash = f'sha256:{h.hexdigest()}'
+        if current_hash != stored_hash:
+            add_finding('warning', 'drift', rel,
+                        f'Content hash mismatch: source changed since ingest '
+                        f'(stored: {stored_hash[:30]}..., current: {current_hash[:30]}...)')
+            # Auto-fix: mark compilation_status as stale (D-14)
+            # GATED: only when --fix is passed, same pattern as stale marker auto-fixes
+            if do_fix and not dry_run:
+                comp_status = sfm.get('compilation_status', '')
+                if comp_status and comp_status != 'stale':
+                    try:
+                        content = open(sp, encoding='utf-8').read()
+                        content = re.sub(
+                            r'^(compilation_status:\s*).*$',
+                            r'\1stale',
+                            content, flags=re.MULTILINE
+                        )
+                        with open(sp, 'w', encoding='utf-8') as f:
+                            f.write(content)
+                        add_finding('info', 'autofix', rel,
+                                    'Set compilation_status to stale (content hash drift)')
+                    except Exception:
+                        pass
+
+    # --- Index coverage (D-11) ---
+    # Check that every wiki page has a wikilink in wiki/index.md
+    print("  Check 10d: Index coverage gaps...", file=sys.stderr)
+    index_path = os.path.join(wiki_dir, 'index.md')
+    if os.path.exists(index_path):
+        index_content = open(index_path, encoding='utf-8').read().lower()
+        # Collect all wiki pages (excluding index, log, maintenance files)
+        skip_ids = {'index', 'log', 'lint-report', 'reflect-state'}
+        for page_path, page_fm, page_body, page_err in all_pages:
+            if page_fm is None:
+                continue
+            page_id = page_fm.get('id', '')
+            if page_id in skip_ids:
+                continue
+            page_title = page_fm.get('title', '')
+            # Check if page appears in index via id or title (case-insensitive)
+            if (page_id.lower() not in index_content and
+                page_title.lower() not in index_content):
+                rel = os.path.relpath(page_path)
+                add_finding('warning', 'drift', rel,
+                            f'Page not listed in wiki/index.md: {page_id}')
+
+    # --- DRFT-03: Obsidian vault awareness ---
+    print("  Check 10e: Obsidian vault awareness (DRFT-03)...", file=sys.stderr)
+    obsidian_dir = os.path.join(project_root, '.obsidian')
+    if not os.path.isdir(obsidian_dir):
+        add_finding('info', 'drift', '.obsidian/',
+                    'No .obsidian/ directory found -- Obsidian vault may not be configured')
+    # Check for non-.md files in wiki/ subdirectories (unexpected binaries)
+    for root, dirs, files in os.walk(wiki_dir):
+        # Skip maintenance/ directory (may contain non-standard files)
+        if 'maintenance' in root:
+            continue
+        for fname in files:
+            if not fname.endswith('.md'):
+                fpath = os.path.join(root, fname)
+                rel = os.path.relpath(fpath)
+                add_finding('info', 'drift', rel,
+                            'Non-markdown file in wiki/ (may cause Obsidian issues)')
+
+# ---------------------------------------------------------------------------
 # Sort findings and write to temp file
 # ---------------------------------------------------------------------------
 
@@ -878,7 +1005,7 @@ error_count = sum(1 for f in findings if f[0] == 'error')
 warning_count = sum(1 for f in findings if f[0] == 'warning')
 info_count = sum(1 for f in findings if f[0] == 'info')
 total = len(findings)
-autofix_applied = autofix_count if (do_fix and not dry_run and should_run('stale')) else 0
+autofix_applied = sum(1 for f in findings if f[1] == 'autofix')
 
 # ---------------------------------------------------------------------------
 # Generate lint report (unless --dry-run)
@@ -909,9 +1036,17 @@ if not dry_run:
         items = [f for f in findings if f[0] == sev]
         if not items:
             return '(none)\n'
-        lines = []
+        # Group by category, preserving insertion order
+        from collections import OrderedDict
+        cats = OrderedDict()
         for s, cat, path, msg in items:
-            lines.append(f'- **{path}** | {cat} | {msg}')
+            cats.setdefault(cat, []).append((path, msg))
+        lines = []
+        for cat, entries in cats.items():
+            lines.append(f'### {cat.title()}')
+            for path, msg in entries:
+                lines.append(f'- **{path}** | {msg}')
+            lines.append('')
         return '\n'.join(lines) + '\n'
 
     report_content = f"""---
