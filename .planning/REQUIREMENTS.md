@@ -78,20 +78,20 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Query & Delta Compilation
 
-- [ ] **QURY-01**: Question answering against the wiki with citations to specific pages and sources
+- [x] **QURY-01**: Question answering against the wiki with citations to specific pages and sources
 - [x] **QURY-02**: Index-first search — LLM reads index to find relevant pages, then drills into them
 - [x] **QURY-03**: Delta compilation at query time — compare current wiki coverage against relevant sources, compile only the missing synthesis exposed by the query
-- [ ] **QURY-04**: Mandatory write-back — useful query outputs become durable wiki updates (new or updated pages), not ephemeral chat
-- [ ] **QURY-05**: Query workflow documented step-by-step in schema
+- [x] **QURY-04**: Mandatory write-back — useful query outputs become durable wiki updates (new or updated pages), not ephemeral chat
+- [x] **QURY-05**: Query workflow documented step-by-step in schema
 
 ### Structured Operations & Executor
 
-- [ ] **SOPS-01**: UPDATE operation — modify existing page with new information, preserving provenance
-- [ ] **SOPS-02**: MERGE operation — combine two pages covering the same concept
-- [ ] **SOPS-03**: SUPERSEDE operation — mark a claim or page as replaced by newer information
-- [ ] **SOPS-04**: ARCHIVE operation — move outdated content out of active wiki while preserving history
-- [ ] **SOPS-05**: All operations logged with rationale
-- [ ] **SOPS-06**: Deterministic executor/validator that applies structured operations (LLM proposes, executor validates and applies)
+- [x] **SOPS-01**: UPDATE operation — modify existing page with new information, preserving provenance
+- [x] **SOPS-02**: MERGE operation — combine two pages covering the same concept
+- [x] **SOPS-03**: SUPERSEDE operation — mark a claim or page as replaced by newer information
+- [x] **SOPS-04**: ARCHIVE operation — move outdated content out of active wiki while preserving history
+- [x] **SOPS-05**: All operations logged with rationale
+- [x] **SOPS-06**: Deterministic executor/validator that applies structured operations (LLM proposes, executor validates and applies)
 
 ### Epistemic Status
 
@@ -269,17 +269,17 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PROV-04 | Phase 3 | Complete |
 | PROV-05 | Phase 3 | Complete |
 | CLI-02 | Phase 3 | Complete |
-| QURY-01 | Phase 4 | Pending |
+| QURY-01 | Phase 4 | Complete |
 | QURY-02 | Phase 4 | Complete |
 | QURY-03 | Phase 4 | Complete |
-| QURY-04 | Phase 4 | Pending |
-| QURY-05 | Phase 4 | Pending |
-| SOPS-01 | Phase 4 | Pending |
-| SOPS-02 | Phase 4 | Pending |
-| SOPS-03 | Phase 4 | Pending |
-| SOPS-04 | Phase 4 | Pending |
-| SOPS-05 | Phase 4 | Pending |
-| SOPS-06 | Phase 4 | Pending |
+| QURY-04 | Phase 4 | Complete |
+| QURY-05 | Phase 4 | Complete |
+| SOPS-01 | Phase 4 | Complete |
+| SOPS-02 | Phase 4 | Complete |
+| SOPS-03 | Phase 4 | Complete |
+| SOPS-04 | Phase 4 | Complete |
+| SOPS-05 | Phase 4 | Complete |
+| SOPS-06 | Phase 4 | Complete |
 | CLI-01 | Phase 4 | Complete |
 | CNTR-01 | Phase 5 | Complete |
 | CNTR-02 | Phase 5 | Complete |
@@ -313,4 +313,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-04-06*
-*Last updated: 2026-04-06 after roadmap creation*
+*Last updated: 2026-04-15 — flipped QURY-01/04/05 + SOPS-01..06 from Pending to Complete per v1.0 milestone audit (quick-260415-gzu)*

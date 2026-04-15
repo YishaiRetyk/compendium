@@ -139,6 +139,7 @@ None yet.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 260415-fvc | fix DRFT-02 error | 2026-04-15 | ad33cb7 | [260415-fvc-fix-drft-02-error](./quick/260415-fvc-fix-drft-02-error/) |
+| 260415-gzu | Flip 9 Pending → Complete in REQUIREMENTS.md (QURY-01/04/05, SOPS-01..06) | 2026-04-15 | pending | [260415-gzu-flip-9-pending-requirements-qury-01-qury](./quick/260415-gzu-flip-9-pending-requirements-qury-01-qury/) |
 
 ## Session Continuity
 
