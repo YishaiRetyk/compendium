@@ -70,11 +70,11 @@ The v1 is a full starter kit: schema, workflows, conventions, page templates, ex
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Guide/template first, software tool second | Get the pattern right through personal use before automating | — Pending |
-| Personal/self as first domain | Concrete use case to validate against, high personal motivation | — Pending |
-| Full framework from v1 (provenance, epistemic status, structured ops) | The advanced features are what differentiate this from "LLM writes notes" | — Pending |
-| Obsidian as primary interface | Graph view, Dataview, Marp, plugin ecosystem — best-in-class for interlinked markdown | — Pending |
-| Agent-agnostic design | Avoid lock-in, test with multiple agents to find what works | — Pending |
+| Guide/template first, software tool second | Get the pattern right through personal use before automating | ✓ Good — v1.0 shipped as starter kit |
+| Personal/self as first domain | Concrete use case to validate against, high personal motivation | ✓ Good — Kahneman cluster + journal entry validated ingest |
+| Full framework from v1 (provenance, epistemic status, structured ops) | The advanced features are what differentiate this from "LLM writes notes" | ✓ Good — all three shipped and validated end-to-end |
+| Obsidian as primary interface | Graph view, Dataview, Marp, plugin ecosystem — best-in-class for interlinked markdown | ⚠️ Revisit — Obsidian render/Dataview check deferred from Phase 4 |
+| Agent-agnostic design | Avoid lock-in, test with multiple agents to find what works | — Pending — only Claude Code exercised in v1.0 |
 
 ## Evolution
 
@@ -94,4 +94,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-15 after Phase 06 completion — v1.0 milestone complete*
+*Last updated: 2026-04-15 after v1.0 milestone archival*

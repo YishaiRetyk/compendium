@@ -1,148 +1,46 @@
 # Roadmap: LLM Wiki Compiler
 
-## Overview
+## Milestones
 
-The LLM Wiki Compiler is built foundation-up: schema and conventions first (the compiler specification), then page types and examples (the output format), then ingestion and provenance (the input pipeline), then query and structured operations (the interaction layer), then lint and quality checks (the trust layer), and finally reflection and drift detection (the maintenance layer). Each phase delivers a complete, verifiable capability that the next phase depends on.
+- ✅ **v1.0 LLM Wiki Compiler MVP** — Phases 1–6 (shipped 2026-04-15) — [archive](milestones/v1.0-ROADMAP.md)
 
 ## Phases
 
-**Phase Numbering:**
-- Integer phases (1, 2, 3): Planned milestone work
-- Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
+<details>
+<summary>✅ v1.0 LLM Wiki Compiler MVP (Phases 1–6) — SHIPPED 2026-04-15</summary>
 
-Decimal phases appear between their surrounding integers in numeric order.
+- [x] Phase 1: Schema, Structure & Conventions (3/3 plans) — completed 2026-04-09
+- [x] Phase 2: Page Types, Examples & Navigation (3/3 plans) — completed 2026-04-10
+- [x] Phase 3: Ingestion & Provenance Pipeline (5/5 plans) — completed 2026-04-11
+- [x] Phase 4: Query & Structured Operations (6/6 plans) — completed 2026-04-13
+- [x] Phase 5: Lint & Quality (4/4 plans) — completed 2026-04-14
+- [x] Phase 6: Reflection & Drift Detection (3/3 plans) — completed 2026-04-15
 
-- [ ] **Phase 1: Schema, Structure & Conventions** - Agent-agnostic schema, directory layout, Obsidian compatibility, progressive disclosure conventions, and scaling boundaries
-- [ ] **Phase 2: Page Types, Examples & Navigation** - Page type templates, epistemic status markers, example pages, index system, and activity log
-- [ ] **Phase 3: Ingestion & Provenance Pipeline** - Source ingestion workflow, multi-pass compilation pipeline, claim-level provenance, and ingest CLI helper
-- [ ] **Phase 4: Query & Structured Operations** - Question answering with delta compilation, structured operations (UPDATE/MERGE/SUPERSEDE/ARCHIVE), and search CLI helper
-- [ ] **Phase 5: Lint & Quality** - Contradiction detection, staleness tracking, knowledge gap detection, full lint workflow, and lint CLI helper
-- [x] **Phase 6: Reflection & Drift Detection** - Decision records, reflect workflow, and cross-system drift detection (completed 2026-04-15)
+</details>
 
-## Phase Details
+### 📋 Next Milestone (TBD)
 
-### Phase 1: Schema, Structure & Conventions
-**Goal**: A working Obsidian vault skeleton exists with a complete agent-agnostic schema that any LLM can follow, established directory conventions, and documented scaling boundaries
-**Depends on**: Nothing (first phase)
-**Requirements**: SCHM-01, SCHM-02, SCHM-03, SCHM-04, SCHM-05, DIRS-01, DIRS-02, DIRS-03, DIRS-04, OBSD-01, OBSD-02, OBSD-03, OBSD-04, PROG-01, PROG-02, PROG-03, BNDY-01, BNDY-02, BNDY-03
-**Success Criteria** (what must be TRUE):
-  1. An LLM agent (Claude Code or Codex) can read the schema document and understand how to create, update, and organize wiki pages without additional instruction
-  2. The directory structure exists with clear separation between sources/, wiki/, and schema/ layers, and git tracks the repository with documented commit conventions
-  3. All wiki page conventions specify valid Obsidian wikilinks, Dataview-compatible YAML frontmatter, and graph-friendly structure
-  4. The schema documents progressive disclosure structure (TL;DR -> key facts -> detail -> sources) and instructs agents to navigate shallow-first
-  5. Scaling boundaries and privacy-tiered routing are documented as provisional heuristics in the schema
-**Plans:** 1/3 plans executed
-Plans:
-- [x] 01-01-PLAN.md — Directory skeleton and AGENTS.md sections 1-8 with worked examples per page type and negative constraints
-- [x] 01-02-PLAN.md — AGENTS.md sections 9-16 with structured workflows (trigger/inputs/outputs/commit/abort), privacy decision table, and scaling tiers
-- [ ] 01-03-PLAN.md — Strengthened validation (YAML parse, structural, provenance syntax) and human review with 11 explicit pass/fail criteria
-
-### Phase 2: Page Types, Examples & Navigation
-**Goal**: Complete page type templates, epistemic status conventions, working example pages, and a functional index/log system exist -- everything needed to start ingesting real sources
-**Depends on**: Phase 1
-**Requirements**: PAGE-01, PAGE-02, PAGE-03, PAGE-04, PAGE-05, PAGE-06, PAGE-07, EPST-01, EPST-02, EPST-03, EXMP-01, EXMP-02, EXMP-03, EXMP-04, EXMP-05, INDX-01, INDX-02, INDX-03, LOG-01, LOG-02, LOG-03
-**Success Criteria** (what must be TRUE):
-  1. Templates exist for all five page types (entity, concept, source summary, comparison, overview/synthesis) with type-specific sections, frontmatter schema, and progressive disclosure structure
-  2. Epistemic status markers (sourced, inferred, tentative, stale) are defined with inline syntax visible in page content, not just frontmatter, and documented in the schema
-  3. Example pages demonstrate every convention: an entity page, a concept page with cross-references and epistemic markers, a source summary with provenance, a comparison page, and populated index/log files
-  4. A content index (index.md) exists organized by category with links, summaries, and metadata, and an activity log exists with consistent parseable format
-  5. Opening the vault in Obsidian shows working wikilinks, valid Dataview queries, and a meaningful graph view across the example pages
-**Plans:** 1/3 plans executed
-Plans:
-- [x] 02-01-PLAN.md — Five page type templates in schema/templates/ with frontmatter and progressive disclosure sections
-- [x] 02-02-PLAN.md — Five example pages (Kahneman domain) with cross-references, provenance chains, and epistemic markers
-- [ ] 02-03-PLAN.md — Populated index.md and log.md, AGENTS.md section 6 epistemic syntax documentation
-
-### Phase 3: Ingestion & Provenance Pipeline
-**Goal**: Real sources can be ingested into the wiki through a documented multi-pass pipeline that creates properly provenanced wiki pages and updates existing pages incrementally
-**Depends on**: Phase 2
-**Requirements**: INGST-01, INGST-02, INGST-03, INGST-04, INGST-05, INGST-06, CMPL-01, CMPL-02, CMPL-03, CMPL-04, CMPL-05, CMPL-06, CMPL-07, PROV-01, PROV-02, PROV-03, PROV-04, PROV-05, CLI-02
-**Success Criteria** (what must be TRUE):
-  1. A user can drop a source document (article, paper, journal entry) into sources/ and an LLM agent can classify it, run the multi-pass pipeline (diff -> extract -> merge -> lint), and produce wiki pages with claim-level provenance
-  2. Each claim in a wiki page links to the specific source passage(s) that support it, with source ID, passage reference, and extraction date
-  3. Ingesting a second source on a related topic updates existing wiki pages with new information rather than creating duplicates, and new cross-references are generated between related pages
-  4. The index and activity log are updated after each ingest, and source hashes are stored so stale claims can be detected when sources change
-  5. A CLI ingest helper exists that scaffolds the ingest workflow for the user
-**Plans:** 4/5 plans executed
-Plans:
-- [x] 03-01-PLAN.md — Encode claim granularity rules (D-01–D-05), append-then-synthesize update policy (D-06–D-10), and normalize book-chapter source type into AGENTS.md (sections 9, 10, 11.1)
-- [x] 03-02-PLAN.md — CLI ingest helper bash script (bin/ingest.sh) with collision handling, slug validation, and documented UTC date policy
-- [x] 03-03-PLAN.md — First validation ingest: synthetic article on Kahneman's prospect theory (atomic extraction, diff-driven merge, optional new concept pages, semantic review checklist)
-- [x] 03-04-PLAN.md — Second validation ingest: synthetic journal entry with clean privacy separation (new local_only personal-decision-patterns page, decision-making.md stays cloud_safe)
-- [x] 03-05-PLAN.md — Phase-level verification checklist covering diff-driven merge, privacy separation, provenance preservation across both ingests
-
-### Phase 4: Query & Structured Operations
-**Goal**: Users can ask questions against the wiki and get cited answers that compile back into durable wiki pages, and all wiki mutations use a structured operations vocabulary that is logged with rationale
-**Depends on**: Phase 3
-**Requirements**: QURY-01, QURY-02, QURY-03, QURY-04, QURY-05, SOPS-01, SOPS-02, SOPS-03, SOPS-04, SOPS-05, SOPS-06, CLI-01
-**Success Criteria** (what must be TRUE):
-  1. A user can ask a question and the LLM reads the index first to find relevant pages, drills into them, and returns an answer with citations to specific pages and sources
-  2. Query answers that produce useful synthesis are written back to the wiki as new or updated pages (mandatory write-back), not left as ephemeral chat
-  3. Delta compilation works: querying a topic where new sources exist but haven't been fully compiled triggers compilation of only the missing synthesis
-  4. Wiki mutations use UPDATE, MERGE, SUPERSEDE, and ARCHIVE operations, each logged with rationale, and a deterministic executor/validator applies them
-  5. A CLI search helper exists for querying wiki pages via index-based or text search
-**Plans:** 6 plans
-Plans:
-- [ ] 04-01-PLAN.md — Compilation status tracking fields with state transition rules in AGENTS.md section 5, retroactive ingest workflow update in section 11.1, backfill existing source pages and template
-- [ ] 04-02-PLAN.md — CLI search helper (bin/search.sh) with index lookup, full-text grep, query-mode prompt scaffolding, and deterministic output contracts per mode
-- [ ] 04-03-PLAN.md — Deterministic operations validator (bin/validate-op.sh) with 5 mechanical checks, per-operation rules, schema compliance, and privacy inheritance checking
-- [ ] 04-04-PLAN.md — AGENTS.md section 11.2 query workflow rewrite with write-back rules, delta compilation, deterministic privacy inheritance, and worked end-to-end example
-- [ ] 04-05-PLAN.md — AGENTS.md section 9 executor model with validator reference and per-operation preconditions/postconditions, section 12 structured operation log format
-- [ ] 04-06-PLAN.md — End-to-end validation matrix (3 scenarios: no-write-back, write-back, privacy-sensitive) with human review of all Phase 4 deliverables
-
-### Phase 5: Lint & Quality
-**Goal**: The wiki has a comprehensive health-check system that detects contradictions, stale claims, orphan pages, missing cross-references, and knowledge gaps on demand
-**Depends on**: Phase 4
-**Requirements**: CNTR-01, CNTR-02, CNTR-03, STALE-01, STALE-02, STALE-03, STALE-04, GAP-01, GAP-02, LINT-01, LINT-02, LINT-03, LINT-04, LINT-05, LINT-06, LINT-07, CLI-03
-**Success Criteria** (what must be TRUE):
-  1. Running the lint workflow detects orphan pages, missing cross-references, stale claims, and contradictions, and reports them in a structured format
-  2. When two sources disagree on a claim, the contradiction is surfaced with both sides cited and flagged in the affected wiki pages
-  3. Claims inherit temporal relevance from source dates, different knowledge types decay at configurable rates, and the lint flags claims older than their threshold
-  4. The lint identifies topics mentioned frequently but lacking dedicated pages, and categories with sparse source coverage
-  5. A CLI lint helper exists that runs all lint rules and reports findings, and the lint workflow is documented step-by-step in the schema
-**Plans:** 4 plans
-Plans:
-- [x] 05-01-PLAN.md — AGENTS.md schema extensions: decay rate table, contradiction syntax, severity tiers, new frontmatter fields (has_contradictions, knowledge_domain), backfill existing pages
-- [x] 05-02-PLAN.md — bin/lint.sh core scaffold with structural checks (orphan, cross-ref, provenance, YAML), staleness detection, and lint report generation
-- [x] 05-03-PLAN.md — bin/lint.sh contradiction detection and knowledge gap detection (red links, sparse coverage, question suggestions)
-- [ ] 05-04-PLAN.md — End-to-end validation: full lint run on existing wiki, coverage verification, and human review
-
-### Phase 6: Reflection & Drift Detection
-**Goal**: The wiki maintains structural self-awareness through decision records that capture why changes were made, and detects drift between the wiki, raw sources, and external tools
-**Depends on**: Phase 5
-**Requirements**: DCSN-01, DCSN-02, DCSN-03, DRFT-01, DRFT-02, DRFT-03, DRFT-04
-**Success Criteria** (what must be TRUE):
-  1. When structural changes occur (page merges, reorganizations, schema updates), a decision record captures what changed, what framing was adopted, what it replaced, and alternatives considered
-  2. The reflect workflow is documented in the schema and produces decision records that are navigable in Obsidian
-  3. The system detects when raw sources have no wiki pages, when wiki pages reference missing sources, and when drift exists between wiki and broader toolchain (Obsidian vault, Zotero, cloud/local)
-  4. Drift detection is integrated into the lint workflow so it runs as part of regular health checks
-**Plans:** 3/3 plans complete
-Plans:
-- [x] 06-01-PLAN.md — Decision record page type: template, example page, AGENTS.md sections 4.6/5/12, index category
-- [x] 06-02-PLAN.md — Drift detection in bin/lint.sh: 5 drift checks, decision page validation, category-labeled report
-- [x] 06-03-PLAN.md — Reflect workflow: AGENTS.md section 11.4 three-tier model, section 9 inline hooks, section 11.3 drift steps, checkpoint state file, human verification
+Run `/gsd:new-milestone` to define the next milestone.
 
 ## Backlog
 
 ### Phase 999.1: Brownfield Vault Initialization (BACKLOG)
 
-**Goal:** Workflow to scan an existing Obsidian vault with non-conforming pages and bring them into compliance: schema inference, bulk frontmatter injection, provenance bootstrapping (mark pre-existing content), index auto-generation, template application, and conformance linting with auto-fix. Cross-cuts Phase 1-5 concerns. Best built after v1.0 systems are proven. Trigger: user wants to apply the wiki system to an existing vault rather than starting from scratch.
+**Goal:** Workflow to scan an existing Obsidian vault with non-conforming pages and bring them into compliance: schema inference, bulk frontmatter injection, provenance bootstrapping (mark pre-existing content), index auto-generation, template application, and conformance linting with auto-fix. Cross-cuts Phase 1–5 concerns. Best built after v1.0 systems are proven. Trigger: user wants to apply the wiki system to an existing vault rather than starting from scratch.
+
 **Requirements:** TBD
 **Plans:** 0 plans
 
 Plans:
-- [ ] TBD (promote with /gsd:review-backlog when ready)
+- [ ] TBD (promote with `/gsd:review-backlog` when ready)
 
 ## Progress
 
-**Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
-
-| Phase | Plans Complete | Status | Completed |
-|-------|----------------|--------|-----------|
-| 1. Schema, Structure & Conventions | 1/3 | In Progress|  |
-| 2. Page Types, Examples & Navigation | 1/3 | In Progress|  |
-| 3. Ingestion & Provenance Pipeline | 4/5 | In Progress|  |
-| 4. Query & Structured Operations | 0/6 | Not started | - |
-| 5. Lint & Quality | 0/4 | Not started | - |
-| 6. Reflection & Drift Detection | 3/3 | Complete    | 2026-04-15 |
+| Phase | Milestone | Plans | Status | Completed |
+|-------|-----------|-------|--------|-----------|
+| 1. Schema, Structure & Conventions | v1.0 | 3/3 | Complete | 2026-04-09 |
+| 2. Page Types, Examples & Navigation | v1.0 | 3/3 | Complete | 2026-04-10 |
+| 3. Ingestion & Provenance Pipeline | v1.0 | 5/5 | Complete | 2026-04-11 |
+| 4. Query & Structured Operations | v1.0 | 6/6 | Complete | 2026-04-13 |
+| 5. Lint & Quality | v1.0 | 4/4 | Complete | 2026-04-14 |
+| 6. Reflection & Drift Detection | v1.0 | 3/3 | Complete | 2026-04-15 |
