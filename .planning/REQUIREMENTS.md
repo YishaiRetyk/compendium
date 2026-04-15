@@ -13,14 +13,14 @@ Numbering continues from v1.0. New REQ-ID prefixes: `TMPL`, `NEUT`, `WZRD`, `MAN
 ### Template Repo Structure (TMPL)
 
 - [ ] **TMPL-01**: Repository is configured as a GitHub Template (green "Use this template" button)
-- [ ] **TMPL-02**: Repo ships with top-level `README.md` containing a ≤60-second pitch + link to `docs/quickstart.md`
-- [ ] **TMPL-03**: Repo ships with `LICENSE` file (MIT or Apache-2.0)
-- [ ] **TMPL-04**: `.gitignore` pre-configured for Obsidian (`.obsidian/workspace*.json`, `.obsidian/cache`, `.trash/`) and `.brownfield/`
+- [x] **TMPL-02**: Repo ships with top-level `README.md` containing a ≤60-second pitch + link to `docs/quickstart.md`
+- [x] **TMPL-03**: Repo ships with `LICENSE` file (MIT or Apache-2.0)
+- [x] **TMPL-04**: `.gitignore` pre-configured for Obsidian (`.obsidian/workspace*.json`, `.obsidian/cache`, `.trash/`) and `.brownfield/`
 - [x] **TMPL-05**: Starter `wiki/` ships with `index.md` and `log.md` skeletons only (no content)
-- [ ] **TMPL-06**: `/docs/` exists with four top-level tracks: `quickstart.md`, `guided-setup.md`, `manual-setup.md`, `reference/index.md`
-- [ ] **TMPL-07**: `/docs/README.md` names the Diátaxis mapping explicitly (quickstart=tutorial, guided/manual=how-to, reference=reference+explanation)
-- [ ] **TMPL-08**: `/docs/reference/` contains `schema-tour.md`, `brownfield.md`, `privacy-model.md`, `ci.md`, `examples.md`
-- [ ] **TMPL-09**: Top-level `PRIVACY.md` page surfacing the local_only / cloud_safe convention
+- [x] **TMPL-06**: `/docs/` exists with four top-level tracks: `quickstart.md`, `guided-setup.md`, `manual-setup.md`, `reference/index.md`
+- [x] **TMPL-07**: `/docs/README.md` names the Diátaxis mapping explicitly (quickstart=tutorial, guided/manual=how-to, reference=reference+explanation)
+- [x] **TMPL-08**: `/docs/reference/` contains `schema-tour.md`, `brownfield.md`, `privacy-model.md`, `ci.md`, `examples.md`
+- [x] **TMPL-09**: Top-level `PRIVACY.md` page surfacing the local_only / cloud_safe convention
 - [x] **TMPL-10**: `CLAUDE.md` exists at repo root alongside `AGENTS.md` (symlink or identical content — agent-agnostic from filename up)
 - [ ] **TMPL-11**: Release process uses orphan-branch publish so v1.0 personal git history does not ship (pitfall C-1 mitigation)
 
@@ -161,14 +161,14 @@ Explicitly excluded from v1.1. Documented to prevent scope creep.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | TMPL-01 | Phase 7 | Pending |
-| TMPL-02 | Phase 7 | Pending |
-| TMPL-03 | Phase 7 | Pending |
-| TMPL-04 | Phase 7 | Pending |
+| TMPL-02 | Phase 7 | Complete |
+| TMPL-03 | Phase 7 | Complete |
+| TMPL-04 | Phase 7 | Complete |
 | TMPL-05 | Phase 7 | Complete |
-| TMPL-06 | Phase 7 | Pending |
-| TMPL-07 | Phase 7 | Pending |
-| TMPL-08 | Phase 7 | Pending |
-| TMPL-09 | Phase 7 | Pending |
+| TMPL-06 | Phase 7 | Complete |
+| TMPL-07 | Phase 7 | Complete |
+| TMPL-08 | Phase 7 | Complete |
+| TMPL-09 | Phase 7 | Complete |
 | TMPL-10 | Phase 7 | Complete |
 | TMPL-11 | Phase 7 | Pending |
 | NEUT-01 | Phase 7 | Complete |

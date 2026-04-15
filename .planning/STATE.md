@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Shareability
 status: Ready to execute
-stopped_at: Completed 07-03-PLAN.md
-last_updated: "2026-04-15T20:33:50.538Z"
+stopped_at: Completed 07-04-PLAN.md
+last_updated: "2026-04-15T20:41:20.212Z"
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 5
-  completed_plans: 3
+  completed_plans: 4
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-04-15)
 ## Current Position
 
 Phase: 07 (neutral-template-foundation) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 
 ## Performance Metrics
 
@@ -69,6 +69,7 @@ Plan: 4 of 5
 | Phase 07 P01 | 6min | 2 tasks | 6 files |
 | Phase 07 P02 | 12min | 2 tasks | 19 files |
 | Phase 07 P03 | 5min | 2 tasks | 11 files |
+| Phase 07 P04 | 4min | 2 tasks | 24 files |
 
 ## Accumulated Context
 
@@ -145,6 +146,10 @@ Recent decisions affecting current work:
 - [Phase 07]: [Phase 07]: bin/lint.sh EXCLUDE_DIRS += examples; per-file example: true skip; WIKI_ROOT env var reuses 07-01 fixture-override pattern
 - [Phase 07]: AGENTS.md neutralization uses <UPPERCASE_NAME> angle-bracket tokens for illustrative content; schema/AGENTS.template.md reserves {{...}} syntax exclusively for the 4 wizard placeholders (PRIMARY_DOMAIN, DEFAULT_PRIVACY, AGENT_FILENAME, DECAY_PROFILE) per D-08/REVIEWS.md HIGH #1
 - [Phase 07]: CLAUDE.md is byte-identical to AGENTS.md, enforced by .githooks/pre-commit that auto-syncs and re-stages on drift (TMPL-10/D-03); hook-path roundtrip test uses ephemeral GIT_INDEX_FILE to avoid polluting the real index
+- [Phase 07]: [Phase 07-04] README 'Repo shape' tree neutralized — 'examples/kahneman/ — Daniel Kahneman' replaced with 'examples/ — Reference example clusters (bundled sample domain)' to reconcile plan's README spec with plan's Kahneman-zero-tolerance test
+- [Phase 07]: [Phase 07-04] test_no_kahneman_in_public_docs.sh exempts lines that only reference the sanctioned examples/kahneman/ directory path (mirrors 07-03 test_agents_neutralized.sh pointer-exemption precedent)
+- [Phase 07]: [Phase 07-04] docs/reference/release.md is NOT a stub — it is the full orphan-branch runbook with --dry-run/--apply/check-neutrality.sh pre-flight/Rollback; 07-05 release.sh and check-neutrality.sh implement exactly this contract
+- [Phase 07]: [Phase 07-04] <org>/<repo> angle-bracket placeholder used 7× across README/LICENSE/quickstart/release.md; no your-org/USER-REPO forms (D-02 template-wide convention)
 
 ### Pending Todos
 
@@ -167,6 +172,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-15T20:33:50.536Z
-Stopped at: Completed 07-03-PLAN.md
+Last session: 2026-04-15T20:41:08.687Z
+Stopped at: Completed 07-04-PLAN.md
 Resume file: None
