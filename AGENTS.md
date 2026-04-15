@@ -989,6 +989,7 @@ For the full incremental update policy governing how new claims integrate with e
 5. Replace the body of both old pages with a brief redirect note: `> This page has been merged into [[New Page Title]].`
 6. Update `wiki/index.md`: add the new page, move old pages to "Archived" section (if one exists) or remove them from active listings.
 7. Log: `"MERGE <page_a> + <page_b> -> <new_page>: <rationale>"`
+7a. **Decision record (inline -- Tier 1):** If this merge represents a significant structural choice -- combining two established pages, resolving a long-standing organizational ambiguity, or eliminating a redundant page that multiple other pages linked to -- create a decision record page in `wiki/decisions/` with `trigger_type: merge` and `affected_pages` listing both original page IDs and the new merged page ID. Add the new decision record to `wiki/index.md` under Decisions. Commit the decision record as part of this same commit. **Skip for trivial cleanup merges** (e.g., merging a stub into its parent when the stub has no unique claims). See Section 11.4, Tier 1.
 
 **SUPERSEDE** -- Mark a page or claim as replaced by newer information.
 
@@ -998,6 +999,7 @@ For the full incremental update policy governing how new claims integrate with e
 4. On the new page, set `supersedes` to the old page's ID.
 5. Update `wiki/index.md`: move the old page to "Archived" section or remove from active listings.
 6. Log: `"SUPERSEDE <old_page> -> <new_page>: <rationale>"`
+6a. **Decision record (inline -- Tier 1):** If this supersession replaces a key page or represents a significant editorial judgment -- the new page substantially reframes the concept, or the superseded page was widely linked -- create a decision record page in `wiki/decisions/` with `trigger_type: reframing` (if the new page reframes the concept) or `trigger_type: merge` (if consolidating). Set `affected_pages` to include both old and new page IDs. Add to `wiki/index.md` under Decisions. Commit as part of this same commit. **Skip for routine stale-claim supersessions** (e.g., updating a fact to a newer version without reframing). See Section 11.4, Tier 1.
 
 **ARCHIVE** -- Move outdated content out of active wiki.
 
@@ -1335,9 +1337,17 @@ Report-only (no auto-fix): contradictions, knowledge gaps, orphan pages, missing
 8. **`has_contradictions` sync:** Verify that `has_contradictions` frontmatter matches actual presence of `[contradiction:]` markers in the body. Auto-fix: set `true` if markers present, `false` if no markers present.
 9. **Knowledge gaps (red links):** Collect unresolved wikilinks. Flag when: appears on 2+ distinct pages, OR appears in TL;DR/Key Facts section of any page (per D-20). Severity: info. Report-only. Suggest investigative question per D-23.
 10. **Source coverage gaps:** Compare domain source counts. Flag domains with materially fewer sources than median. Only run when wiki has 5+ distinct knowledge_domain values with at least 3 having 2+ source pages (maturity guardrail per D-22). Use `knowledge_domain` consistently for both page classification and source counting. Severity: info. Report-only. Suggest investigative question per D-23.
-11. Compile findings into `wiki/maintenance/lint-report.md` organized by severity then category. Include total counts and per-category breakdowns.
-12. Append entry to `wiki/log.md`: `## [YYYY-MM-DD] lint | <scope>` with summary of findings counts and auto-fixes applied.
-13. Commit: `lint(<scope>): <one-line summary of findings and fixes>`
+11. **Drift detection (category: `drift`):** Run cross-system drift checks. These detect misalignment between the wiki layer and its dependencies.
+    - **Unrepresented sources (DRFT-01):** Walk `sources/` directory for `.md` files, check each has a corresponding wiki source summary page (matching the `path` field in source page frontmatter). Severity: warning.
+    - **Missing source files (DRFT-02):** For each source summary page, verify the raw source file at the `path` frontmatter field exists on disk. Severity: error.
+    - **Content-hash drift:** Recompute SHA-256 of the raw source file, compare against `content_hash` in source summary frontmatter. If mismatch: report finding (severity: warning). When `--fix` is passed, auto-fix `compilation_status` to `stale` on the affected source page. See Section 10 compilation status transitions.
+    - **Index coverage:** Verify every wiki page (excluding index.md, log.md, and maintenance/ pages) has a wikilink entry in `wiki/index.md`. Severity: warning.
+    - **Obsidian vault awareness (DRFT-03):** Verify `.obsidian/` directory exists (info if missing). Check for non-markdown files in `wiki/` subdirectories (severity: info).
+12. Compile findings into `wiki/maintenance/lint-report.md` organized by severity then category. Findings are grouped with category subsections (e.g., `### Drift` under `## Warnings`). Include total counts and per-category breakdowns.
+13. Append entry to `wiki/log.md`: `## [YYYY-MM-DD] lint | <scope>` with summary of findings counts and auto-fixes applied.
+14. Commit: `lint(<scope>): <one-line summary of findings and fixes>`
+
+**Categories** (valid values for `--category` filter): `orphan`, `crossref`, `stale`, `contradiction`, `gap`, `provenance`, `yaml`, `drift`.
 
 **Abort conditions:**
 
@@ -1345,25 +1355,75 @@ Report-only (no auto-fix): contradictions, knowledge gaps, orphan pages, missing
 
 ### 11.4 Reflect Workflow
 
+The reflect workflow creates decision records (see Section 4.6) that capture why structural changes were made to the wiki. It operates through three tiers, from automatic to manual.
+
 ```
-Trigger:  After major ingests, reorganizations, or periodic review
-Inputs:   Recent changes (from log.md or git history)
-Outputs:  Decision record page, updated index/log
+Trigger:  After structural operations, on workflow recommendation, or periodically
+Inputs:   Recent changes (from log.md and git history), reflect checkpoint state
+Outputs:  Decision record page(s) in wiki/decisions/, updated index/log, advanced checkpoint
 Commit:   reflect(<scope>): <one-line summary>
 ```
 
-**Steps:**
+#### Three-Tier Reflect Model
 
-1. Identify what structural change was made: page merges, topic reorganization, schema updates, domain restructuring, or significant reframing.
-2. Create a decision record page in `wiki/overviews/` with `type: overview` and the following sections: TL;DR -> Decision -> Why -> Alternatives Considered -> Consequences -> Sources.
-3. The decision page documents: what framing was adopted, what it replaced, what alternatives were considered, and why the chosen approach was selected.
-4. Update `wiki/index.md` with the new decision page.
-5. Append entry to `wiki/log.md`: `## [YYYY-MM-DD] reflect | <scope>` with the decision summary.
-6. Commit: `reflect(<scope>): <one-line summary>`
+**Tier 1 -- Inline creation:** MERGE, SUPERSEDE, splits, domain reorganization, schema updates, and recognized reframings produce decision records as part of the operation commit. No separate reflect pass needed. The agent creating the structural change also creates the decision record in the same commit. See Section 9 operation definitions for inline hooks (steps 7a and 6a).
 
-**Abort conditions:**
+Inline creation is for operations where the "why" is obvious because the agent is actively making the structural choice. The decision record is a natural byproduct, not extra work.
 
-- No structural changes have been made since the last reflection. Skip and do not create an empty decision record.
+**Tier 2 -- Workflow recommendations:** Ingest, query, and lint workflows emit a structured recommendation when they detect ambiguous signals that may warrant a decision record but require judgment:
+
+```
+reflect recommended: [trigger_type] -- [reason]
+```
+
+Signals that trigger recommendations:
+- Material framing shifts during ingest (a new source substantially reframes an existing concept)
+- Contradiction resolution choices during query write-back (choosing one framing over another)
+- Novel synthesis frames created during query compilation (new overview page creates a novel organizing principle)
+- Accumulated structural drift detected during lint (3+ related drift findings suggest a systemic issue)
+
+This message is appended to the workflow's log entry in `wiki/log.md`. It is NOT an automatic action. The agent or human decides whether to act on it in a subsequent reflect pass or immediately.
+
+**Tier 3 -- Manual/periodic reflect:** A safety-net pass that scans recent activity and backfills missed decision records. Run periodically (e.g., after several ingests or a batch of structural changes) or when the operator suspects structural decisions went unrecorded.
+
+#### Reflect Checkpoint
+
+The reflect checkpoint lives at `wiki/maintenance/reflect-state.md`. It tracks where the last reflect pass ended so subsequent passes resume from the correct position, even when a pass produces no decision records.
+
+Fields (in frontmatter):
+- `last_reflect_log_entry`: The full heading line of the last log entry scanned (e.g., `"## [2026-04-14] lint | wiki health check"`)
+- `last_reflect_commit`: The short SHA of the last git commit inspected (e.g., `"abc1234"`)
+- `last_reflect_at`: ISO 8601 date of the last reflect pass (e.g., `2026-04-14`)
+
+`wiki/maintenance/` is a control-plane directory. Files here (lint-report.md, reflect-state.md) are NOT listed in wiki/index.md -- they are infrastructure, not content.
+
+#### Periodic Reflect Procedure (Tier 3)
+
+1. Read the reflect checkpoint from `wiki/maintenance/reflect-state.md`.
+2. Scan `wiki/log.md` for entries after `last_reflect_log_entry`. Identify:
+   - Structural operations: MERGE, SUPERSEDE, ARCHIVE entries
+   - Schema changes: entries referencing AGENTS.md modifications
+   - Workflow recommendations: lines matching `reflect recommended: [trigger_type] -- [reason]`
+3. Inspect `git log --oneline` for commits after `last_reflect_commit`. Look for structural file changes: new/deleted/renamed pages, template modifications, AGENTS.md updates, directory reorganizations. **Deduplication rule:** If both log.md and git show the same event, use the log.md entry as the primary trigger (it has intent). Git-only changes (no log entry) indicate unrecorded structural work and should be investigated.
+4. For each identified structural change that lacks a corresponding decision record:
+   a. Create a decision record page in `wiki/decisions/` using the decision template (Section 4.6).
+   b. Set `trigger_type` to the most appropriate value from the six allowed types.
+   c. Set `affected_pages` to the IDs of pages touched by the change.
+   d. Fill all 7 required sections with real content (not placeholders). The "Why" section must state what framing was adopted and what it replaced. "Alternatives Considered" must list at least one alternative.
+   e. Add the decision record ID to `decision_history` on each affected page's frontmatter (only when meaningful per D-05).
+5. Update `wiki/index.md` with new decision record entries under the Decisions category.
+6. Append entry to `wiki/log.md`: `## [YYYY-MM-DD] reflect | <scope>` with a summary of how many decision records were created, or "no structural changes detected" if none.
+7. Advance the reflect checkpoint: update `last_reflect_log_entry` to the most recent log entry heading, `last_reflect_commit` to current HEAD short SHA, `last_reflect_at` to today's date. **A reflect run that produces no decision records still advances the checkpoint.**
+8. Commit: `reflect(<scope>): <one-line summary>`
+
+#### Abort Conditions
+
+- No structural changes detected since the last checkpoint AND no pending workflow recommendations. Advance the checkpoint (step 7) and skip record creation. Log: `## [YYYY-MM-DD] reflect | no structural changes detected`.
+- Log entry for a structural operation already has a corresponding decision record in `wiki/decisions/` (check by date + scope match). Skip that event -- already recorded.
+
+#### Unifying Principle
+
+Create a decision record when future-you would reasonably ask "why is the wiki shaped this way?" When in doubt, record. A redundant record is retrievable; a missing record is lost context.
 
 ## 12. Index and Log
 
