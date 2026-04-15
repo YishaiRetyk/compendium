@@ -1,10 +1,11 @@
 ---
 phase: 4
 slug: query-structured-operations
-status: draft
-nyquist_compliant: false
-wave_0_complete: false
+status: validated
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-04-12
+validated: 2026-04-15
 ---
 
 # Phase 4 — Validation Strategy
@@ -19,8 +20,8 @@ created: 2026-04-12
 |----------|-------|
 | **Framework** | bash + grep/diff assertions (no test framework — phase delivers bash scripts and markdown specs) |
 | **Config file** | none — validation is script-exit-code and content-check based |
-| **Quick run command** | `bash bin/validate-op.sh UPDATE wiki/sources/test.md && bash bin/search.sh test` |
-| **Full suite command** | `bash bin/validate-op.sh UPDATE wiki/sources/test.md && bash bin/search.sh test && bash bin/search.sh --query "test query"` |
+| **Quick run command** | `bash bin/validate-op.sh UPDATE wiki/sources/src-2026-04-09-thinking-fast-and-slow-part1.md && bash bin/search.sh test` |
+| **Full suite command** | `bash bin/validate-op.sh UPDATE wiki/sources/src-2026-04-09-thinking-fast-and-slow-part1.md && bash bin/search.sh test && bash bin/search.sh --query "test query"` |
 | **Estimated runtime** | ~2 seconds |
 
 ---
@@ -38,14 +39,14 @@ created: 2026-04-12
 
 | Task ID | Plan | Wave | Requirement | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|-----------|-------------------|-------------|--------|
-| 04-01-01 | 01 | 1 | SOPS-01 | content | `grep -c "validate-op" AGENTS.md` | ❌ W0 | ⬜ pending |
-| 04-01-02 | 01 | 1 | SOPS-02 | content | `grep "UPDATE\|MERGE\|SUPERSEDE\|ARCHIVE" AGENTS.md` | ✅ | ⬜ pending |
-| 04-02-01 | 02 | 1 | SOPS-03 | script | `bash bin/validate-op.sh UPDATE wiki/sources/test.md` | ❌ W0 | ⬜ pending |
-| 04-02-02 | 02 | 1 | SOPS-04 | content | `grep "compilation_status" AGENTS.md` | ❌ W0 | ⬜ pending |
-| 04-03-01 | 03 | 2 | CLI-01 | script | `bash bin/search.sh test` | ❌ W0 | ⬜ pending |
-| 04-04-01 | 04 | 2 | QURY-01 | content | `grep "index-first" AGENTS.md` | ✅ | ⬜ pending |
-| 04-04-02 | 04 | 2 | QURY-02 | content | `grep "write-back" AGENTS.md` | ❌ W0 | ⬜ pending |
-| 04-04-03 | 04 | 2 | QURY-03 | content | `grep "compilation_status" AGENTS.md` | ❌ W0 | ⬜ pending |
+| 04-01-01 | 01 | 1 | SOPS-01 | content | `grep -c "validate-op" AGENTS.md` | ✅ | ✅ green |
+| 04-01-02 | 01 | 1 | SOPS-02 | content | `grep -E "UPDATE\|MERGE\|SUPERSEDE\|ARCHIVE" AGENTS.md` | ✅ | ✅ green |
+| 04-02-01 | 02 | 1 | SOPS-03 | script | `bash bin/validate-op.sh UPDATE wiki/sources/src-2026-04-09-thinking-fast-and-slow-part1.md` | ✅ | ✅ green |
+| 04-02-02 | 02 | 1 | SOPS-04 | content | `grep "compilation_status" AGENTS.md` | ✅ | ✅ green |
+| 04-03-01 | 03 | 2 | CLI-01 | script | `bash bin/search.sh test` | ✅ | ✅ green |
+| 04-04-01 | 04 | 2 | QURY-01 | content | `grep -E "index.first" AGENTS.md` | ✅ | ✅ green |
+| 04-04-02 | 04 | 2 | QURY-02 | content | `grep "write-back" AGENTS.md` | ✅ | ✅ green |
+| 04-04-03 | 04 | 2 | QURY-03 | content | `grep "compilation_status" AGENTS.md` | ✅ | ✅ green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -80,4 +81,20 @@ created: 2026-04-12
 - [ ] Feedback latency < 5s
 - [ ] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+**Approval:** approved 2026-04-15
+
+---
+
+## Validation Audit 2026-04-15
+
+| Metric | Count |
+|--------|-------|
+| Gaps found | 2 |
+| Resolved | 2 |
+| Escalated | 0 |
+
+**Resolved gaps:**
+- **04-02-01 (SOPS-03):** Test command referenced nonexistent fixture `wiki/sources/test.md` → updated to existing `src-2026-04-09-thinking-fast-and-slow-part1.md`. Verified exit 0.
+- **04-04-01 (QURY-01):** `grep "index-first"` (hyphenated) found 0 matches; actual AGENTS.md phrasing is `"index first"`. Updated pattern to `grep -E "index.first"`. Verified green.
+
+All 8 automated verify commands now run green. `nyquist_compliant: true`.
