@@ -8,6 +8,24 @@ A personal knowledge management system where LLM agents incrementally build and 
 
 The wiki is a persistent, compounding artifact — cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested. Knowledge accumulates rather than being re-derived.
 
+## Current Milestone: v1.1 Shareability
+
+**Goal:** Make the v1.0 starter kit usable by technically comfortable early adopters — a template-based starter repo with a two-track setup, git-based collaborative curation, and a safe path for onboarding existing Obsidian vaults.
+
+**Target features:**
+
+- **Template-based starter repo on GitHub** — cloneable structure with in-repo `/docs/` organized into four explicit tracks (quickstart, guided setup, manual setup, reference), Kahneman cluster moved to `examples/`, empty vault by default.
+- **Two-track setup** — guided wizard (prompts for domain, privacy defaults, LLM agent, generates personalized `AGENTS.md`) *and* a manual hand-edit track for power users; each track has its own docs page.
+- **Git-based collaborative curation** — PR workflow where contributors fork, ingest on a branch, open PR; merge conflicts handled by git + lint gate. Attribution: git commit authorship is the source of truth; `log.md` ingest entries carry a contributor field as a convenience index.
+- **Brownfield vault onboarding** — `bin/brownfield.sh` with four subcommands: `scan` (dry-run markdown report), `bootstrap` (mechanical-only auto: sentinel frontmatter, SHA hashing, `index.md`/`log.md` skeleton, YAML normalization), `suggest` (writes `.brownfield/REPORT.md` plus `.brownfield/migrations/*.sh` — one idempotent staged shell script per transformation class, each printing what it changed), `verify` (runs existing lint after user-applied migrations). Strict mechanical/judgment boundary — page typing, provenance bootstrapping, cross-reference inference, and privacy classification stay in `suggest` only.
+- **Domain-agnostic defaults** — neutral starter content; `AGENTS.md` stripped of Kahneman-specific examples (kept in `examples/` for reference).
+
+**Audience:** Technically comfortable early adopters first, with a guided setup path that reduces friction for less technical Obsidian users.
+
+**Deferred to backlog:** Obsidian plugin distribution, one-command installer (`curl|bash`), hosted docs site, brownfield `--apply` mode for judgment-heavy operations (→ v1.2 after the dry-run path is battle-tested).
+
+**v1.0 revisit flags threaded in:** Obsidian render/Dataview verification (deferred from Phase 4) and multi-agent validation (Codex, etc.) — folded into v1.1 verification gates.
+
 ## Requirements
 
 ### Validated
@@ -34,14 +52,27 @@ The wiki is a persistent, compounding artifact — cross-references are already 
 - [x] Reflect workflow: decision records, structural reasoning, reframing history — Validated in Phase 06: reflection-drift-detection
 - [x] Cross-system drift detection between wiki, raw sources, and any external tools — Validated in Phase 06: reflection-drift-detection
 
-### Active
-(none — all v1 requirements validated)
+### Active (v1.1 focus areas — formal REQ-IDs in REQUIREMENTS.md)
+
+- [ ] Template-based starter repo with four-track `/docs/` (quickstart, guided setup, manual setup, reference)
+- [ ] Guided setup wizard generating personalized `AGENTS.md` (domain, privacy, LLM agent)
+- [ ] Manual setup track preserved for power users
+- [ ] Kahneman cluster moved to `examples/`; starter vault neutral
+- [ ] Git-based PR workflow for collaborative curation with lint gate
+- [ ] Per-ingest contributor field in `log.md` (git authorship remains source of truth)
+- [ ] `bin/brownfield.sh scan` — dry-run markdown report
+- [ ] `bin/brownfield.sh bootstrap` — mechanical-only auto (sentinel frontmatter, hashes, skeleton, YAML normalization)
+- [ ] `bin/brownfield.sh suggest` — staged idempotent migration scripts for judgment-heavy work
+- [ ] `bin/brownfield.sh verify` — lint integration after user-applied migrations
+- [ ] Multi-agent validation (Codex or other) against v1.0 workflows
+- [ ] Obsidian render/Dataview verification (deferred from Phase 4)
 
 ### Out of Scope
 
 - Building a hosted web application — this is a local, file-based system
 - Embedding-based RAG infrastructure — index-first search is the v1 approach
-- Multi-user collaboration features — this is a personal system
+- Real-time / concurrent multi-user editing — collaboration in v1.1 is asynchronous git PR workflow only; no shared-vault coordination, locking, or merge-coordination services
+- Hosted multi-tenant service — local + git-hosted only; no servers
 - Non-markdown output formats — markdown + Obsidian is the stack
 - Mobile apps — desktop Obsidian + CLI agents only
 - OAuth/auth — no authentication layer needed for a local system
@@ -94,4 +125,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-15 after v1.0 milestone archival*
+*Last updated: 2026-04-15 — v1.1 Shareability milestone started*
