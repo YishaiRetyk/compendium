@@ -20,7 +20,7 @@ Options:
   --fix               Apply mechanical auto-fixes (stale markers)
   --category <cat>    Run only specified category:
                         orphan, crossref, stale, contradiction, gap,
-                        provenance, yaml
+                        provenance, yaml, drift
                       Default: all categories
 
 Arguments:
@@ -152,7 +152,7 @@ EPISTEMIC_MODIFIERS = {
     'mixed': 0.85,
 }
 
-VALID_TYPES = {'entity', 'concept', 'source', 'comparison', 'overview'}
+VALID_TYPES = {'entity', 'concept', 'source', 'comparison', 'overview', 'decision'}
 VALID_STATUS = {'active', 'stale', 'superseded', 'archived'}
 VALID_EPISTEMIC = {'sourced', 'mixed', 'tentative', 'stale'}
 VALID_PRIVACY = {'local_only', 'cloud_safe'}
@@ -276,6 +276,28 @@ if should_run('yaml'):
             cs = fm.get('compilation_status')
             if cs and cs not in VALID_COMPILATION:
                 add_finding('error', 'yaml', rel, f"Invalid compilation_status: '{cs}'")
+
+        # Decision record validation (per AGENTS.md section 5 items 15-17)
+        if fm.get('type') == 'decision':
+            VALID_TRIGGER_TYPES = {'merge', 'split', 'schema-update', 'domain-reorg', 'reframing', 'contradiction-resolution'}
+            tt = fm.get('trigger_type', '')
+            if not tt:
+                add_finding('error', 'yaml', rel, 'Decision page missing trigger_type')
+            elif tt not in VALID_TRIGGER_TYPES:
+                add_finding('error', 'yaml', rel, f'Invalid trigger_type: {tt} (expected one of: {", ".join(sorted(VALID_TRIGGER_TYPES))})')
+            ap = fm.get('affected_pages')
+            if ap is None:
+                add_finding('error', 'yaml', rel, 'Decision page missing affected_pages field')
+            elif not isinstance(ap, list):
+                add_finding('error', 'yaml', rel, 'affected_pages must be a YAML list')
+
+        # decision_history validation (optional field on any page type, per item 17)
+        dh = fm.get('decision_history')
+        if dh is not None:
+            if not isinstance(dh, list):
+                add_finding('error', 'yaml', rel, 'decision_history must be a YAML list')
+            elif not all(isinstance(item, str) for item in dh):
+                add_finding('error', 'yaml', rel, 'decision_history items must be strings')
 
 # ---------------------------------------------------------------------------
 # Check 2: Provenance validation
