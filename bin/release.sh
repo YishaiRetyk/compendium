@@ -155,7 +155,9 @@ for dp in "${DENYLIST_PATHS[@]}"; do
 done
 
 # Programmatic sweep for privacy: local_only (belt-and-suspenders).
-if grep -rIn -E '^privacy:[[:space:]]*local_only' "$STAGE" 2>/dev/null; then
+# Match actual frontmatter values only (exact `local_only`, optional trailing
+# whitespace/comment) — NOT schema-doc lines like `privacy: local_only|cloud_safe`.
+if grep -rIn -E '^privacy:[[:space:]]*local_only[[:space:]]*(#.*)?$' "$STAGE" 2>/dev/null; then
     echo "ERROR: privacy: local_only content found in staged dir" >&2
     exit 2
 fi
