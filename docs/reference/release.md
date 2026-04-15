@@ -84,8 +84,10 @@ COUNT=$(git rev-list --all --count)
 echo "git rev-list --all --count = $COUNT"
 [ "$COUNT" -eq 1 ] || { echo "FAIL: expected 1 commit, got $COUNT"; exit 1; }
 
-# Neutrality smoke (use the published denylist categories):
-grep -rIn -iE '<creator-slug>|<creator-term-1>|<creator-term-2>' AGENTS.md README.md docs/ && echo "LEAK" || echo "Clean"
+# Neutrality smoke (use the published denylist categories).
+# --exclude=release.md so this very runbook's quoted example command
+# doesn't self-match when docs/ is scanned recursively.
+grep -rIn -iE '<creator-slug>|<creator-term-1>|<creator-term-2>' --exclude=release.md AGENTS.md README.md docs/ && echo "LEAK" || echo "Clean"
 
 # Denylist-paths-must-be-absent smoke:
 for d in .planning .brownfield wiki/entities wiki/concepts wiki/comparisons wiki/overviews wiki/sources wiki/maintenance; do
