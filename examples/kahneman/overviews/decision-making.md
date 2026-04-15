@@ -61,7 +61,6 @@ The "nudge" lineage draws directly on prospect theory rather than generically on
 - [[Prospect Theory]]
 - [[Loss Aversion]]
 - [[Bounded Rationality]]
-- [[personal-decision-patterns]] -- personal experiential patterns (local_only)
 
 ## Sources
 

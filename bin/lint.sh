@@ -42,7 +42,7 @@ EOF
 # Argument parsing
 # ---------------------------------------------------------------------------
 
-WIKI_DIR="wiki/"
+WIKI_DIR="${WIKI_ROOT:-wiki/}"
 DRY_RUN=0
 FIX=0
 CATEGORY="all"
@@ -177,7 +177,7 @@ EPISTEMIC_INLINE_RE = re.compile(r'\[epistemic::\s*(sourced|mixed|inferred|tenta
 
 # Files to exclude from lint candidate list
 EXCLUDE_FILES = {'index.md', 'log.md'}
-EXCLUDE_DIRS = {'maintenance'}
+EXCLUDE_DIRS = {'maintenance', 'examples'}
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -228,6 +228,9 @@ for root, dirs, files in os.walk(wiki_dir):
             continue
         fpath = os.path.join(root, fname)
         fm, body, err = parse_frontmatter(fpath)
+        # NEUT-04 (D-09 fallback): example: true suppresses all health checks.
+        if isinstance(fm, dict) and fm.get('example') is True:
+            continue
         all_pages.append((fpath, fm, body, err))
         if fm and fm.get('type') == 'source':
             source_pages.append((fpath, fm, body))

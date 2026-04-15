@@ -16,6 +16,10 @@ domains:
   - wiki-infrastructure
 privacy: cloud_safe
 knowledge_domain: software
+supersedes:
+superseded_by:
+aliases: []
+has_contradictions: false
 trigger_type: schema-update
 affected_pages:
   - daniel-kahneman
