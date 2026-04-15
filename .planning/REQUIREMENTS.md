@@ -21,14 +21,14 @@ Numbering continues from v1.0. New REQ-ID prefixes: `TMPL`, `NEUT`, `WZRD`, `MAN
 - [ ] **TMPL-07**: `/docs/README.md` names the Diátaxis mapping explicitly (quickstart=tutorial, guided/manual=how-to, reference=reference+explanation)
 - [ ] **TMPL-08**: `/docs/reference/` contains `schema-tour.md`, `brownfield.md`, `privacy-model.md`, `ci.md`, `examples.md`
 - [ ] **TMPL-09**: Top-level `PRIVACY.md` page surfacing the local_only / cloud_safe convention
-- [ ] **TMPL-10**: `CLAUDE.md` exists at repo root alongside `AGENTS.md` (symlink or identical content — agent-agnostic from filename up)
+- [x] **TMPL-10**: `CLAUDE.md` exists at repo root alongside `AGENTS.md` (symlink or identical content — agent-agnostic from filename up)
 - [ ] **TMPL-11**: Release process uses orphan-branch publish so v1.0 personal git history does not ship (pitfall C-1 mitigation)
 
 ### Neutralization & Examples (NEUT)
 
 - [x] **NEUT-01**: Kahneman cluster (all 7 pages + sources) moved from `wiki/` to `examples/kahneman/`, internal wikilinks preserved
-- [ ] **NEUT-02**: `AGENTS.md` illustrative content rewritten with generic placeholders (no Kahneman, prospect-theory, loss-aversion strings)
-- [ ] **NEUT-03**: `AGENTS.md` sections that need examples add `See: examples/kahneman/...` pointers instead of inlining
+- [x] **NEUT-02**: `AGENTS.md` illustrative content rewritten with generic placeholders (no Kahneman, prospect-theory, loss-aversion strings)
+- [x] **NEUT-03**: `AGENTS.md` sections that need examples add `See: examples/kahneman/...` pointers instead of inlining
 - [x] **NEUT-04**: New optional frontmatter field `example: true` documented in `AGENTS.md §5`; `bin/lint.sh EXCLUDE_DIRS` honors `examples/` and/or `example: true`
 - [x] **NEUT-05**: `examples/kahneman/README.md` explains why the cluster is preserved and how to use it as a reference
 - [ ] **NEUT-06**: CI neutrality gate: grep-based check that **public control-plane surfaces** (`AGENTS.md`, `CLAUDE.md`, `README.md`, `PRIVACY.md`, `/docs/**`, `.github/**`, `wiki/**`, `bin/**`) contain zero Kahneman-specific strings; `examples/kahneman/**` is explicitly excluded from the check as the permitted home for Kahneman content (runs on every PR) (pitfall C-1)
@@ -169,11 +169,11 @@ Explicitly excluded from v1.1. Documented to prevent scope creep.
 | TMPL-07 | Phase 7 | Pending |
 | TMPL-08 | Phase 7 | Pending |
 | TMPL-09 | Phase 7 | Pending |
-| TMPL-10 | Phase 7 | Pending |
+| TMPL-10 | Phase 7 | Complete |
 | TMPL-11 | Phase 7 | Pending |
 | NEUT-01 | Phase 7 | Complete |
-| NEUT-02 | Phase 7 | Pending |
-| NEUT-03 | Phase 7 | Pending |
+| NEUT-02 | Phase 7 | Complete |
+| NEUT-03 | Phase 7 | Complete |
 | NEUT-04 | Phase 7 | Complete |
 | NEUT-05 | Phase 7 | Complete |
 | NEUT-06 | Phase 7 | Pending |

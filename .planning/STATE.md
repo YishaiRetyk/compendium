@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Shareability
 status: Ready to execute
-stopped_at: Completed 07-02-PLAN.md
-last_updated: "2026-04-15T20:24:43.156Z"
+stopped_at: Completed 07-03-PLAN.md
+last_updated: "2026-04-15T20:33:50.538Z"
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 5
-  completed_plans: 2
+  completed_plans: 3
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-04-15)
 ## Current Position
 
 Phase: 07 (neutral-template-foundation) — EXECUTING
-Plan: 3 of 5
+Plan: 4 of 5
 
 ## Performance Metrics
 
@@ -68,6 +68,7 @@ Plan: 3 of 5
 | Phase 06 P03 | 3min | 3 tasks | 2 files |
 | Phase 07 P01 | 6min | 2 tasks | 6 files |
 | Phase 07 P02 | 12min | 2 tasks | 19 files |
+| Phase 07 P03 | 5min | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -142,6 +143,8 @@ Recent decisions affecting current work:
 - [Phase 07]: [Phase 07]: Kahneman cluster relocated to examples/; wiki/ reduced to TMPL-05 skeleton; local_only creator content deleted
 - [Phase 07]: [Phase 07]: NEUT-07 decision record uses canonical AGENTS.md §4.6 schema with all BASE_FIELDS (including supersedes/superseded_by/aliases/has_contradictions)
 - [Phase 07]: [Phase 07]: bin/lint.sh EXCLUDE_DIRS += examples; per-file example: true skip; WIKI_ROOT env var reuses 07-01 fixture-override pattern
+- [Phase 07]: AGENTS.md neutralization uses <UPPERCASE_NAME> angle-bracket tokens for illustrative content; schema/AGENTS.template.md reserves {{...}} syntax exclusively for the 4 wizard placeholders (PRIMARY_DOMAIN, DEFAULT_PRIVACY, AGENT_FILENAME, DECAY_PROFILE) per D-08/REVIEWS.md HIGH #1
+- [Phase 07]: CLAUDE.md is byte-identical to AGENTS.md, enforced by .githooks/pre-commit that auto-syncs and re-stages on drift (TMPL-10/D-03); hook-path roundtrip test uses ephemeral GIT_INDEX_FILE to avoid polluting the real index
 
 ### Pending Todos
 
@@ -164,6 +167,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-15T20:24:43.154Z
-Stopped at: Completed 07-02-PLAN.md
+Last session: 2026-04-15T20:33:50.536Z
+Stopped at: Completed 07-03-PLAN.md
 Resume file: None
