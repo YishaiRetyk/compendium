@@ -64,7 +64,7 @@ Plans:
 - [x] 08-02-init-wizard-core-PLAN.md — bin/init-wizard.sh core (preflight, prompts, validator, render, --dry-run, --render-to, idempotency guard) + 7 tests
 - [x] 08-03-wizard-side-effects-PLAN.md — Wizard write side (.wizard-answers.yaml atomic, initial decision record, sync-claude invoke, wiki/index.md edit) + 4 tests
 - [x] 08-04-manual-track-and-docs-PLAN.md — docs/manual-setup.md (D-07 11-section walkthrough), guided-setup, quickstart, setup-prerequisites, WZRD-07 amendment + 5 doc tests
-- [ ] 08-05-ci-byte-equality-PLAN.md — MANUAL-06 byte-equality test + .github/workflows/setup-parity.yml CI gate
+- [x] 08-05-ci-byte-equality-PLAN.md — MANUAL-06 byte-equality test + .github/workflows/setup-parity.yml CI gate
 **UI hint**: yes
 
 ### Phase 9: Collaborative PR Workflow + CI Lint Gate

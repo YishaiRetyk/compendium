@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Shareability
-status: Ready to execute
-stopped_at: Completed 08-03-wizard-side-effects-PLAN.md
-last_updated: "2026-04-16T04:20:40.149Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 08-05-ci-byte-equality-PLAN.md
+last_updated: "2026-04-16T04:26:00.254Z"
 progress:
   total_phases: 5
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 10
-  completed_plans: 9
+  completed_plans: 10
 ---
 
 # Project State
@@ -75,6 +75,7 @@ Plan: 5 of 5
 | Phase 08-two-track-setup-wizard-manual P04 | 8min | 2 tasks | 12 files |
 | Phase 08-two-track-setup-wizard-manual P02 | 12min | 2 tasks | 10 files |
 | Phase 08-two-track-setup-wizard-manual P03 | 8min | 2 tasks | 7 files |
+| Phase 08-two-track-setup-wizard-manual P05 | 2min | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -180,6 +181,9 @@ Recent decisions affecting current work:
 - [Phase 08-two-track-setup-wizard-manual]: [Phase 08-03] update_index_md() 3 guardrails (review #2): idempotency (skip if exact entry present), duplicate-header (refuse >1 `## Decisions` with recovery message), malformed-recovery (clear pointer-to-manual-recovery error on missing/unreadable file)
 - [Phase 08-two-track-setup-wizard-manual]: [Phase 08-03] template_sha fallback chain (review #9): WIZARD_TEMPLATE_SHA env > git log -1 --format=%H schema/AGENTS.template.md > <unresolved> literal; CI must set env var (no fetch-depth: 2 reliance)
 - [Phase 08-two-track-setup-wizard-manual]: [Phase 08-03] Plan 02 exit-2 gate removed; test_wizard_not_yet_implemented.sh deleted; 5 new side-effect tests added (answers_yaml, decision_record, sync_claude, index_md, partial_failure); aggregator PHASE 08 TESTS: 20/20
+- [Phase 08-two-track-setup-wizard-manual]: [Phase 08-05] Workflow comments avoid literal 'fetch-depth' + 'test_canonical_byte_equality.sh' tokens so plan's strict ! grep -q acceptance checks pass as single-pattern greps; semantically equivalent phrasing ('shallow-clone depth' / 'MANUAL-06 byte-equality test') used instead
+- [Phase 08-two-track-setup-wizard-manual]: [Phase 08-05] Aggregator math reconciled per review #7: 13 wizard + 7 manual-setup + 1 new byte-equality = 21/21 (test_wizard_not_yet_implemented deleted in 08-03 so does not count)
+- [Phase 08-two-track-setup-wizard-manual]: [Phase 08-05] Required-check name 'setup-parity' matches jobs.setup-parity key; operator adds to branch-protection on public template repo (one-time GitHub UI action, same model as Phase 7 neutrality)
 
 ### Pending Todos
 
@@ -202,6 +206,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-16T04:20:40.145Z
-Stopped at: Completed 08-03-wizard-side-effects-PLAN.md
+Last session: 2026-04-16T04:26:00.252Z
+Stopped at: Completed 08-05-ci-byte-equality-PLAN.md
 Resume file: None
