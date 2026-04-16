@@ -23,7 +23,10 @@ check '^\.obsidian/workspace' ".gitignore: .obsidian/workspace*"
 check '^\.obsidian/cache'     ".gitignore: .obsidian/cache"
 check '^\.trash/'             ".gitignore: .trash/"
 check '^\.brownfield/'        ".gitignore: .brownfield/"
-check '^\.planning/'          ".gitignore: .planning/"
+# Note: .planning/ is intentionally NOT ignored. bin/release.sh ALLOWLIST
+# staging is the single source of truth for keeping .planning/ out of the
+# public template; see .planning/notes/2026-04-16-planning-dir-git-asymmetry.md.
+# Regression against that invariant is caught by test_release_allowlist.sh.
 check '^\.DS_Store'           ".gitignore: .DS_Store"
 check '^Thumbs\.db'           ".gitignore: Thumbs.db"
 check '^\*\.swp'              ".gitignore: *.swp"

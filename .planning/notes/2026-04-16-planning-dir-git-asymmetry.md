@@ -1,45 +1,40 @@
-# .planning/ git asymmetry — local author vs. template consumer
+# .planning/ git handling — resolved 2026-04-16
 
-**Captured:** 2026-04-16
+**Original date:** 2026-04-16 (morning)
+**Resolved:** 2026-04-16 (same day, evening)
 **Audience:** future template author (me), future Claude sessions working in this repo.
 
-## TL;DR
+## TL;DR (current state)
 
-`.planning/` is listed in `.gitignore` *and* ~150+ of its files are tracked in the local `main` history. Both are intentional. `bin/release.sh` ALLOWLIST staging keeps `.planning/` out of the public template. The ignore rule is written for template consumers, not the author.
+`.planning/` is **tracked like any other directory** in this repo. The single source of truth for keeping `.planning/` out of the public template is `bin/release.sh`'s ALLOWLIST staging, verified by `tests/phase-07/test_release_allowlist.sh`. No special `git add -f` / `-u` dance required for new planning files.
 
-## What's actually going on
+## What changed and why
 
-| Context | Behavior |
-|---|---|
-| `.gitignore` line 10 | `.planning/` — shipped with the public template so consumers' fresh ingests land in an ignored dir by default. |
-| Pre-existing tracked files (`ROADMAP.md`, `phases/**/*`, `PROJECT.md`, this note's sibling `2026-04-09-agents-md-size-risk.md`) | Tracked *before* the ignore rule was added in Phase 7. Git keeps tracking them until a `git rm --cached`. |
-| New files under `.planning/` (created during planning sessions) | Blocked by the ignore rule. `git add <path>` refuses with a hint; `git add -f <path>` or `git add -u <path>` (for modifications of already-tracked files) bypasses. |
-| `bin/release.sh --apply` ALLOWLIST staging | `.planning/` is in the EXCLUDES list — it never reaches the published orphan-branch commit. |
-| Public template repo (`YishaiRetyk/compendium`) | A 1-commit orphan. Zero `.planning/` content. Consumers clone clean. |
-| Local `main` (`/home/yishai/Documents/compendium`) | Carries the full planning history. Diverged from the public template after the 2026-04-16 re-publish. |
+Phase 7's `.gitignore` added `.planning/` as belt-and-suspenders alongside `bin/release.sh` ALLOWLIST. But:
 
-## Day-to-day friction for the author
+- The ignore rule was **redundant** — `bin/release.sh` only copies ALLOWLIST paths into the staged publish dir. `.planning/` is not in the ALLOWLIST, so it cannot leak at publish time regardless of `.gitignore`.
+- The ignore rule was **asymmetric** — `.planning/ROADMAP.md` and ~150 other files were already tracked before the rule was added, creating a `gitignored AND tracked` state that caused daily friction (`git add <new-planning-file>` silently refused; `gsd-tools commit` returned `skipped_gitignored`).
+- The ignore rule offered **no benefit to template consumers** either. When someone clicks "Use this template" on `YishaiRetyk/compendium`, they get a 1-commit orphan with zero `.planning/` content. Their first `/gsd-new-project` creates a fresh `.planning/` that they can track normally — which is what they'd want anyway, consistent with every other gsd project.
 
-- `git add .planning/<path>` on a new file silently refuses. Use `git add -f` for new files or `git add -u` for modifications.
-- `gsd-tools commit --files .planning/...` returns `skipped_gitignored` when the file list contains an untracked `.planning/` path. Workaround: either pre-create the file and use `git add -f` manually, or drop `.planning/` paths from the `--files` list and rely on `-u` on already-tracked ones.
-- Don't push local `main` to the public template remote. It has unrelated histories; the push would be rejected anyway, but a `--force` from muscle memory would clobber the orphan snapshot. If you need a separate tracking remote for dev work, name it something other than `origin` to avoid ambiguity.
+On 2026-04-16, `.planning/` was removed from `.gitignore` (and the corresponding assertion was removed from `tests/phase-07/test_gitignore.sh`). Ordinary `git add .planning/...` now works. The publish-time filter in `bin/release.sh` is untouched.
 
-## If this ever becomes painful
+## What still protects the public template
 
-Three options ranked by blast radius:
+1. **`bin/release.sh` ALLOWLIST** (lines defining `INCLUDES` array). Only paths in the allowlist get copied into the staged publish dir. `.planning/` is absent from ALLOWLIST → absent from publish.
+2. **`bin/release.sh` EXCLUDES post-copy sweep**. After copying, the script hard-fails if any denylist path (`.planning`, `.brownfield`, `wiki/entities`, etc.) shows up in the staged dir. Catches accidental drift in the ALLOWLIST.
+3. **`tests/phase-07/test_release_allowlist.sh`** asserts the dry-run output includes `.planning` in EXCLUDES and excludes it from INCLUDES. Blocks regressions in the staging logic.
 
-1. **Leave as-is.** Works today; friction is low.
-2. **Untrack `.planning/` in local main.** `git rm --cached -r .planning/ && git commit`. Future planning work stops appearing in `git log`. Filesystem is unchanged; gsd tooling keeps working (it reads the FS, not the index).
-3. **Split remotes explicitly.** Configure a named `template-upstream` remote that only ever receives `bin/release.sh --apply` pushes. Keep `origin` (or a private mirror) for the dev repo. Prevents accidental full-history pushes.
+If any of those three layers changes, revisit this note.
 
 ## Landmines to avoid
 
-- **Never** `git push --force` from this worktree to `YishaiRetyk/compendium`. The orphan-branch snapshot is the canonical template; force-pushing local `main` would replace it with 200+ commits of planning history, re-creating the bug that triggered the 2026-04-16 re-publish.
-- **Never** add `.planning/` to an ALLOWLIST path in `bin/release.sh`. It must stay in EXCLUDES.
-- When adding new `.planning/` files (new phases, notes), use `git add -f` if you want them tracked alongside the existing planning history. If you're ambivalent, leave them untracked — they still serve their purpose in the working tree for gsd tooling.
+- **Never** add `.planning/` to the ALLOWLIST in `bin/release.sh`. It must stay in EXCLUDES. `test_release_allowlist.sh` would fail immediately, but a careless edit that also updates the test is not impossible.
+- **Never** `git push --force` from this worktree to `YishaiRetyk/compendium`. The orphan-branch snapshot is the canonical template; force-pushing local `main` would replace it with the full dev history. Unrelated to the `.gitignore` change — the landmine exists regardless — but worth repeating.
+- If you ever configure a separate "template upstream" remote, name it something like `template-upstream` to avoid muscle-memory confusion with `origin`.
 
 ## Related
 
 - Phase 7 `07-VERIFICATION.md` — TMPL-11 single-commit invariant and ALLOWLIST rationale.
-- `bin/release.sh` — the actual publish-time filter.
-- `.gitignore` lines 8–10 — the ignore rule with its author comment.
+- `bin/release.sh` — the actual publish-time filter (INCLUDES + EXCLUDES).
+- `tests/phase-07/test_release_allowlist.sh` — dry-run assertion of INCLUDES/EXCLUDES contract.
+- `tests/phase-07/test_gitignore.sh` — inline comment explains why `.planning/` is intentionally absent from the ignore list.

@@ -6,9 +6,6 @@
 # Brownfield workflow artifacts
 .brownfield/
 
-# Planning (private; not for public template)
-.planning/
-
 # OS / editor noise
 .DS_Store
 Thumbs.db
