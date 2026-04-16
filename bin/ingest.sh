@@ -16,7 +16,7 @@ set -euo pipefail
 
 usage() {
     cat <<'EOF'
-Usage: bin/ingest.sh <source-file> [--slug <slug>] [--force]
+Usage: bin/ingest.sh <source-file> [--slug <slug>] [--force] [--contributor <handle>]
 
 Scaffolds source ingestion by:
   1. Creating dated directory structure in sources/ (UTC date)
@@ -25,9 +25,13 @@ Scaffolds source ingestion by:
   4. Printing ready-to-ingest instructions for the LLM agent
 
 Options:
-  --slug <slug>   Custom slug for the source directory (default: derived from filename)
-  --force         Overwrite files in an existing destination directory
-  --help, -h      Show this help message
+  --slug <slug>           Custom slug for the source directory (default: derived from filename)
+  --force                 Overwrite files in an existing destination directory
+  --contributor <handle>  Explicit contributor @handle for the log entry.
+                          Auto-detects from git config user.email +
+                          .git-author-map.txt if omitted. Single-author
+                          repos auto-omit the field.
+  --help, -h              Show this help message
 
 Notes:
   - Dates are UTC (date -u) so paths are deterministic across time zones.
@@ -64,6 +68,81 @@ compute_hash() {
     fi
 }
 
+# D-19..D-21: resolve contributor handle.
+# Order:
+#   1. If --contributor <handle> provided, use it verbatim.
+#   2. Else if single-author (git log --all --format='%ae' | sort -u | wc -l == 1), omit field.
+#   3. Else look up `git config user.email` in .git-author-map.txt (case-insensitive).
+#   4. On map hit, use mapped @handle.
+#   5. On map miss, warn stderr + OMIT field (D-21: never write bare email).
+resolve_contributor() {
+    local repo_root="${1:-$PWD}"
+    local explicit="$CONTRIBUTOR"
+    if [ -n "$explicit" ]; then
+        printf '%s' "$explicit"
+        return 0
+    fi
+    # D-20 single-author detection
+    local author_count
+    author_count="$(cd "$repo_root" && git log --all --format='%ae' 2>/dev/null | sort -u | wc -l | tr -d ' ')"
+    if [ "${author_count:-0}" -le 1 ]; then
+        # Single-author: omit
+        return 0
+    fi
+    # Multi-author: look up email in map
+    local email
+    email="$(cd "$repo_root" && git config user.email 2>/dev/null || true)"
+    if [ -z "$email" ]; then
+        echo "WARN: no git config user.email; omitting contributor:: field" >&2
+        echo "      Set with: git config user.email <your-email>" >&2
+        echo "      Or use: bin/ingest.sh --contributor @your-handle ..." >&2
+        return 0
+    fi
+    local email_lc
+    email_lc="$(printf '%s' "$email" | tr '[:upper:]' '[:lower:]')"
+    local map="$repo_root/.git-author-map.txt"
+    if [ ! -f "$map" ]; then
+        echo "WARN: no .git-author-map.txt at repo root; cannot resolve $email to @handle" >&2
+        echo "      Omitting contributor:: field." >&2
+        echo "      Fix: add line '$email  ->  @your-handle' to .git-author-map.txt" >&2
+        echo "      Or: re-run with --contributor @your-handle" >&2
+        return 0
+    fi
+    local handle=""
+    local line left right left_lc right_trimmed
+    while IFS= read -r line || [ -n "$line" ]; do
+        # Skip comments and blank lines
+        case "$line" in
+            ''|\#*) continue ;;
+        esac
+        # Accept separator "  ->  " or tab
+        if [[ "$line" == *"  ->  "* ]]; then
+            left="${line%%  ->  *}"
+            right="${line##*  ->  }"
+        elif [[ "$line" == *$'\t'* ]]; then
+            left="${line%%$'\t'*}"
+            right="${line##*$'\t'}"
+        else
+            continue
+        fi
+        left_lc="$(printf '%s' "$left" | tr '[:upper:]' '[:lower:]' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
+        right_trimmed="$(printf '%s' "$right" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
+        if [ "$left_lc" = "$email_lc" ]; then
+            handle="$right_trimmed"
+            break
+        fi
+    done < "$map"
+    if [ -n "$handle" ]; then
+        printf '%s' "$handle"
+        return 0
+    fi
+    # D-21 Pitfall 5 guard: NEVER write bare email
+    echo "WARN: no mapping for $email in .git-author-map.txt; omitting contributor:: field" >&2
+    echo "      Fix: add line '$email  ->  @your-handle' to .git-author-map.txt" >&2
+    echo "      Or: re-run with --contributor @your-handle" >&2
+    return 0
+}
+
 # ---------------------------------------------------------------------------
 # Argument parsing
 # ---------------------------------------------------------------------------
@@ -77,6 +156,7 @@ SOURCE_FILE=""
 SLUG_OVERRIDE=""
 SLUG_PROVIDED=0
 FORCE=0
+CONTRIBUTOR=""
 
 while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -96,6 +176,19 @@ while [ "$#" -gt 0 ]; do
         --force)
             FORCE=1
             shift
+            ;;
+        --contributor)
+            if [ "$#" -lt 2 ]; then
+                echo "ERROR: --contributor requires a value (e.g., @octocat)" >&2
+                exit 1
+            fi
+            CONTRIBUTOR="$2"
+            # Normalize: ensure leading @
+            case "$CONTRIBUTOR" in
+                @*) : ;;
+                *)  CONTRIBUTOR="@$CONTRIBUTOR" ;;
+            esac
+            shift 2
             ;;
         --)
             shift
@@ -226,6 +319,12 @@ fi
 HASH=$(compute_hash "${DEST_FILE}")
 
 # ---------------------------------------------------------------------------
+# Contributor resolution (D-19..D-21)
+# ---------------------------------------------------------------------------
+
+RESOLVED_CONTRIBUTOR="$(resolve_contributor "$(pwd)")"
+
+# ---------------------------------------------------------------------------
 # Output — scaffold summary and ingest instructions
 # ---------------------------------------------------------------------------
 
@@ -249,4 +348,17 @@ Tell your LLM agent:
     path: ${DEST_FILE}
 
   Follow the Ingest Workflow in AGENTS.md section 11.1.
+
+=== Log Entry Template (append to wiki/log.md) ===
+
+## [${TODAY}] ingest | <source title>
+
+EOF
+
+if [ -n "$RESOLVED_CONTRIBUTOR" ]; then
+    printf 'contributor:: %s\n\n' "$RESOLVED_CONTRIBUTOR"
+fi
+
+cat <<EOF
+<what was done, affected pages, rationale>
 EOF
