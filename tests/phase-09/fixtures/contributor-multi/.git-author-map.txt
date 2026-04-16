@@ -1,0 +1,4 @@
+# .git-author-map.txt -- email -> GitHub handle map (Phase 9 COLAB-04 fixture).
+# Format: "<email>  ->  @<handle>"  (two-space-arrow-two-space, or tab separator)
+# Comments start with #. Case-insensitive email match.
+alice@example.com  ->  @alice
