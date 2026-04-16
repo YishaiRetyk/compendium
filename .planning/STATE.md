@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Shareability
 status: Ready to execute
-stopped_at: Completed 08-01-test-harness-and-fixtures-PLAN.md
-last_updated: "2026-04-16T03:57:57.708Z"
+stopped_at: Completed 08-04-manual-track-and-docs-PLAN.md
+last_updated: "2026-04-16T04:04:33.527Z"
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 10
-  completed_plans: 6
+  completed_plans: 7
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-04-15)
 ## Current Position
 
 Phase: 08 (two-track-setup-wizard-manual) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 
 ## Performance Metrics
 
@@ -72,6 +72,7 @@ Plan: 2 of 5
 | Phase 07 P04 | 4min | 2 tasks | 24 files |
 | Phase 07 P05 | 65min | 5 tasks | 13 files |
 | Phase 08 P01 | 3 | 2 tasks | 7 files |
+| Phase 08-two-track-setup-wizard-manual P04 | 8min | 2 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -164,6 +165,11 @@ Recent decisions affecting current work:
 - [Phase 08-01]: Plan 01 python3 str.replace render is the byte-equality reference; Plan 02 wizard render routine must produce byte-identical output or Plan 05 CI fails (review #13)
 - [Phase 08-01]: phase-08/run.sh uses semantic parity (not line-count parity) with phase-07/run.sh — filtered diff returns 0 unexpected lines (review #12)
 - [Phase 08-01]: schema/fixtures/ + tests/phase-08/ establish byte-frozen fixture pair pattern (answers.yaml + rendered target, LF-pinned in .gitattributes, README-documented regen rule)
+- [Phase 08-04]: Manual-setup.md Section 8 inlines full decision-record heredoc + wiki/index.md append — manual track reaches canonical fixture WITHOUT wizard invocation (review concern #4)
+- [Phase 08-04]: Pre-step cp schema/AGENTS.template.md AGENTS.md (copy-not-edit); all Sections 2-5 'File to edit:' lines cite AGENTS.md, template stays pristine (review concern #3)
+- [Phase 08-04]: docs/reference/setup-prerequisites.md centralizes bash>=4/git/python3 install matrix for macOS/Debian/Arch/Fedora/Windows (D-16)
+- [Phase 08-04]: Privacy tier cloud_safe in walkthrough (deviates from wizard prompt default local_only per D-11) to match canonical public fixture per D-08/Open-Q2
+- [Phase 08-04]: Phase-07 test_docs_skeleton.sh relaxed: dropped 'Phase 8' stub-marker assertion + raised quickstart ≤60→≤80 line cap (Rule 3 — prev-phase test obsoleted by Phase 8 populate)
 
 ### Pending Todos
 
@@ -186,6 +192,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-16T03:57:57.705Z
-Stopped at: Completed 08-01-test-harness-and-fixtures-PLAN.md
+Last session: 2026-04-16T04:04:33.524Z
+Stopped at: Completed 08-04-manual-track-and-docs-PLAN.md
 Resume file: None

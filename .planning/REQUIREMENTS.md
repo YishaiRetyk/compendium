@@ -51,11 +51,11 @@ Numbering continues from v1.0. New REQ-ID prefixes: `TMPL`, `NEUT`, `WZRD`, `MAN
 
 ### Manual Setup Track (MANUAL)
 
-- [ ] **MANUAL-01**: `/docs/manual-setup.md` walks section-by-section through `AGENTS.md` explaining what each section expects
-- [ ] **MANUAL-02**: `/docs/manual-setup.md` contains a concrete minimal-diff example from neutral starter → working personal-knowledge setup
-- [ ] **MANUAL-03**: `/docs/manual-setup.md` ends with a checklist that maps one-to-one to wizard prompts (wizard-manual isomorphism)
-- [ ] **MANUAL-04**: `/docs/manual-setup.md` includes explicit equivalence statement — wizard and manual produce the same end state
-- [ ] **MANUAL-05**: `/docs/manual-setup.md` lists every file the wizard touches and what it writes
+- [x] **MANUAL-01**: `/docs/manual-setup.md` walks section-by-section through `AGENTS.md` explaining what each section expects
+- [x] **MANUAL-02**: `/docs/manual-setup.md` contains a concrete minimal-diff example from neutral starter → working personal-knowledge setup
+- [x] **MANUAL-03**: `/docs/manual-setup.md` ends with a checklist that maps one-to-one to wizard prompts (wizard-manual isomorphism)
+- [x] **MANUAL-04**: `/docs/manual-setup.md` includes explicit equivalence statement — wizard and manual produce the same end state
+- [x] **MANUAL-05**: `/docs/manual-setup.md` lists every file the wizard touches and what it writes
 - [x] **MANUAL-06**: Byte-equality test: wizard output with canonical answers matches manual track's stated end state (pitfall M-1/M-3 mitigation)
 
 ### Collaborative PR Workflow (COLAB)
@@ -191,11 +191,11 @@ Explicitly excluded from v1.1. Documented to prevent scope creep.
 | WZRD-09 | Phase 8 | Pending |
 | WZRD-10 | Phase 8 | Pending |
 | WZRD-11 | Phase 8 | Pending |
-| MANUAL-01 | Phase 8 | Pending |
-| MANUAL-02 | Phase 8 | Pending |
-| MANUAL-03 | Phase 8 | Pending |
-| MANUAL-04 | Phase 8 | Pending |
-| MANUAL-05 | Phase 8 | Pending |
+| MANUAL-01 | Phase 8 | Complete |
+| MANUAL-02 | Phase 8 | Complete |
+| MANUAL-03 | Phase 8 | Complete |
+| MANUAL-04 | Phase 8 | Complete |
+| MANUAL-05 | Phase 8 | Complete |
 | MANUAL-06 | Phase 8 | Complete |
 | COLAB-01 | Phase 9 | Pending |
 | COLAB-02 | Phase 9 | Pending |
