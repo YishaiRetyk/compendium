@@ -3,13 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Shareability
 status: Ready to execute
-stopped_at: "Completed 09-02 plan (Plan 02: lint flags, JSON, CI, version)"
-last_updated: "2026-04-16T07:49:14.507Z"
+stopped_at: Completed 09-03-lint-strict-escape-hatch-contributor-PLAN.md
+last_updated: "2026-04-16T08:06:45.987Z"
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 16
-  completed_plans: 13
+  completed_plans: 14
+  percent: 88
 ---
 
 # Project State
@@ -24,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-04-15)
 ## Current Position
 
 Phase: 09 (collaborative-pr-workflow-ci-lint-gate) — EXECUTING
-Plan: 3 of 6
+Plan: 4 of 6
 
 ## Performance Metrics
 
@@ -79,6 +80,7 @@ Plan: 3 of 6
 | Phase 09-collaborative-pr-workflow-ci-lint-gate P01 | 4min | 2 tasks | 18 files |
 | Phase 09-collaborative-pr-workflow-ci-lint-gate P04 | 6min | 3 tasks | 11 files |
 | Phase 09-collaborative-pr-workflow-ci-lint-gate P02 | 8min | 2 tasks | 6 files |
+| Phase 09-collaborative-pr-workflow-ci-lint-gate P03 | 10min | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -202,6 +204,14 @@ Recent decisions affecting current work:
 - [Phase 09-02]: [Phase 09-02] --category/--skip-category precedence = intersect-then-subtract; narrow first (via existing should_run), skip subtracts; tested by --category X --skip-category X → empty
 - [Phase 09-02]: [Phase 09-02] --ci default-skip is drift-external only; DRFT-01/02/content-hash/index-coverage still emit as warnings — only DRFT-03 Obsidian-awareness is suppressed by default
 - [Phase 09-02]: [Phase 09-02] Parallel execution race: Task 2 commit content absorbed into concurrent 09-04 commit 8f08d17 (misattributed title). bin/lint.sh content + 3 test files correct at HEAD; all 5 tests green. Record for commit archaeology.
+- [Phase 09-03]: DR index collected wiki-wide (merged decisions are valid coverage); only the SET OF CLAIMS checked is PR-diff-scoped, the COVERAGE INDEX is historical
+- [Phase 09-03]: origin/main fallback: has_origin_main() probe + stderr WARN + wiki-wide _strict_check_fallback() walk; new-page provenance skipped in fallback (D-10 intrinsically PR-diff-scoped)
+- [Phase 09-03]: Escape-hatch marker strictness load-bearing: adjacent-line placement + blank-line-invalidates + id-match + non-empty reason (D-09); prevents stale markers drifting during edits
+- [Phase 09-03]: contributor category uses .git-author-map.txt two-space-arrow-two-space or tab separator; case-insensitive email match; D-20 single-author short-circuit silent (zero findings)
+- [Phase 09-03]: CI + --strict unified exit policy: exit 1 iff any post-remap error-severity finding; Plan 02 exit path extended to honor STRICT_MODE in both JSON and text modes
+- [Phase 09-03]: Fixture data Rule 3 fix: strict-missing-dr + strict-escape-hatch gained source summary pages + raw source files because attention.md's prov ref needed resolution under --strict exit-on-any-error policy
+- [Phase 09-03]: test_lint_strict_new_page.sh flips type to source WITH SOURCE_EXTRA_FIELDS injection + --category provenance isolation — isolates D-10 exempt assertion from unrelated yaml errors
+- [Phase 09-03]: strict PR-diff scope via git diff unified=0 origin/main...HEAD unified-diff parser (D-08); pre-existing debt on unchanged pages does NOT fail unrelated PRs (Codex HIGH resolution)
 
 ### Pending Todos
 
@@ -224,6 +234,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-16T07:49:14.504Z
-Stopped at: Completed 09-02 plan (Plan 02: lint flags, JSON, CI, version)
+Last session: 2026-04-16T08:06:45.984Z
+Stopped at: Completed 09-03-lint-strict-escape-hatch-contributor-PLAN.md
 Resume file: None
