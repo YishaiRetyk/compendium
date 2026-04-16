@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Shareability
 status: Ready to execute
-stopped_at: Completed 08-02-init-wizard-core-PLAN.md
-last_updated: "2026-04-16T04:07:44.986Z"
+stopped_at: Completed 08-03-wizard-side-effects-PLAN.md
+last_updated: "2026-04-16T04:20:40.149Z"
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 10
-  completed_plans: 8
+  completed_plans: 9
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-04-15)
 ## Current Position
 
 Phase: 08 (two-track-setup-wizard-manual) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 
 ## Performance Metrics
 
@@ -74,6 +74,7 @@ Plan: 4 of 5
 | Phase 08 P01 | 3 | 2 tasks | 7 files |
 | Phase 08-two-track-setup-wizard-manual P04 | 8min | 2 tasks | 12 files |
 | Phase 08-two-track-setup-wizard-manual P02 | 12min | 2 tasks | 10 files |
+| Phase 08-two-track-setup-wizard-manual P03 | 8min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -174,6 +175,11 @@ Recent decisions affecting current work:
 - [Phase 08-two-track-setup-wizard-manual]: [Phase 08-02] Prompts + D-13 explainers routed to stderr (not stdout) so command-substitution captures only validated values; fixed a latent interactive byte-equality bug caught in self-test
 - [Phase 08-two-track-setup-wizard-manual]: [Phase 08-02] Pure-bash parameter-expansion SCRIPT_DIR resolution (no 'dirname') to survive preflight PATH stripping in tests
 - [Phase 08-two-track-setup-wizard-manual]: [Phase 08-02] Exit-code 2 'not yet implemented — Plan 03 pending' gate as explicit branch before any write; Plan 03 removes it when repo-root writes land
+- [Phase 08-two-track-setup-wizard-manual]: [Phase 08-03] Idempotency guard scope retained Plan 02 semantics (triggers for both real-run and --render-to when .wizard-answers.yaml exists at REPO_ROOT); narrowing to real-run-only would have regressed test_wizard_idempotent.sh
+- [Phase 08-two-track-setup-wizard-manual]: [Phase 08-03] Staging-dir pattern (review #8): mkdtemp(dir=REPO_ROOT, prefix='.wizard-stage-') keeps staging on same filesystem as repo-root for atomic shutil.move rename; rmtree in finally block ensures cleanup on both success and failure
+- [Phase 08-two-track-setup-wizard-manual]: [Phase 08-03] update_index_md() 3 guardrails (review #2): idempotency (skip if exact entry present), duplicate-header (refuse >1 `## Decisions` with recovery message), malformed-recovery (clear pointer-to-manual-recovery error on missing/unreadable file)
+- [Phase 08-two-track-setup-wizard-manual]: [Phase 08-03] template_sha fallback chain (review #9): WIZARD_TEMPLATE_SHA env > git log -1 --format=%H schema/AGENTS.template.md > <unresolved> literal; CI must set env var (no fetch-depth: 2 reliance)
+- [Phase 08-two-track-setup-wizard-manual]: [Phase 08-03] Plan 02 exit-2 gate removed; test_wizard_not_yet_implemented.sh deleted; 5 new side-effect tests added (answers_yaml, decision_record, sync_claude, index_md, partial_failure); aggregator PHASE 08 TESTS: 20/20
 
 ### Pending Todos
 
@@ -196,6 +202,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-16T04:07:44.983Z
-Stopped at: Completed 08-02-init-wizard-core-PLAN.md
+Last session: 2026-04-16T04:20:40.145Z
+Stopped at: Completed 08-03-wizard-side-effects-PLAN.md
 Resume file: None
