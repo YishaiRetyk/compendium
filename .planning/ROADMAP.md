@@ -83,7 +83,7 @@ Plans:
 - [x] 09-02-lint-flags-json-ci-version-PLAN.md — bin/lint.sh flags: --format json, --ci severity remap, --skip-category, --version, --require-version (CI-02/03/04/08)
 - [x] 09-03-lint-strict-escape-hatch-contributor-PLAN.md — bin/lint.sh --strict (DR-match + new-page provenance), escape-hatch marker parser, --count-skips, contributor category (CI-06, COLAB-08)
 - [x] 09-04-privacy-ingest-search-contributor-PLAN.md — bin/check-privacy.sh standalone + bin/ingest.sh --contributor + bin/search.sh --contributor + .git-author-map.txt (CI-07, COLAB-04, COLAB-07)
-- [ ] 09-05-ci-workflow-agents-amendments-pr-template-PLAN.md — .github/workflows/lint.yml (3 parallel jobs) + json-to-annotations.py + PR template + AGENTS.md §§11.1/11.3/12 amendments (CI-01, CI-05, COLAB-02, COLAB-03)
+- [x] 09-05-ci-workflow-agents-amendments-pr-template-PLAN.md — .github/workflows/lint.yml (3 parallel jobs) + json-to-annotations.py + PR template + AGENTS.md §§11.1/11.3/12 amendments (CI-01, CI-05, COLAB-02, COLAB-03)
 - [ ] 09-06-contributing-docs-integration-PLAN.md — CONTRIBUTING.md + docs/reference/ci.md full populate + cross-links (COLAB-01/05/06, CI-09)
 
 ### Phase 10: Brownfield Scan + Bootstrap

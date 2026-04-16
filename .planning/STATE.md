@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Shareability
 status: Ready to execute
-stopped_at: Completed 09-03-lint-strict-escape-hatch-contributor-PLAN.md
-last_updated: "2026-04-16T08:06:45.987Z"
+stopped_at: Completed 09-05-ci-workflow-agents-amendments-pr-template-PLAN.md
+last_updated: "2026-04-16T08:18:22.540Z"
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 16
-  completed_plans: 14
-  percent: 88
+  completed_plans: 15
+  percent: 94
 ---
 
 # Project State
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-04-15)
 ## Current Position
 
 Phase: 09 (collaborative-pr-workflow-ci-lint-gate) — EXECUTING
-Plan: 4 of 6
+Plan: 5 of 6
 
 ## Performance Metrics
 
@@ -81,6 +81,7 @@ Plan: 4 of 6
 | Phase 09-collaborative-pr-workflow-ci-lint-gate P04 | 6min | 3 tasks | 11 files |
 | Phase 09-collaborative-pr-workflow-ci-lint-gate P02 | 8min | 2 tasks | 6 files |
 | Phase 09-collaborative-pr-workflow-ci-lint-gate P03 | 10min | 2 tasks | 11 files |
+| Phase 09-collaborative-pr-workflow-ci-lint-gate P05 | 6min | 3 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -212,6 +213,12 @@ Recent decisions affecting current work:
 - [Phase 09-03]: Fixture data Rule 3 fix: strict-missing-dr + strict-escape-hatch gained source summary pages + raw source files because attention.md's prov ref needed resolution under --strict exit-on-any-error policy
 - [Phase 09-03]: test_lint_strict_new_page.sh flips type to source WITH SOURCE_EXTRA_FIELDS injection + --category provenance isolation — isolates D-10 exempt assertion from unrelated yaml errors
 - [Phase 09-03]: strict PR-diff scope via git diff unified=0 origin/main...HEAD unified-diff parser (D-08); pre-existing debt on unchanged pages does NOT fail unrelated PRs (Codex HIGH resolution)
+- [Phase 09-collaborative-pr-workflow-ci-lint-gate]: [Phase 09-05] lint.yml uses 3 parallel jobs (no needs: edges) - fast feedback, each an independent required check in branch protection
+- [Phase 09-collaborative-pr-workflow-ci-lint-gate]: [Phase 09-05] annotation shim maps info -> ::notice (NOT ::info) - GitHub's workflow-command set has 3 tiers: error/warning/notice
+- [Phase 09-collaborative-pr-workflow-ci-lint-gate]: [Phase 09-05] annotation cap strategy: sort errors first (preserves critical findings under 10/10/50 cap), emit trailing ::notice with dropped count + 'more' token
+- [Phase 09-collaborative-pr-workflow-ci-lint-gate]: [Phase 09-05] AGENTS.md §11.3 CI-mode subsection opens with source-of-truth blockquote (Codex MEDIUM fix) - docs/reference/ci.md and CONTRIBUTING.md MUST link rather than restate policy
+- [Phase 09-collaborative-pr-workflow-ci-lint-gate]: [Phase 09-05] AGENTS.md §12 documents contributor:: @handle as Dataview inline BODY field (NOT frontmatter per §3 prohibition); single-author repos omit the field entirely
+- [Phase 09-collaborative-pr-workflow-ci-lint-gate]: [Phase 09-05] flag-based awk section extractor replaces range-pair in test_agents_section_*.sh - range pair collapses to 1 line when start regex is a subset of end regex (Rule 1 bug fix)
 
 ### Pending Todos
 
@@ -234,6 +241,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-16T08:06:45.984Z
-Stopped at: Completed 09-03-lint-strict-escape-hatch-contributor-PLAN.md
+Last session: 2026-04-16T08:18:08.267Z
+Stopped at: Completed 09-05-ci-workflow-agents-amendments-pr-template-PLAN.md
 Resume file: None
