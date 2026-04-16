@@ -30,18 +30,17 @@ for link in quickstart.md guided-setup.md manual-setup.md reference; do
   fi
 done
 
-# Quickstart stub markers
-grep -q 'Phase 8' docs/quickstart.md && pass "quickstart.md has Phase 8 stub marker" || fail "quickstart.md missing Phase 8 marker"
+# Quickstart content markers (updated Phase 8: stubs populated; Phase-8 marker no longer required post-population)
 grep -q 'bin/init-wizard.sh' docs/quickstart.md && pass "quickstart.md names bin/init-wizard.sh" || fail "quickstart.md missing bin/init-wizard.sh"
 grep -q 'bin/ingest.sh' docs/quickstart.md && pass "quickstart.md names bin/ingest.sh" || fail "quickstart.md missing bin/ingest.sh"
 grep -qi 'obsidian' docs/quickstart.md && pass "quickstart.md mentions Obsidian" || fail "quickstart.md missing Obsidian"
 
-# Quickstart is a stub (≤60 lines per D-11)
+# Quickstart size: stub was ≤60 lines per Phase 7 D-11; Phase 8 populates it but still targets ≤80 lines as a tutorial-length cap.
 LINES=$(wc -l < docs/quickstart.md)
-if [ "$LINES" -le 60 ]; then
-  pass "quickstart.md is ≤60 lines ($LINES lines) — stub, not full tutorial"
+if [ "$LINES" -le 80 ]; then
+  pass "quickstart.md is ≤80 lines ($LINES lines) — populated tutorial within cap"
 else
-  fail "quickstart.md is $LINES lines (must be ≤60 — D-11 stub constraint)"
+  fail "quickstart.md is $LINES lines (must be ≤80)"
 fi
 
 exit "$FAIL"
