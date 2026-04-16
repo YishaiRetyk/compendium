@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Shareability
 status: Ready to execute
-stopped_at: Completed 09-04-privacy-ingest-search-contributor-PLAN.md
-last_updated: "2026-04-16T07:48:54.108Z"
+stopped_at: "Completed 09-02 plan (Plan 02: lint flags, JSON, CI, version)"
+last_updated: "2026-04-16T07:49:14.507Z"
 progress:
   total_phases: 5
   completed_phases: 2
@@ -196,6 +196,12 @@ Recent decisions affecting current work:
 - [Phase 09-collaborative-pr-workflow-ci-lint-gate]: [Phase 09-04] bin/ingest.sh --contributor integration path (a): flag augments printed stdout log-entry template (LLM agent copies into wiki/log.md); bin/ingest.sh does not mutate log.md directly (preserves D-11/D-12/D-13 scope)
 - [Phase 09-collaborative-pr-workflow-ci-lint-gate]: [Phase 09-04] Contributor resolution order: explicit --contributor > single-author-omit (D-20) > .git-author-map.txt hit > map-miss-warn-and-omit (Pitfall 5: never bare email)
 - [Phase 09-collaborative-pr-workflow-ci-lint-gate]: [Phase 09-04] bin/search.sh --contributor branch placed before WIKI_INDEX validation so contributor mode works on fresh forks without wiki/index.md
+- [Phase 09-02]: [Phase 09-02] LINT_VERSION=1.1.0 ships as Phase-9 v1.1 baseline; semver MAJOR on breaking, MINOR on additions, PATCH on bug fixes; --require-version is minimum-check semantics
+- [Phase 09-02]: [Phase 09-02] drift-external is logical subcategory via EXTERNAL: message prefix (not a new add_finding category) — preserves 4-tuple backward compat + grep-friendly
+- [Phase 09-02]: [Phase 09-02] JSON line field OMITTED (not null) when unknown; Plan 02 4-tuple has no line slot so line always omitted for Plan 02 findings (P0 review fix — Codex MEDIUM #3)
+- [Phase 09-02]: [Phase 09-02] --category/--skip-category precedence = intersect-then-subtract; narrow first (via existing should_run), skip subtracts; tested by --category X --skip-category X → empty
+- [Phase 09-02]: [Phase 09-02] --ci default-skip is drift-external only; DRFT-01/02/content-hash/index-coverage still emit as warnings — only DRFT-03 Obsidian-awareness is suppressed by default
+- [Phase 09-02]: [Phase 09-02] Parallel execution race: Task 2 commit content absorbed into concurrent 09-04 commit 8f08d17 (misattributed title). bin/lint.sh content + 3 test files correct at HEAD; all 5 tests green. Record for commit archaeology.
 
 ### Pending Todos
 
@@ -218,6 +224,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-16T07:48:35.123Z
-Stopped at: Completed 09-04-privacy-ingest-search-contributor-PLAN.md
+Last session: 2026-04-16T07:49:14.504Z
+Stopped at: Completed 09-02 plan (Plan 02: lint flags, JSON, CI, version)
 Resume file: None
