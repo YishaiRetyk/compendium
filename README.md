@@ -1,4 +1,4 @@
-# Compendium
+# <org>/<repo>
 
 A local-first LLM knowledge compiler built on Obsidian, plain markdown, and git.
 
@@ -36,6 +36,8 @@ schema/                   Template and schema support files
 - git >= 2.30
 - [Obsidian](https://obsidian.md)
 - an LLM coding agent such as Claude Code or Codex
+
+On Windows, run all `bin/*.sh` helpers from Git Bash (shipped with [Git for Windows](https://git-scm.com/download/win)), not PowerShell or cmd.exe. See [`docs/reference/setup-prerequisites.md`](docs/reference/setup-prerequisites.md) for the full platform matrix.
 
 Some workflows require additional Python packages. Brownfield onboarding, in particular, has extra requirements documented in [`docs/reference/brownfield.md`](docs/reference/brownfield.md).
 
