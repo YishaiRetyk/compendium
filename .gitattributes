@@ -1,0 +1,7 @@
+*.md text eol=lf
+*.sh text eol=lf
+
+# Phase 8 byte-equality fixtures — pin LF to prevent CRLF drift on Windows checkouts (M-2 mitigation).
+schema/fixtures/canonical-AGENTS.md text eol=lf
+schema/fixtures/canonical-answers.yaml text eol=lf
+schema/fixtures/README.md text eol=lf

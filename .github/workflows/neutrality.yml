@@ -1,0 +1,43 @@
+# Neutrality + CLAUDE.md byte-equality CI gate.
+#
+# ENFORCEMENT MODEL (REVIEWS.md HIGH #6 on 07-05):
+#   - `pull_request` is the HARD GATE. Branch protection rules on the public
+#     repo MUST require passing runs of this workflow on PR before merging.
+#     This is the actual enforcement lever; the workflow itself only reports.
+#   - `push` to `main` is ADVISORY ONLY. It runs after the PR is already merged
+#     and cannot prevent bad code from reaching main — branch protection does
+#     that. The push trigger exists for post-merge visibility only.
+#
+# Operator action required on the public remote:
+#   Settings -> Branches -> Branch protection rule for `main`:
+#     [x] Require status checks to pass before merging
+#     [x] Require branches to be up to date before merging
+#         Required checks: neutrality
+#
+# See: docs/reference/ci.md (to be populated in Phase 9) for the full
+# severity policy, GitLab/Gitea/Codeberg equivalents, and privacy-leak
+# guard documentation.
+name: Neutrality + CLAUDE.md Drift
+
+on:
+  pull_request:
+  # Advisory only -- see enforcement model note above.
+  push:
+    branches: [main]
+
+jobs:
+  neutrality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install PyYAML
+        run: pip install pyyaml
+      - name: Neutrality gate (NEUT-06 + NEUT-08)
+        run: bash bin/check-neutrality.sh
+      - name: CLAUDE.md <-> AGENTS.md byte-equality (TMPL-10 D-03)
+        run: bash bin/sync-claude.sh --check
+      - name: Phase 7 test suite
+        run: bash tests/phase-07/run.sh

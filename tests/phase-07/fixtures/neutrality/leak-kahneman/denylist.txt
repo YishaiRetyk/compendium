@@ -1,0 +1,5 @@
+# Kahneman terms
+kahneman
+prospect theory
+# Personal terms
+personal-term-xyz

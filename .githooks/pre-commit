@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Pre-commit hook: enforce AGENTS.md <-> CLAUDE.md byte-equality (D-03).
+set -euo pipefail
+
+if ! bash bin/sync-claude.sh --check 2>/dev/null; then
+    echo "CLAUDE.md drift detected. Auto-syncing..." >&2
+    bash bin/sync-claude.sh
+    git add CLAUDE.md
+    echo "CLAUDE.md resynced and re-staged. Re-run commit." >&2
+    exit 1
+fi

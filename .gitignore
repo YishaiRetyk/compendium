@@ -1,0 +1,17 @@
+# Obsidian noise
+.obsidian/workspace*.json
+.obsidian/cache
+.trash/
+
+# Brownfield workflow artifacts
+.brownfield/
+
+# Planning (private; not for public template)
+.planning/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/

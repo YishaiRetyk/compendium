@@ -1,0 +1,9 @@
+# .obsidianignore — STARTER DEFAULT.
+# This file hides examples/ from the Obsidian graph view + content indexing
+# so the bundled Kahneman reference cluster does not pollute your personal
+# vault's graph. It is shipped as a sensible default for new template users.
+#
+# Safe to delete: if you want examples/ visible in your Obsidian graph
+# (e.g., to study the reference cluster as part of your own knowledge base),
+# delete this file or remove the `examples/` line below.
+examples/

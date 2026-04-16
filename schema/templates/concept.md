@@ -1,0 +1,47 @@
+---
+id:
+title:
+type: concept
+status: active
+summary: ""
+created_at:
+updated_at:
+sources: []
+epistemic_status:
+tags: []
+domains: []
+supersedes:
+superseded_by:
+privacy:
+aliases: []
+---
+
+<!-- FORBIDDEN PATTERNS (see AGENTS.md section 3):
+     - No wikilinks in frontmatter (use plain string IDs in sources[], supersedes, etc.)
+     - No display aliases: write [[Page Title]] not [[Page Title|Alias]]
+     - Link each page only on first mention in the body
+     - No example content in this template -- fill with real content when using -->
+
+## TL;DR
+
+<!-- Subject is an abstract idea, theory, methodology, or framework. Summarize the core idea. -->
+<!-- 1 short paragraph or 2-4 bullets. Must be scannable in seconds. -->
+
+## Key Facts
+
+<!-- Compact bullets with inline provenance and epistemic markers.
+     Format: - Claim text [prov:source_id#locator|support_type] [epistemic:: status] -->
+
+## Detail
+
+<!-- Full narrative, synthesis, caveats. Long-form prose goes here. -->
+
+## Related Pages
+
+<!-- Wikilinks to connected pages. Link on first mention only.
+     Use [[Page Title]] format. Do NOT use display aliases like [[Page|Alias]]. -->
+
+## Sources
+
+<!-- Human-readable source list with wikilinks to source summary pages.
+     Format: - [[src-YYYY-MM-DD-slug]]: "Title" (date) -->
