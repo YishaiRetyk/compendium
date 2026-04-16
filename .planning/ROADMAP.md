@@ -88,13 +88,14 @@ Plans:
 
 ### Phase 09.1: Progressive Disclosure Extraction (INSERTED)
 
-**Goal:** [Urgent work - to be planned]
+**Goal**: Reduce `AGENTS.md`/`CLAUDE.md` (~1,785 lines) by extracting §4 worked examples to `schema/examples/<type>.md` (6 files) and §16 Appendices A & B to `docs/reference/{dataview-queries,commit-examples}.md` (2 files); preserve byte-equality (AGENTS.md ≡ CLAUDE.md), canonical-fixture parity (setup-parity CI), Codex agent-parity, and the "sole authoritative specification" framing via uniform `See: <path>` pointers matching §§11.1/11.2/12 convention.
 **Requirements**: TBD
 **Depends on:** Phase 9
-**Plans:** 0 plans
+**Plans:** 2 plans
 
 Plans:
-- [ ] TBD (run /gsd-plan-phase 09.1 to break down)
+- [ ] 09.1-01-PLAN.md — Wave-0 test scaffolding (tests/phase-09.1/run.sh + lib.sh + 10 RED tests asserting I-1..I-15 extraction invariants)
+- [ ] 09.1-02-PLAN.md — Atomic extraction: 6 schema/examples/* + 2 docs/reference/* + DR; edit AGENTS.md + schema/AGENTS.template.md residue; regenerate canonical fixture; update wiki/index.md Decisions; CLAUDE.md auto-syncs via pre-commit hook
 
 ### Phase 10: Brownfield Scan + Bootstrap
 **Goal**: A user with a real existing Obsidian vault can run `bin/brownfield.sh scan` safely (no vault mutation) and `bin/brownfield.sh bootstrap` confidently (mechanical-only, idempotent, byte-exact reproducible) without corrupting frontmatter or losing content.
