@@ -1,0 +1,15 @@
+# .git-author-map.txt -- email -> GitHub handle map for bin/ingest.sh auto-detect.
+#
+# Format: "<email>  ->  @<github-handle>"
+#   - Two-space-arrow-two-space separator (or a single tab)
+#   - One mapping per line
+#   - Comments start with #
+#   - Email match is case-insensitive
+#
+# Single-author repos can leave this file empty with just this header --
+# bin/ingest.sh detects single-author (git log --all --format='%ae' | sort -u | wc -l == 1)
+# and omits the contributor:: field entirely. Multi-author repos add mappings
+# as contributors onboard.
+#
+# Example:
+#   octocat@github.com  ->  @octocat
