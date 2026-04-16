@@ -10,17 +10,23 @@ source "$SCRIPT_DIR/lib.sh"
 
 A="$REPO_ROOT/AGENTS.md"
 
-# I-7: Appendix A pointer present, former content absent
+# Extract just §16 body (from '## 16.' to EOF) to scope the absence-of-old-content checks.
+# Without this, the absence checks would false-fail on pre-existing inline content elsewhere
+# (e.g., the `reflect(q1-review): restructure AI safety domain` example also appears in the
+# §3 commit-conventions table at line ~99 and is unrelated to §16 Appendix B).
+S16=$(awk '/^## 16\. Appendices and Examples/{inside=1} inside==1{print}' "$A")
+
+# I-7: Appendix A pointer present, former content absent (§16-scoped)
 grep -q 'docs/reference/dataview-queries\.md' "$A" \
     || { echo "FAIL: §16 missing docs/reference/dataview-queries.md pointer" >&2; exit 1; }
-! grep -q 'TABLE summary, epistemic_status, updated_at' "$A" \
-    || { echo "FAIL: §16 still contains former Appendix A Dataview block" >&2; exit 1; }
+echo "$S16" | grep -q 'TABLE summary, epistemic_status, updated_at' \
+    && { echo "FAIL: §16 still contains former Appendix A Dataview block" >&2; exit 1; } || true
 
-# I-8: Appendix B pointer present, former content absent
+# I-8: Appendix B pointer present, former content absent (§16-scoped)
 grep -q 'docs/reference/commit-examples\.md' "$A" \
     || { echo "FAIL: §16 missing docs/reference/commit-examples.md pointer" >&2; exit 1; }
-! grep -q 'reflect(q1-review): restructure AI safety domain' "$A" \
-    || { echo "FAIL: §16 still contains former Appendix B commit example" >&2; exit 1; }
+echo "$S16" | grep -q 'reflect(q1-review): restructure AI safety domain' \
+    && { echo "FAIL: §16 still contains former Appendix B commit example" >&2; exit 1; } || true
 
 # I-9: Appendix C preserved verbatim. R7 review consensus: use grep -F fixed-string matches
 # (no regex metachars) to pin the EXACT literal text from AGENTS.md §16. Brittle regex-based

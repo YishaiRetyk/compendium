@@ -132,7 +132,7 @@ Red links (wikilinks to non-existent pages) are allowed and intentional. They si
 
 ## 4. Page Types and Templates
 
-Five page types exist. Each has a defined purpose, section order, and frontmatter requirements.
+Six page types exist. Each has a defined purpose, section order, and frontmatter requirements.
 
 ### 4.1 Entity (`type: entity`)
 
@@ -142,59 +142,9 @@ Five page types exist. Each has a defined purpose, section order, and frontmatte
 
 **When to use:** The subject has a proper name and is a concrete thing (not an abstract idea).
 
-**Worked example:**
+**Example:** Geoffrey Hinton. Demonstrates minimal aliases (single "Geoff Hinton"), mixed-locator Key Facts (bare `sec:`, `sec:` + `direct`, and `sec:` + `direct` + `checked_at`), and the Related-Pages link-on-first-mention convention.
 
-```markdown
----
-id: geoffrey-hinton
-title: Geoffrey Hinton
-type: entity
-status: active
-summary: "British-Canadian computer scientist, pioneer of deep learning and neural networks."
-created_at: 2026-04-08
-updated_at: 2026-04-08
-sources:
-  - src-2026-03-20-hinton-interview
-epistemic_status: sourced
-tags:
-  - researcher
-  - deep-learning
-domains:
-  - ai-research
-supersedes:
-superseded_by:
-privacy: cloud_safe
-aliases:
-  - Geoff Hinton
----
-
-## TL;DR
-
-Geoffrey Hinton is a pioneer of [[Deep Learning]] and co-inventor of [[Backpropagation]]. He shared the 2018 Turing Award with [[Yoshua Bengio]] and [[Yann LeCun]].
-
-## Key Facts
-
-- Co-invented backpropagation algorithm for training neural networks [prov:src-2026-03-20-hinton-interview#sec:early-work]
-- Pioneered deep belief networks and restricted Boltzmann machines [prov:src-2026-03-20-hinton-interview#sec:contributions|direct]
-- Left Google in 2023 citing concerns about AI safety [prov:src-2026-03-20-hinton-interview#sec:google-departure|direct|2026-04-08]
-
-## Detail
-
-Geoffrey Hinton spent decades working on neural networks when they were considered a dead end by much of the AI research community. His persistence led to breakthroughs in deep belief networks (2006) and later contributed to the deep learning revolution. His backpropagation work with David Rumelhart and Ronald Williams provided the foundational training algorithm still used today.
-
-In 2023, Hinton resigned from Google to speak freely about AI safety risks, particularly the potential for AI systems to become more intelligent than humans. He has since been vocal about the need for regulation and safety research.
-
-## Related Pages
-
-- [[Deep Learning]]
-- [[Backpropagation]]
-- [[Neural Networks]]
-- [[AI Safety]]
-
-## Sources
-
-- [[src-2026-03-20-hinton-interview]]: "Geoffrey Hinton Interview on AI Safety" (2026-03-20)
-```
+See: schema/examples/entity.md for a concrete filled-in instance.
 
 ### 4.2 Concept (`type: concept`)
 
@@ -204,66 +154,9 @@ In 2023, Hinton resigned from Google to speak freely about AI safety risks, part
 
 **When to use:** The subject is an abstract idea, theory, methodology, or framework -- not a specific named entity.
 
-**Worked example:**
+**Example:** Attention Mechanism. Demonstrates multi-source sourced claims (two sources in frontmatter), three-locator-shape Key Facts (`sec:introduction`, `sec:self-attention`, `p5`), and Related-Pages cross-referencing to entity and concept siblings.
 
-```markdown
----
-id: attention-mechanism
-title: Attention Mechanism
-type: concept
-status: active
-summary: "A neural network component that allows models to focus on relevant parts of the input sequence."
-created_at: 2026-04-08
-updated_at: 2026-04-08
-sources:
-  - src-2026-03-15-vaswani-attention
-  - src-2026-04-01-bahdanau-alignment
-epistemic_status: sourced
-tags:
-  - machine-learning
-  - transformers
-  - deep-learning
-domains:
-  - ai-research
-supersedes:
-superseded_by:
-privacy: cloud_safe
-aliases:
-  - Attention
-  - Self-Attention
----
-
-## TL;DR
-
-Attention mechanisms allow neural networks to dynamically focus on relevant parts of the input when producing each part of the output. Introduced for sequence-to-sequence models by Bahdanau et al. and generalized as the core component of the [[Transformer Architecture]] by Vaswani et al.
-
-## Key Facts
-
-- Computes weighted sum of input representations, where weights reflect relevance to the current output [prov:src-2026-03-15-vaswani-attention#sec:introduction|direct|2026-04-08]
-- Self-attention relates different positions within a single sequence to compute a representation of that sequence [prov:src-2026-03-15-vaswani-attention#sec:self-attention|direct|2026-04-08]
-- Multi-head attention runs multiple attention functions in parallel, enabling the model to attend to information from different representation subspaces [prov:src-2026-03-15-vaswani-attention#p5|direct|2026-04-08]
-- Originally introduced for alignment in machine translation by Bahdanau et al. [prov:src-2026-04-01-bahdanau-alignment#sec:introduction|direct|2026-04-08]
-
-## Detail
-
-The attention mechanism was first proposed as a solution to the information bottleneck in encoder-decoder architectures. Traditional sequence-to-sequence models compress the entire input into a single fixed-length vector, which degrades performance on long sequences. Attention allows the decoder to look back at all encoder hidden states.
-
-Vaswani et al. extended this idea to self-attention in the Transformer architecture, removing the need for recurrence entirely. The Transformer uses scaled dot-product attention: Q (queries), K (keys), and V (values) are linear projections of the input, and attention weights are computed as softmax(QK^T / sqrt(d_k)).
-
-Multi-head attention applies this mechanism multiple times in parallel with different learned projections, then concatenates and linearly transforms the results. This allows the model to jointly attend to information from different positions and representation subspaces.
-
-## Related Pages
-
-- [[Transformer Architecture]]
-- [[Deep Learning]]
-- [[Machine Translation]]
-- [[BERT]]
-
-## Sources
-
-- [[src-2026-03-15-vaswani-attention]]: Vaswani et al. "Attention Is All You Need" (2017)
-- [[src-2026-04-01-bahdanau-alignment]]: Bahdanau et al. "Neural Machine Translation by Jointly Learning to Align and Translate" (2014)
-```
+See: schema/examples/concept.md for a concrete filled-in instance.
 
 ### 4.3 Source Summary (`type: source`)
 
@@ -283,65 +176,9 @@ Multi-head attention applies this mechanism multiple times in parallel with diff
 | `ingested_at` | date | When the source was processed |
 | `source_type` | enum | `article`, `paper`, `transcript`, `journal`, `data`, `image` |
 
-**Worked example:**
+**Example:** "Vaswani et al. - Attention Is All You Need" (`type: source`, `source_type: paper`; filename `schema/examples/source-summary.md` matches the `schema/templates/` sibling — readers should NOT expect `schema/examples/source.md`). Demonstrates full population of `path` / `url` / `content_hash` / `ingested_at` / `source_type`, Extracted Claims with direct-quote provenance, and the Source Metadata authors / published block.
 
-```markdown
----
-id: src-2026-03-15-vaswani-attention
-title: "Vaswani et al. - Attention Is All You Need"
-type: source
-status: active
-summary: "Seminal paper introducing the Transformer architecture based entirely on attention mechanisms."
-created_at: 2026-04-08
-updated_at: 2026-04-08
-sources: []
-epistemic_status: sourced
-tags:
-  - transformers
-  - attention
-  - deep-learning
-domains:
-  - ai-research
-supersedes:
-superseded_by:
-privacy: cloud_safe
-aliases:
-  - Attention Is All You Need
-path: sources/2026/2026-03/2026-03-15-vaswani-attention/source.md
-url: "https://arxiv.org/abs/1706.03762"
-content_hash: "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-ingested_at: 2026-04-08
-source_type: paper
----
-
-## TL;DR
-
-Introduces the Transformer, a sequence-to-sequence architecture that replaces recurrence and convolutions entirely with self-attention. Achieves state-of-the-art results on machine translation benchmarks.
-
-## Key Takeaways
-
-- Attention alone (without recurrence or convolution) is sufficient for sequence transduction [prov:src-2026-03-15-vaswani-attention#sec:introduction|direct|2026-04-08]
-- The Transformer trains significantly faster than architectures based on recurrent or convolutional layers [prov:src-2026-03-15-vaswani-attention#sec:training|direct|2026-04-08]
-- Multi-head attention is more beneficial than single-head attention with equivalent computational cost [prov:src-2026-03-15-vaswani-attention#sec:experiments|direct|2026-04-08]
-
-## Extracted Claims
-
-- "The Transformer achieves 28.4 BLEU on the WMT 2014 English-to-German translation task, improving over the existing best results by over 2 BLEU" [prov:src-2026-03-15-vaswani-attention#p8|direct|2026-04-08]
-- "The Transformer achieves 41.8 BLEU on the WMT 2014 English-to-French translation task, outperforming all previously published single models" [prov:src-2026-03-15-vaswani-attention#p8|direct|2026-04-08]
-- "Training took 3.5 days on 8 P100 GPUs for the base model" [prov:src-2026-03-15-vaswani-attention#sec:training|direct|2026-04-08]
-
-## Notes
-
-This paper is one of the most cited in machine learning history. The Transformer architecture became the foundation for [[BERT]], [[GPT]], and virtually all modern large language models. The "Attention Is All You Need" title has become iconic.
-
-## Source Metadata
-
-- **Source type:** paper
-- **Authors:** Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz Kaiser, Illia Polosukhin
-- **Published:** 2017
-- **Path:** `sources/2026/2026-03/2026-03-15-vaswani-attention/source.md`
-- **URL:** https://arxiv.org/abs/1706.03762
-```
+See: schema/examples/source-summary.md for a concrete filled-in instance.
 
 ### 4.4 Comparison (`type: comparison`)
 
@@ -351,64 +188,9 @@ This paper is one of the most cited in machine learning history. The Transformer
 
 **When to use:** When two or more subjects need structured side-by-side analysis.
 
-**Worked example:**
+**Example:** RNNs vs Transformers. Demonstrates the Bottom Line + Comparison Table + Detailed Comparison three-tier structure, mixed-source `sources` list in frontmatter, and domain-spanning dimension rows.
 
-```markdown
----
-id: rnns-vs-transformers
-title: "RNNs vs Transformers"
-type: comparison
-status: active
-summary: "Comparison of recurrent neural networks and Transformer architectures for sequence modeling."
-created_at: 2026-04-08
-updated_at: 2026-04-08
-sources:
-  - src-2026-03-15-vaswani-attention
-  - src-2026-04-02-lstm-survey
-epistemic_status: sourced
-tags:
-  - architecture-comparison
-  - deep-learning
-domains:
-  - ai-research
-supersedes:
-superseded_by:
-privacy: cloud_safe
-aliases: []
----
-
-## TL;DR
-
-Transformers have largely replaced RNNs for most sequence tasks due to superior parallelization and performance at scale. RNNs remain relevant for low-resource settings and tasks requiring strict sequential processing.
-
-## Bottom Line
-
-Use Transformers for most sequence tasks, especially when data and compute are abundant. Consider RNNs only when hardware constraints are severe or the task genuinely requires online sequential processing.
-
-## Comparison Table
-
-| Dimension | RNNs (LSTM/GRU) | Transformers |
-|-----------|------------------|--------------|
-| **Parallelization** | Sequential (hard to parallelize) | Fully parallel |
-| **Long-range dependencies** | Struggles with very long sequences | Handles well via self-attention |
-| **Training speed** | Slow (sequential bottleneck) | Fast (parallel computation) |
-| **Memory footprint** | Linear in sequence length | Quadratic in sequence length (attention matrix) |
-| **Performance at scale** | Plateaus earlier | Scales with data and parameters |
-| **Best for** | Low-resource, streaming, online tasks | Most NLP, vision, and multimodal tasks |
-
-## Detailed Comparison
-
-**Architecture:** RNNs process sequences one element at a time, maintaining a hidden state that carries information forward. This sequential nature makes them inherently difficult to parallelize. Transformers process all positions simultaneously using self-attention, with positional encodings providing sequence order information [prov:src-2026-03-15-vaswani-attention#sec:introduction|direct|2026-04-08].
-
-**Scaling:** The Transformer architecture has proven remarkably scalable. Models like GPT and BERT demonstrate that increasing parameters and training data yields consistent improvements. RNNs show diminishing returns at scale, partly due to the information bottleneck of the hidden state.
-
-**Memory:** Standard self-attention has O(n^2) memory complexity in sequence length, which can be prohibitive for very long sequences. Various efficient attention variants (linear attention, sparse attention) address this. RNNs have O(n) memory complexity but carry the sequential processing cost.
-
-## Sources
-
-- [[src-2026-03-15-vaswani-attention]]: Vaswani et al. "Attention Is All You Need" (2017)
-- [[src-2026-04-02-lstm-survey]]: "A Survey of LSTM and GRU Architectures" (2026-04-02)
-```
+See: schema/examples/comparison.md for a concrete filled-in instance.
 
 ### 4.5 Overview (`type: overview`)
 
@@ -418,67 +200,9 @@ Use Transformers for most sequence tasks, especially when data and compute are a
 
 **When to use:** When a broad topic needs a synthesis page that ties together multiple entities, concepts, and sources.
 
-**Worked example:**
+**Example:** Deep Learning. Demonstrates synthesis across 3 sources (frontmatter list + body provenance), four-claim Key Facts with domain-internal wikilinks to entity and concept siblings, and Related-Pages as a navigation hub.
 
-```markdown
----
-id: deep-learning
-title: Deep Learning
-type: overview
-status: active
-summary: "High-level overview of deep learning: history, key architectures, and current state."
-created_at: 2026-04-08
-updated_at: 2026-04-08
-sources:
-  - src-2026-03-15-vaswani-attention
-  - src-2026-03-20-hinton-interview
-  - src-2026-04-02-lstm-survey
-epistemic_status: sourced
-tags:
-  - machine-learning
-  - neural-networks
-domains:
-  - ai-research
-supersedes:
-superseded_by:
-privacy: cloud_safe
-aliases:
-  - DL
----
-
-## TL;DR
-
-Deep learning is a subset of machine learning using neural networks with multiple layers. It has driven breakthroughs in vision, language, and generative AI since 2012. Key architectures include CNNs, RNNs/LSTMs, and [[Transformer Architecture|Transformers]].
-
-## Key Facts
-
-- Deep learning became practically viable after GPU training and large datasets became available (circa 2012) [prov:src-2026-03-20-hinton-interview#sec:early-work|direct|2026-04-08]
-- The Transformer architecture (2017) replaced recurrence with self-attention and became the foundation for modern LLMs [prov:src-2026-03-15-vaswani-attention#sec:introduction|direct|2026-04-08]
-- [[Geoffrey Hinton]], [[Yoshua Bengio]], and [[Yann LeCun]] received the 2018 Turing Award for their foundational work [prov:src-2026-03-20-hinton-interview#sec:contributions|direct|2026-04-08]
-- RNNs/LSTMs dominated sequence tasks before Transformers but are now largely superseded [prov:src-2026-04-02-lstm-survey#sec:conclusion|direct|2026-04-08]
-
-## Detail
-
-Deep learning emerged from decades of work on artificial neural networks. The field experienced several "AI winters" where interest and funding waned, but researchers like Geoffrey Hinton persisted. The combination of large datasets (ImageNet), powerful GPUs, and algorithmic improvements (dropout, batch normalization, residual connections) led to the modern deep learning era.
-
-Key milestones include AlexNet's ImageNet victory (2012), the introduction of GANs (2014), the Transformer architecture (2017), BERT (2018), and GPT-3 (2020). Each built on previous work and expanded the range of tasks deep learning could handle.
-
-Current challenges include interpretability, energy consumption, safety alignment, and the concentration of compute resources. The field continues to evolve rapidly, with new architectures and training paradigms emerging regularly.
-
-## Related Pages
-
-- [[Transformer Architecture]]
-- [[Geoffrey Hinton]]
-- [[Attention Mechanism]]
-- [[Neural Networks]]
-- [[AI Safety]]
-
-## Sources
-
-- [[src-2026-03-15-vaswani-attention]]: Vaswani et al. "Attention Is All You Need" (2017)
-- [[src-2026-03-20-hinton-interview]]: "Geoffrey Hinton Interview on AI Safety" (2026-03-20)
-- [[src-2026-04-02-lstm-survey]]: "A Survey of LSTM and GRU Architectures" (2026-04-02)
-```
+See: schema/examples/overview.md for a concrete filled-in instance.
 
 ### 4.6 Decision (`type: decision`)
 
@@ -520,44 +244,9 @@ Decision records capture why structural changes were made to the wiki. They answ
 
 **`decision_history` back-link:** Pages affected by a decision gain a `decision_history` field in their frontmatter -- a YAML list of decision record IDs. This field is optional (not part of BASE_FIELDS); it is added when the first decision references a page. A visible "Decision History" section in the page body is optional -- include only when the history is meaningful for readers.
 
-**Worked example:**
+**Example:** Introduce Decision Record Page Type (`dr-2026-04-14-phase6-decision-type`). Demonstrates `trigger_type: schema-update` classification, empty `affected_pages: []` for an infrastructure record, and the Why-section-names-replaced-framing pattern.
 
-```markdown
----
-id: dr-2026-04-14-phase6-decision-type
-title: "Introduce Decision Record Page Type"
-type: decision
-status: active
-summary: "Decision records are a dedicated page type (type: decision) with their own template, directory (wiki/decisions/), and index category, rather than overloading the overview type."
-created_at: 2026-04-14
-updated_at: 2026-04-14
-sources: []
-epistemic_status: sourced
-tags:
-  - meta
-  - schema
-domains:
-  - wiki-infrastructure
-privacy: cloud_safe
-knowledge_domain: software
-trigger_type: schema-update
-affected_pages: []
----
-
-## TL;DR
-
-Decision records get a dedicated `type: decision` page type with their own template, directory, and index category, replacing the prior convention of storing them as overview pages.
-
-## Decision
-
-Created `wiki/decisions/` as a first-class content directory, `schema/templates/decision.md` as the canonical template, and added `decision` to the `type` enum. Decision records use a fixed section ordering and introduce two type-specific frontmatter fields (`trigger_type`, `affected_pages`).
-
-## Why
-
-The previous reflect workflow stored decision records as overview pages in `wiki/overviews/`, conflating structural reasoning with topic synthesis. The framing adopted is "decision records as a first-class page type." The framing it replaced is "decision records overloaded onto the overview type."
-
-(...remaining sections: Alternatives Considered, Consequences, Affected Pages, Sources.)
-```
+See: schema/examples/decision.md for a concrete filled-in instance.
 
 ## 5. Frontmatter Schema
 
@@ -1639,73 +1328,11 @@ When provenance queries, search, or concurrency become awkward in pure markdown.
 
 ### Appendix A: Dataview Query Examples
 
-**List all active entity pages:**
-
-````markdown
-```dataview
-TABLE summary, epistemic_status, updated_at
-FROM "wiki/entities"
-WHERE status = "active"
-SORT updated_at DESC
-```
-````
-
-**List all sources by domain:**
-
-````markdown
-```dataview
-TABLE source_type, ingested_at, content_hash
-FROM "wiki/sources"
-WHERE contains(domains, "ai-research")
-SORT ingested_at DESC
-```
-````
-
-**List stale pages across the entire wiki:**
-
-````markdown
-```dataview
-LIST
-FROM "wiki"
-WHERE epistemic_status = "stale"
-SORT updated_at ASC
-```
-````
-
-**Find pages missing privacy classification:**
-
-````markdown
-```dataview
-LIST
-FROM "wiki"
-WHERE !privacy
-```
-````
-
-**List all pages in a specific domain:**
-
-````markdown
-```dataview
-TABLE title, type, epistemic_status
-FROM "wiki"
-WHERE contains(domains, "ai-research") AND status = "active"
-SORT type ASC
-```
-````
+See `docs/reference/dataview-queries.md` for five Dataview query patterns (active entities, sources by domain, stale pages, missing privacy classification, pages in a domain).
 
 ### Appendix B: Commit Message Examples
 
-```
-schema: define base frontmatter fields and page type conventions
-ingest(hinton-interview): add source summary and update entity pages
-ingest(vaswani-attention): create source summary with 3 extracted claims, update attention mechanism page
-query(attention-mechanisms): synthesize comparison of attention variants
-query(ai-safety-timeline): create overview page from 4 existing sources
-lint(wiki): fix 3 orphan pages and 2 broken provenance references
-lint(entities): update 5 stale epistemic_status markers
-reflect(q1-review): restructure AI safety domain after new sources
-reflect(domain-split): separate neuroscience from ai-research domain
-```
+See `docs/reference/commit-examples.md` for representative commit messages per workflow type (schema/ingest/query/lint/reflect).
 
 ### Appendix C: Quick Reference Card
 

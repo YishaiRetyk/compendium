@@ -11,7 +11,7 @@ CE="$REPO_ROOT/docs/reference/commit-examples.md"
 # I-10
 test -f "$DQ" || { echo "FAIL: $DQ missing" >&2; exit 1; }
 dataview_count="$(grep -cE '^```dataview$' "$DQ")"
-[ "$dataview_count" -eq 5 ] || { echo "FAIL: expected 5 '```dataview' blocks in dataview-queries.md, found $dataview_count" >&2; exit 1; }
+[ "$dataview_count" -eq 5 ] || { echo "FAIL: expected 5 dataview fence opens in dataview-queries.md, found $dataview_count" >&2; exit 1; }
 
 # I-11
 test -f "$CE" || { echo "FAIL: $CE missing" >&2; exit 1; }
