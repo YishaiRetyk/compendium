@@ -75,6 +75,7 @@ Modes:
   --render-to <dir>       (internal — CI/testing only) Write rendered files to <dir> instead
                           of repo root. Used by tests and CI; not intended as a user-facing
                           flag. Combine with --answers-file for non-interactive.
+  --help, -h              Show this help and exit.
 
 Exit codes:
   0  success
