@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Shareability
 status: Ready to execute
-stopped_at: Completed 08-04-manual-track-and-docs-PLAN.md
-last_updated: "2026-04-16T04:04:33.527Z"
+stopped_at: Completed 08-02-init-wizard-core-PLAN.md
+last_updated: "2026-04-16T04:07:44.986Z"
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 10
-  completed_plans: 7
+  completed_plans: 8
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-04-15)
 ## Current Position
 
 Phase: 08 (two-track-setup-wizard-manual) — EXECUTING
-Plan: 3 of 5
+Plan: 4 of 5
 
 ## Performance Metrics
 
@@ -73,6 +73,7 @@ Plan: 3 of 5
 | Phase 07 P05 | 65min | 5 tasks | 13 files |
 | Phase 08 P01 | 3 | 2 tasks | 7 files |
 | Phase 08-two-track-setup-wizard-manual P04 | 8min | 2 tasks | 12 files |
+| Phase 08-two-track-setup-wizard-manual P02 | 12min | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -170,6 +171,9 @@ Recent decisions affecting current work:
 - [Phase 08-04]: docs/reference/setup-prerequisites.md centralizes bash>=4/git/python3 install matrix for macOS/Debian/Arch/Fedora/Windows (D-16)
 - [Phase 08-04]: Privacy tier cloud_safe in walkthrough (deviates from wizard prompt default local_only per D-11) to match canonical public fixture per D-08/Open-Q2
 - [Phase 08-04]: Phase-07 test_docs_skeleton.sh relaxed: dropped 'Phase 8' stub-marker assertion + raised quickstart ≤60→≤80 line cap (Rule 3 — prev-phase test obsoleted by Phase 8 populate)
+- [Phase 08-two-track-setup-wizard-manual]: [Phase 08-02] Prompts + D-13 explainers routed to stderr (not stdout) so command-substitution captures only validated values; fixed a latent interactive byte-equality bug caught in self-test
+- [Phase 08-two-track-setup-wizard-manual]: [Phase 08-02] Pure-bash parameter-expansion SCRIPT_DIR resolution (no 'dirname') to survive preflight PATH stripping in tests
+- [Phase 08-two-track-setup-wizard-manual]: [Phase 08-02] Exit-code 2 'not yet implemented — Plan 03 pending' gate as explicit branch before any write; Plan 03 removes it when repo-root writes land
 
 ### Pending Todos
 
@@ -192,6 +196,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-16T04:04:33.524Z
-Stopped at: Completed 08-04-manual-track-and-docs-PLAN.md
+Last session: 2026-04-16T04:07:44.983Z
+Stopped at: Completed 08-02-init-wizard-core-PLAN.md
 Resume file: None
