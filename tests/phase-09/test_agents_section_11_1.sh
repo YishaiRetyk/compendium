@@ -6,8 +6,8 @@ source "$SCRIPT_DIR/lib.sh"
 
 A="$REPO_ROOT/AGENTS.md"
 
-# Extract §11.1 section body (from "### 11.1" to next "### 11.")
-SECTION="$(awk '/^### 11\.1/,/^### 11\.[0-9]/' "$A" | head -n -1)"
+# Extract §11.1 section body (from "### 11.1" to next "### 11.N" where N != 1)
+SECTION="$(awk '/^### 11\.1 /{flag=1; next} /^### 11\.[02-9]/{flag=0} flag' "$A")"
 echo "$SECTION" | grep -q -- "--contributor" \
     || { echo "FAIL: §11.1 missing --contributor documentation" >&2; exit 1; }
 echo "$SECTION" | grep -q "\.git-author-map\.txt" \

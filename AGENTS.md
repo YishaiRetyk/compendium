@@ -1196,6 +1196,12 @@ Commit:   ingest(<source-slug>): <one-line summary>
 7. **Lint** (Pipeline Pass 4): Verify all provenance references resolve, wikilinks are valid, frontmatter is complete on all modified pages.
 8. Update `wiki/index.md` with new and modified pages.
 9. Append entry to `wiki/log.md`: `## [YYYY-MM-DD] ingest | <source title>` with affected pages and rationale.
+    - 9a. **Contributor attribution (COLAB-03, COLAB-04):** If the log entry is produced via `bin/ingest.sh`, the helper resolves a contributor handle via the following order:
+        1. Explicit `--contributor @handle` flag wins (forces emission even on single-author repos).
+        2. On single-author repos (`git log --all --format='%ae' | sort -u | wc -l == 1`), the field is omitted entirely.
+        3. Otherwise, look up `git config user.email` in `.git-author-map.txt` at the repo root (case-insensitive; format `email  ->  @handle`, `#` comments allowed). On hit, emit `contributor:: @handle` as a Dataview inline body field directly below the `## [YYYY-MM-DD]` log-entry header (see §12).
+        4. On map miss, warn to stderr (actionable: suggest `--contributor @handle` or adding the mapping) and OMIT the field. NEVER write a bare email into the `contributor::` field (privacy hygiene + parser consistency).
+      Git commit authorship remains the attribution source of truth; `contributor::` is a Dataview convenience index.
 10. Commit: `ingest(<source-slug>): <one-line summary>`
 
 **Abort conditions:**
@@ -1338,6 +1344,38 @@ Commit:   lint(<scope>): <one-line summary>
 Auto-fix (mechanical, deterministic, reversible): updating stale claim markers per decay table, syncing `has_contradictions` frontmatter boolean to match presence of `[contradiction:]` markers in body.
 
 Report-only (no auto-fix): contradictions, knowledge gaps, orphan pages, missing cross-references, page restructuring, any fix requiring judgment.
+
+#### CI mode (Phase 9)
+
+> **Source of truth for Phase 9 CI contracts.** This section is the authoritative specification for: (a) the severity-remap dispatch table, (b) the `--format json` output schema, (c) the escape-hatch marker contract, and (d) the `--require-version` semantics. Other docs (`docs/reference/ci.md`, `CONTRIBUTING.md`, `.github/workflows/lint.yml` comments) MUST link here rather than restating the policy. Drift between this section and the shipped code is a Phase 9 regression.
+
+`bin/lint.sh` supports a CI operating profile via several independent, orthogonal flags:
+
+| Flag | Effect |
+|------|--------|
+| `--format json` | Emit JSON array `[{severity, category, path, line?, message}]` to stdout; do NOT write `lint-report.md`. |
+| `--ci` | Apply severity-remap dispatch table: `yaml`/`orphan`/`crossref`/`provenance` -> `error`; `stale`/`gap`/`contradiction`/`contradiction-sync`/`drift`/`contributor` -> `warning`; `autofix`/`skip-count` -> `info`. Default-skip `drift-external` category. Exit 1 iff any post-remap finding has severity `error`. |
+| `--skip-category <cat>` | Exclude one category. Repeatable. Inverse of `--category`. |
+| `--strict` | Quality ratchet: fail on (a) new `[epistemic:: inferred]` / `[epistemic:: tentative]` claims without a matching decision record whose `affected_pages` frontmatter contains the page ID; (b) new (git-diff status `A`) pages of type `entity`/`concept`/`overview`/`comparison` with zero `[prov:` markers. Source pages and decision records are exempt by design. |
+| `--require-version X.Y.Z` | Minimum-version pin. Fails if `LINT_VERSION < X.Y.Z`. Semver tuple comparison, not string. |
+| `--version` | Print `LINT_VERSION` and exit 0. |
+| `--count-skips` | Enumerate every `<!-- lint:expect-* -->` escape-hatch marker. Emits one `info`/`skip-count` finding per marker (human-review aid). |
+
+**Escape-hatch marker syntax (`--strict` exemption):**
+
+```
+<!-- lint:expect-inferred id=<page-id> reason="<one line>" -->
+<!-- lint:expect-tentative id=<page-id> reason="<one line>" -->
+```
+
+Placement rules (strict):
+
+1. Marker MUST appear on the line IMMEDIATELY above the claim line -- no blank line between.
+2. `id` MUST match the containing page's frontmatter `id` field.
+3. `reason` is required and non-empty.
+4. Exempted claims are emitted as severity `info`, category `skip-count` (visible in PR annotations as `::notice`, non-blocking).
+
+**CI workflow reference:** `.github/workflows/lint.yml` invokes three jobs in parallel -- `lint`, `privacy-leak`, `strict` -- each a required check in branch protection. See `docs/reference/ci.md`.
 
 **Steps:**
 
@@ -1513,6 +1551,35 @@ reason: new comprehensive source makes old summary redundant
 ```
 
 See: examples/kahneman/concepts/prospect-theory.md for concrete filled-in instances of these operation patterns.
+
+#### Contributor inline field (COLAB-03, Phase 9)
+
+Log entries may carry an optional `contributor:: @github-handle` Dataview inline body field immediately below the entry header:
+
+```markdown
+## [YYYY-MM-DD] ingest | <description>
+
+contributor:: @octocat
+
+<rationale and affected pages>
+```
+
+**Rules:**
+
+- `contributor::` is a **Dataview inline body field** (per AGENTS.md §6 inline syntax precedent). It MUST NOT be placed in YAML frontmatter (§3 prohibition).
+- Handle format: `@github-handle` -- leading `@` required. `bin/search.sh --contributor` accepts both `@octocat` and `octocat` forms (leading `@` stripped internally).
+- **Single-author repos omit the field entirely** -- `bin/ingest.sh` auto-detects via `git log --all --format='%ae' | sort -u | wc -l == 1` (see §11.1 step 9a).
+- **Git commit authorship is the attribution source of truth** (COLAB-05). The `contributor::` field is a Dataview convenience index for filtering log history by contributor (`bin/search.sh --contributor @alice`); it is NOT authoritative.
+- Handle-to-email resolution lives in `.git-author-map.txt` at the repo root (committed, human-curated, `email  ->  @handle` format; `#` comments; case-insensitive email match).
+- `bin/lint.sh` category `contributor` (severity `warning`) catches `@handle` values in `wiki/log.md` whose `.git-author-map.txt` email does NOT appear in `git log --all --format='%ae'` -- non-blocking consistency check. Skipped on single-author repos.
+
+**Queryable via Dataview:**
+
+```dataview
+LIST
+FROM "wiki/log.md"
+WHERE contains(file.lists.text, "contributor:: @octocat")
+```
 
 ## 13. Privacy Routing
 

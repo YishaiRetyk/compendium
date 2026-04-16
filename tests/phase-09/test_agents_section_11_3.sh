@@ -5,7 +5,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib.sh"
 
 A="$REPO_ROOT/AGENTS.md"
-SECTION="$(awk '/^### 11\.3/,/^### 11\.[0-9]/' "$A" | head -n -1)"
+SECTION="$(awk '/^### 11\.3 /{flag=1; next} /^### 11\.[0-24-9]/{flag=0} flag' "$A")"
 
 # CI mode subsection present
 echo "$SECTION" | grep -qi "CI mode" \
