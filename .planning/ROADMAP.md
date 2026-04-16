@@ -22,7 +22,7 @@
 ### 🚧 v1.1 Shareability (Phases 7–12)
 
 - [x] **Phase 7: Neutral Template Foundation** — Public orphan-branch template, Kahneman → `examples/`, neutrality CI gate, `requirements-sync` mechanical check. (5/5 plans complete 2026-04-15)
-- [ ] **Phase 8: Two-Track Setup (Wizard + Manual)** — `bin/init-wizard.sh` plus byte-equivalent manual track, co-shipped to prevent drift.
+- [x] **Phase 8: Two-Track Setup (Wizard + Manual)** — `bin/init-wizard.sh` plus byte-equivalent manual track, co-shipped to prevent drift. (5/5 plans complete 2026-04-16)
 - [ ] **Phase 9: Collaborative PR Workflow + CI Lint Gate** — Git-based PR workflow, `log.md` contributor field, `bin/lint.sh --ci --format json` severity policy, privacy-leak guard.
 - [ ] **Phase 10: Brownfield Scan + Bootstrap** — `bin/brownfield.sh scan|bootstrap` with `bootstrap_stage` sentinel, ruamel.yaml round-trip, byte-exact fixture tests.
 - [ ] **Phase 11: Brownfield Suggest + Verify** — Four staged migration script classes, `verify` wrapper over lint.
@@ -137,7 +137,7 @@ Plans:
 | 5. Lint & Quality | v1.0 | 4/4 | Complete | 2026-04-14 |
 | 6. Reflection & Drift Detection | v1.0 | 3/3 | Complete | 2026-04-15 |
 | 7. Neutral Template Foundation | v1.1 | 5/5 | Complete | 2026-04-15 |
-| 8. Two-Track Setup (Wizard + Manual) | v1.1 | 0/5 | Planned | - |
+| 8. Two-Track Setup (Wizard + Manual) | v1.1 | 5/5 | Complete | 2026-04-16 |
 | 9. Collaborative PR Workflow + CI Lint Gate | v1.1 | 0/0 | Not started | - |
 | 10. Brownfield Scan + Bootstrap | v1.1 | 0/0 | Not started | - |
 | 11. Brownfield Suggest + Verify | v1.1 | 0/0 | Not started | - |
