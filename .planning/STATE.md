@@ -229,6 +229,10 @@ Recent decisions affecting current work:
 
 None yet.
 
+### Roadmap Evolution
+
+- Phase 09.1 inserted after Phase 09: Progressive Disclosure Extraction (URGENT) — extract §4 worked examples + §16 appendices from AGENTS.md/CLAUDE.md to reduce spec size while preserving §1 authority, byte-equality, wizard render, manual-setup walkthrough, and Codex agent-parity. Research backing at .planning/notes/research-progressive-disclosure-framework-comparison.md; open questions at .planning/research/questions.md; deferred workflow/operations skill extraction seeded at .planning/seeds/workflows-operations-to-skills.md.
+
 ### Blockers/Concerns
 
 - Phase 10 needs a YAML-lib spike during planning (ruamel.yaml vs PyYAML order-loss tradeoff); treat ruamel.yaml as the single accepted new runtime dep in Phase 10.

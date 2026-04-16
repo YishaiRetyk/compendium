@@ -86,6 +86,16 @@ Plans:
 - [x] 09-05-ci-workflow-agents-amendments-pr-template-PLAN.md — .github/workflows/lint.yml (3 parallel jobs) + json-to-annotations.py + PR template + AGENTS.md §§11.1/11.3/12 amendments (CI-01, CI-05, COLAB-02, COLAB-03)
 - [x] 09-06-contributing-docs-integration-PLAN.md — CONTRIBUTING.md + docs/reference/ci.md full populate + cross-links (COLAB-01/05/06, CI-09)
 
+### Phase 09.1: Progressive Disclosure Extraction (INSERTED)
+
+**Goal:** [Urgent work - to be planned]
+**Requirements**: TBD
+**Depends on:** Phase 9
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 09.1 to break down)
+
 ### Phase 10: Brownfield Scan + Bootstrap
 **Goal**: A user with a real existing Obsidian vault can run `bin/brownfield.sh scan` safely (no vault mutation) and `bin/brownfield.sh bootstrap` confidently (mechanical-only, idempotent, byte-exact reproducible) without corrupting frontmatter or losing content.
 **Prerequisite dependency** (user-facing): Brownfield phases require **Python 3 with `ruamel.yaml`** installed locally. Unlike the bash-native wizard/ingest/search/lint paths, brownfield onboarding has a narrowly-scoped Python runtime dependency used for YAML comment-and-key-order-preserving round-trip. `docs/reference/brownfield.md` and `docs/quickstart.md` must surface this install step (`pip install ruamel.yaml` or distro package) before a user attempts brownfield. This is the single new runtime dependency introduced in v1.1, revising STACK.md's "zero new deps" posture for brownfield only.
