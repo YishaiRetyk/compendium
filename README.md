@@ -1,43 +1,47 @@
-# <org>/<repo>
+# Compendium
 
-A persistent, compounding wiki compiled from your sources by an LLM agent. Built on Obsidian + plain markdown + git.
+A local-first LLM knowledge compiler built on Obsidian, plain markdown, and git.
 
 ## What this is
 
-A repository scaffold that turns book notes, articles, and journal entries into a cross-linked knowledge vault. An LLM agent ingests sources through a deterministic CLI (`bin/ingest.sh`), synthesizing them into entity/concept/comparison/overview pages with claim-level provenance. Every claim is traceable back to its source; contradictions between sources are flagged rather than resolved silently.
+Compendium is a repository template for building an LLM-maintained knowledge vault from your own sources: book notes, articles, journals, transcripts, and similar materials.
 
-Unlike search-over-notes or retrieval-over-PDFs, the wiki is a persistent artifact. Cross-references are already there. Synthesis already reflects everything ingested.
+Deterministic CLI helpers manage the file and workflow scaffolding. An LLM coding agent then compiles sources into cross-linked entity, concept, comparison, overview, and decision pages with claim-level provenance. Every important claim can point back to its source, and contradictions are surfaced rather than silently flattened away.
+
+Unlike search-over-notes or chat-on-top-of-PDFs, the result is a persistent artifact. Cross-references are already there. Syntheses accumulate. The vault gets more useful as you ingest more material and ask better questions.
 
 ## Who this is for
 
-Technical Obsidian users comfortable with bash, git, and running a local LLM agent (Claude Code, Codex, or equivalent). If you want a compounding knowledge base instead of a chat-on-top-of-PDFs experience, this is for you.
+Technical Obsidian users who are comfortable with bash, git, and working with an LLM coding agent such as Claude Code or Codex. If you want a compounding knowledge base instead of a chat-on-top-of-PDFs workflow, this repo is for you.
 
 ## Repo shape
 
 ```
-AGENTS.md                 Canonical agent spec (schema + operations)
-CLAUDE.md                 Byte-identical dup of AGENTS.md (agent-agnostic filename)
-README.md                 This file
+AGENTS.md                 Canonical agent spec
+CLAUDE.md                 Byte-identical copy of AGENTS.md
+README.md                 Project overview
 LICENSE                   MIT
-PRIVACY.md                Tier model (local_only vs cloud_safe)
+PRIVACY.md                Privacy tiers and sharing model
 wiki/                     Your compiled knowledge vault (starts empty)
-examples/                 Reference example clusters (bundled sample domain)
-bin/                      CLI helpers (ingest.sh, lint.sh, search.sh, ...)
+examples/                 Reference example clusters
+bin/                      CLI helpers (ingest, lint, search, ...)
 docs/                     Quickstart, guided/manual setup, reference
-schema/                   AGENTS.template.md (wizard source)
+schema/                   Template and schema support files
 ```
 
 ## Prerequisites
 
-- bash ≥ 4
-- python3 (stdlib only for Phase 7 tooling; later phases require additional Python packages — PyYAML is used by `bin/lint.sh` schema parsing in v1.0 and remains required, and Phases 10–11 brownfield onboarding adds `ruamel.yaml`. See `docs/reference/brownfield.md`.)
-- git ≥ 2.30
-- [Obsidian](https://obsidian.md) for reading + editing
-- An LLM coding agent (Claude Code, Codex, or similar) for ingest
+- bash >= 4
+- python3
+- git >= 2.30
+- [Obsidian](https://obsidian.md)
+- an LLM coding agent such as Claude Code or Codex
+
+Some workflows require additional Python packages. Brownfield onboarding, in particular, has extra requirements documented in [`docs/reference/brownfield.md`](docs/reference/brownfield.md).
 
 ## First step
 
-See [docs/quickstart.md](docs/quickstart.md).
+Start with [docs/quickstart.md](docs/quickstart.md).
 
 ## License
 
