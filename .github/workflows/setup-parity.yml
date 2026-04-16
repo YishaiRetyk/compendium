@@ -1,0 +1,56 @@
+# Phase 8 MANUAL-06: wizard <-> manual-setup.md byte-equality CI gate.
+#
+# ENFORCEMENT MODEL (mirrors .github/workflows/neutrality.yml):
+#   - `pull_request` is the HARD GATE. Branch protection rules on the public
+#     repo MUST require passing runs of this workflow on PR before merging.
+#     Required check name: `setup-parity`.
+#   - `push` to `main` is ADVISORY ONLY (post-merge visibility).
+#
+# What this gates:
+#   The wizard (bin/init-wizard.sh) and the manual track (docs/manual-setup.md)
+#   MUST produce a byte-identical AGENTS.md when fed the canonical answer set
+#   (schema/fixtures/canonical-answers.yaml). Drift = red CI = blocked PR.
+#   On drift, regenerate the fixture: see schema/fixtures/README.md.
+#
+# Determinism:
+#   WIZARD_TEMPLATE_SHA env var is authoritative -- the wizard's internal
+#   git-log fallback is therefore unused, so no shallow-clone depth
+#   manipulation is needed.
+name: Setup Parity (Wizard <-> Manual Byte-Equality)
+
+on:
+  pull_request:
+  # Advisory only -- see enforcement model note above.
+  push:
+    branches: [main]
+
+jobs:
+  setup-parity:
+    runs-on: ubuntu-latest
+    env:
+      # Freeze time + template SHA so the test's .wizard-answers.yaml comparison
+      # is reproducible. These match schema/fixtures/canonical-answers.yaml.
+      WIZARD_GENERATED_AT: "2026-04-16T00:00:00Z"
+      WIZARD_TEMPLATE_SHA: "<frozen-fixture>"
+    steps:
+      - uses: actions/checkout@v6
+        # Default shallow-clone depth. WIZARD_TEMPLATE_SHA env var makes the
+        # wizard's git-log template_sha fallback unnecessary, so no
+        # shallow-clone depth manipulation is needed.
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install PyYAML
+        run: pip install pyyaml
+      - name: Verify wizard exists + executable
+        run: test -x bin/init-wizard.sh
+      - name: Phase 8 full test suite (includes MANUAL-06 byte-equality test)
+        # NOTE: The aggregator picks up tests/phase-08/test_*.sh via glob,
+        # so the MANUAL-06 byte-equality test runs as part of this invocation.
+        # Do NOT run it separately -- that would duplicate the work and confuse
+        # failure attribution.
+        run: bash tests/phase-08/run.sh
+      - name: Phase 7 regression test suite
+        run: bash tests/phase-07/run.sh
+      - name: Neutrality gate (regression)
+        run: bash bin/check-neutrality.sh
