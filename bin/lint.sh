@@ -7,6 +7,11 @@
 # Requires: python3 with PyYAML.
 set -euo pipefail
 
+# Lint rule-set semver per CI-08 / D-26. Bump MAJOR on breaking changes
+# (removed category, changed severity semantics). MINOR on non-breaking
+# additions. PATCH on bug fixes. --require-version X.Y.Z is a minimum check.
+LINT_VERSION="1.1.0"
+
 usage() {
     cat <<'EOF'
 Usage: bin/lint.sh [OPTIONS] [wiki-directory]
@@ -22,6 +27,10 @@ Options:
                         orphan, crossref, stale, contradiction, gap,
                         provenance, yaml, drift
                       Default: all categories
+  --version           Print lint rule-set semver (LINT_VERSION) and exit 0
+  --require-version X.Y.Z
+                      Fail with exit 1 if running LINT_VERSION < X.Y.Z
+                      (minimum-version semantics, semver tuple compare)
 
 Arguments:
   [wiki-directory]    Path to wiki directory (default: wiki/)
@@ -46,6 +55,7 @@ WIKI_DIR="${WIKI_ROOT:-wiki/}"
 DRY_RUN=0
 FIX=0
 CATEGORY="all"
+REQUIRE_VERSION=""
 
 while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -69,6 +79,18 @@ while [ "$#" -gt 0 ]; do
             CATEGORY="$2"
             shift 2
             ;;
+        --version)
+            echo "$LINT_VERSION"
+            exit 0
+            ;;
+        --require-version)
+            if [ "$#" -lt 2 ]; then
+                echo "ERROR: --require-version requires a semver value (e.g., 1.1.0)" >&2
+                exit 1
+            fi
+            REQUIRE_VERSION="$2"
+            shift 2
+            ;;
         -*)
             echo "ERROR: Unknown option: $1" >&2
             usage >&2
@@ -80,6 +102,31 @@ while [ "$#" -gt 0 ]; do
             ;;
     esac
 done
+
+# ---------------------------------------------------------------------------
+# Version-pin check (D-28 minimum-version semantics, semver tuple ordering)
+# ---------------------------------------------------------------------------
+
+if [ -n "$REQUIRE_VERSION" ]; then
+    if ! python3 - "$LINT_VERSION" "$REQUIRE_VERSION" <<'PYEOF'
+import sys
+try:
+    running = tuple(map(int, sys.argv[1].split('.')))
+    required = tuple(map(int, sys.argv[2].split('.')))
+except ValueError:
+    print(f"ERROR: bin/lint.sh --require-version expected semver X.Y.Z, got '{sys.argv[2]}'", file=sys.stderr)
+    sys.exit(1)
+if running < required:
+    print(f"ERROR: bin/lint.sh --require-version {sys.argv[2]} not satisfied. "
+          f"Running version: {sys.argv[1]}. "
+          f"Upgrade bin/lint.sh or lower the pin.", file=sys.stderr)
+    sys.exit(1)
+sys.exit(0)
+PYEOF
+    then
+        exit 1
+    fi
+fi
 
 # Normalize wiki dir (strip trailing slash for consistency, re-add)
 WIKI_DIR="${WIKI_DIR%/}/"
