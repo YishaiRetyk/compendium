@@ -125,4 +125,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-16 — Phase 09 (Collaborative PR Workflow / CI Lint Gate) complete*
+*Last updated: 2026-04-16 — Phase 09.1 (Progressive Disclosure Extraction) complete: AGENTS.md/CLAUDE.md reduced 1,785 → 1,412 lines (~21%) by extracting §4 worked examples to schema/examples/ and §16 Appendices A/B to docs/reference/, with the "sole authoritative specification" framing preserved via uniform `See:` pointers.*
