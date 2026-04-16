@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Shareability
 status: Ready to execute
-stopped_at: Completed 09-01-test-harness-and-fixtures-PLAN.md
-last_updated: "2026-04-16T07:45:23.726Z"
+stopped_at: Completed 09-04-privacy-ingest-search-contributor-PLAN.md
+last_updated: "2026-04-16T07:48:54.108Z"
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 16
-  completed_plans: 11
+  completed_plans: 13
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-04-15)
 ## Current Position
 
 Phase: 09 (collaborative-pr-workflow-ci-lint-gate) — EXECUTING
-Plan: 2 of 6
+Plan: 3 of 6
 
 ## Performance Metrics
 
@@ -77,6 +77,8 @@ Plan: 2 of 6
 | Phase 08-two-track-setup-wizard-manual P03 | 8min | 2 tasks | 7 files |
 | Phase 08-two-track-setup-wizard-manual P05 | 2min | 1 tasks | 2 files |
 | Phase 09-collaborative-pr-workflow-ci-lint-gate P01 | 4min | 2 tasks | 18 files |
+| Phase 09-collaborative-pr-workflow-ci-lint-gate P04 | 6min | 3 tasks | 11 files |
+| Phase 09-collaborative-pr-workflow-ci-lint-gate P02 | 8min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -190,6 +192,10 @@ Recent decisions affecting current work:
 - [Phase 09-01]: setup_git_author uses per-call unique filename (email-slug + nanoseconds + RANDOM) replacing Codex-LOW-flagged collision-prone .ts primitive
 - [Phase 09-01]: seed_origin_main_ref as first-class helper (not per-test plumbing) — Plan 09-03 strict tests depend on origin/main...HEAD semantics
 - [Phase 09-01]: All seeded .md fixtures use LF + UTF-8 (no BOM, no CRLF); critical for Plan 09-03 line-number-sensitive adjacency assertions
+- [Phase 09-collaborative-pr-workflow-ci-lint-gate]: [Phase 09-04] bin/check-privacy.sh pattern-twin of check-neutrality.sh: PUBLIC_PATHS (examples, docs, AGENTS.md, CLAUDE.md, README.md, PRIVACY.md, .github) scanned, wiki/ excluded per D-15 (local_only valid user content per AGENTS.md §13); frontmatter-only match per D-14 (prose mentions exempt); exit codes 0/1/2
+- [Phase 09-collaborative-pr-workflow-ci-lint-gate]: [Phase 09-04] bin/ingest.sh --contributor integration path (a): flag augments printed stdout log-entry template (LLM agent copies into wiki/log.md); bin/ingest.sh does not mutate log.md directly (preserves D-11/D-12/D-13 scope)
+- [Phase 09-collaborative-pr-workflow-ci-lint-gate]: [Phase 09-04] Contributor resolution order: explicit --contributor > single-author-omit (D-20) > .git-author-map.txt hit > map-miss-warn-and-omit (Pitfall 5: never bare email)
+- [Phase 09-collaborative-pr-workflow-ci-lint-gate]: [Phase 09-04] bin/search.sh --contributor branch placed before WIKI_INDEX validation so contributor mode works on fresh forks without wiki/index.md
 
 ### Pending Todos
 
@@ -212,6 +218,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-16T07:45:23.723Z
-Stopped at: Completed 09-01-test-harness-and-fixtures-PLAN.md
+Last session: 2026-04-16T07:48:35.123Z
+Stopped at: Completed 09-04-privacy-ingest-search-contributor-PLAN.md
 Resume file: None

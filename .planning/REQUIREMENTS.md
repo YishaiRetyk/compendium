@@ -66,7 +66,7 @@ Numbering continues from v1.0. New REQ-ID prefixes: `TMPL`, `NEUT`, `WZRD`, `MAN
 - [x] **COLAB-04**: `bin/ingest.sh --contributor <handle>` flag; auto-detects from `git config user.email` if omitted; omits field entirely on single-author repos
 - [ ] **COLAB-05**: Git commit authorship is the attribution source of truth; documented as such in `CONTRIBUTING.md`
 - [ ] **COLAB-06**: `CONTRIBUTING.md` includes merge-conflict recipes for `index.md` and `log.md` (the write-heavy hotspots)
-- [ ] **COLAB-07**: `bin/search.sh --contributor <handle>` filter (parses `log.md` contributor field)
+- [x] **COLAB-07**: `bin/search.sh --contributor <handle>` filter (parses `log.md` contributor field)
 - [ ] **COLAB-08**: `bin/lint.sh` optional check: `contributor::` handles appear as git commit authors (low-severity warning)
 
 ### CI Lint Gate (CI)
@@ -203,7 +203,7 @@ Explicitly excluded from v1.1. Documented to prevent scope creep.
 | COLAB-04 | Phase 9 | Complete |
 | COLAB-05 | Phase 9 | Pending |
 | COLAB-06 | Phase 9 | Pending |
-| COLAB-07 | Phase 9 | Pending |
+| COLAB-07 | Phase 9 | Complete |
 | COLAB-08 | Phase 9 | Pending |
 | CI-01 | Phase 9 | Pending |
 | CI-02 | Phase 9 | Pending |
