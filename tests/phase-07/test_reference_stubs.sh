@@ -14,16 +14,26 @@ for f in docs/reference/index.md docs/reference/schema-tour.md docs/reference/br
   if [ -f "$f" ]; then pass "$f exists"; else fail "$f missing"; fi
 done
 
-# 5 stubs carry the exact "Status: stub — populated in v1.1 Phase" marker
+# Stubs still pending future-phase populate carry the exact
+# "Status: stub — populated in v1.1 Phase" marker. ci.md was populated in
+# Phase 9 Plan 06 (drops from the stub list).
+STUB_FILES=(docs/reference/schema-tour.md docs/reference/brownfield.md docs/reference/privacy-model.md docs/reference/examples.md)
 STUBS_OK=0
-for f in docs/reference/schema-tour.md docs/reference/brownfield.md docs/reference/privacy-model.md docs/reference/ci.md docs/reference/examples.md; do
+for f in "${STUB_FILES[@]}"; do
   if grep -q 'Status: stub — populated in v1.1 Phase' "$f"; then
     STUBS_OK=$((STUBS_OK+1))
   else
     fail "$f missing 'Status: stub — populated in v1.1 Phase' marker"
   fi
 done
-if [ "$STUBS_OK" -eq 5 ]; then pass "all 5 reference stubs carry stub marker"; fi
+if [ "$STUBS_OK" -eq "${#STUB_FILES[@]}" ]; then pass "all ${#STUB_FILES[@]} remaining reference stubs carry stub marker"; fi
+
+# ci.md is NOT a stub (populated in Phase 9 Plan 06)
+if grep -q 'Status: stub' docs/reference/ci.md; then
+  fail "ci.md contains 'Status: stub' (Phase 9 Plan 06 populated this file; must no longer be a stub)"
+else
+  pass "ci.md is not marked as a stub"
+fi
 
 # release.md is NOT a stub
 if grep -q 'Status: stub' docs/reference/release.md; then

@@ -6,3 +6,7 @@
 - [ci.md](ci.md) — CI lint gate, privacy-leak guard, multi-provider equivalents (Phase 9)
 - [examples.md](examples.md) — how to use examples/, Obsidian graph filtering, copy-to-wiki ramp (Phase 12)
 - [release.md](release.md) — orphan-branch release runbook (Phase 7 — this phase owns this file)
+
+## Contributing
+
+- [../../CONTRIBUTING.md](../../CONTRIBUTING.md) — PR workflow, attribution rules, merge-conflict recipes (Phase 9)
