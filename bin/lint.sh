@@ -49,6 +49,14 @@ Options:
                       Precedence: --category (inclusive) applies FIRST; then
                       --skip-category SUBTRACTS. Example:
                         --category stale --skip-category stale -> no findings.
+  --strict                   CI-06 quality ratchet: fail on PR-added
+                             [epistemic:: inferred]/[tentative] claims without
+                             matching decision record, and on new (git diff
+                             status A) pages lacking [prov:] markers. Honors
+                             <!-- lint:expect-inferred|tentative id=X reason="Y" -->
+                             escape hatch on the line above the claim.
+                             Requires origin/main ref (falls back to wiki-wide
+                             scan with stderr WARN when absent).
 
 Arguments:
   [wiki-directory]    Path to wiki directory (default: wiki/)
@@ -77,6 +85,8 @@ REQUIRE_VERSION=""
 FORMAT="text"
 CI_MODE=0
 SKIP_CATEGORIES=""   # colon-separated list
+STRICT_MODE=0
+COUNT_SKIPS=0
 
 while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -138,6 +148,14 @@ while [ "$#" -gt 0 ]; do
                 SKIP_CATEGORIES="$SKIP_CATEGORIES:$2"
             fi
             shift 2
+            ;;
+        --strict)
+            STRICT_MODE=1
+            shift
+            ;;
+        --count-skips)
+            COUNT_SKIPS=1
+            shift
             ;;
         -*)
             echo "ERROR: Unknown option: $1" >&2
@@ -223,6 +241,9 @@ export LINT_CATEGORY="$CATEGORY"
 export LINT_FORMAT="$FORMAT"
 export LINT_CI_MODE="$CI_MODE"
 export LINT_SKIP_CATEGORIES="$SKIP_CATEGORIES"
+export LINT_STRICT_MODE="$STRICT_MODE"
+export LINT_COUNT_SKIPS="$COUNT_SKIPS"
+export LINT_REPO_ROOT="${LINT_REPO_ROOT:-$PWD}"
 
 python3 << 'PYEOF'
 import sys, os, re, yaml
@@ -243,6 +264,30 @@ category_filter = os.environ['LINT_CATEGORY']
 CI_MODE = os.environ.get('LINT_CI_MODE', '0') == '1'
 LINT_FORMAT = os.environ.get('LINT_FORMAT', 'text')
 SKIP_CATEGORIES = set(filter(None, os.environ.get('LINT_SKIP_CATEGORIES', '').split(':')))
+
+# --- Phase 9 Plan 03 primitives (D-07..D-11, D-22) ---
+STRICT_MODE = os.environ.get('LINT_STRICT_MODE', '0') == '1'
+COUNT_SKIPS_MODE = os.environ.get('LINT_COUNT_SKIPS', '0') == '1'
+REPO_ROOT = os.environ.get('LINT_REPO_ROOT', os.getcwd())
+
+import subprocess
+
+# Escape-hatch marker regex (D-09). Matches on line IMMEDIATELY above claim.
+# `id` must match containing page's frontmatter id; `reason` must be non-empty.
+EXPECT_MARKER_RE = re.compile(
+    r'^<!--\s*lint:expect-(?P<kind>inferred|tentative)\s+'
+    r'id=(?P<id>[a-z0-9-]+)\s+'
+    r'reason="(?P<reason>[^"]+)"\s*-->\s*$'
+)
+
+# Inline epistemic marker regex (subset: only inferred|tentative gate --strict).
+EPISTEMIC_INFERRED_RE = re.compile(r'\[epistemic::\s*(?P<kind>inferred|tentative)\s*\]')
+
+# Provenance presence check (D-10).
+PROVENANCE_PRESENCE_RE = re.compile(r'\[prov:')
+
+# Types that require [prov:] markers when added as new pages (D-10).
+PROVENANCE_REQUIRED_TYPES = {'entity', 'concept', 'overview', 'comparison'}
 
 # Severity remap dispatch table (D-02, D-05). Any add_finding() category not
 # listed here retains its original severity. Plan 03 extends this with new
@@ -357,6 +402,300 @@ def parse_frontmatter(filepath):
 
 def should_run(cat):
     return category_filter == 'all' or category_filter == cat
+
+# ---------------------------------------------------------------------------
+# Phase 9 Plan 03 helpers: --strict (CI-06), escape-hatch marker parser,
+# PR-diff-scoped epistemic claim detection (D-08), new-page provenance check
+# (D-10), origin/main fallback.
+# ---------------------------------------------------------------------------
+
+def parse_fm_from_text(content):
+    """Return parsed YAML frontmatter dict from raw content, or None."""
+    if not content.startswith('---'):
+        return None
+    try:
+        end = content.index('---', 3)
+    except ValueError:
+        return None
+    try:
+        return yaml.safe_load(content[3:end]) or {}
+    except yaml.YAMLError:
+        return None
+
+
+def has_origin_main():
+    """Return True iff refs/remotes/origin/main exists.
+
+    Used for the --strict local-mode fallback (see stderr WARN path below).
+    CI runs always have origin/main (fetch-depth: 0); local dev may not.
+    """
+    try:
+        subprocess.run(
+            ['git', 'show-ref', '--verify', '--quiet', 'refs/remotes/origin/main'],
+            cwd=REPO_ROOT, check=True, capture_output=True,
+        )
+        return True
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return False
+
+
+def strict_added_epistemic_claims(base_ref='origin/main'):
+    """D-08 (PR-diff scope): parse `git diff origin/main...HEAD -- wiki/` and
+       return a list of (path, line_no, kind) tuples for EACH line ADDED by
+       the PR that contains [epistemic:: inferred] or [epistemic:: tentative].
+
+       - line_no is the NEW-file line number (post-PR), 1-indexed.
+       - kind is 'inferred' or 'tentative'.
+       - `path` is the new-file path (diff 'b/' side).
+       - Pages entirely new to the PR (status A) have ALL their epistemic
+         claims surfaced here, not only the diff context.
+
+       Ignores the `+++` file-header line (diff metadata, not content)."""
+    try:
+        result = subprocess.run(
+            ['git', 'diff', '--unified=0', f'{base_ref}...HEAD', '--', 'wiki/'],
+            cwd=REPO_ROOT, check=True, capture_output=True, text=True,
+        )
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return []
+    added = []
+    current_path = None
+    current_new_lineno = None
+    hunk_header_re = re.compile(r'^@@ -\d+(?:,\d+)? \+(\d+)(?:,\d+)? @@')
+    for line in result.stdout.splitlines():
+        # File header: "+++ b/<path>"
+        if line.startswith('+++ '):
+            rest = line[4:]
+            if rest.startswith('b/'):
+                current_path = rest[2:]
+            elif rest == '/dev/null':
+                current_path = None
+            else:
+                current_path = rest
+            current_new_lineno = None
+            continue
+        if line.startswith('--- '):
+            continue
+        # Hunk header: "@@ -A,B +C,D @@ ..." — extract the new-side start line.
+        if line.startswith('@@'):
+            m = hunk_header_re.match(line)
+            if m:
+                current_new_lineno = int(m.group(1))
+            else:
+                current_new_lineno = None
+            continue
+        if current_path is None or current_new_lineno is None:
+            continue
+        # Content lines: +added, -removed, ' ' context. Only +added advances new-side.
+        # (--unified=0 means no context lines, so we see only +/- lines.)
+        if line.startswith('+') and not line.startswith('+++'):
+            content = line[1:]  # strip leading '+'
+            m = EPISTEMIC_INFERRED_RE.search(content)
+            if m:
+                added.append((current_path, current_new_lineno, m.group('kind')))
+            current_new_lineno += 1
+        elif line.startswith('-') and not line.startswith('---'):
+            # Removed line: does NOT advance new-side line counter.
+            pass
+        else:
+            # Context line (shouldn't appear with --unified=0 but defensive).
+            current_new_lineno += 1
+    return added
+
+
+def strict_new_pages(base_ref='origin/main'):
+    """D-10: return list of git-diff status-A .md paths under
+       wiki/{entities,concepts,overviews,comparisons}/*.md."""
+    try:
+        result = subprocess.run(
+            ['git', 'diff', '--name-status', f'{base_ref}...HEAD'],
+            cwd=REPO_ROOT, check=True, capture_output=True, text=True,
+        )
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return []
+    paths = []
+    for line in result.stdout.splitlines():
+        parts = line.split('\t', 1)
+        if len(parts) != 2:
+            continue
+        status, path = parts
+        if status != 'A' or not path.endswith('.md'):
+            continue
+        for t in ('entities', 'concepts', 'overviews', 'comparisons'):
+            if path.startswith(f'wiki/{t}/'):
+                paths.append(path)
+                break
+    return paths
+
+
+def collect_dr_affected_pages(wiki_root):
+    """D-08 helper: union of affected_pages lists across ALL type: decision
+       pages in the wiki. Built wiki-wide because decisions already merged are
+       valid coverage for current-PR claims. What's PR-diff-scoped is the SET
+       OF CLAIMS checked; the DR index itself is historical."""
+    covered = set()
+    decisions_dir = os.path.join(wiki_root, 'decisions')
+    if not os.path.isdir(decisions_dir):
+        return covered
+    for fn in sorted(os.listdir(decisions_dir)):
+        if not fn.endswith('.md'):
+            continue
+        try:
+            content = open(os.path.join(decisions_dir, fn), encoding='utf-8').read()
+        except OSError:
+            continue
+        fm = parse_fm_from_text(content)
+        if not fm or fm.get('type') != 'decision':
+            continue
+        for pid in (fm.get('affected_pages') or []):
+            if pid:
+                covered.add(str(pid))
+    return covered
+
+
+def page_id_for_path(path):
+    """Return the id frontmatter field of the markdown page at `path`
+       (resolved against REPO_ROOT), or '' on miss."""
+    abs_path = path if os.path.isabs(path) else os.path.join(REPO_ROOT, path)
+    try:
+        content = open(abs_path, encoding='utf-8').read()
+    except OSError:
+        return ''
+    fm = parse_fm_from_text(content)
+    if not fm:
+        return ''
+    return str(fm.get('id', '') or '')
+
+
+def is_claim_excepted_by_adjacent_marker(path, claim_line_no, page_id):
+    """D-09: True iff the line IMMEDIATELY above `claim_line_no` (1-indexed)
+       in the working-tree file at `path` is a matching lint:expect-* marker.
+       Blank line between marker and claim invalidates the exemption."""
+    if claim_line_no <= 1:
+        return False
+    abs_path = path if os.path.isabs(path) else os.path.join(REPO_ROOT, path)
+    try:
+        lines = open(abs_path, encoding='utf-8').read().splitlines()
+    except OSError:
+        return False
+    prev_idx = claim_line_no - 2  # 0-indexed line above the claim
+    if prev_idx < 0 or prev_idx >= len(lines):
+        return False
+    m = EXPECT_MARKER_RE.match(lines[prev_idx].rstrip('\n'))
+    if not m:
+        return False
+    if m.group('id') != page_id:
+        return False
+    return bool(m.group('reason').strip())
+
+
+def _strict_check_fallback(wiki_root):
+    """Local-mode fallback when origin/main is absent. Mirrors the pre-revision
+       wiki-wide scan. Prints stderr WARN above, then scans all wiki pages.
+       Useful for offline iteration; CI never hits this path."""
+    dr_covered = collect_dr_affected_pages(wiki_root)
+    for dirpath, _, files in os.walk(wiki_root):
+        # Skip examples/ and decisions/ (both are never subject to strict gate)
+        rel_parts = os.path.relpath(dirpath, wiki_root).split(os.sep)
+        if 'examples' in rel_parts or rel_parts[0] == 'decisions':
+            continue
+        for fn in sorted(files):
+            if not fn.endswith('.md'):
+                continue
+            path = os.path.join(dirpath, fn)
+            try:
+                text = open(path, encoding='utf-8').read()
+            except OSError:
+                continue
+            fm = parse_fm_from_text(text)
+            if not fm:
+                continue
+            page_id = str(fm.get('id', '') or '')
+            rel = os.path.relpath(path)
+            body_lines = text.splitlines()
+            for i, line in enumerate(body_lines):
+                m = EPISTEMIC_INFERRED_RE.search(line)
+                if not m:
+                    continue
+                claim_line_no = i + 1
+                if is_claim_excepted_by_adjacent_marker(path, claim_line_no, page_id):
+                    add_finding('info', 'skip-count', rel,
+                                f"line {claim_line_no}: {m.group('kind')} claim exempted via lint:expect-* marker")
+                    continue
+                if page_id and page_id not in dr_covered:
+                    add_finding('error', 'strict', rel,
+                                f"line {claim_line_no}: [{m.group('kind')}] claim without matching decision record "
+                                f"(local-mode scan: no origin/main ref present)")
+    # New-page check is inherently PR-diff-scoped (D-10 requires status A); skip in fallback.
+
+
+def strict_check(wiki_root):
+    """Run --strict checks.
+       - DR-match (D-08, PR-diff-scoped): fail on [epistemic:: inferred|tentative]
+         claims ADDED by this PR unless matched by a wiki decision record's
+         affected_pages, or exempted by an adjacent lint:expect-* marker.
+       - New-page provenance (D-10): fail on status-A pages of type
+         entity/concept/overview/comparison with zero [prov: markers.
+
+       Appends findings (severity='error', cat='strict' or 'provenance') on
+       violation. Exempted claims appended as (severity='info', cat='skip-count').
+    """
+    if not STRICT_MODE:
+        return
+
+    # Local-mode fallback: if origin/main is absent, warn and fall back to wiki-wide scan.
+    # CI always has origin/main (fetch-depth: 0); local dev may not.
+    if not has_origin_main():
+        print("WARN: no origin/main; scanning all wiki pages (local mode)", file=sys.stderr)
+        _strict_check_fallback(wiki_root)
+        return
+
+    dr_covered = collect_dr_affected_pages(wiki_root)
+
+    # 1. DR-match: scan ONLY the claims ADDED by this PR (D-08).
+    added = strict_added_epistemic_claims()
+    for path, line_no, kind in added:
+        # path is repo-relative (e.g., 'wiki/concepts/attention.md'). Skip examples/ and decisions/.
+        if path.startswith('examples/') or '/examples/' in path:
+            continue
+        if path.startswith('wiki/decisions/'):
+            # Decision records themselves can contain epistemic markers in their prose;
+            # they ARE the gating mechanism and must not gate on themselves.
+            continue
+        page_id = page_id_for_path(path)
+        if not page_id:
+            continue
+        # D-09 escape-hatch check uses working-tree content (marker on line above claim)
+        if is_claim_excepted_by_adjacent_marker(path, line_no, page_id):
+            add_finding('info', 'skip-count', path,
+                        f"line {line_no}: {kind} claim exempted via lint:expect-* marker")
+            continue
+        if page_id in dr_covered:
+            continue
+        add_finding('error', 'strict', path,
+                    f"line {line_no}: [{kind}] claim added by this PR without matching decision record "
+                    f"(add wiki/decisions/*.md with type:decision, affected_pages: [{page_id}], "
+                    f"or add <!-- lint:expect-{kind} id={page_id} reason=\"...\" --> above)")
+
+    # 2. New-page provenance: for each git-diff status A wiki page under PROVENANCE_REQUIRED_TYPES
+    new_pages = strict_new_pages()
+    for path in new_pages:
+        abs_path = path if os.path.isabs(path) else os.path.join(REPO_ROOT, path)
+        if not os.path.exists(abs_path):
+            continue
+        try:
+            text = open(abs_path, encoding='utf-8').read()
+        except OSError:
+            continue
+        fm = parse_fm_from_text(text)
+        if not fm:
+            continue
+        t = fm.get('type', '')
+        if t not in PROVENANCE_REQUIRED_TYPES:
+            continue  # source/decision exempt by design
+        if not PROVENANCE_PRESENCE_RE.search(text):
+            add_finding('error', 'provenance', path,
+                        f"new {t} page has zero [prov:...] markers (D-10)")
 
 # ---------------------------------------------------------------------------
 # Collect all wiki pages
@@ -1143,6 +1482,13 @@ if should_run('drift') or should_run('all'):
                             'EXTERNAL: Non-markdown file in wiki/ (may cause Obsidian issues)')
 
 # ---------------------------------------------------------------------------
+# Phase 9 Plan 03: --strict check (CI-06 quality ratchet) runs BEFORE the
+# filter pipeline so its findings ride through the standard skip + remap path.
+# ---------------------------------------------------------------------------
+
+strict_check(wiki_dir)
+
+# ---------------------------------------------------------------------------
 # Apply Phase 9 filters (Plan 02): category narrowing is already enforced by
 # `should_run()` at check-time. Here we apply the --skip-category subtraction
 # (including `drift-external` logical subcategory) and the --ci severity remap.
@@ -1198,8 +1544,10 @@ if LINT_FORMAT == 'json':
             'message': msg,
         })
     sys.stdout.write(json.dumps(payload, indent=2) + '\n')
-    # CI exit policy (D-05): exit 1 iff any post-remap error-severity finding.
-    if CI_MODE:
+    # CI / strict exit policy (D-05 + CI-06): exit 1 iff any post-remap
+    # error-severity finding. --strict participates in the same exit rule
+    # (strict_check emits error-severity strict/provenance findings).
+    if CI_MODE or STRICT_MODE:
         has_error = any(sev == 'error' for (sev, _, _, _) in findings)
         sys.exit(1 if has_error else 0)
     sys.exit(0)
@@ -1322,9 +1670,10 @@ if top_findings:
 print(f"Auto-fixes applied: {autofix_msg}", file=sys.stderr)
 print(f"Report: {report_msg}", file=sys.stderr)
 
-# CI exit policy (D-05) for text mode: exit 1 iff any post-remap error-severity
-# finding is present. Non-CI mode always exits 0 (v1.0 behavior preserved).
-if CI_MODE:
+# CI / --strict exit policy for text mode: exit 1 iff any post-remap
+# error-severity finding is present. Non-CI, non-strict mode always exits 0
+# (v1.0 behavior preserved).
+if CI_MODE or STRICT_MODE:
     has_error = any(sev == 'error' for (sev, _, _, _) in findings)
     sys.exit(1 if has_error else 0)
 

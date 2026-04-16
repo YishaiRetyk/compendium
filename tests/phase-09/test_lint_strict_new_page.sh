@@ -34,12 +34,41 @@ if ! grep -qi "prov" /tmp/sn-out /tmp/sn-err; then
     popd >/dev/null; exit 1
 fi
 
-# Now change type to source → exempt
-sed -i 's/^type: concept/type: source/' wiki/concepts/new-concept.md
-git add . && git -c commit.gpgsign=false commit -q -m "feature: flip to source type"
+# Now change type to source → exempt from D-10 provenance requirement.
+# Flipping to source type also requires SOURCE_EXTRA_FIELDS (path, content_hash,
+# ingested_at, source_type, compilation_status) per AGENTS.md §5 to avoid
+# unrelated yaml-error findings that would otherwise gate --strict exit.
+python3 - <<'PYEOF'
+p = "wiki/concepts/new-concept.md"
+text = open(p).read()
+text = text.replace('type: concept', 'type: source')
+# Inject required SOURCE_EXTRA_FIELDS before closing frontmatter delimiter.
+extra = (
+    'path: sources/new-concept.md\n'
+    'content_hash: "sha256:fixture"\n'
+    'ingested_at: 2026-04-16\n'
+    'source_type: paper\n'
+    'compilation_status: compiled\n'
+)
+# Find closing `---` of frontmatter (the second one) and insert before it.
+first = text.find('---')
+second = text.find('---', first + 3)
+text = text[:second] + extra + text[second:]
+open(p, 'w').write(text)
+PYEOF
+# Raw source file (DRFT-02 check requires the file at `path` to exist).
+mkdir -p sources
+echo "fixture" > sources/new-concept.md
+git add .
+git -c commit.gpgsign=false commit -q -m "feature: flip to source type + required fields"
 
-bash "$REPO_ROOT/bin/lint.sh" --strict wiki/ >/dev/null 2>&1 \
-    || { echo "FAIL: --strict should exempt type:source pages from provenance check" >&2; popd >/dev/null; exit 1; }
+# --category provenance isolates the D-10 strict provenance check so unrelated
+# yaml/drift errors elsewhere in the wiki don't taint the exit-code assertion.
+# (Source pages are exempt per D-10 regardless.)
+bash "$REPO_ROOT/bin/lint.sh" --strict --category provenance wiki/ >/dev/null 2>&1 \
+    || { echo "FAIL: --strict should exempt type:source pages from provenance check" >&2
+         bash "$REPO_ROOT/bin/lint.sh" --strict --category provenance wiki/ 2>&1 >&2
+         popd >/dev/null; exit 1; }
 
 popd >/dev/null
 echo "PASS: --strict new-page provenance + source-type exempt"
