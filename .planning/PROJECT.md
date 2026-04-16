@@ -53,13 +53,13 @@ The wiki is a persistent, compounding artifact — cross-references are already 
 - [x] Cross-system drift detection between wiki, raw sources, and any external tools — Validated in Phase 06: reflection-drift-detection
 - [x] Guided setup wizard generating personalized `AGENTS.md` (domain, privacy, LLM agent) — Validated in Phase 08: two-track-setup-wizard-manual
 - [x] Manual setup track preserved for power users — Validated in Phase 08: two-track-setup-wizard-manual
+- [x] Git-based PR workflow for collaborative curation with lint gate — Validated in Phase 09: collaborative-pr-workflow-ci-lint-gate
+- [x] Per-ingest contributor field in `log.md` (git authorship remains source of truth) — Validated in Phase 09: collaborative-pr-workflow-ci-lint-gate
 
 ### Active (v1.1 focus areas — formal REQ-IDs in REQUIREMENTS.md)
 
 - [ ] Template-based starter repo with four-track `/docs/` (quickstart, guided setup, manual setup, reference)
 - [ ] Kahneman cluster moved to `examples/`; starter vault neutral
-- [ ] Git-based PR workflow for collaborative curation with lint gate
-- [ ] Per-ingest contributor field in `log.md` (git authorship remains source of truth)
 - [ ] `bin/brownfield.sh scan` — dry-run markdown report
 - [ ] `bin/brownfield.sh bootstrap` — mechanical-only auto (sentinel frontmatter, hashes, skeleton, YAML normalization)
 - [ ] `bin/brownfield.sh suggest` — staged idempotent migration scripts for judgment-heavy work
@@ -125,4 +125,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-16 — Phase 08 (Two-Track Setup) complete*
+*Last updated: 2026-04-16 — Phase 09 (Collaborative PR Workflow / CI Lint Gate) complete*
