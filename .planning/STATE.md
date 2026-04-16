@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Shareability
 status: Ready to execute
-stopped_at: Completed 09-05-ci-workflow-agents-amendments-pr-template-PLAN.md
-last_updated: "2026-04-16T08:18:22.540Z"
+stopped_at: Completed 09-06-contributing-docs-integration-PLAN.md (Phase 9 complete)
+last_updated: "2026-04-16T08:29:39.808Z"
 progress:
   total_phases: 5
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 16
-  completed_plans: 15
-  percent: 94
+  completed_plans: 16
+  percent: 100
 ---
 
 # Project State
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-04-15)
 ## Current Position
 
 Phase: 09 (collaborative-pr-workflow-ci-lint-gate) — EXECUTING
-Plan: 5 of 6
+Plan: 6 of 6
 
 ## Performance Metrics
 
@@ -82,6 +82,7 @@ Plan: 5 of 6
 | Phase 09-collaborative-pr-workflow-ci-lint-gate P02 | 8min | 2 tasks | 6 files |
 | Phase 09-collaborative-pr-workflow-ci-lint-gate P03 | 10min | 2 tasks | 11 files |
 | Phase 09-collaborative-pr-workflow-ci-lint-gate P05 | 6min | 3 tasks | 11 files |
+| Phase 09-collaborative-pr-workflow-ci-lint-gate P06 | 8min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -219,6 +220,10 @@ Recent decisions affecting current work:
 - [Phase 09-collaborative-pr-workflow-ci-lint-gate]: [Phase 09-05] AGENTS.md §11.3 CI-mode subsection opens with source-of-truth blockquote (Codex MEDIUM fix) - docs/reference/ci.md and CONTRIBUTING.md MUST link rather than restate policy
 - [Phase 09-collaborative-pr-workflow-ci-lint-gate]: [Phase 09-05] AGENTS.md §12 documents contributor:: @handle as Dataview inline BODY field (NOT frontmatter per §3 prohibition); single-author repos omit the field entirely
 - [Phase 09-collaborative-pr-workflow-ci-lint-gate]: [Phase 09-05] flag-based awk section extractor replaces range-pair in test_agents_section_*.sh - range pair collapses to 1 line when start regex is a subset of end regex (Rule 1 bug fix)
+- [Phase 09-06]: [Phase 09-06] CONTRIBUTING.md links to AGENTS.md §11.3 as source of truth for severity tiers (does NOT duplicate category->severity table); Codex MEDIUM spec-duplication fix enforced by test guard
+- [Phase 09-06]: [Phase 09-06] docs/reference/ci.md opens Severity policy + JSON schema sections with source-of-truth blockquotes pointing to AGENTS.md §11.3; rationale columns kept for user-facing context not in §11.3
+- [Phase 09-06]: [Phase 09-06] .gitattributes merge=union documented as operator opt-in (NOT committed default per D-24) to prevent surprise for contributors who haven't read CONTRIBUTING.md
+- [Phase 09-06]: [Phase 09-06] Rule 3 relaxed tests/phase-07/test_reference_stubs.sh to drop ci.md from stub list + added inverse 'ci.md is NOT a stub' assertion (precedent: Phase 08-04 relaxing phase-07 test_docs_skeleton.sh)
 
 ### Pending Todos
 
@@ -241,6 +246,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-16T08:18:08.267Z
-Stopped at: Completed 09-05-ci-workflow-agents-amendments-pr-template-PLAN.md
+Last session: 2026-04-16T08:29:39.805Z
+Stopped at: Completed 09-06-contributing-docs-integration-PLAN.md (Phase 9 complete)
 Resume file: None

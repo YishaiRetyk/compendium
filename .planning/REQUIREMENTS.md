@@ -60,12 +60,12 @@ Numbering continues from v1.0. New REQ-ID prefixes: `TMPL`, `NEUT`, `WZRD`, `MAN
 
 ### Collaborative PR Workflow (COLAB)
 
-- [ ] **COLAB-01**: Top-level `CONTRIBUTING.md` describing branch-per-ingest convention, PR workflow, attribution rules
+- [x] **COLAB-01**: Top-level `CONTRIBUTING.md` describing branch-per-ingest convention, PR workflow, attribution rules
 - [x] **COLAB-02**: `.github/pull_request_template.md` prompts for source attribution, ingest type, privacy review confirmation, lint output
 - [x] **COLAB-03**: `log.md` entry schema amended (AGENTS.md §12) with optional `contributor:: <handle>` Dataview inline field
 - [x] **COLAB-04**: `bin/ingest.sh --contributor <handle>` flag; auto-detects from `git config user.email` if omitted; omits field entirely on single-author repos
-- [ ] **COLAB-05**: Git commit authorship is the attribution source of truth; documented as such in `CONTRIBUTING.md`
-- [ ] **COLAB-06**: `CONTRIBUTING.md` includes merge-conflict recipes for `index.md` and `log.md` (the write-heavy hotspots)
+- [x] **COLAB-05**: Git commit authorship is the attribution source of truth; documented as such in `CONTRIBUTING.md`
+- [x] **COLAB-06**: `CONTRIBUTING.md` includes merge-conflict recipes for `index.md` and `log.md` (the write-heavy hotspots)
 - [x] **COLAB-07**: `bin/search.sh --contributor <handle>` filter (parses `log.md` contributor field)
 - [x] **COLAB-08**: `bin/lint.sh` optional check: `contributor::` handles appear as git commit authors (low-severity warning)
 
@@ -79,7 +79,7 @@ Numbering continues from v1.0. New REQ-ID prefixes: `TMPL`, `NEUT`, `WZRD`, `MAN
 - [x] **CI-06**: `bin/lint.sh --strict` mode: exits non-zero on any `[inferred]`/`[tentative]` claim added without a matching decision record, and on new pages lacking provenance (quality ratchet at merge time)
 - [x] **CI-07**: Privacy-leak guard: CI check fails a PR only when `privacy: local_only` (or any `local_only` frontmatter) appears under paths declared public (default: `examples/**`, `docs/**`, `AGENTS.md`, `CLAUDE.md`, `README.md`, `.github/**`). `local_only` is a valid tier in user content (`wiki/**`) — the guard prevents leakage into public/template material only. Public paths glob is configurable in `.github/workflows/lint.yml`.
 - [x] **CI-08**: `bin/lint.sh --version` supports version pinning so rule changes don't silently break existing PRs
-- [ ] **CI-09**: `/docs/reference/ci.md` documents GitLab/Gitea/Codeberg equivalents of the GitHub workflow (JSON output is platform-neutral)
+- [x] **CI-09**: `/docs/reference/ci.md` documents GitLab/Gitea/Codeberg equivalents of the GitHub workflow (JSON output is platform-neutral)
 
 ### Brownfield Onboarding (BRWN)
 
@@ -197,12 +197,12 @@ Explicitly excluded from v1.1. Documented to prevent scope creep.
 | MANUAL-04 | Phase 8 | Complete |
 | MANUAL-05 | Phase 8 | Complete |
 | MANUAL-06 | Phase 8 | Complete |
-| COLAB-01 | Phase 9 | Pending |
+| COLAB-01 | Phase 9 | Complete |
 | COLAB-02 | Phase 9 | Complete |
 | COLAB-03 | Phase 9 | Complete |
 | COLAB-04 | Phase 9 | Complete |
-| COLAB-05 | Phase 9 | Pending |
-| COLAB-06 | Phase 9 | Pending |
+| COLAB-05 | Phase 9 | Complete |
+| COLAB-06 | Phase 9 | Complete |
 | COLAB-07 | Phase 9 | Complete |
 | COLAB-08 | Phase 9 | Complete |
 | CI-01 | Phase 9 | Complete |
@@ -213,7 +213,7 @@ Explicitly excluded from v1.1. Documented to prevent scope creep.
 | CI-06 | Phase 9 | Complete |
 | CI-07 | Phase 9 | Complete |
 | CI-08 | Phase 9 | Complete |
-| CI-09 | Phase 9 | Pending |
+| CI-09 | Phase 9 | Complete |
 | BRWN-01 | Phase 10 | Pending |
 | BRWN-02 | Phase 10 | Pending |
 | BRWN-03 | Phase 10 | Pending |
