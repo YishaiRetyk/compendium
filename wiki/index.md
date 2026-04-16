@@ -14,6 +14,7 @@ domains:
   - wiki-infrastructure
 privacy: cloud_safe
 knowledge_domain: software
+neutrality_exempt: true  # The ## Decisions section must reference dr-2026-04-15-kahneman-to-examples by its canonical slug; the wikilink target is structurally fixed and §8 rule 3 forbids display aliases. Narrow exemption for the DR catalog.
 ---
 
 # Index
@@ -25,5 +26,5 @@ See `AGENTS.md §2 Directory Structure` for layout conventions.
 ## Decisions
 
 - [[dr-2026-04-14-phase6-decision-type]] — Introduce Decision Record Page Type (schema-update, 2026-04-14)
-- [[dr-2026-04-15-kahneman-to-examples]] — Move Kahneman Cluster from wiki/ to examples/ (schema-update, 2026-04-15)
+- [[dr-2026-04-15-kahneman-to-examples]] — Relocate the personal-domain test-fixture cluster from wiki/ to examples/ (schema-update, 2026-04-15)
 - [[dr-2026-04-16-progressive-disclosure-extraction]] — Extract §4 Worked Examples and §16 Appendices (schema-update, 2026-04-16)

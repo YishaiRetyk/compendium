@@ -19,6 +19,7 @@ privacy: cloud_safe
 aliases: []
 has_contradictions: false
 knowledge_domain: software
+neutrality_exempt: true  # Why-section legitimately names the rejected `examples/kahneman/` reuse and the prior dr-2026-04-15-kahneman-to-examples decision; mirrors the dr-2026-04-15 precedent (check-neutrality.sh).
 trigger_type: schema-update
 affected_pages: []
 ---
