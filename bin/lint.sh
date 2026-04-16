@@ -25,7 +25,7 @@ Options:
   --fix               Apply mechanical auto-fixes (stale markers)
   --category <cat>    Run only specified category:
                         orphan, crossref, stale, contradiction, gap,
-                        provenance, yaml, drift
+                        provenance, yaml, drift, contributor
                       Default: all categories
   --version           Print lint rule-set semver (LINT_VERSION) and exit 0
   --require-version X.Y.Z
@@ -57,6 +57,10 @@ Options:
                              escape hatch on the line above the claim.
                              Requires origin/main ref (falls back to wiki-wide
                              scan with stderr WARN when absent).
+  --count-skips              D-09 aggregator: enumerate every lint:expect-*
+                             marker across the wiki. Emits one info/skip-count
+                             finding per marker + stderr grand total. Intended
+                             for human review, not automated enforcement.
 
 Arguments:
   [wiki-directory]    Path to wiki directory (default: wiki/)
@@ -696,6 +700,142 @@ def strict_check(wiki_root):
         if not PROVENANCE_PRESENCE_RE.search(text):
             add_finding('error', 'provenance', path,
                         f"new {t} page has zero [prov:...] markers (D-10)")
+
+
+def count_skips_aggregate(wiki_root):
+    """D-09 aggregator: scan wiki for all lint:expect-* markers, emit one
+       info/skip-count finding per marker. Unlike strict_check (which emits
+       skip-count only for actually-exempted inferred/tentative claims),
+       this mode enumerates every marker for human-review visibility.
+
+       Prints a human-readable grand total to stderr independent of --format."""
+    if not COUNT_SKIPS_MODE:
+        return
+    per_page = {}
+    for dirpath, _, files in os.walk(wiki_root):
+        # Skip examples/ and maintenance/ (same exclusions as main walk)
+        rel_parts = os.path.relpath(dirpath, wiki_root).split(os.sep)
+        if rel_parts[0] in EXCLUDE_DIRS:
+            continue
+        for fn in sorted(files):
+            if not fn.endswith('.md'):
+                continue
+            path = os.path.join(dirpath, fn)
+            try:
+                lines = open(path, encoding='utf-8').read().splitlines()
+            except OSError:
+                continue
+            rel = os.path.relpath(path)
+            count = 0
+            for i, line in enumerate(lines):
+                m = EXPECT_MARKER_RE.match(line.rstrip('\n'))
+                if not m:
+                    continue
+                count += 1
+                add_finding(
+                    'info', 'skip-count', rel,
+                    f"line {i+1}: lint:expect-{m.group('kind')} "
+                    f"id={m.group('id')} reason=\"{m.group('reason')}\""
+                )
+            if count > 0:
+                per_page[rel] = count
+    total = sum(per_page.values())
+    if total > 0:
+        print(
+            f"--count-skips: {total} skipped findings across {len(per_page)} pages",
+            file=sys.stderr,
+        )
+
+
+# ---------------------------------------------------------------------------
+# Contributor category (COLAB-08 / D-22)
+# ---------------------------------------------------------------------------
+
+def parse_author_map(root):
+    """Parse .git-author-map.txt at repo root. Return dict {email_lc: @handle}.
+
+    Accepts two separator conventions: "email  ->  @handle" (two-space-arrow-
+    two-space) or tab separator. Comments start with `#`; email match is
+    case-insensitive.
+    """
+    path = os.path.join(root, '.git-author-map.txt')
+    mapping = {}
+    if not os.path.isfile(path):
+        return mapping
+    try:
+        raw_lines = open(path, encoding='utf-8').read().splitlines()
+    except OSError:
+        return mapping
+    for raw in raw_lines:
+        line = raw.strip()
+        if not line or line.startswith('#'):
+            continue
+        for sep in ('  ->  ', '\t'):
+            if sep in line:
+                left, right = line.split(sep, 1)
+                email = left.strip().lower()
+                handle = right.strip()
+                if email and handle.startswith('@'):
+                    mapping[email] = handle
+                break
+    return mapping
+
+
+def git_author_emails(root):
+    """Return set of author emails across git log. Empty set on git failure."""
+    try:
+        result = subprocess.run(
+            ['git', 'log', '--all', '--format=%ae'],
+            cwd=root, check=True, capture_output=True, text=True,
+        )
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return set()
+    return {line.strip().lower() for line in result.stdout.splitlines() if line.strip()}
+
+
+def contributor_check(wiki_root, repo_root):
+    """COLAB-08 / D-22: for each `contributor:: @handle` in wiki/log.md,
+       verify handle's email (via .git-author-map.txt reverse lookup)
+       appears in git log --all --format='%ae'. Short-circuit when
+       single-author (D-20).
+
+       Finding severity is always `warning` (non-blocking); CI_SEVERITY_REMAP
+       preserves this."""
+    if not should_run('contributor'):
+        return
+    log_path = os.path.join(wiki_root, 'log.md')
+    if not os.path.isfile(log_path):
+        return
+    git_emails = git_author_emails(repo_root)
+    # D-20 single-author short-circuit: personal forks emit no contributor
+    # findings because the single-author heuristic suppresses the field anyway.
+    if len(git_emails) <= 1:
+        return
+    mapping = parse_author_map(repo_root)
+    # Reverse lookup: handle (lowercase) -> email
+    reverse = {handle.lower(): email for email, handle in mapping.items()}
+    contrib_re = re.compile(r'contributor::\s*(@[a-zA-Z0-9_\-]+)')
+    seen = set()
+    rel_log = os.path.relpath(log_path)
+    try:
+        log_lines = open(log_path, encoding='utf-8').read().splitlines()
+    except OSError:
+        return
+    for i, line in enumerate(log_lines):
+        for m in contrib_re.finditer(line):
+            handle = m.group(1)
+            key = handle.lower()
+            if key in seen:
+                continue
+            seen.add(key)
+            email = reverse.get(key)
+            if email is None:
+                add_finding('warning', 'contributor', rel_log,
+                            f"line {i+1}: {handle} has no mapping in .git-author-map.txt")
+            elif email not in git_emails:
+                add_finding('warning', 'contributor', rel_log,
+                            f"line {i+1}: {handle} mapped to {email} "
+                            f"but email not in git commit authors")
 
 # ---------------------------------------------------------------------------
 # Collect all wiki pages
@@ -1482,11 +1622,15 @@ if should_run('drift') or should_run('all'):
                             'EXTERNAL: Non-markdown file in wiki/ (may cause Obsidian issues)')
 
 # ---------------------------------------------------------------------------
-# Phase 9 Plan 03: --strict check (CI-06 quality ratchet) runs BEFORE the
-# filter pipeline so its findings ride through the standard skip + remap path.
+# Phase 9 Plan 03: --strict check (CI-06 quality ratchet), --count-skips
+# aggregator (D-09), and contributor category (COLAB-08 / D-22) run BEFORE
+# the filter pipeline so their findings ride through the standard skip +
+# remap path.
 # ---------------------------------------------------------------------------
 
 strict_check(wiki_dir)
+count_skips_aggregate(wiki_dir)
+contributor_check(wiki_dir, REPO_ROOT)
 
 # ---------------------------------------------------------------------------
 # Apply Phase 9 filters (Plan 02): category narrowing is already enforced by
