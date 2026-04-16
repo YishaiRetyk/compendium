@@ -20,13 +20,15 @@ Usage: bin/search.sh [OPTIONS] <keyword>
 Search wiki pages by keyword with deterministic output per mode.
 
 Modes:
-  Default         Index lookup with TL;DR snippets
-  --paths-only    Output file paths only (no headers, no TL;DR)
-  --fulltext      Also search wiki/ body text (default: index-only)
-  --query "Q"     Generate an LLM-ready prompt from a question
+  Default                 Index lookup with TL;DR snippets
+  --paths-only            Output file paths only (no headers, no TL;DR)
+  --fulltext              Also search wiki/ body text (default: index-only)
+  --query "Q"             Generate an LLM-ready prompt from a question
+  --contributor <handle>  Filter wiki/log.md entries by contributor @handle.
+                          Accepts both @octocat and octocat (leading @ optional).
 
 Options:
-  --help, -h      Show this help message
+  --help, -h              Show this help message
 
 Output Contracts:
   Default mode:
@@ -114,6 +116,7 @@ KEYWORD=""
 QUERY=""
 PATHS_ONLY=0
 FULLTEXT=0
+CONTRIBUTOR_FILTER=""
 
 while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -127,6 +130,18 @@ while [ "$#" -gt 0 ]; do
                 exit 1
             fi
             QUERY="$2"
+            shift 2
+            ;;
+        --contributor)
+            if [ "$#" -lt 2 ]; then
+                echo "ERROR: --contributor requires a value (e.g., @octocat)" >&2
+                exit 1
+            fi
+            CONTRIBUTOR_FILTER="$2"
+            # Strip leading @ for internal matching (accept both forms)
+            case "$CONTRIBUTOR_FILTER" in
+                @*) CONTRIBUTOR_FILTER="${CONTRIBUTOR_FILTER#@}" ;;
+            esac
             shift 2
             ;;
         --paths-only)
@@ -152,6 +167,43 @@ while [ "$#" -gt 0 ]; do
             ;;
     esac
 done
+
+# ---------------------------------------------------------------------------
+# Contributor filter mode (COLAB-07)
+# ---------------------------------------------------------------------------
+
+if [ -n "$CONTRIBUTOR_FILTER" ]; then
+    LOG="$WIKI_DIR/log.md"
+    if [ ! -f "$LOG" ]; then
+        echo "No results found for \"@$CONTRIBUTOR_FILTER\"" >&2
+        exit 0
+    fi
+    # Extract log entries (separated by `## [YYYY-MM-DD]` headers) whose body
+    # contains `contributor:: @<filter>` (case-sensitive; handles are case-sensitive).
+    python3 - "$LOG" "$CONTRIBUTOR_FILTER" <<'PYEOF'
+import sys, re
+log_path = sys.argv[1]
+handle = sys.argv[2]
+content = open(log_path, encoding='utf-8').read()
+# Split into entries at `## [` headers; keep the header with each entry
+parts = re.split(r'(?m)^(?=## \[)', content)
+matches = []
+for p in parts:
+    if not p.strip().startswith('## ['):
+        continue
+    if re.search(r'contributor::\s*@' + re.escape(handle) + r'\b', p):
+        matches.append(p.rstrip())
+if not matches:
+    print(f'No results found for "@{handle}"', file=sys.stderr)
+    sys.exit(0)
+print("=== Contributor Results ===")
+for m in matches:
+    print(m)
+    print("---")
+print(f"=== {len(matches)} result(s) ===")
+PYEOF
+    exit 0
+fi
 
 # ---------------------------------------------------------------------------
 # Validation

@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Shareability
-status: Ready to plan
-stopped_at: Completed 08-05-ci-byte-equality-PLAN.md
-last_updated: "2026-04-16T04:31:30.754Z"
+status: Ready to execute
+stopped_at: Completed 09-01-test-harness-and-fixtures-PLAN.md
+last_updated: "2026-04-16T07:45:23.726Z"
 progress:
   total_phases: 5
   completed_phases: 2
-  total_plans: 10
-  completed_plans: 10
+  total_plans: 16
+  completed_plans: 11
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-15)
 
 **Core value:** The wiki is a persistent, compounding artifact -- cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested.
-**Current focus:** Phase 08 — two-track-setup-wizard-manual
+**Current focus:** Phase 09 — collaborative-pr-workflow-ci-lint-gate
 
 ## Current Position
 
-Phase: 9
-Plan: Not started
+Phase: 09 (collaborative-pr-workflow-ci-lint-gate) — EXECUTING
+Plan: 2 of 6
 
 ## Performance Metrics
 
@@ -76,6 +76,7 @@ Plan: Not started
 | Phase 08-two-track-setup-wizard-manual P02 | 12min | 2 tasks | 10 files |
 | Phase 08-two-track-setup-wizard-manual P03 | 8min | 2 tasks | 7 files |
 | Phase 08-two-track-setup-wizard-manual P05 | 2min | 1 tasks | 2 files |
+| Phase 09-collaborative-pr-workflow-ci-lint-gate P01 | 4min | 2 tasks | 18 files |
 
 ## Accumulated Context
 
@@ -184,6 +185,11 @@ Recent decisions affecting current work:
 - [Phase 08-two-track-setup-wizard-manual]: [Phase 08-05] Workflow comments avoid literal 'fetch-depth' + 'test_canonical_byte_equality.sh' tokens so plan's strict ! grep -q acceptance checks pass as single-pattern greps; semantically equivalent phrasing ('shallow-clone depth' / 'MANUAL-06 byte-equality test') used instead
 - [Phase 08-two-track-setup-wizard-manual]: [Phase 08-05] Aggregator math reconciled per review #7: 13 wizard + 7 manual-setup + 1 new byte-equality = 21/21 (test_wizard_not_yet_implemented deleted in 08-03 so does not count)
 - [Phase 08-two-track-setup-wizard-manual]: [Phase 08-05] Required-check name 'setup-parity' matches jobs.setup-parity key; operator adds to branch-protection on public template repo (one-time GitHub UI action, same model as Phase 7 neutrality)
+- [Phase 09-01]: Phase 9 test harness cloned from phase-08 with 08->09 rename only (zero semantic drift preserves operator muscle memory)
+- [Phase 09-01]: Fixtures are static input (no committed .git/); make_fixture_repo creates throwaway git repo at test time via mktemp + git init -b main
+- [Phase 09-01]: setup_git_author uses per-call unique filename (email-slug + nanoseconds + RANDOM) replacing Codex-LOW-flagged collision-prone .ts primitive
+- [Phase 09-01]: seed_origin_main_ref as first-class helper (not per-test plumbing) — Plan 09-03 strict tests depend on origin/main...HEAD semantics
+- [Phase 09-01]: All seeded .md fixtures use LF + UTF-8 (no BOM, no CRLF); critical for Plan 09-03 line-number-sensitive adjacency assertions
 
 ### Pending Todos
 
@@ -206,6 +212,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-16T04:26:00.252Z
-Stopped at: Completed 08-05-ci-byte-equality-PLAN.md
+Last session: 2026-04-16T07:45:23.723Z
+Stopped at: Completed 09-01-test-harness-and-fixtures-PLAN.md
 Resume file: None

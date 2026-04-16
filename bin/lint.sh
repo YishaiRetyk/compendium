@@ -31,6 +31,24 @@ Options:
   --require-version X.Y.Z
                       Fail with exit 1 if running LINT_VERSION < X.Y.Z
                       (minimum-version semantics, semver tuple compare)
+  --format text|json  Output format (default: text). JSON writes a `[{severity,
+                      category, path, message, line?}, ...]` array to stdout
+                      and does NOT write wiki/maintenance/lint-report.md.
+  --ci                CI mode: apply severity remap (yaml/orphan/crossref/
+                      provenance -> error; stale/gap/contradiction/drift/
+                      contributor -> warning; autofix/skip-count -> info),
+                      default-skip `drift-external`, exit 1 on any post-remap
+                      error-severity finding.
+  --skip-category <cat>
+                      Skip one category. Repeatable (chains into cat1:cat2).
+                      Inverse of --category. Valid values: any add_finding()
+                      category name, plus the logical subcategory
+                      'drift-external' (targets drift findings whose message
+                      starts with `EXTERNAL: `, i.e. DRFT-03 Obsidian-vault
+                      awareness and future external-state checks).
+                      Precedence: --category (inclusive) applies FIRST; then
+                      --skip-category SUBTRACTS. Example:
+                        --category stale --skip-category stale -> no findings.
 
 Arguments:
   [wiki-directory]    Path to wiki directory (default: wiki/)
@@ -56,6 +74,9 @@ DRY_RUN=0
 FIX=0
 CATEGORY="all"
 REQUIRE_VERSION=""
+FORMAT="text"
+CI_MODE=0
+SKIP_CATEGORIES=""   # colon-separated list
 
 while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -89,6 +110,33 @@ while [ "$#" -gt 0 ]; do
                 exit 1
             fi
             REQUIRE_VERSION="$2"
+            shift 2
+            ;;
+        --format)
+            if [ "$#" -lt 2 ]; then
+                echo "ERROR: --format requires a value (text or json)" >&2
+                exit 1
+            fi
+            case "$2" in
+                text|json) FORMAT="$2" ;;
+                *) echo "ERROR: --format must be 'text' or 'json', got '$2'" >&2; exit 1 ;;
+            esac
+            shift 2
+            ;;
+        --ci)
+            CI_MODE=1
+            shift
+            ;;
+        --skip-category)
+            if [ "$#" -lt 2 ]; then
+                echo "ERROR: --skip-category requires a value" >&2
+                exit 1
+            fi
+            if [ -z "$SKIP_CATEGORIES" ]; then
+                SKIP_CATEGORIES="$2"
+            else
+                SKIP_CATEGORIES="$SKIP_CATEGORIES:$2"
+            fi
             shift 2
             ;;
         -*)
@@ -146,6 +194,15 @@ if [ ! -d "$WIKI_DIR" ]; then
 fi
 
 # ---------------------------------------------------------------------------
+# CI default skip: drift-external (D-02). Only applied when --ci and no user
+# --skip-category value was provided; an explicit --skip-category wins.
+# ---------------------------------------------------------------------------
+
+if [ "$CI_MODE" -eq 1 ] && [ -z "$SKIP_CATEGORIES" ]; then
+    SKIP_CATEGORIES="drift-external"
+fi
+
+# ---------------------------------------------------------------------------
 # Temp file for finding accumulation + cleanup trap
 # ---------------------------------------------------------------------------
 
@@ -163,6 +220,9 @@ export LINT_FINDINGS_FILE="$FINDINGS_FILE"
 export LINT_DRY_RUN="$DRY_RUN"
 export LINT_FIX="$FIX"
 export LINT_CATEGORY="$CATEGORY"
+export LINT_FORMAT="$FORMAT"
+export LINT_CI_MODE="$CI_MODE"
+export LINT_SKIP_CATEGORIES="$SKIP_CATEGORIES"
 
 python3 << 'PYEOF'
 import sys, os, re, yaml
@@ -178,6 +238,48 @@ findings_file = os.environ['LINT_FINDINGS_FILE']
 dry_run = os.environ['LINT_DRY_RUN'] == "1"
 do_fix = os.environ['LINT_FIX'] == "1"
 category_filter = os.environ['LINT_CATEGORY']
+
+# --- Phase 9 CI-mode primitives (D-01..D-06) ---
+CI_MODE = os.environ.get('LINT_CI_MODE', '0') == '1'
+LINT_FORMAT = os.environ.get('LINT_FORMAT', 'text')
+SKIP_CATEGORIES = set(filter(None, os.environ.get('LINT_SKIP_CATEGORIES', '').split(':')))
+
+# Severity remap dispatch table (D-02, D-05). Any add_finding() category not
+# listed here retains its original severity. Plan 03 extends this with new
+# categories (`contributor`, `skip-count`) in one line each.
+CI_SEVERITY_REMAP = {
+    'yaml':               'error',
+    'orphan':             'error',
+    'crossref':           'error',
+    'provenance':         'error',
+    'stale':              'warning',
+    'gap':                'warning',
+    'contradiction':      'warning',
+    'contradiction-sync': 'warning',
+    'drift':              'warning',
+    'contributor':        'warning',   # Plan 03 populates
+    'autofix':            'info',
+    'skip-count':         'info',      # Plan 03 populates
+}
+
+def matches_skip(cat, msg, skip_set):
+    """Return True iff the finding (cat, msg) should be dropped per skip_set.
+
+    Supports both plain-category skips (e.g., 'yaml') and the
+    'drift-external' LOGICAL SUBCATEGORY skip, which targets drift findings
+    whose message begins with the `EXTERNAL: ` token (DRFT-03 Obsidian-vault
+    awareness and future external-state checks). Plain 'drift' in skip_set
+    drops ALL drift findings.
+
+    EXTERNAL: prefix marks drift findings originating from external-state
+    checks (DRFT-03 Obsidian vault awareness). The --skip-category drift-external
+    filter (applied by --ci default) consults this prefix. See AGENTS.md §11.3.
+    """
+    if cat in skip_set:
+        return True
+    if 'drift-external' in skip_set and cat == 'drift' and msg.startswith('EXTERNAL: '):
+        return True
+    return False
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -1019,11 +1121,15 @@ if should_run('drift') or should_run('all'):
                             f'Page not listed in wiki/index.md: {page_id}')
 
     # --- DRFT-03: Obsidian vault awareness ---
+    # EXTERNAL: prefix marks drift findings originating from external-state
+    # checks (Obsidian vault, future Zotero/etc). The --skip-category drift-external
+    # filter (applied by --ci default per D-02) consults this prefix.
+    # See AGENTS.md §11.3 and Phase 9 Plan 02 D-06.
     print("  Check 10e: Obsidian vault awareness (DRFT-03)...", file=sys.stderr)
     obsidian_dir = os.path.join(project_root, '.obsidian')
     if not os.path.isdir(obsidian_dir):
         add_finding('info', 'drift', '.obsidian/',
-                    'No .obsidian/ directory found -- Obsidian vault may not be configured')
+                    'EXTERNAL: No .obsidian/ directory found -- Obsidian vault may not be configured')
     # Check for non-.md files in wiki/ subdirectories (unexpected binaries)
     for root, dirs, files in os.walk(wiki_dir):
         # Skip maintenance/ directory (may contain non-standard files)
@@ -1034,7 +1140,23 @@ if should_run('drift') or should_run('all'):
                 fpath = os.path.join(root, fname)
                 rel = os.path.relpath(fpath)
                 add_finding('info', 'drift', rel,
-                            'Non-markdown file in wiki/ (may cause Obsidian issues)')
+                            'EXTERNAL: Non-markdown file in wiki/ (may cause Obsidian issues)')
+
+# ---------------------------------------------------------------------------
+# Apply Phase 9 filters (Plan 02): category narrowing is already enforced by
+# `should_run()` at check-time. Here we apply the --skip-category subtraction
+# (including `drift-external` logical subcategory) and the --ci severity remap.
+# Precedence (D-01 + P0 review fix): category_filter narrows FIRST (via
+# should_run), then skip_set SUBTRACTS. Equivalent set math:
+#   final = (category_filter or ALL) - skip_set
+# ---------------------------------------------------------------------------
+
+if SKIP_CATEGORIES:
+    findings = [f for f in findings if not matches_skip(f[1], f[3], SKIP_CATEGORIES)]
+
+if CI_MODE:
+    findings = [(CI_SEVERITY_REMAP.get(cat, sev), cat, path, msg)
+                for (sev, cat, path, msg) in findings]
 
 # ---------------------------------------------------------------------------
 # Sort findings and write to temp file
@@ -1058,7 +1180,34 @@ total = len(findings)
 autofix_applied = sum(1 for f in findings if f[1] == 'autofix')
 
 # ---------------------------------------------------------------------------
-# Generate lint report (unless --dry-run)
+# JSON emitter (D-03 + D-04): print array to stdout, DO NOT write
+# lint-report.md. The 4-tuple (sev, cat, path, msg) has no line slot, so
+# `line` is OMITTED (NOT present as null) for all Plan 02 findings. Plan 03
+# strict/skip-count findings will carry lines via their own mechanism.
+# ---------------------------------------------------------------------------
+
+if LINT_FORMAT == 'json':
+    import json
+    payload = []
+    for (sev, cat, path, msg) in findings:
+        # Note: `line` intentionally OMITTED when unknown (P0 review fix).
+        payload.append({
+            'severity': sev,
+            'category': cat,
+            'path': path,
+            'message': msg,
+        })
+    sys.stdout.write(json.dumps(payload, indent=2) + '\n')
+    # CI exit policy (D-05): exit 1 iff any post-remap error-severity finding.
+    if CI_MODE:
+        has_error = any(sev == 'error' for (sev, _, _, _) in findings)
+        sys.exit(1 if has_error else 0)
+    sys.exit(0)
+
+# ---------------------------------------------------------------------------
+# Text-mode emit (v1.0 behavior preserved): generate lint-report.md unless
+# --dry-run. The --ci flag still remaps severities for text output; exit code
+# still obeys D-05 CI policy.
 # ---------------------------------------------------------------------------
 
 if not dry_run:
@@ -1172,6 +1321,12 @@ if top_findings:
 
 print(f"Auto-fixes applied: {autofix_msg}", file=sys.stderr)
 print(f"Report: {report_msg}", file=sys.stderr)
+
+# CI exit policy (D-05) for text mode: exit 1 iff any post-remap error-severity
+# finding is present. Non-CI mode always exits 0 (v1.0 behavior preserved).
+if CI_MODE:
+    has_error = any(sev == 'error' for (sev, _, _, _) in findings)
+    sys.exit(1 if has_error else 0)
 
 PYEOF
 

@@ -63,7 +63,7 @@ Numbering continues from v1.0. New REQ-ID prefixes: `TMPL`, `NEUT`, `WZRD`, `MAN
 - [ ] **COLAB-01**: Top-level `CONTRIBUTING.md` describing branch-per-ingest convention, PR workflow, attribution rules
 - [ ] **COLAB-02**: `.github/pull_request_template.md` prompts for source attribution, ingest type, privacy review confirmation, lint output
 - [ ] **COLAB-03**: `log.md` entry schema amended (AGENTS.md §12) with optional `contributor:: <handle>` Dataview inline field
-- [ ] **COLAB-04**: `bin/ingest.sh --contributor <handle>` flag; auto-detects from `git config user.email` if omitted; omits field entirely on single-author repos
+- [x] **COLAB-04**: `bin/ingest.sh --contributor <handle>` flag; auto-detects from `git config user.email` if omitted; omits field entirely on single-author repos
 - [ ] **COLAB-05**: Git commit authorship is the attribution source of truth; documented as such in `CONTRIBUTING.md`
 - [ ] **COLAB-06**: `CONTRIBUTING.md` includes merge-conflict recipes for `index.md` and `log.md` (the write-heavy hotspots)
 - [ ] **COLAB-07**: `bin/search.sh --contributor <handle>` filter (parses `log.md` contributor field)
@@ -76,8 +76,8 @@ Numbering continues from v1.0. New REQ-ID prefixes: `TMPL`, `NEUT`, `WZRD`, `MAN
 - [ ] **CI-03**: `bin/lint.sh --ci` mode applies severity policy: `stale`, `gap`, and `contradiction` surface as warnings (not blockers — contradictions reflect source disagreement, not system failure, per Phase 5 decision); `yaml`, `orphan`, `crossref`, `provenance` remain blockers
 - [ ] **CI-04**: `bin/lint.sh --skip-category drift-external` skips cross-tool drift checks in CI (DRFT-03 requires local Zotero/Obsidian state)
 - [ ] **CI-05**: Annotation shim converts JSON findings to GitHub `::error file=...,line=...::` inline annotations
-- [ ] **CI-06**: `bin/lint.sh --strict` mode: exits non-zero on any `[inferred]`/`[tentative]` claim added without a matching decision record, and on new pages lacking provenance (quality ratchet at merge time)
-- [ ] **CI-07**: Privacy-leak guard: CI check fails a PR only when `privacy: local_only` (or any `local_only` frontmatter) appears under paths declared public (default: `examples/**`, `docs/**`, `AGENTS.md`, `CLAUDE.md`, `README.md`, `.github/**`). `local_only` is a valid tier in user content (`wiki/**`) — the guard prevents leakage into public/template material only. Public paths glob is configurable in `.github/workflows/lint.yml`.
+- [x] **CI-06**: `bin/lint.sh --strict` mode: exits non-zero on any `[inferred]`/`[tentative]` claim added without a matching decision record, and on new pages lacking provenance (quality ratchet at merge time)
+- [x] **CI-07**: Privacy-leak guard: CI check fails a PR only when `privacy: local_only` (or any `local_only` frontmatter) appears under paths declared public (default: `examples/**`, `docs/**`, `AGENTS.md`, `CLAUDE.md`, `README.md`, `.github/**`). `local_only` is a valid tier in user content (`wiki/**`) — the guard prevents leakage into public/template material only. Public paths glob is configurable in `.github/workflows/lint.yml`.
 - [ ] **CI-08**: `bin/lint.sh --version` supports version pinning so rule changes don't silently break existing PRs
 - [ ] **CI-09**: `/docs/reference/ci.md` documents GitLab/Gitea/Codeberg equivalents of the GitHub workflow (JSON output is platform-neutral)
 
@@ -200,7 +200,7 @@ Explicitly excluded from v1.1. Documented to prevent scope creep.
 | COLAB-01 | Phase 9 | Pending |
 | COLAB-02 | Phase 9 | Pending |
 | COLAB-03 | Phase 9 | Pending |
-| COLAB-04 | Phase 9 | Pending |
+| COLAB-04 | Phase 9 | Complete |
 | COLAB-05 | Phase 9 | Pending |
 | COLAB-06 | Phase 9 | Pending |
 | COLAB-07 | Phase 9 | Pending |
@@ -210,8 +210,8 @@ Explicitly excluded from v1.1. Documented to prevent scope creep.
 | CI-03 | Phase 9 | Pending |
 | CI-04 | Phase 9 | Pending |
 | CI-05 | Phase 9 | Pending |
-| CI-06 | Phase 9 | Pending |
-| CI-07 | Phase 9 | Pending |
+| CI-06 | Phase 9 | Complete |
+| CI-07 | Phase 9 | Complete |
 | CI-08 | Phase 9 | Pending |
 | CI-09 | Phase 9 | Pending |
 | BRWN-01 | Phase 10 | Pending |

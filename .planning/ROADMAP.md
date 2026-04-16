@@ -77,7 +77,14 @@ Plans:
   3. A PR that introduces `privacy: local_only` into a public path (`examples/**`, `docs/**`, `AGENTS.md`, `CLAUDE.md`, `README.md`, `.github/**`) fails the privacy-leak guard; `local_only` used inside `wiki/**` user content passes cleanly.
   4. User runs `bin/lint.sh --strict` on a branch adding an `[inferred]`/`[tentative]` claim without a matching decision record, or a new page lacking provenance, and lint exits non-zero (quality ratchet at merge time).
   5. `CONTRIBUTING.md` and `/docs/reference/ci.md` document the PR workflow, merge-conflict recipes for `index.md` and `log.md`, version-pinning via `--version`, and GitLab/Gitea/Codeberg equivalents of the GitHub workflow.
-**Plans**: TBD
+**Plans:** 6 plans
+Plans:
+- [x] 09-01-test-harness-and-fixtures-PLAN.md — Wave 0 test harness + 8 fixture repos (lib.sh helpers, run.sh aggregator)
+- [ ] 09-02-lint-flags-json-ci-version-PLAN.md — bin/lint.sh flags: --format json, --ci severity remap, --skip-category, --version, --require-version (CI-02/03/04/08)
+- [ ] 09-03-lint-strict-escape-hatch-contributor-PLAN.md — bin/lint.sh --strict (DR-match + new-page provenance), escape-hatch marker parser, --count-skips, contributor category (CI-06, COLAB-08)
+- [ ] 09-04-privacy-ingest-search-contributor-PLAN.md — bin/check-privacy.sh standalone + bin/ingest.sh --contributor + bin/search.sh --contributor + .git-author-map.txt (CI-07, COLAB-04, COLAB-07)
+- [ ] 09-05-ci-workflow-agents-amendments-pr-template-PLAN.md — .github/workflows/lint.yml (3 parallel jobs) + json-to-annotations.py + PR template + AGENTS.md §§11.1/11.3/12 amendments (CI-01, CI-05, COLAB-02, COLAB-03)
+- [ ] 09-06-contributing-docs-integration-PLAN.md — CONTRIBUTING.md + docs/reference/ci.md full populate + cross-links (COLAB-01/05/06, CI-09)
 
 ### Phase 10: Brownfield Scan + Bootstrap
 **Goal**: A user with a real existing Obsidian vault can run `bin/brownfield.sh scan` safely (no vault mutation) and `bin/brownfield.sh bootstrap` confidently (mechanical-only, idempotent, byte-exact reproducible) without corrupting frontmatter or losing content.
@@ -138,7 +145,7 @@ Plans:
 | 6. Reflection & Drift Detection | v1.0 | 3/3 | Complete | 2026-04-15 |
 | 7. Neutral Template Foundation | v1.1 | 5/5 | Complete | 2026-04-15 |
 | 8. Two-Track Setup (Wizard + Manual) | v1.1 | 5/5 | Complete | 2026-04-16 |
-| 9. Collaborative PR Workflow + CI Lint Gate | v1.1 | 0/0 | Not started | - |
+| 9. Collaborative PR Workflow + CI Lint Gate | v1.1 | 0/6 | Not started | - |
 | 10. Brownfield Scan + Bootstrap | v1.1 | 0/0 | Not started | - |
 | 11. Brownfield Suggest + Verify | v1.1 | 0/0 | Not started | - |
 | 12. Docs Finalization + v1.0 Debt Verification Gate | v1.1 | 0/0 | Not started | - |
