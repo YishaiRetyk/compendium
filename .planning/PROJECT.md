@@ -51,12 +51,12 @@ The wiki is a persistent, compounding artifact — cross-references are already 
 - [x] Lint workflow: contradiction detection, stale claims, orphan pages, missing cross-references, data gaps — Validated in Phase 05: lint-quality
 - [x] Reflect workflow: decision records, structural reasoning, reframing history — Validated in Phase 06: reflection-drift-detection
 - [x] Cross-system drift detection between wiki, raw sources, and any external tools — Validated in Phase 06: reflection-drift-detection
+- [x] Guided setup wizard generating personalized `AGENTS.md` (domain, privacy, LLM agent) — Validated in Phase 08: two-track-setup-wizard-manual
+- [x] Manual setup track preserved for power users — Validated in Phase 08: two-track-setup-wizard-manual
 
 ### Active (v1.1 focus areas — formal REQ-IDs in REQUIREMENTS.md)
 
 - [ ] Template-based starter repo with four-track `/docs/` (quickstart, guided setup, manual setup, reference)
-- [ ] Guided setup wizard generating personalized `AGENTS.md` (domain, privacy, LLM agent)
-- [ ] Manual setup track preserved for power users
 - [ ] Kahneman cluster moved to `examples/`; starter vault neutral
 - [ ] Git-based PR workflow for collaborative curation with lint gate
 - [ ] Per-ingest contributor field in `log.md` (git authorship remains source of truth)
@@ -125,4 +125,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-15 — v1.1 Shareability milestone started*
+*Last updated: 2026-04-16 — Phase 08 (Two-Track Setup) complete*
