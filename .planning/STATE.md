@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Shareability
-status: Executing Phase 09.1
-stopped_at: Phase 09.1 context gathered
-last_updated: "2026-04-16T11:57:11.524Z"
+status: Ready to execute
+stopped_at: Completed 09.1-01-PLAN.md
+last_updated: "2026-04-16T14:10:45.409Z"
 progress:
   total_phases: 6
   completed_phases: 3
   total_plans: 18
-  completed_plans: 16
-  percent: 89
+  completed_plans: 17
+  percent: 94
 ---
 
 # Project State
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-04-15)
 ## Current Position
 
 Phase: 09.1 (progressive-disclosure-extraction) — EXECUTING
-Plan: 1 of 2
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -83,6 +83,7 @@ Plan: 1 of 2
 | Phase 09-collaborative-pr-workflow-ci-lint-gate P03 | 10min | 2 tasks | 11 files |
 | Phase 09-collaborative-pr-workflow-ci-lint-gate P05 | 6min | 3 tasks | 11 files |
 | Phase 09-collaborative-pr-workflow-ci-lint-gate P06 | 8min | 2 tasks | 5 files |
+| Phase 09.1 P01 | 4min | 2 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -224,6 +225,11 @@ Recent decisions affecting current work:
 - [Phase 09-06]: [Phase 09-06] docs/reference/ci.md opens Severity policy + JSON schema sections with source-of-truth blockquotes pointing to AGENTS.md §11.3; rationale columns kept for user-facing context not in §11.3
 - [Phase 09-06]: [Phase 09-06] .gitattributes merge=union documented as operator opt-in (NOT committed default per D-24) to prevent surprise for contributors who haven't read CONTRIBUTING.md
 - [Phase 09-06]: [Phase 09-06] Rule 3 relaxed tests/phase-07/test_reference_stubs.sh to drop ci.md from stub list + added inverse 'ci.md is NOT a stub' assertion (precedent: Phase 08-04 relaxing phase-07 test_docs_skeleton.sh)
+- [Phase 09.1]: [Phase 09.1-01] Wave-0 mechanical gate: 13 files in tests/phase-09.1/ (1 aggregator + 1 lib + 11 test files); 3 GREEN canaries + 8 RED extraction-invariant tests; aggregator emits PHASE 09.1 TESTS: 3/11 today, must emit 11/11 after Plan 09.1-02 commit
+- [Phase 09.1]: [Phase 09.1-01] R7 review consensus enforced: test_agents_section_16.sh uses grep -F fixed-string for Appendix C literal (backticks/asterisks are regex metachars); R3 enforced: affected_pages == [] EXACTLY (no None fallback); R8 enforced: §4 preamble ratchet from 'Five page types exist.' to 'Six' is mandatory polish
+- [Phase 09.1]: [Phase 09.1-01] R2 promoted dataview-fence-shape from inline acceptance criterion to first-class test_dataview_fences.sh — standalone cookbook uses 5 direct ```dataview opens + 0 outer ```markdown wrappers (vs the AGENTS.md §16 inline-illustration nested-fence shape)
+- [Phase 09.1]: [Phase 09.1-01] Test scripts use minimal lib.sh (REPO_ROOT + assert_exit_code only) — Phase-09 fixture-repo helpers (make_fixture_repo, setup_git_author, etc.) unnecessary because Phase 09.1 tests operate on the real repo tree, not throwaway fixtures
+- [Phase 09.1]: [Phase 09.1-01] test_template_parity.sh uses flag-based awk extraction with sentinel END patterns (## 4. → ## 5. exclusive; ## 16. → EOF) so the AGENTS.md ↔ schema/AGENTS.template.md byte-equality assertion survives the line-number drift Wave-1 will introduce when worked-example fenced blocks shrink to residue
 
 ### Pending Todos
 
@@ -250,6 +256,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-16T09:50:53.733Z
-Stopped at: Phase 09.1 context gathered
-Resume file: .planning/phases/09.1-progressive-disclosure-extraction/09.1-CONTEXT.md
+Last session: 2026-04-16T14:10:25.824Z
+Stopped at: Completed 09.1-01-PLAN.md
+Resume file: None
