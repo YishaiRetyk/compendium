@@ -37,13 +37,13 @@ Numbering continues from v1.0. New REQ-ID prefixes: `TMPL`, `NEUT`, `WZRD`, `MAN
 
 ### Guided Setup Wizard (WZRD)
 
-- [ ] **WZRD-01**: `bin/init-wizard.sh` exists, bash-only, no new runtime dependencies
+- [x] **WZRD-01**: `bin/init-wizard.sh` exists, bash-only, no new runtime dependencies
 - [ ] **WZRD-02**: Wizard prompts are semantically grouped: Domain → LLM agent → Privacy defaults → Obsidian conventions, each group prints a one-sentence explainer before its questions
 - [ ] **WZRD-03**: Wizard supports non-interactive mode via `--answers-file <path>` for CI and replay
 - [ ] **WZRD-04**: Wizard validates input: domain matches `^[a-z0-9-]+$`, agent is in allowed set, privacy tier is one of three named values
 - [ ] **WZRD-05**: Wizard is idempotent — re-running on an already-initialized repo either no-ops or refuses with a clear message
 - [ ] **WZRD-06**: Wizard writes `.wizard-answers.yaml` recording the inputs that produced the rendered AGENTS.md (powers v1.2 upgrades)
-- [ ] **WZRD-07**: Wizard renders from `schema/AGENTS.template.md` using named placeholders (≤6 placeholders: `{{PRIMARY_DOMAIN}}`, `{{DEFAULT_PRIVACY}}`, `{{AGENT_FILENAME}}`, `{{DECAY_PROFILE}}`, `{{EXAMPLE_CLUSTER_REF}}`, `{{USER_NAME}}`)
+- [x] **WZRD-07**: Wizard renders from `schema/AGENTS.template.md` using exactly 4 named placeholders: `{{PRIMARY_DOMAIN}}`, `{{DEFAULT_PRIVACY}}`, `{{AGENT_FILENAME}}`, `{{DECAY_PROFILE}}`. (Amended Phase 8 per D-02: the previously-proposed example-cluster and user-name placeholders were rejected; the maintainer-name answer lives only in `.wizard-answers.yaml` + the initial decision record, never in AGENTS.md.)
 - [ ] **WZRD-08**: Wizard prints the file list it wrote with a summary diff on completion
 - [ ] **WZRD-09**: Wizard pre-flight check: confirms `git`, `bash >= 4`, prints actionable message if missing
 - [ ] **WZRD-10**: Wizard writes an initial decision record per DCSN-01 capturing the setup choices (self-referential first reflect artifact)
@@ -56,7 +56,7 @@ Numbering continues from v1.0. New REQ-ID prefixes: `TMPL`, `NEUT`, `WZRD`, `MAN
 - [ ] **MANUAL-03**: `/docs/manual-setup.md` ends with a checklist that maps one-to-one to wizard prompts (wizard-manual isomorphism)
 - [ ] **MANUAL-04**: `/docs/manual-setup.md` includes explicit equivalence statement — wizard and manual produce the same end state
 - [ ] **MANUAL-05**: `/docs/manual-setup.md` lists every file the wizard touches and what it writes
-- [ ] **MANUAL-06**: Byte-equality test: wizard output with canonical answers matches manual track's stated end state (pitfall M-1/M-3 mitigation)
+- [x] **MANUAL-06**: Byte-equality test: wizard output with canonical answers matches manual track's stated end state (pitfall M-1/M-3 mitigation)
 
 ### Collaborative PR Workflow (COLAB)
 
@@ -180,13 +180,13 @@ Explicitly excluded from v1.1. Documented to prevent scope creep.
 | NEUT-07 | Phase 7 | Complete |
 | NEUT-08 | Phase 7 | Deferred (partial — infrastructure shipped, denylist entries pending follow-up PR) |
 | DEBT-03 | Phase 7 | Complete |
-| WZRD-01 | Phase 8 | Pending |
+| WZRD-01 | Phase 8 | Complete |
 | WZRD-02 | Phase 8 | Pending |
 | WZRD-03 | Phase 8 | Pending |
 | WZRD-04 | Phase 8 | Pending |
 | WZRD-05 | Phase 8 | Pending |
 | WZRD-06 | Phase 8 | Pending |
-| WZRD-07 | Phase 8 | Pending |
+| WZRD-07 | Phase 8 | Complete |
 | WZRD-08 | Phase 8 | Pending |
 | WZRD-09 | Phase 8 | Pending |
 | WZRD-10 | Phase 8 | Pending |
@@ -196,7 +196,7 @@ Explicitly excluded from v1.1. Documented to prevent scope creep.
 | MANUAL-03 | Phase 8 | Pending |
 | MANUAL-04 | Phase 8 | Pending |
 | MANUAL-05 | Phase 8 | Pending |
-| MANUAL-06 | Phase 8 | Pending |
+| MANUAL-06 | Phase 8 | Complete |
 | COLAB-01 | Phase 9 | Pending |
 | COLAB-02 | Phase 9 | Pending |
 | COLAB-03 | Phase 9 | Pending |

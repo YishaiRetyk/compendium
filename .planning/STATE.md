@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Shareability
-status: Ready to plan
-stopped_at: "Completed 07-05-PLAN.md — Phase 7 (neutral-template-foundation) done (5/5 plans). Ready for /gsd:plan-phase 8 (two-track-setup-wizard-manual)."
-last_updated: "2026-04-15T22:25:58.493Z"
+status: Ready to execute
+stopped_at: Completed 08-01-test-harness-and-fixtures-PLAN.md
+last_updated: "2026-04-16T03:57:57.708Z"
 progress:
   total_phases: 5
   completed_phases: 1
-  total_plans: 5
-  completed_plans: 5
+  total_plans: 10
+  completed_plans: 6
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-15)
 
 **Core value:** The wiki is a persistent, compounding artifact -- cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested.
-**Current focus:** Phase 07 complete — ready for Phase 08 (Two-Track Setup: Wizard + Manual)
+**Current focus:** Phase 08 — two-track-setup-wizard-manual
 
 ## Current Position
 
-Phase: 8
-Next: Phase 08 (two-track-setup-wizard-manual) — not yet planned
+Phase: 08 (two-track-setup-wizard-manual) — EXECUTING
+Plan: 2 of 5
 
 ## Performance Metrics
 
@@ -71,6 +71,7 @@ Next: Phase 08 (two-track-setup-wizard-manual) — not yet planned
 | Phase 07 P03 | 5min | 2 tasks | 11 files |
 | Phase 07 P04 | 4min | 2 tasks | 24 files |
 | Phase 07 P05 | 65min | 5 tasks | 13 files |
+| Phase 08 P01 | 3 | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -159,6 +160,10 @@ Recent decisions affecting current work:
 - [Phase 07-05]: TMPL-01 mechanics proven on throwaway YishaiRetyk/template-smoke-test — is_template: true toggled + branch protection requires 'neutrality' status check. Real public template repo name deferred to operator decision; runbook at docs/reference/release.md is sufficient for name-pick.
 - [Phase 07-05]: release.sh local_only regex tightened (fix 21e0445) to exclude AGENTS.md enum-documentation contexts; release.md smoke grep excludes --exclude=release.md to skip the runbook's own self-reference (fix a1b2afd).
 - [Phase 07-05]: NEUT-08 deferred to a follow-up PR; 861-line deterministic --suggest-denylist candidate output preserved at .planning/backlog-neutrality-denylist-candidate.txt for later hand-curated review.
+- [Phase 08-01]: default_privacy=cloud_safe in canonical-answers.yaml (not local_only) — deliberate deviation from wizard default to pass bin/release.sh '^privacy:[[:space:]]*local_only' public-leak regex; rationale in schema/fixtures/README.md (review #1)
+- [Phase 08-01]: Plan 01 python3 str.replace render is the byte-equality reference; Plan 02 wizard render routine must produce byte-identical output or Plan 05 CI fails (review #13)
+- [Phase 08-01]: phase-08/run.sh uses semantic parity (not line-count parity) with phase-07/run.sh — filtered diff returns 0 unexpected lines (review #12)
+- [Phase 08-01]: schema/fixtures/ + tests/phase-08/ establish byte-frozen fixture pair pattern (answers.yaml + rendered target, LF-pinned in .gitattributes, README-documented regen rule)
 
 ### Pending Todos
 
@@ -181,6 +186,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-15T22:30:00.000Z
-Stopped at: Completed 07-05-PLAN.md — Phase 7 (neutral-template-foundation) done (5/5 plans). Ready for /gsd:plan-phase 8 (two-track-setup-wizard-manual).
+Last session: 2026-04-16T03:57:57.705Z
+Stopped at: Completed 08-01-test-harness-and-fixtures-PLAN.md
 Resume file: None

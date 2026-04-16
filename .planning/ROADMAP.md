@@ -58,7 +58,13 @@ Plans:
   3. User runs `bin/init-wizard.sh --answers-file canonical.yaml` in CI (non-interactive) and produces an `AGENTS.md` that is byte-equal to the end state described by `docs/manual-setup.md`'s checklist — enforced by a CI test.
   4. User who prefers the hand-edit path follows `docs/manual-setup.md` section-by-section, using a one-to-one wizard-prompt checklist and a concrete minimal-diff example, and lands in the same configured state.
   5. Wizard pre-flight detects missing `git`/`bash >= 4` and prints an actionable remediation message before touching anything; invalid input (bad domain slug, unknown agent, unknown privacy tier) is rejected with a clear error.
-**Plans**: TBD
+**Plans:** 5 plans
+Plans:
+- [x] 08-01-test-harness-and-fixtures-PLAN.md — Wave 0 test harness + canonical fixtures (tests/phase-08/, schema/fixtures/, .gitattributes EOL pin)
+- [ ] 08-02-init-wizard-core-PLAN.md — bin/init-wizard.sh core (preflight, prompts, validator, render, --dry-run, --render-to, idempotency guard) + 7 tests
+- [ ] 08-03-wizard-side-effects-PLAN.md — Wizard write side (.wizard-answers.yaml atomic, initial decision record, sync-claude invoke, wiki/index.md edit) + 4 tests
+- [ ] 08-04-manual-track-and-docs-PLAN.md — docs/manual-setup.md (D-07 11-section walkthrough), guided-setup, quickstart, setup-prerequisites, WZRD-07 amendment + 5 doc tests
+- [ ] 08-05-ci-byte-equality-PLAN.md — MANUAL-06 byte-equality test + .github/workflows/setup-parity.yml CI gate
 **UI hint**: yes
 
 ### Phase 9: Collaborative PR Workflow + CI Lint Gate
@@ -131,7 +137,7 @@ Plans:
 | 5. Lint & Quality | v1.0 | 4/4 | Complete | 2026-04-14 |
 | 6. Reflection & Drift Detection | v1.0 | 3/3 | Complete | 2026-04-15 |
 | 7. Neutral Template Foundation | v1.1 | 5/5 | Complete | 2026-04-15 |
-| 8. Two-Track Setup (Wizard + Manual) | v1.1 | 0/0 | Not started | - |
+| 8. Two-Track Setup (Wizard + Manual) | v1.1 | 0/5 | Planned | - |
 | 9. Collaborative PR Workflow + CI Lint Gate | v1.1 | 0/0 | Not started | - |
 | 10. Brownfield Scan + Bootstrap | v1.1 | 0/0 | Not started | - |
 | 11. Brownfield Suggest + Verify | v1.1 | 0/0 | Not started | - |
