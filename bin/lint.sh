@@ -25,7 +25,7 @@ Options:
   --fix               Apply mechanical auto-fixes (stale markers)
   --category <cat>    Run only specified category:
                         orphan, crossref, stale, contradiction, gap,
-                        provenance, yaml, drift, contributor
+                        provenance, yaml, drift, contributor, brownfield
                       Default: all categories
   --version           Print lint rule-set semver (LINT_VERSION) and exit 0
   --require-version X.Y.Z
@@ -307,6 +307,7 @@ CI_SEVERITY_REMAP = {
     'contradiction-sync': 'warning',
     'drift':              'warning',
     'contributor':        'warning',   # Plan 03 populates
+    'brownfield':         'warning',   # Phase 10 populates
     'autofix':            'info',
     'skip-count':         'info',      # Plan 03 populates
 }
@@ -868,6 +869,21 @@ source_registry = {}
 for sp, sfm, sbody in source_pages:
     if sfm and 'id' in sfm:
         source_registry[sfm['id']] = sfm
+
+# ---------------------------------------------------------------------------
+# Phase 10 (BRWN-08): identify bootstrapped pages for the --ci error->info
+# downgrade applied later in the CI_MODE block. Build once here from the
+# already-parsed frontmatter so the downgrade is O(1) per finding.
+# BROWNFIELD_ALLOWLIST: categories eligible for downgrade (matches the plan's
+# "unknown type, empty knowledge_domain, missing sources, epistemic_status:
+# tentative" surface which manifests as yaml/provenance/orphan findings).
+# ---------------------------------------------------------------------------
+
+BROWNFIELD_ALLOWLIST = {'yaml', 'provenance', 'orphan'}
+BROWNFIELD_BOOTSTRAPPED_PAGES = set()
+for page_path, page_fm, _body, _err in all_pages:
+    if page_fm and page_fm.get('bootstrap_stage') == 'bootstrapped':
+        BROWNFIELD_BOOTSTRAPPED_PAGES.add(os.path.relpath(page_path))
 
 # ---------------------------------------------------------------------------
 # Check 1: YAML frontmatter validation
@@ -1622,6 +1638,47 @@ if should_run('drift') or should_run('all'):
                             'EXTERNAL: Non-markdown file in wiki/ (may cause Obsidian issues)')
 
 # ---------------------------------------------------------------------------
+# Check: brownfield (BRWN-09) — 30-day staleness + summary counts
+# ---------------------------------------------------------------------------
+# Emits:
+#   warning/brownfield/<path>: "bootstrapped N days ago; consider Phase-11
+#                              suggest/verify" — for pages whose
+#                              bootstrap_date is >30 days old.
+#   info/brownfield/<empty>:   "bootstrapped pages: X; stale (>30d): Y" —
+#                              summary roll-up (only emitted when X > 0).
+# Fresh bootstraps (<=30 days) are NOT flagged; missing/malformed
+# bootstrap_date is ignored (no finding) because the summary count still
+# reflects bootstrap_stage presence.
+
+if should_run('brownfield') or should_run('all'):
+    from datetime import date as _date
+    today_d = _date.today()
+    bf_count = 0
+    stale_count = 0
+    for page_path, page_fm, _body, _err in all_pages:
+        if page_fm is None:
+            continue
+        if page_fm.get('bootstrap_stage') != 'bootstrapped':
+            continue
+        bf_count += 1
+        bd = page_fm.get('bootstrap_date')
+        if not bd:
+            continue
+        try:
+            bdate = _date.fromisoformat(str(bd))
+        except (ValueError, TypeError):
+            continue
+        age_days = (today_d - bdate).days
+        if age_days > 30:
+            stale_count += 1
+            rel = os.path.relpath(page_path)
+            add_finding('warning', 'brownfield', rel,
+                        f'bootstrapped {age_days} days ago; consider Phase-11 suggest/verify')
+    if bf_count > 0:
+        add_finding('info', 'brownfield', '',
+                    f'bootstrapped pages: {bf_count}; stale (>30d): {stale_count}')
+
+# ---------------------------------------------------------------------------
 # Phase 9 Plan 03: --strict check (CI-06 quality ratchet), --count-skips
 # aggregator (D-09), and contributor category (COLAB-08 / D-22) run BEFORE
 # the filter pipeline so their findings ride through the standard skip +
@@ -1646,6 +1703,18 @@ if SKIP_CATEGORIES:
 
 if CI_MODE:
     findings = [(CI_SEVERITY_REMAP.get(cat, sev), cat, path, msg)
+                for (sev, cat, path, msg) in findings]
+    # BRWN-08: downgrade allowlist findings on bootstrapped pages from error
+    # to info. SCOPE (I-1): --ci mode only; text-mode lint is unaffected.
+    # A finding is eligible iff its category is in BROWNFIELD_ALLOWLIST AND
+    # its path is in BROWNFIELD_BOOTSTRAPPED_PAGES AND its severity is error.
+    def _bf_downgrade(sev, cat, path):
+        if (cat in BROWNFIELD_ALLOWLIST
+                and path in BROWNFIELD_BOOTSTRAPPED_PAGES
+                and sev == 'error'):
+            return 'info'
+        return sev
+    findings = [(_bf_downgrade(sev, cat, path), cat, path, msg)
                 for (sev, cat, path, msg) in findings]
 
 # ---------------------------------------------------------------------------
