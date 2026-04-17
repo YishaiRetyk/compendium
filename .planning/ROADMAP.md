@@ -24,7 +24,7 @@
 - [x] **Phase 7: Neutral Template Foundation** — Public orphan-branch template, Kahneman → `examples/`, neutrality CI gate, `requirements-sync` mechanical check. (5/5 plans complete 2026-04-15)
 - [x] **Phase 8: Two-Track Setup (Wizard + Manual)** — `bin/init-wizard.sh` plus byte-equivalent manual track, co-shipped to prevent drift. (5/5 plans complete 2026-04-16)
 - [ ] **Phase 9: Collaborative PR Workflow + CI Lint Gate** — Git-based PR workflow, `log.md` contributor field, `bin/lint.sh --ci --format json` severity policy, privacy-leak guard.
-- [ ] **Phase 10: Brownfield Scan + Bootstrap** — `bin/brownfield.sh scan|bootstrap` with `bootstrap_stage` sentinel, ruamel.yaml round-trip, byte-exact fixture tests.
+- [x] **Phase 10: Brownfield Scan + Bootstrap** — `bin/brownfield.sh scan|bootstrap` with `bootstrap_stage` sentinel, ruamel.yaml round-trip, byte-exact fixture tests. (completed 2026-04-17)
 - [ ] **Phase 11: Brownfield Suggest + Verify** — Four staged migration script classes, `verify` wrapper over lint.
 - [ ] **Phase 12: Docs Finalization + v1.0 Debt Verification Gate** — `/docs/reference/` fill-out, Obsidian render check, Codex agent-parity, write-back scenario re-run.
 
@@ -108,13 +108,13 @@ Plans:
   3. Running `bootstrap` twice on the same vault produces zero-byte diff on the second run (idempotency); a byte-exact fixture CI test validates this across sample vaults.
   4. After bootstrap, `bin/lint.sh` downgrades the allowlist findings (unknown `type`, empty `knowledge_domain`, missing `sources`, `epistemic_status: tentative`) from `error` to `info` when `bootstrap_stage: bootstrapped`; a new `brownfield` lint category reports counts and warns on pages `bootstrapped` older than 30 days.
   5. If `bin/ingest.sh` encounters `bootstrap_stage` on a normal ingest, it strips the field to prevent pollution; `AGENTS.md §5` documents `bootstrap_stage` narrowly as the **brownfield onboarding sentinel** (enum `raw|bootstrapped|verified`) — explicitly NOT a substitute for the claim-level + source-linked provenance model (PROV-01..05). The field tracks migration state and marks imported-vs-LLM-generated lineage at page level; it is not the general provenance mechanism.
-**Plans:** 4/5 plans executed
+**Plans:** 5/5 plans complete
 Plans:
 - [x] 10-01-PLAN.md — Wave 1: tests/phase-10/ harness + 7 byte-frozen fixtures (dual golden contract per D-07) + 2 self-check tests
 - [x] 10-02-PLAN.md — Wave 2: bin/brownfield.sh subcommand dispatch + scan subcommand + bin/lib/brownfield_classify.py + .brownfield-ignore parser + 6 tests (BRWN-01, BRWN-02, BRWN-16)
 - [x] 10-03-PLAN.md — Wave 3: bin/brownfield.sh bootstrap (dry-run default + --apply) + bin/lib/brownfield_yaml.py ruamel round-trip + typed-merge Class A/B/C + APPLIED.md/SKIPPED.md + idempotency + 12 tests (BRWN-03, BRWN-04, BRWN-05, BRWN-06, BRWN-07, BRWN-21)
 - [x] 10-04-PLAN.md — Wave 3: AGENTS.md §5 bootstrap_stage + bootstrap_date rows + CLAUDE.md byte-sync + schema/AGENTS.template.md mirror + canonical-AGENTS.md regen + bin/ingest.sh BRWN-10 strip + bin/lint.sh BRWN-08 downgrade + brownfield category + 9 tests (BRWN-07, BRWN-08, BRWN-09, BRWN-10)
-- [ ] 10-05-PLAN.md — Wave 4: docs/reference/brownfield.md scan+bootstrap full populate + suggest/verify stubs + docs/quickstart.md ruamel.yaml prereq + 10-VERIFICATION.md + 3 docs tests (BRWN-01..10, BRWN-21)
+- [x] 10-05-PLAN.md — Wave 4: docs/reference/brownfield.md scan+bootstrap full populate + suggest/verify stubs + docs/quickstart.md ruamel.yaml prereq + 10-VERIFICATION.md + 3 docs tests (BRWN-01..10, BRWN-21)
 
 ### Phase 11: Brownfield Suggest + Verify
 **Goal**: A user who has completed `bootstrap` can run `bin/brownfield.sh suggest` to generate four staged, idempotent, user-invoked migration scripts for judgment-heavy work — and run `verify` to re-lint the vault after applying them, with zero claim-level schema expansion.
@@ -212,6 +212,6 @@ Plans:
 | 7. Neutral Template Foundation | v1.1 | 5/5 | Complete | 2026-04-15 |
 | 8. Two-Track Setup (Wizard + Manual) | v1.1 | 5/5 | Complete | 2026-04-16 |
 | 9. Collaborative PR Workflow + CI Lint Gate | v1.1 | 0/6 | Not started | - |
-| 10. Brownfield Scan + Bootstrap | v1.1 | 4/5 | In Progress|  |
+| 10. Brownfield Scan + Bootstrap | v1.1 | 5/5 | Complete   | 2026-04-17 |
 | 11. Brownfield Suggest + Verify | v1.1 | 0/0 | Not started | - |
 | 12. Docs Finalization + v1.0 Debt Verification Gate | v1.1 | 0/0 | Not started | - |
