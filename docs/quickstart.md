@@ -6,6 +6,8 @@
 
 You need `bash >= 4`, `git`, and `python3`. See [reference/setup-prerequisites.md](reference/setup-prerequisites.md) for platform-specific install instructions (macOS, Debian/Ubuntu, Arch, Fedora, WSL, Windows).
 
+**For brownfield onboarding only:** If you have an existing Obsidian vault and plan to use `bin/brownfield.sh`, also install `ruamel.yaml` (`pip install ruamel.yaml` or your distro's `python3-ruamel.yaml` package). Not needed for greenfield users. See [reference/brownfield.md](reference/brownfield.md) for the runbook.
+
 ## 1. Fork the template
 
 Click "Use this template" on the <org>/<repo> GitHub page.

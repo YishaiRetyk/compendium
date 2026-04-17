@@ -16,8 +16,10 @@ done
 
 # Stubs still pending future-phase populate carry the exact
 # "Status: stub — populated in v1.1 Phase" marker. ci.md was populated in
-# Phase 9 Plan 06 (drops from the stub list).
-STUB_FILES=(docs/reference/schema-tour.md docs/reference/brownfield.md docs/reference/privacy-model.md docs/reference/examples.md)
+# Phase 9 Plan 06; brownfield.md was populated in Phase 10 Plan 05
+# (both drop from the stub list — Phase 08-04 precedent for relaxing prior-phase
+# tests when a successor plan populates the stub).
+STUB_FILES=(docs/reference/schema-tour.md docs/reference/privacy-model.md docs/reference/examples.md)
 STUBS_OK=0
 for f in "${STUB_FILES[@]}"; do
   if grep -q 'Status: stub — populated in v1.1 Phase' "$f"; then
@@ -33,6 +35,13 @@ if grep -q 'Status: stub' docs/reference/ci.md; then
   fail "ci.md contains 'Status: stub' (Phase 9 Plan 06 populated this file; must no longer be a stub)"
 else
   pass "ci.md is not marked as a stub"
+fi
+
+# brownfield.md is NOT a stub (populated in Phase 10 Plan 05)
+if grep -q 'Status: stub' docs/reference/brownfield.md; then
+  fail "brownfield.md contains 'Status: stub' (Phase 10 Plan 05 populated this file; must no longer be a stub)"
+else
+  pass "brownfield.md is not marked as a stub"
 fi
 
 # release.md is NOT a stub
