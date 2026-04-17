@@ -313,6 +313,69 @@ else
 fi
 
 # ---------------------------------------------------------------------------
+# BRWN-10: strip brownfield-scoped fields to prevent pollution
+# ---------------------------------------------------------------------------
+# If the source file carries `bootstrap_stage` or `bootstrap_date` (from a
+# prior `bin/brownfield.sh bootstrap` pass), strip them from the copied
+# DEST_FILE and emit a one-line stderr warning per field per D-21.
+# Regex-only implementation: keeps bin/ingest.sh free of any preserving-YAML
+# runtime dep (round-trip YAML is brownfield-path-only per CONTEXT.md
+# §Established-Patterns).
+
+BF_REL_PATH="${DEST_FILE#"$(pwd)/"}"
+for BF_FIELD in bootstrap_stage bootstrap_date; do
+    # Pre-filter: is the field present anywhere in DEST_FILE? The python3 pass
+    # below re-confirms by scoping to the first `---`..`---` frontmatter block
+    # so body text containing the token (e.g., inside a code block) is NOT
+    # mutated or warned about.
+    BF_VALUE_RAW="$(grep -E "^${BF_FIELD}:" "${DEST_FILE}" 2>/dev/null | head -1 || true)"
+    if [ -z "${BF_VALUE_RAW}" ]; then
+        continue
+    fi
+    # Extract the value (portion after the first colon, trimmed).
+    BF_VALUE="$(printf '%s' "${BF_VALUE_RAW}" | sed -E 's/^[^:]+:[[:space:]]*//' | sed -E 's/[[:space:]]+$//')"
+    # Frontmatter-scoped strip via python3; stdout reports whether a strip occurred.
+    BF_STRIPPED="$(python3 - "${DEST_FILE}" "${BF_FIELD}" <<'PYSTRIP'
+import re, sys
+path, field = sys.argv[1], sys.argv[2]
+with open(path, 'r', encoding='utf-8') as f:
+    content = f.read()
+lines = content.splitlines(keepends=True)
+# Locate frontmatter block boundaries: first two lines that equal "---".
+in_fm = False
+fm_end = -1
+for i, ln in enumerate(lines):
+    stripped = ln.rstrip('\r\n')
+    if stripped == '---':
+        if not in_fm:
+            in_fm = True
+        else:
+            fm_end = i
+            break
+if fm_end < 0:
+    # No frontmatter or unterminated — do nothing, report no strip.
+    print('0')
+    sys.exit(0)
+pattern = re.compile(r'^' + re.escape(field) + r'\s*:')
+new_lines = []
+stripped_count = 0
+for i, ln in enumerate(lines):
+    if i <= fm_end and pattern.match(ln):
+        stripped_count += 1
+        continue
+    new_lines.append(ln)
+if stripped_count > 0:
+    with open(path, 'w', encoding='utf-8') as f:
+        f.writelines(new_lines)
+print(str(stripped_count))
+PYSTRIP
+)"
+    if [ "${BF_STRIPPED:-0}" != "0" ]; then
+        echo "Note: stripped ${BF_FIELD}=${BF_VALUE} from ${BF_REL_PATH} during ingest (brownfield-scoped field; see AGENTS.md §5)." >&2
+    fi
+done
+
+# ---------------------------------------------------------------------------
 # Hash computation
 # ---------------------------------------------------------------------------
 
