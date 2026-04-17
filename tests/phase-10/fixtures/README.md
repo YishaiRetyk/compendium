@@ -50,9 +50,9 @@ tabs permissively.
 
 ## EOL Policy
 
-All parseable `expected/page.md` files use LF + UTF-8 without BOM (matches
-Phase 09-01 D invariant: "All seeded .md fixtures use LF + UTF-8").  This is
-pinned via `.gitattributes`:
+All parseable `expected/page.md` files use LF + UTF-8 without BOM (matching
+the prior-phase fixture-seeding invariant: "All seeded .md fixtures use LF
++ UTF-8").  This is pinned via `.gitattributes`:
 
 ```
 tests/phase-10/fixtures/**/*.md text eol=lf
