@@ -12,3 +12,7 @@ Thumbs.db
 *.swp
 .idea/
 .vscode/
+
+# Python bytecode cache (generated when bin/lib/*.py modules are imported)
+__pycache__/
+*.pyc
