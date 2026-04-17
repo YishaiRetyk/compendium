@@ -34,13 +34,10 @@ set -e
 grep -q "not yet implemented — see Phase 11" ver.err  || { echo "FAIL: verify missing exit-2 message" >&2; rm -f ver.err; exit 1; }
 rm -f ver.err
 
-set +e
-bash "$REPO_ROOT/bin/brownfield.sh" bootstrap >/dev/null 2>boot.err
-boot_exit=$?
-set -e
-[ "$boot_exit" -eq 2 ]                                 || { echo "FAIL: bootstrap stub exit=$boot_exit (want 2)" >&2; rm -f boot.err; exit 1; }
-grep -q "Plan 10-03 populates" boot.err                || { echo "FAIL: bootstrap stub missing 'Plan 10-03 populates' message" >&2; rm -f boot.err; exit 1; }
-rm -f boot.err
+# NOTE: Plan 10-03 populates bootstrap; the Plan 10-02 stub-exit-2 assertion is
+# relaxed here (pattern: Phase 08-04 relaxing phase-07 test_docs_skeleton on
+# populate).  Bootstrap-specific behaviour is covered by the
+# test_brownfield_bootstrap_*.sh suite authored in Plan 10-03.
 
 # unknown subcommand exits 1 with "unknown subcommand"
 set +e
