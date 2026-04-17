@@ -1,0 +1,2 @@
+# user override — un-exclude attachments/ so its contents appear in Inventory
+!attachments
