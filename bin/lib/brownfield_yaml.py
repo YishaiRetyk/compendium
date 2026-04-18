@@ -17,7 +17,7 @@ Exports:
   - build_d14_sentinel_set() — assemble D-14 sentinel dict for a given page.
   - infer_id_from_filename()  — filename → kebab-case id.
   - extract_h1()         — first `# ...` H1 from body, if any.
-  - file_mtime_iso()     — file mtime as YYYY-MM-DD (UTC).
+  - file_mtime_iso()     — file mtime as YYYY-MM-DD (UTC).  Overridable via BROWNFIELD_FIXTURE_CREATED_AT (fixture-testing only; scope mirrors BROWNFIELD_FIXTURE_TODAY in bin/brownfield.sh).
   - make_yaml()          — factory for a pre-configured ruamel.yaml.YAML instance.
 """
 from __future__ import annotations
@@ -275,11 +275,26 @@ def build_d14_sentinel_set(
     inferred_id = infer_id_from_filename(path)
     h1 = extract_h1(body)
     inferred_title = h1 if h1 else inferred_id
-    try:
-        created_at = file_mtime_iso(path)
-    except OSError:
-        # New / unreadable mtime; fall back to today (never fails the bootstrap).
-        created_at = datetime.date(today.year, today.month, today.day)
+    # BRWN-21 fixture-date-freeze: BROWNFIELD_FIXTURE_CREATED_AT pins created_at
+    # for byte-equality fixture tests.  Scope mirrors BROWNFIELD_FIXTURE_TODAY
+    # in bin/brownfield.sh (fixture-testing only; production bootstrap uses
+    # file mtime per D-11).  Fail-loud on malformed values — the mechanical-
+    # only brownfield contract rejects silent fallbacks on bad fixture pins.
+    created_at_override = os.environ.get('BROWNFIELD_FIXTURE_CREATED_AT')
+    if created_at_override:
+        try:
+            created_at = datetime.date.fromisoformat(created_at_override)
+        except ValueError as exc:
+            raise ValueError(
+                f"BROWNFIELD_FIXTURE_CREATED_AT must be YYYY-MM-DD, got: "
+                f"{created_at_override!r}"
+            ) from exc
+    else:
+        try:
+            created_at = file_mtime_iso(path)
+        except OSError:
+            # New / unreadable mtime; fall back to today (never fails the bootstrap).
+            created_at = datetime.date(today.year, today.month, today.day)
 
     # Create DISTINCT date instances — ruamel.yaml emits anchor/alias pairs
     # (``&id001`` / ``*id001``) when the same Python object appears at multiple

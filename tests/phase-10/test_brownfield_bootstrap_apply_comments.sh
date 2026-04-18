@@ -4,6 +4,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib.sh"
 export BROWNFIELD_FIXTURE_TODAY="2026-04-17"
+export BROWNFIELD_FIXTURE_CREATED_AT="2026-04-17"
 
 FIXTURE="frontmatter-with-comments"
 tmp=$(make_fixture_repo "$FIXTURE")

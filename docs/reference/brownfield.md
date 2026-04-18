@@ -185,6 +185,19 @@ The `verify` subcommand wraps `bin/lint.sh` with brownfield-appropriate severity
 - **Bootstrap does not infer provenance, privacy, or page type:** These are judgment calls that belong in Phase 11's suggest/verify workflow. Bootstrap only writes mechanical sentinel frontmatter.
 - **Lint downgrade is CI-only:** The BRWN-08 error->info downgrade for bootstrapped pages fires in `bin/lint.sh --ci` mode only (I-1 scope). Local `bin/lint.sh` runs show full-severity findings on bootstrapped pages. Use `--ci` locally to mirror CI behavior.
 
+## Fixture testing environment variables
+
+Two environment variables pin date fields to deterministic values so the Phase-10 byte-equality fixture tests (`tests/phase-10/test_brownfield_bootstrap_apply_*.sh`) produce identical output on every calendar day. **These variables are fixture-testing only; do not use them in production bootstrap runs.** Production bootstrap uses file mtime for `created_at` and UTC today for `updated_at` / `bootstrap_date` per D-11.
+
+| Variable | Pins | Consumed by |
+|----------|------|-------------|
+| `BROWNFIELD_FIXTURE_TODAY` | `updated_at`, `bootstrap_date` | `bin/brownfield.sh` (bootstrap + scan today derivation) |
+| `BROWNFIELD_FIXTURE_CREATED_AT` | `created_at` (bypasses `file_mtime_iso`) | `bin/lib/brownfield_yaml.py::build_d14_sentinel_set` |
+
+Both variables accept `YYYY-MM-DD` strings only. `BROWNFIELD_FIXTURE_CREATED_AT` fails loud with `ValueError` on any malformed value — the mechanical-only brownfield contract rejects silent fallbacks on bad fixture pins. When unset, the production code paths (`file_mtime_iso` + `date -u '+%Y-%m-%d'`) run unchanged.
+
+> **Scope warning:** Exporting `BROWNFIELD_FIXTURE_CREATED_AT` on a real vault overrides the mtime-derived `created_at` for every page in that run. This is exactly what you want during fixture regression tests and exactly what you do NOT want in production. Keep these exports inside `tests/phase-10/test_*.sh` files.
+
 ## See also
 
 - [AGENTS.md §5](../../AGENTS.md) — `bootstrap_stage` + `bootstrap_date` field definitions
