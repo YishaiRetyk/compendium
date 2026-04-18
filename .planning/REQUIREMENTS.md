@@ -103,7 +103,7 @@ Numbering continues from v1.0. New REQ-ID prefixes: `TMPL`, `NEUT`, `WZRD`, `MAN
 - [ ] **BRWN-18**: `docs/reference/brownfield.md` explains the mechanical-vs-judgment boundary explicitly ("this is why `bootstrap` won't ever do X; use `suggest`")
 - [ ] **BRWN-19**: `docs/reference/brownfield.md` documents `git reset` recipe as the canonical undo path
 - [ ] **BRWN-20**: New `AGENTS.md §11.5 Brownfield Workflow` documents scan/bootstrap/suggest/verify, idempotency contract, mechanical/judgment boundary
-- [ ] **BRWN-21**: Byte-exact fixture tests: bootstrap produces identical output on sample vaults across runs (pitfall M-11 mitigation)
+- [x] **BRWN-21**: Byte-exact fixture tests: bootstrap produces identical output on sample vaults across runs (pitfall M-11 mitigation)
 
 ### v1.0 Debt Closure (DEBT)
 
@@ -224,7 +224,7 @@ Explicitly excluded from v1.1. Documented to prevent scope creep.
 | BRWN-08 | Phase 10 | Pending |
 | BRWN-09 | Phase 10 | Pending |
 | BRWN-10 | Phase 10 | Pending |
-| BRWN-21 | Phase 10 | Pending |
+| BRWN-21 | Phase 10 | Complete |
 | BRWN-11 | Phase 11 | Pending |
 | BRWN-12 | Phase 11 | Pending |
 | BRWN-13 | Phase 11 | Pending |

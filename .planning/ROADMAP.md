@@ -108,7 +108,7 @@ Plans:
   3. Running `bootstrap` twice on the same vault produces zero-byte diff on the second run (idempotency); a byte-exact fixture CI test validates this across sample vaults.
   4. After bootstrap, `bin/lint.sh` downgrades the allowlist findings (unknown `type`, empty `knowledge_domain`, missing `sources`, `epistemic_status: tentative`) from `error` to `info` when `bootstrap_stage: bootstrapped`; a new `brownfield` lint category reports counts and warns on pages `bootstrapped` older than 30 days.
   5. If `bin/ingest.sh` encounters `bootstrap_stage` on a normal ingest, it strips the field to prevent pollution; `AGENTS.md §5` documents `bootstrap_stage` narrowly as the **brownfield onboarding sentinel** (enum `raw|bootstrapped|verified`) — explicitly NOT a substitute for the claim-level + source-linked provenance model (PROV-01..05). The field tracks migration state and marks imported-vs-LLM-generated lineage at page level; it is not the general provenance mechanism.
-**Plans:** 5/5 plans complete
+**Plans:** 6/6 plans complete
 Plans:
 - [x] 10-01-PLAN.md — Wave 1: tests/phase-10/ harness + 7 byte-frozen fixtures (dual golden contract per D-07) + 2 self-check tests
 - [x] 10-02-PLAN.md — Wave 2: bin/brownfield.sh subcommand dispatch + scan subcommand + bin/lib/brownfield_classify.py + .brownfield-ignore parser + 6 tests (BRWN-01, BRWN-02, BRWN-16)
@@ -212,6 +212,6 @@ Plans:
 | 7. Neutral Template Foundation | v1.1 | 5/5 | Complete | 2026-04-15 |
 | 8. Two-Track Setup (Wizard + Manual) | v1.1 | 5/5 | Complete | 2026-04-16 |
 | 9. Collaborative PR Workflow + CI Lint Gate | v1.1 | 0/6 | Not started | - |
-| 10. Brownfield Scan + Bootstrap | v1.1 | 5/5 | Complete   | 2026-04-17 |
+| 10. Brownfield Scan + Bootstrap | v1.1 | 6/6 | Complete   | 2026-04-18 |
 | 11. Brownfield Suggest + Verify | v1.1 | 0/0 | Not started | - |
 | 12. Docs Finalization + v1.0 Debt Verification Gate | v1.1 | 0/0 | Not started | - |
