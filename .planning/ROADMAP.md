@@ -23,7 +23,7 @@
 
 - [x] **Phase 7: Neutral Template Foundation** — Public orphan-branch template, Kahneman → `examples/`, neutrality CI gate, `requirements-sync` mechanical check. (5/5 plans complete 2026-04-15)
 - [x] **Phase 8: Two-Track Setup (Wizard + Manual)** — `bin/init-wizard.sh` plus byte-equivalent manual track, co-shipped to prevent drift. (5/5 plans complete 2026-04-16)
-- [ ] **Phase 9: Collaborative PR Workflow + CI Lint Gate** — Git-based PR workflow, `log.md` contributor field, `bin/lint.sh --ci --format json` severity policy, privacy-leak guard.
+- [x] **Phase 9: Collaborative PR Workflow + CI Lint Gate** — Git-based PR workflow, `log.md` contributor field, `bin/lint.sh --ci --format json` severity policy, privacy-leak guard. (6/6 plans complete 2026-04-16)
 - [x] **Phase 10: Brownfield Scan + Bootstrap** — `bin/brownfield.sh scan|bootstrap` with `bootstrap_stage` sentinel, ruamel.yaml round-trip, byte-exact fixture tests. (completed 2026-04-17)
 - [ ] **Phase 11: Brownfield Suggest + Verify** — Four staged migration script classes, `verify` wrapper over lint.
 - [ ] **Phase 12: Docs Finalization + v1.0 Debt Verification Gate** — `/docs/reference/` fill-out, Obsidian render check, Codex agent-parity, write-back scenario re-run.
@@ -115,6 +115,7 @@ Plans:
 - [x] 10-03-PLAN.md — Wave 3: bin/brownfield.sh bootstrap (dry-run default + --apply) + bin/lib/brownfield_yaml.py ruamel round-trip + typed-merge Class A/B/C + APPLIED.md/SKIPPED.md + idempotency + 12 tests (BRWN-03, BRWN-04, BRWN-05, BRWN-06, BRWN-07, BRWN-21)
 - [x] 10-04-PLAN.md — Wave 3: AGENTS.md §5 bootstrap_stage + bootstrap_date rows + CLAUDE.md byte-sync + schema/AGENTS.template.md mirror + canonical-AGENTS.md regen + bin/ingest.sh BRWN-10 strip + bin/lint.sh BRWN-08 downgrade + brownfield category + 9 tests (BRWN-07, BRWN-08, BRWN-09, BRWN-10)
 - [x] 10-05-PLAN.md — Wave 4: docs/reference/brownfield.md scan+bootstrap full populate + suggest/verify stubs + docs/quickstart.md ruamel.yaml prereq + 10-VERIFICATION.md + 3 docs tests (BRWN-01..10, BRWN-21)
+- [x] 10-06-PLAN.md — Gap closure: BROWNFIELD_FIXTURE_CREATED_AT env override in bin/lib/brownfield_yaml.py (BRWN-21 transformed-output byte-equality across calendar dates)
 
 ### Phase 11: Brownfield Suggest + Verify
 **Goal**: A user who has completed `bootstrap` can run `bin/brownfield.sh suggest` to generate four staged, idempotent, user-invoked migration scripts for judgment-heavy work — and run `verify` to re-lint the vault after applying them, with zero claim-level schema expansion.
@@ -211,7 +212,7 @@ Plans:
 | 6. Reflection & Drift Detection | v1.0 | 3/3 | Complete | 2026-04-15 |
 | 7. Neutral Template Foundation | v1.1 | 5/5 | Complete | 2026-04-15 |
 | 8. Two-Track Setup (Wizard + Manual) | v1.1 | 5/5 | Complete | 2026-04-16 |
-| 9. Collaborative PR Workflow + CI Lint Gate | v1.1 | 0/6 | Not started | - |
+| 9. Collaborative PR Workflow + CI Lint Gate | v1.1 | 6/6 | Complete | 2026-04-16 |
 | 10. Brownfield Scan + Bootstrap | v1.1 | 6/6 | Complete    | 2026-04-18 |
 | 11. Brownfield Suggest + Verify | v1.1 | 0/0 | Not started | - |
 | 12. Docs Finalization + v1.0 Debt Verification Gate | v1.1 | 0/0 | Not started | - |

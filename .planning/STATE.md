@@ -20,7 +20,7 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-15)
 
 **Core value:** The wiki is a persistent, compounding artifact -- cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested.
-**Current focus:** Phase 10 — brownfield-scan-bootstrap
+**Current focus:** Phase 11 — brownfield-suggest-verify
 
 ## Current Position
 
