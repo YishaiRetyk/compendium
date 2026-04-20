@@ -830,6 +830,18 @@ for script in SCRIPTS:
     pathlib.Path(target).write_text('\n'.join(output_lines), encoding='utf-8')
     os.chmod(target, 0o755)
 
+# Write a shell-source-able env file so migration scripts copied into the
+# vault can locate the repo's bin/lib at run time.  The scripts live under
+# .brownfield/migrations/<script>.sh which has no ancestor link to the
+# source repo; without this breadcrumb they cannot find brownfield_yaml.
+# Gitignored alongside the rest of .brownfield/ (TMPL-04).
+env_path = os.path.join(BF_DIR, '.brownfield-env')
+lib_dir_abs = os.environ['BROWNFIELD_LIB_DIR']
+with open(env_path, 'w', encoding='utf-8') as fh:
+    fh.write('# Written by bin/brownfield.sh suggest at ' + GENERATED_AT + '\n')
+    fh.write('# Sourced by .brownfield/migrations/*.sh to locate bin/lib at run-time.\n')
+    fh.write(f'BROWNFIELD_LIB_DIR="{lib_dir_abs}"\n')
+
 # Canonical script source hashes (for D-09 metadata header's source_script_hash field)
 SCRIPT_HASHES = {s: sha256_file(os.path.join(SCHEMA_MIG_DIR, s)) for s in SCRIPTS}
 
