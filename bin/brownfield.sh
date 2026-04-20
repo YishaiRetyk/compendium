@@ -1360,6 +1360,13 @@ import yaml
 
 sys.path.insert(0, os.environ['BROWNFIELD_LIB_DIR'])
 from brownfield_classify import classify_page, unknown_reason  # noqa: E402
+# REVIEWS item 3: .brownfield-ignore parsing + walk semantics are SHARED
+# with the suggest subcommand via bin/lib/brownfield_walk.py so scan and
+# suggest cannot drift on exclusion behavior.
+from brownfield_walk import (  # noqa: E402
+    load_brownfield_ignore,
+    any_match as _any_match,
+)
 
 ROOT = os.environ['BROWNFIELD_ROOT']
 LIST_EXCLUDED = os.environ['BROWNFIELD_LIST_EXCLUDED'] == '1'
@@ -1370,90 +1377,6 @@ DEFAULT_EXCLUDE_DIRS = set(
 # Daily-note filename patterns (D-19).  Matched against basenames for files
 # at root, under daily/, or under journal/.
 DAILY_NOTE_RE = re.compile(r'^\d{4}-\d{2}-\d{2}\.md$')
-
-# ---------------------------------------------------------------------------
-# .brownfield-ignore parser (gitignore-like subset, fnmatch-based).
-# Supported: blank lines, '#' comments, '!' negation, '*', '**'.
-# Not supported: trailing-slash directory-only patterns, '\' escapes,
-# character classes beyond what fnmatch provides natively.  This is the
-# narrowed grammar declared in PLAN truths.
-# ---------------------------------------------------------------------------
-
-def _translate_pattern_to_regex(pat: str) -> re.Pattern:
-    """Convert a gitignore-like subset glob to a regex.
-
-    Handles '**' (match anything including /), '*' (match anything except /),
-    and literal characters.  Anchored at start.  Does not anchor at end so a
-    pattern like 'attachments' matches 'attachments/diagram.md'.
-    """
-    # Drop a leading '/' (treat as anchored-to-root; equivalent here since
-    # we match against relative paths).
-    if pat.startswith('/'):
-        pat = pat[1:]
-    # Drop a trailing '/' (we only support file matching at the moment; a
-    # trailing slash conventionally means "dir only" but we treat it as a
-    # prefix match for both the dir and anything inside).
-    had_trailing_slash = pat.endswith('/')
-    if had_trailing_slash:
-        pat = pat[:-1]
-
-    out: list[str] = ['^']
-    i = 0
-    while i < len(pat):
-        c = pat[i]
-        if c == '*':
-            # '**' → match anything (including '/')
-            if i + 1 < len(pat) and pat[i + 1] == '*':
-                out.append('.*')
-                i += 2
-                # Skip a trailing '/' that often follows '**/'
-                if i < len(pat) and pat[i] == '/':
-                    i += 1
-                continue
-            # Single '*' → match anything except '/'
-            out.append('[^/]*')
-            i += 1
-        elif c == '?':
-            out.append('[^/]')
-            i += 1
-        elif c in r'.+()|{}[]^$\\':
-            out.append(re.escape(c))
-            i += 1
-        else:
-            out.append(re.escape(c))
-            i += 1
-    # Allow either exact match or match-followed-by-a-path-separator so
-    # 'attachments' matches both 'attachments' and 'attachments/diagram.md'.
-    out.append(r'(?:/.*)?$')
-    return re.compile(''.join(out))
-
-
-def load_brownfield_ignore(root: str) -> tuple[list[re.Pattern], list[re.Pattern]]:
-    """Return (exclude_patterns, negate_patterns) lists of compiled regexes."""
-    path = os.path.join(root, '.brownfield-ignore')
-    exclude: list[re.Pattern] = []
-    negate: list[re.Pattern] = []
-    if not os.path.isfile(path):
-        return exclude, negate
-    with open(path, 'r', encoding='utf-8') as fh:
-        for raw in fh:
-            line = raw.strip()
-            if not line or line.startswith('#'):
-                continue
-            if line.startswith('!'):
-                body = line[1:].strip()
-                if body:
-                    negate.append(_translate_pattern_to_regex(body))
-            else:
-                exclude.append(_translate_pattern_to_regex(line))
-    return exclude, negate
-
-
-def _any_match(patterns: list[re.Pattern], rel: str) -> bool:
-    for pat in patterns:
-        if pat.match(rel):
-            return True
-    return False
 
 
 # ---------------------------------------------------------------------------
