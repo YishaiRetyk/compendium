@@ -128,7 +128,13 @@ Plans:
   3. `02-provenance-bootstrap.sh` tags pre-existing claims using only the existing epistemic vocabulary (`inferred` per EPST-01) — no new claim-level schema fields, no magic-string provenance values; the imported-vs-LLM-generated distinction lives at page level via `bootstrap_stage`.
   4. User runs `bin/brownfield.sh verify` and it wraps `bin/lint.sh` with brownfield-appropriate severity thresholds to confirm the vault passes after user-applied migrations.
   5. `docs/reference/brownfield.md` and `AGENTS.md §11.5 Brownfield Workflow` explain the mechanical-vs-judgment boundary explicitly, document the `git reset` canonical undo recipe, and note that v1.1 requires manual per-script invocation (auto-apply chain-runner is explicitly deferred to v1.2 BRWNAPPLY-01).
-**Plans**: TBD
+**Plans:** 5 plans
+Plans:
+- [ ] 11-01-PLAN.md — Wave-0 test harness + 5 fixtures + 4 canonical script skeletons + RED test suite locking the D-19 contract
+- [ ] 11-02-PLAN.md — `bin/brownfield.sh suggest` (hybrid byte-copy + candidate-file generation) + `cluster_by_signals()` in brownfield_classify
+- [ ] 11-03-PLAN.md — Four canonical migration scripts (01 apply-from-manifest, 02 direct-apply + soft prereq WARN, 03/04 advisory) + brownfield_provenance.py
+- [ ] 11-04-PLAN.md — `bin/brownfield.sh review-typing` (TTY + AI-handoff) + `verify [--promote]` (D-14 5-gate) + end-to-end golden fixture
+- [ ] 11-05-PLAN.md — AGENTS.md §11.5 populate (Option C renumber §11.5→§11.6; closes WR-03) + docs/reference/brownfield.md + REQUIREMENTS BRWN-12 rename + BRWN-22 new + Tier-1 DR
 
 ### Phase 12: Docs Finalization + v1.0 Debt Verification Gate
 **Goal**: All `/docs/reference/` material is filled out against the now-stable v1.1 feature surface, and every deferred v1.0 verification (Obsidian render, multi-agent parity, write-back scenario) is executed end-to-end before v1.1 ships.
