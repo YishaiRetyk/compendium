@@ -93,12 +93,12 @@ Numbering continues from v1.0. New REQ-ID prefixes: `TMPL`, `NEUT`, `WZRD`, `MAN
 - [ ] **BRWN-08**: `bin/lint.sh` downgrades allowlist findings (unknown `type`, empty `knowledge_domain`, missing `sources`, `epistemic_status: tentative`) from `error` to `info` when `bootstrap_stage: bootstrapped`
 - [ ] **BRWN-09**: `bin/lint.sh` new `brownfield` category reports counts of pages still in `bootstrapped` state; warns on pages `bootstrapped` older than 30 days
 - [ ] **BRWN-10**: `bin/ingest.sh` strips `bootstrap_stage` if encountered on normal ingest (prevents pollution)
-- [ ] **BRWN-11**: `bin/brownfield.sh suggest` writes `.brownfield/REPORT.md` + `.brownfield/migrations/*.sh`
+- [x] **BRWN-11**: `bin/brownfield.sh suggest` writes `.brownfield/REPORT.md` + `.brownfield/migrations/*.sh`
 - [ ] **BRWN-12**: Four staged migration script classes: `01-page-typing.sh`, `02-provenance-bootstrap.sh`, `03-cross-link-inference.sh`, `04-privacy-classification.sh`
 - [ ] **BRWN-13**: Each migration script is **user-invoked manually** (`bash .brownfield/migrations/02-provenance-bootstrap.sh`); self-describing (prints what it will change); dry-run default; per-script `--apply` flag executes the change on that single class; idempotent when re-run. v1.1 does NOT ship a single-command chain-runner that auto-applies all classes — that is explicitly deferred to v1.2 (see BRWNAPPLY-01).
-- [ ] **BRWN-14**: Each migration script header contains `# op_hash: <sha256>` derived from normalized operation descriptors (not the rendered shell); idempotency recorded in `.brownfield/applied.log`
+- [x] **BRWN-14**: Each migration script header contains `# op_hash: <sha256>` derived from normalized operation descriptors (not the rendered shell); idempotency recorded in `.brownfield/applied.log`
 - [ ] **BRWN-15**: `02-provenance-bootstrap.sh` tags pre-existing claims using the **existing epistemic vocabulary only** (`inferred` per EPST-01). **Zero claim-level schema expansion.** The imported-vs-LLM-generated distinction is captured at the page level via `bootstrap_stage` (BRWN-07) — no magic-string provenance values, no new epistemic sub-markers. AGENTS.md §5 documents `bootstrap_stage` as the canonical provenance-lineage field for imported pages.
-- [ ] **BRWN-16**: Classification heuristics in `scan` are rule-based (frontmatter fields, filename conventions, link density) — no LLM calls inside `brownfield.sh`
+- [x] **BRWN-16**: Classification heuristics in `scan` are rule-based (frontmatter fields, filename conventions, link density) — no LLM calls inside `brownfield.sh`
 - [ ] **BRWN-17**: `bin/brownfield.sh verify` is a thin wrapper over `bin/lint.sh` with brownfield-appropriate severity thresholds
 - [ ] **BRWN-18**: `docs/reference/brownfield.md` explains the mechanical-vs-judgment boundary explicitly ("this is why `bootstrap` won't ever do X; use `suggest`")
 - [ ] **BRWN-19**: `docs/reference/brownfield.md` documents `git reset` recipe as the canonical undo path
@@ -225,12 +225,12 @@ Explicitly excluded from v1.1. Documented to prevent scope creep.
 | BRWN-09 | Phase 10 | Complete |
 | BRWN-10 | Phase 10 | Complete |
 | BRWN-21 | Phase 10 | Complete |
-| BRWN-11 | Phase 11 | Pending |
+| BRWN-11 | Phase 11 | Complete |
 | BRWN-12 | Phase 11 | Pending |
 | BRWN-13 | Phase 11 | Pending |
-| BRWN-14 | Phase 11 | Pending |
+| BRWN-14 | Phase 11 | Complete |
 | BRWN-15 | Phase 11 | Pending |
-| BRWN-16 | Phase 11 | Pending |
+| BRWN-16 | Phase 11 | Complete |
 | BRWN-17 | Phase 11 | Pending |
 | BRWN-18 | Phase 11 | Pending |
 | BRWN-19 | Phase 11 | Pending |

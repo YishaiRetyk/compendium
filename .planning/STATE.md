@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Shareability
 status: Ready to execute
-stopped_at: Completed 11-01-PLAN.md (Wave-0 RED harness)
-last_updated: "2026-04-20T16:43:59.934Z"
+stopped_at: Completed 11-02-PLAN.md
+last_updated: "2026-04-20T20:53:48.566Z"
 progress:
   total_phases: 6
   completed_phases: 5
   total_plans: 29
-  completed_plans: 25
-  percent: 86
+  completed_plans: 26
+  percent: 90
 ---
 
 # Project State
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-04-15)
 ## Current Position
 
 Phase: 11 (brownfield-suggest-verify) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 
 ## Performance Metrics
 
@@ -89,6 +89,7 @@ Plan: 2 of 5
 | Phase 09.1 P02 | 14min | 2 tasks | 18 files |
 | Phase 10-brownfield-scan-bootstrap P10-06 | 2min | 5 tasks | 7 files |
 | Phase 11-brownfield-suggest-verify P01 | 45 | 2 tasks | 114 files |
+| Phase 11-brownfield-suggest-verify P02 | 90min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -247,6 +248,11 @@ Recent decisions affecting current work:
 - [Phase 11-brownfield-suggest-verify]: [Phase 11-01] Per-plan gate split via # EXPECTED_BY: tag + --expected-by filter (REVIEWS item 6) — each downstream plan asserts its subset not aggregate success
 - [Phase 11-brownfield-suggest-verify]: [Phase 11-01] Canonical scripts ship without op_hash headers (RESEARCH Q2); suggest prepends on lines 2+3 after shebang (REVIEWS item 13 Gemini)
 - [Phase 11-brownfield-suggest-verify]: [Phase 11-01] applied.log DOCUMENTED PER-SCRIPT VARIANCE (REVIEWS item 10): 01 paired inputs, 02 single vault-walk line, 03/04 advisory with report_section field — schema/brownfield/migrations/README.md owns the shapes
+- [Phase 11-brownfield-suggest-verify]: cluster_by_signals returns list[dict]; cluster_is_autoapproveable honors D-03 widened predicate (both frontmatter-explicit AND 3+ signals-agree paths)
+- [Phase 11-brownfield-suggest-verify]: bin/lib/brownfield_walk.py extracted as single source of truth for .brownfield-ignore semantics; scan and suggest both import from it (no forked walker logic)
+- [Phase 11-brownfield-suggest-verify]: Cluster-level confidence promoted to 'high' when D-03 gate satisfied, even if classify_page's per-page confidence was lower (adds inbound density as 5th cluster-level signal)
+- [Phase 11-brownfield-suggest-verify]: Proposed label derivation: frontmatter > directory hint > classify_page output, preventing generic 'entity' fallback for pages under wiki/concepts, wiki/overviews, etc.
+- [Phase 11-brownfield-suggest-verify]: All hashing via Python hashlib (macOS-portable); zero shell sha256sum invocations; shebang preserved on line 1 with op_hash headers on lines 2+3 via Python list manipulation
 
 ### Pending Todos
 
@@ -273,6 +279,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-20T16:43:59.931Z
-Stopped at: Completed 11-01-PLAN.md (Wave-0 RED harness)
+Last session: 2026-04-20T20:53:35.554Z
+Stopped at: Completed 11-02-PLAN.md
 Resume file: None
