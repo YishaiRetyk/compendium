@@ -130,7 +130,7 @@ Plans:
   5. `docs/reference/brownfield.md` and `AGENTS.md §11.5 Brownfield Workflow` explain the mechanical-vs-judgment boundary explicitly, document the `git reset` canonical undo recipe, and note that v1.1 requires manual per-script invocation (auto-apply chain-runner is explicitly deferred to v1.2 BRWNAPPLY-01).
 **Plans:** 5 plans
 Plans:
-- [ ] 11-01-PLAN.md — Wave-0 test harness + 5 fixtures + 4 canonical script skeletons + RED test suite locking the D-19 contract
+- [x] 11-01-PLAN.md — Wave-0 test harness + 7 fixtures + 4 canonical script skeletons + RED test suite locking the D-19 contract — completed 2026-04-20 (47 tests; PHASE 11 TESTS: 4/47 RED)
 - [ ] 11-02-PLAN.md — `bin/brownfield.sh suggest` (hybrid byte-copy + candidate-file generation) + `cluster_by_signals()` in brownfield_classify
 - [ ] 11-03-PLAN.md — Four canonical migration scripts (01 apply-from-manifest, 02 direct-apply + soft prereq WARN, 03/04 advisory) + brownfield_provenance.py
 - [ ] 11-04-PLAN.md — `bin/brownfield.sh review-typing` (TTY + AI-handoff) + `verify [--promote]` (D-14 5-gate) + end-to-end golden fixture

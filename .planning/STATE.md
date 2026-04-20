@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Shareability
 status: Ready to execute
-stopped_at: Phase 11 context gathered
-last_updated: "2026-04-20T14:33:56.987Z"
+stopped_at: Completed 11-01-PLAN.md (Wave-0 RED harness)
+last_updated: "2026-04-20T16:43:59.934Z"
 progress:
   total_phases: 6
   completed_phases: 5
   total_plans: 29
-  completed_plans: 24
-  percent: 83
+  completed_plans: 25
+  percent: 86
 ---
 
 # Project State
@@ -24,8 +24,8 @@ See: .planning/PROJECT.md (updated 2026-04-15)
 
 ## Current Position
 
-Phase: 11
-Plan: Not started
+Phase: 11 (brownfield-suggest-verify) — EXECUTING
+Plan: 2 of 5
 
 ## Performance Metrics
 
@@ -88,6 +88,7 @@ Plan: Not started
 | Phase 09.1 P01 | 4min | 2 tasks | 13 files |
 | Phase 09.1 P02 | 14min | 2 tasks | 18 files |
 | Phase 10-brownfield-scan-bootstrap P10-06 | 2min | 5 tasks | 7 files |
+| Phase 11-brownfield-suggest-verify P01 | 45 | 2 tasks | 114 files |
 
 ## Accumulated Context
 
@@ -242,6 +243,10 @@ Recent decisions affecting current work:
 - [Phase 09.1]: [Phase 09.1-02] 4 Rule 1 auto-fixes to inherited Plan 09.1-01 test files: (1-3) bash backticks-in-double-quoted-string parser bugs in test_docs_reference_new.sh + test_dataview_fences.sh broke test parsing; (3) set -e + grep -c 0-match in command substitution aborted test_dataview_fences.sh silently; (4) test_agents_section_16.sh unscoped grep false-fired on §3 commit-conventions example unrelated to §16. All bundled into atomic extraction commit per AGENTS.md §3 one-commit-per-logical-operation
 - [Phase 10-brownfield-scan-bootstrap]: [Phase 10-06] BROWNFIELD_FIXTURE_CREATED_AT env override mirrors BROWNFIELD_FIXTURE_TODAY precedent; chosen over mtime-pinning in make_fixture_repo because date policy lives in bin/lib/brownfield_yaml.py
 - [Phase 10-brownfield-scan-bootstrap]: [Phase 10-06] Fail-loud ValueError on malformed BROWNFIELD_FIXTURE_CREATED_AT (not silent fallback) — matches mechanical-only brownfield contract D-11
+- [Phase 11-brownfield-suggest-verify]: [Phase 11-01] Wave-0 RED harness: 47 tests (3/7/19/11/7) across 5 EXPECTED_BY tiers + 7 fixtures + 4 canonical-script skeletons; PHASE 11 TESTS: 4/47 today
+- [Phase 11-brownfield-suggest-verify]: [Phase 11-01] Per-plan gate split via # EXPECTED_BY: tag + --expected-by filter (REVIEWS item 6) — each downstream plan asserts its subset not aggregate success
+- [Phase 11-brownfield-suggest-verify]: [Phase 11-01] Canonical scripts ship without op_hash headers (RESEARCH Q2); suggest prepends on lines 2+3 after shebang (REVIEWS item 13 Gemini)
+- [Phase 11-brownfield-suggest-verify]: [Phase 11-01] applied.log DOCUMENTED PER-SCRIPT VARIANCE (REVIEWS item 10): 01 paired inputs, 02 single vault-walk line, 03/04 advisory with report_section field — schema/brownfield/migrations/README.md owns the shapes
 
 ### Pending Todos
 
@@ -268,6 +273,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-19T15:10:00.356Z
-Stopped at: Phase 11 context gathered
-Resume file: .planning/phases/11-brownfield-suggest-verify/11-CONTEXT.md
+Last session: 2026-04-20T16:43:59.931Z
+Stopped at: Completed 11-01-PLAN.md (Wave-0 RED harness)
+Resume file: None
