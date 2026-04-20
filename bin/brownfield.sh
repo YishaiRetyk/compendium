@@ -699,8 +699,7 @@ Flags:
   --root DIR   Vault root (default: .)
   --help       Print this help and exit 0.
 
-Design principle: Review may be interactive and AI-guided; apply must always
-be deterministic.
+Design principle: Review may be interactive and AI-guided; apply must always be deterministic.
 EOF
                 exit 0
                 ;;
