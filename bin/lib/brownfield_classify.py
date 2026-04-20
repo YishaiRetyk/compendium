@@ -152,3 +152,170 @@ def unknown_reason(
     Avoids pre-filled type suggestions that would anchor user judgment.
     """
     return f"`{rel_path}` — {signal_trace}. What kind of page should this become?"
+
+
+# --- Phase 11 additions: cluster_by_signals() + cluster_is_autoapproveable() (BRWN-11, BRWN-14) ---
+#
+# These helpers are additive: classify_page() + unknown_reason() above are unchanged.
+# They power bin/brownfield.sh suggest (Plan 11-02) without perturbing scan (Phase 10).
+#
+# Design note: classify_page() returns a tuple (label, confidence, signal_trace).
+# The cluster helper consumes a RICHER dict shape that suggest builds in its Python
+# heredoc — combining classify_page's output with slug-form signals (pascal/kebab/
+# entity-like/inbound-heavy/etc.) derived from filename + frontmatter + body + the
+# vault-wide inbound wikilink count.  The slug form is what D-03's cluster-level
+# "3+ signals agree" gate operates on.
+
+from collections import defaultdict  # noqa: E402
+from typing import Iterable  # noqa: E402
+
+
+# Label-hint agreement table — each label lists the signal values that point
+# TOWARD that label.  Used by cluster_is_autoapproveable() to count agreement
+# along the D-03 "3+ non-frontmatter signals agree" path.
+_LABEL_HINTS = {
+    'entity':     {'filename': {'pascal'},        'heading': {'entity-like'},     'inbound': {'inbound-heavy'}, 'links': {'outbound-light', 'none'}},
+    'concept':    {'filename': {'kebab'},         'heading': {'concept-like'},    'inbound': {'inbound-light'}, 'links': {'outbound-heavy'}},
+    'overview':   {'filename': {'kebab'},         'heading': {'overview-like'},   'inbound': {'inbound-heavy'}, 'links': {'outbound-heavy'}},
+    'source':     {'filename': {'date-prefixed'}, 'heading': {'source-like'},     'inbound': {'inbound-light'}, 'links': {'none'}},
+    'comparison': {'filename': {'kebab'},         'heading': {'comparison-like'}, 'inbound': {'inbound-light'}, 'links': {'outbound-heavy'}},
+    'decision':   {'filename': {'dr-prefixed'},   'heading': {'decision-like'},   'inbound': {'inbound-light'}, 'links': {'outbound-light'}},
+}
+_VALID_TYPE_ENUM = {'entity', 'concept', 'source', 'comparison', 'overview', 'decision'}
+
+
+def _count_agreement(signals: dict, label: str | None) -> int:
+    """Count how many non-frontmatter signals in `signals` agree with the
+    hint table for `label`.  Returns 0 on missing label / unknown hints."""
+    if not label or label == 'unknown':
+        return 0
+    hints = _LABEL_HINTS.get(label, {})
+    if not hints:
+        return 0
+    count = 0
+    for signal_name, accepted_values in hints.items():
+        if signals.get(signal_name) in accepted_values:
+            count += 1
+    return count
+
+
+def cluster_by_signals(classifications: Iterable[dict]) -> list[dict]:
+    """Group page classifications into clusters by signal tuple.
+
+    Input
+    -----
+    classifications : iterable of dicts.  Each dict has keys:
+        path           -- str, relative page path
+        label          -- str, one of VALID_TYPES + 'unknown'
+        confidence     -- str, 'high' | 'medium' | 'low' | 'unknown'
+        signals        -- dict: {frontmatter, filename, heading, inbound, links}
+                          in slug form (pascal/kebab/entity-like/inbound-heavy/etc.)
+        inbound_count  -- int, optional; informational only
+
+    Output
+    ------
+    list[dict] with keys:
+        cluster_id      -- "cluster_1", "cluster_2", ... (1-indexed, stable
+                           sort by signal tuple)
+        page_count      -- int
+        pages           -- sorted list of paths
+        signals         -- {frontmatter, filename, heading, inbound, links}
+        confidence      -- 'high' | 'medium' | 'low' | 'unknown'.  Promoted to
+                           'high' at cluster level when the D-03 "3+ signals
+                           agree OR explicit valid frontmatter type" gate is
+                           satisfied even if individual-page confidence from
+                           classify_page() was lower (classify_page uses an
+                           older 4-signal gate; D-03 adds inbound density as a
+                           fifth cluster-level signal).
+        proposed_label  -- str (first member's label — all members share it
+                           by construction).
+
+    Rationale (RESEARCH Q1):
+        - O(n) single pass; stdlib only; no scipy/numpy.
+        - Deterministic: sort() over string-tuple keys avoids Python hash
+          randomization issues.
+        - Human-reviewable cluster descriptions ("kebab filenames + entity-
+          like H1 + inbound-heavy") beat opaque similarity scores.
+
+    Invariant:
+        All members of a cluster share the exact same signal tuple by
+        construction.  `proposed_label` is therefore identical across members
+        — the function takes it from the first member (sorted path order).
+    """
+    # Materialize once (iterable may be single-pass).
+    classes = list(classifications)
+    buckets: dict[tuple, list[str]] = defaultdict(list)
+    label_of: dict[tuple, str] = {}
+    page_conf: dict[tuple, str] = {}
+
+    for c in classes:
+        s = c.get('signals') or {}
+        key = (
+            s.get('frontmatter', 'none') or 'none',
+            s.get('filename', 'none') or 'none',
+            s.get('heading', 'none') or 'none',
+            s.get('inbound', 'inbound-light') or 'inbound-light',
+            s.get('links', 'none') or 'none',
+        )
+        buckets[key].append(c.get('path', ''))
+        if key not in label_of:
+            label_of[key] = c.get('label', 'unknown') or 'unknown'
+            page_conf[key] = c.get('confidence', 'unknown') or 'unknown'
+
+    clusters = []
+    for idx, (key, pages) in enumerate(sorted(buckets.items()), start=1):
+        signals_dict = {
+            'frontmatter': key[0],
+            'filename': key[1],
+            'heading': key[2],
+            'inbound': key[3],
+            'links': key[4],
+        }
+        label = label_of[key]
+        # Cluster-level confidence promotion per D-03: explicit valid
+        # frontmatter type OR 3+ non-frontmatter signals agree => 'high'.
+        # Otherwise retain classify_page()'s per-page confidence.
+        fm = signals_dict['frontmatter']
+        if fm in _VALID_TYPE_ENUM:
+            cluster_conf = 'high'
+        elif _count_agreement(signals_dict, label) >= 3:
+            cluster_conf = 'high'
+        else:
+            cluster_conf = page_conf[key]
+        clusters.append({
+            'cluster_id': f'cluster_{idx}',
+            'page_count': len(pages),
+            'pages': sorted(pages),
+            'signals': signals_dict,
+            'confidence': cluster_conf,
+            'proposed_label': label,
+        })
+    return clusters
+
+
+def cluster_is_autoapproveable(cluster: dict) -> bool:
+    """Return True iff D-03's 'high confidence' gate is satisfied for this cluster.
+
+    D-03 verbatim (CONTEXT.md): high confidence means '3+ signals agree OR
+    explicit valid frontmatter type'.  Review item 7 widened this from the
+    pre-review narrow frontmatter-only interpretation.
+
+    Auto-approve iff ALL of:
+      1. cluster['confidence'] == 'high'.
+      2. EITHER signals.frontmatter is a valid type enum value (the explicit
+         path), OR 3+ of the 5 non-frontmatter signals agree with the
+         proposed_label via the _LABEL_HINTS table.
+
+    Conservative default: return False if required keys are missing or
+    proposed_label is 'unknown' (route to review queue).
+    """
+    if cluster.get('confidence') != 'high':
+        return False
+    signals = cluster.get('signals') or {}
+    fm = signals.get('frontmatter', 'none')
+    if fm in _VALID_TYPE_ENUM:
+        return True  # explicit valid frontmatter type
+    label = cluster.get('proposed_label')
+    if not label or label == 'unknown':
+        return False  # no target label to check agreement against
+    return _count_agreement(signals, label) >= 3
