@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Shareability
-status: Ready to execute
-stopped_at: Completed 11-04-PLAN.md
-last_updated: "2026-04-20T21:34:55.918Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 11-05-PLAN.md (Phase 11 close)
+last_updated: "2026-04-20T21:56:59.727Z"
 progress:
   total_phases: 6
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 29
-  completed_plans: 28
-  percent: 97
+  completed_plans: 29
+  percent: 100
 ---
 
 # Project State
@@ -92,6 +92,7 @@ Plan: 5 of 5
 | Phase 11-brownfield-suggest-verify P02 | 90min | 2 tasks | 4 files |
 | Phase 11-brownfield-suggest-verify P03 | 35min | 3 tasks | 6 files |
 | Phase 11-brownfield-suggest-verify P04 | 70min | 2 tasks | 7 files |
+| Phase 11-brownfield-suggest-verify P05 | 40min | 2 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -264,6 +265,10 @@ Recent decisions affecting current work:
 - [Phase 11-brownfield-suggest-verify]: [Phase 11-04] VALID_TYPE_ENUM for review-typing override excludes empty-string sentinel; {''} is a D-14 scaffolding value but not a valid resolved_label
 - [Phase 11-brownfield-suggest-verify]: [Phase 11-04] Stale-artifact comparison strips op_hash header from .brownfield/migrations/ copy then sha256 → matches the canonical body sha256 recorded as source_script_hash; on divergence suggest must re-run
 - [Phase 11-brownfield-suggest-verify]: [Phase 11-04] verify --promote performance: 500-page synthetic vault completes in ~1.5s (budget <20s); O(n) single os.walk + indexed O(1) lookups; no per-page subprocess
+- [Phase 11-brownfield-suggest-verify]: [Phase 11-05] Option C renumber: §11.5 Release Workflow → §11.6; new §11.5 Brownfield Workflow closes Phase 10 WR-03 forward-ref typo by construction
+- [Phase 11-brownfield-suggest-verify]: [Phase 11-05] Tier-1 DR with trigger_type: schema-update + affected_pages: [] for infrastructure-only records (inaugural-record precedent from dr-2026-04-14-phase6-decision-type)
+- [Phase 11-brownfield-suggest-verify]: [Phase 11-05] canonical-AGENTS.md regenerated via Phase 8-01 wizard render routine with pinned WIZARD_GENERATED_AT + WIZARD_TEMPLATE_SHA; test_canonical_agents_byte_equality.sh Rule 1 fix re-uses Phase 8 wizard-render shape per 11-01 plan fallback
+- [Phase 11-brownfield-suggest-verify]: [Phase 11-05] Single comprehensive Tier-1 DR over 11 micro-DRs for review-feedback items 1-11 — they are implementation details of the apply-vs-advisory + review-manifest + lifecycle-gate architecture, not independent architectural choices
 
 ### Pending Todos
 
@@ -290,6 +295,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-20T21:34:55.915Z
-Stopped at: Completed 11-04-PLAN.md
+Last session: 2026-04-20T21:56:59.724Z
+Stopped at: Completed 11-05-PLAN.md (Phase 11 close)
 Resume file: None
