@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Shareability
 status: Ready to execute
-stopped_at: Completed 11-02-PLAN.md
-last_updated: "2026-04-20T20:53:48.566Z"
+stopped_at: Completed 11-03-PLAN.md
+last_updated: "2026-04-20T21:14:47.595Z"
 progress:
   total_phases: 6
   completed_phases: 5
   total_plans: 29
-  completed_plans: 26
-  percent: 90
+  completed_plans: 27
+  percent: 93
 ---
 
 # Project State
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-04-15)
 ## Current Position
 
 Phase: 11 (brownfield-suggest-verify) — EXECUTING
-Plan: 3 of 5
+Plan: 4 of 5
 
 ## Performance Metrics
 
@@ -90,6 +90,7 @@ Plan: 3 of 5
 | Phase 10-brownfield-scan-bootstrap P10-06 | 2min | 5 tasks | 7 files |
 | Phase 11-brownfield-suggest-verify P01 | 45 | 2 tasks | 114 files |
 | Phase 11-brownfield-suggest-verify P02 | 90min | 2 tasks | 4 files |
+| Phase 11-brownfield-suggest-verify P03 | 35min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -253,6 +254,10 @@ Recent decisions affecting current work:
 - [Phase 11-brownfield-suggest-verify]: Cluster-level confidence promoted to 'high' when D-03 gate satisfied, even if classify_page's per-page confidence was lower (adds inbound density as 5th cluster-level signal)
 - [Phase 11-brownfield-suggest-verify]: Proposed label derivation: frontmatter > directory hint > classify_page output, preventing generic 'entity' fallback for pages under wiki/concepts, wiki/overviews, etc.
 - [Phase 11-brownfield-suggest-verify]: All hashing via Python hashlib (macOS-portable); zero shell sha256sum invocations; shebang preserved on line 1 with op_hash headers on lines 2+3 via Python list manipulation
+- [Phase 11-brownfield-suggest-verify]: [Phase 11-03] .brownfield-env breadcrumb pattern added (Rule 3 blocking fix) — suggest writes lib-dir path so installed migration scripts can self-locate bin/lib; tests use only PYTHONPATH for ruamel, not BROWNFIELD_LIB_DIR
+- [Phase 11-brownfield-suggest-verify]: [Phase 11-03] TASK_RE \b anchor replaced with (\s|$) — \b is zero-width at ]-space boundary so '- [ ] TODO item' leaked as eligible; correctness fix enforced by Task 1 smoke test
+- [Phase 11-brownfield-suggest-verify]: [Phase 11-03] test_04_advisory_only.sh SSN-redaction fix: plan must_haves + threat model + Plan 11-02 suggest implementation all agree SSN redacts to [redacted-SSN]; Wave-0 RED test expectation of raw '123-45-6789' was buggy; fixed test preserves plan policy
+- [Phase 11-brownfield-suggest-verify]: [Phase 11-03] applied.log 03/04 emit unconditionally (even on 0 findings) — plan text 'appends on findings' conflicts with test_applied_log_advisory_schema asserting 03's block on privacy-sensitive-vault (0 cross-link candidates); test-as-contract wins, always-emit
 
 ### Pending Todos
 
@@ -279,6 +284,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-20T20:53:35.554Z
-Stopped at: Completed 11-02-PLAN.md
+Last session: 2026-04-20T21:14:47.593Z
+Stopped at: Completed 11-03-PLAN.md
 Resume file: None

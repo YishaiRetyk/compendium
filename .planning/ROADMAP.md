@@ -128,11 +128,11 @@ Plans:
   3. `02-provenance-bootstrap.sh` tags pre-existing claims using only the existing epistemic vocabulary (`inferred` per EPST-01) — no new claim-level schema fields, no magic-string provenance values; the imported-vs-LLM-generated distinction lives at page level via `bootstrap_stage`.
   4. User runs `bin/brownfield.sh verify` and it wraps `bin/lint.sh` with brownfield-appropriate severity thresholds to confirm the vault passes after user-applied migrations.
   5. `docs/reference/brownfield.md` and `AGENTS.md §11.5 Brownfield Workflow` explain the mechanical-vs-judgment boundary explicitly, document the `git reset` canonical undo recipe, and note that v1.1 requires manual per-script invocation (auto-apply chain-runner is explicitly deferred to v1.2 BRWNAPPLY-01).
-**Plans:** 2/5 plans executed
+**Plans:** 3/5 plans executed
 Plans:
 - [x] 11-01-PLAN.md — Wave-0 test harness + 7 fixtures + 4 canonical script skeletons + RED test suite locking the D-19 contract — completed 2026-04-20 (47 tests; PHASE 11 TESTS: 4/47 RED)
 - [x] 11-02-PLAN.md — `bin/brownfield.sh suggest` (hybrid byte-copy + candidate-file generation) + `cluster_by_signals()` in brownfield_classify
-- [ ] 11-03-PLAN.md — Four canonical migration scripts (01 apply-from-manifest, 02 direct-apply + soft prereq WARN, 03/04 advisory) + brownfield_provenance.py
+- [x] 11-03-PLAN.md — Four canonical migration scripts (01 apply-from-manifest, 02 direct-apply + soft prereq WARN, 03/04 advisory) + brownfield_provenance.py
 - [ ] 11-04-PLAN.md — `bin/brownfield.sh review-typing` (TTY + AI-handoff) + `verify [--promote]` (D-14 5-gate) + end-to-end golden fixture
 - [ ] 11-05-PLAN.md — AGENTS.md §11.5 populate (Option C renumber §11.5→§11.6; closes WR-03) + docs/reference/brownfield.md + REQUIREMENTS BRWN-12 rename + BRWN-22 new + Tier-1 DR
 
@@ -220,5 +220,5 @@ Plans:
 | 8. Two-Track Setup (Wizard + Manual) | v1.1 | 5/5 | Complete | 2026-04-16 |
 | 9. Collaborative PR Workflow + CI Lint Gate | v1.1 | 6/6 | Complete | 2026-04-16 |
 | 10. Brownfield Scan + Bootstrap | v1.1 | 6/6 | Complete    | 2026-04-18 |
-| 11. Brownfield Suggest + Verify | v1.1 | 2/5 | In Progress|  |
+| 11. Brownfield Suggest + Verify | v1.1 | 3/5 | In Progress|  |
 | 12. Docs Finalization + v1.0 Debt Verification Gate | v1.1 | 0/0 | Not started | - |
