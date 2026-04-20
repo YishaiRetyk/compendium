@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# bin/brownfield.sh -- Phase 10 BRWN-01..07, BRWN-16, BRWN-21:
+# bin/brownfield.sh -- Phase 10 BRWN-01..07, BRWN-16, BRWN-21 + Phase 11 BRWN-11..17, BRWN-22:
 # Brownfield onboarding dispatcher.  Subcommands:
-#   scan         Dry-run vault inventory; writes .brownfield/REPORT.md (no mutation).
-#   bootstrap    Idempotent mechanical transforms (default: dry-run; --apply writes).
-#   suggest      Byte-copy migration scripts + generate candidate YAMLs (Phase 11 Plan 11-02).
-#   review-typing NOT YET IMPLEMENTED — Plan 11-04 pending
-#   verify       NOT YET IMPLEMENTED — Plan 11-04 pending
+#   scan          Dry-run vault inventory; writes .brownfield/REPORT.md (no mutation).
+#   bootstrap     Idempotent mechanical transforms (default: dry-run; --apply writes).
+#   suggest       Byte-copy migration scripts + generate candidate YAMLs (Phase 11 Plan 11-02).
+#   review-typing Orchestrate page-typing cluster decisions (Phase 11 Plan 11-04).
+#   verify        Read-only lint wrapper; --promote flips bootstrap_stage (Phase 11 Plan 11-04).
 #
 # D-16 classifier lives in bin/lib/brownfield_classify.py (reusable by
 # Phase 11's 01-page-typing.sh).  D-02 typed-merge + D-14 sentinel set live
@@ -20,8 +20,11 @@ Subcommands:
   scan                   Dry-run vault inventory; writes .brownfield/REPORT.md
   bootstrap              Idempotent mechanical transforms (default: dry-run)
   suggest                Byte-copy migration scripts + generate candidate YAMLs
-  review-typing          NOT YET IMPLEMENTED (Plan 11-04 pending)
-  verify                 NOT YET IMPLEMENTED (Plan 11-04 pending)
+  review-typing          Review page-typing cluster decisions (TTY small-batch
+                         or large-batch AI handoff); writes decisions.yaml
+  verify                 Read-only lint wrapper over the brownfield category
+                         set; --promote flips bootstrap_stage bootstrapped ->
+                         verified on pages passing the D-14 5-gate pass-list
 
 scan options:
   --list-excluded        List every excluded file in REPORT.md (default: counts only)
@@ -35,7 +38,20 @@ bootstrap options:
   --root <path>          Vault root (default: .)
   -h, --help             Show this help
 
+review-typing options:
+  --root <path>          Vault root (default: .)
+  --threshold N          Cluster-count threshold for small-batch vs large-batch
+                         branch (default: 20)
+  -h, --help             Show this help
+
+verify options:
+  --promote              Flip bootstrap_stage: bootstrapped -> verified on pages
+                         passing the D-14 5-gate pass-list
+  --root <path>          Vault root (default: .)
+  -h, --help             Show this help
+
 Decision boundary: Skip on parse failure or unsafe structure; merge on parseable metadata; warn whenever preserved values may not satisfy the schema.
+Design principle: Review may be interactive and AI-guided; apply must always be deterministic.
 EOF
 }
 
@@ -51,11 +67,7 @@ esac
 shift
 
 case "$SUBCOMMAND" in
-    scan|bootstrap|suggest) ;;
-    review-typing|verify)
-        echo "ERROR: '$SUBCOMMAND' not yet implemented — Plan 11-04 pending" >&2
-        exit 2
-        ;;
+    scan|bootstrap|suggest|review-typing|verify) ;;
     *)
         echo "ERROR: unknown subcommand: $SUBCOMMAND" >&2
         usage >&2
@@ -1301,6 +1313,709 @@ if not bootstrapped_paths:
         'suggest: WARN no bootstrapped pages found '
         '— run `bin/brownfield.sh bootstrap --apply` first for best results\n'
     )
+PYEOF
+
+    exit 0
+fi
+
+# --- review-typing subcommand (Phase 11 Plan 11-04) -------------------------
+# D-04 orchestrator: branches on pending-cluster count.  Small-batch
+# (< threshold AND TTY stdout) uses cluster-by-cluster TTY prompts.
+# Large-batch (>= threshold OR non-TTY stdout) emits a static
+# .brownfield/review-typing-prompt.md for the user to open in their AI session.
+# Both paths write back to .brownfield/page-typing-decisions.yaml via ruamel.yaml
+# round-trip so user-authored comments are preserved (REVIEWS item 4, 11, 14).
+if [ "$SUBCOMMAND" = "review-typing" ]; then
+    RT_ROOT="."
+    RT_THRESHOLD=20   # CONTEXT planner default; RESEARCH Q3 recommends 20
+    while [ "$#" -gt 0 ]; do
+        case "$1" in
+            --root)
+                if [ "$#" -lt 2 ]; then
+                    echo "ERROR: --root requires a path" >&2
+                    exit 1
+                fi
+                RT_ROOT="$2"
+                shift 2
+                ;;
+            --threshold)
+                if [ "$#" -lt 2 ]; then
+                    echo "ERROR: --threshold requires a value" >&2
+                    exit 1
+                fi
+                RT_THRESHOLD="$2"
+                shift 2
+                ;;
+            --help|-h)
+                cat <<'EOF'
+Usage: bin/brownfield.sh review-typing [--root DIR] [--threshold N]
+
+Review page-typing cluster decisions. Branches on pending-cluster count:
+  < threshold (default 20) AND TTY available  -> small-batch TTY prompts
+  >= threshold OR non-TTY stdout              -> large-batch AI handoff
+    (writes .brownfield/review-typing-prompt.md; CLI returns)
+
+TTY primitives per cluster:
+  a) approve all   r) reject all   i) inspect   o) override   s) skip
+
+Both modes write back to .brownfield/page-typing-decisions.yaml via
+ruamel.yaml round-trip (comments preserved).
+
+On stdin EOF (e.g., piped `</dev/null` in CI), session aborts cleanly and
+any decisions made so far are persisted (review item 4 — validated at entry time).
+
+Override label must be one of: entity | concept | source | comparison |
+overview | decision (review item 11 — validated at entry time).
+
+Color output honors NO_COLOR env var (Phase 8 D-20).
+
+Flags:
+  --root DIR        Vault root (default: .)
+  --threshold N     Cluster-count threshold for small-batch vs large-batch
+                    branch (default: 20)
+  --help            Print this help and exit 0.
+
+Design principle: Review may be interactive and AI-guided; apply must always be deterministic.
+EOF
+                exit 0
+                ;;
+            *) echo "ERROR: unknown review-typing argument: $1" >&2; exit 1 ;;
+        esac
+    done
+
+    if [ ! -d "$RT_ROOT" ]; then
+        echo "ERROR: --root path does not exist or is not a directory: $RT_ROOT" >&2
+        exit 1
+    fi
+    RT_ROOT_ABS="$(cd "$RT_ROOT" && pwd)"
+    RT_REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+    RT_LIB_DIR="$(cd "$RT_REPO_ROOT/bin/lib" && pwd)"
+
+    RT_DECISIONS_FILE="$RT_ROOT_ABS/.brownfield/page-typing-decisions.yaml"
+    RT_CANDIDATES_FILE="$RT_ROOT_ABS/.brownfield/page-typing-candidates.yaml"
+
+    if [ ! -f "$RT_DECISIONS_FILE" ]; then
+        echo "ERROR: $RT_DECISIONS_FILE not found. Run \`bin/brownfield.sh suggest\` first." >&2
+        exit 1
+    fi
+
+    # isatty detection
+    RT_TTY_STDIN=0
+    RT_TTY_STDOUT=0
+    [ -t 0 ] && RT_TTY_STDIN=1
+    [ -t 1 ] && RT_TTY_STDOUT=1
+
+    export BROWNFIELD_ROOT="$RT_ROOT_ABS"
+    export BROWNFIELD_LIB_DIR="$RT_LIB_DIR"
+    export BF_DECISIONS_FILE="$RT_DECISIONS_FILE"
+    export BF_CANDIDATES_FILE="$RT_CANDIDATES_FILE"
+    export BF_N_THRESHOLD="$RT_THRESHOLD"
+    export BF_TTY_STDIN="$RT_TTY_STDIN"
+    export BF_TTY_STDOUT="$RT_TTY_STDOUT"
+
+    # Use process substitution to provide the Python script as a file, so
+    # Python's sys.stdin remains connected to the caller's stdin (the TTY or
+    # the piped input). A bare `python3 <<'PYEOF'` heredoc would consume stdin
+    # with the script text, which breaks the small-batch prompt loop.
+    python3 <(cat <<'PYEOF'
+import io
+import os
+import sys
+
+sys.path.insert(0, os.environ['BROWNFIELD_LIB_DIR'])
+
+from ruamel.yaml import YAML  # noqa: E402
+from brownfield_yaml import VALID_ENUMS  # noqa: E402  (REVIEWS item 11 — enum source)
+
+yaml = YAML(typ='rt')
+yaml.preserve_quotes = True
+yaml.indent(mapping=2, sequence=4, offset=2)
+
+decisions_path = os.environ['BF_DECISIONS_FILE']
+candidates_path = os.environ['BF_CANDIDATES_FILE']
+
+# --- Colors (REVIEWS item 14 — Phase 8 D-20 NO_COLOR convention) ---------
+_NO_COLOR = os.environ.get('NO_COLOR', '') != '' or not sys.stderr.isatty()
+CLR_DIM   = '' if _NO_COLOR else '\033[2m'
+CLR_BOLD  = '' if _NO_COLOR else '\033[1m'
+CLR_RESET = '' if _NO_COLOR else '\033[0m'
+
+# --- EOF-safe prompt (REVIEWS item 4 — CRITICAL for CI/non-interactive) ---
+_EOF_SENTINEL = object()
+_MAX_REPROMPTS_PER_CLUSTER = 5
+
+# Pre-peek buffer: read stdin up front when it's non-TTY so we can distinguish
+# "scripted input" (small-batch) from "immediate EOF / nothing piped"
+# (large-batch AI handoff). Per RESEARCH Pitfall 8: scripted-stdin-with-data
+# always flows through small-batch regardless of stdout TTY state.
+_stdin_is_tty = sys.stdin.isatty()
+_prebuffered_lines = []
+_prebuffered_exhausted = False
+if not _stdin_is_tty:
+    try:
+        _raw_stdin = sys.stdin.read()
+    except Exception:
+        _raw_stdin = ''
+    if _raw_stdin:
+        # Preserve trailing blank lines; split and keep empty trailing elements
+        # up to but not including a single trailing empty after split.
+        _prebuffered_lines = _raw_stdin.splitlines(True)
+    _prebuffered_exhausted = not _prebuffered_lines
+
+
+def prompt(msg):
+    """Return user input (stripped) or _EOF_SENTINEL on stdin EOF.
+
+    REVIEWS item 4 contract: distinguish zero-byte read (EOF) from '\\n'
+    (Enter with no input). EOF ends the session cleanly; Enter-with-no-input
+    is re-prompted (bounded by _MAX_REPROMPTS_PER_CLUSTER).
+
+    When stdin was non-TTY and pre-buffered at startup, prompts consume from
+    the buffer. Once the buffer empties, further reads return _EOF_SENTINEL.
+    TTY stdin reads directly via sys.stdin.readline().
+    """
+    global _prebuffered_exhausted
+    sys.stderr.write(msg)
+    sys.stderr.flush()
+    if _stdin_is_tty:
+        raw = sys.stdin.readline()
+        if raw == '':
+            return _EOF_SENTINEL
+        return raw.strip()
+    # Non-TTY: consume the pre-buffered lines we captured at startup.
+    if _prebuffered_lines:
+        raw = _prebuffered_lines.pop(0)
+        return raw.strip()
+    _prebuffered_exhausted = True
+    return _EOF_SENTINEL
+
+
+# --- Load (skip D-09 metadata-comment header so ruamel sees the YAML block) ---
+def load_with_header(path):
+    with open(path, encoding='utf-8') as fh:
+        content = fh.read()
+    lines = content.splitlines(keepends=True)
+    header = []
+    body_start = 0
+    seen_first = False
+    for i, ln in enumerate(lines):
+        if ln.strip() == '# ---':
+            header.append(ln)
+            if seen_first:
+                body_start = i + 1
+                break
+            seen_first = True
+        elif seen_first:
+            header.append(ln)
+        elif not seen_first:
+            # pre-header line (should not happen; defensive)
+            header.append(ln)
+    body = ''.join(lines[body_start:])
+    data = yaml.load(body) if body.strip() else None
+    return data, ''.join(header)
+
+
+decisions, dec_header = load_with_header(decisions_path)
+candidates, _cand_header = load_with_header(candidates_path)
+
+if decisions is None:
+    sys.stderr.write(f"review-typing: no data in {decisions_path}; nothing to do.\n")
+    sys.exit(0)
+
+cand_by_id = {c['cluster_id']: c for c in (candidates.get('clusters', []) if candidates else [])}
+
+pending = [c for c in decisions.get('clusters', []) if c.get('decision') == 'pending']
+
+if not pending:
+    sys.stderr.write("review-typing: all clusters resolved; nothing to do.\n")
+    sys.exit(0)
+
+n_thresh = int(os.environ.get('BF_N_THRESHOLD', '20'))
+tty_stdout = os.environ.get('BF_TTY_STDOUT') == '1'
+
+# Branch selection per D-04 + RESEARCH Pitfall 8:
+#   - pending >= threshold                                  -> large-batch
+#   - stdin is TTY (interactive)        AND pending < N     -> small-batch
+#   - stdin is non-TTY BUT has data     AND pending < N     -> small-batch (scripted)
+#   - stdin is non-TTY AND immediately EOF (no scripted input) -> large-batch (CI-safe)
+# The pre-peek buffer above distinguishes "scripted input" from "immediate EOF".
+_has_scripted_stdin = (not _stdin_is_tty) and bool(_prebuffered_lines)
+_has_usable_stdin = _stdin_is_tty or _has_scripted_stdin
+force_large_batch = (len(pending) >= n_thresh) or (not _has_usable_stdin)
+
+# REVIEWS item 11 — label enum source (exclude empty string — that is a D-14
+# scaffolding sentinel, not a valid RESOLVED override label).
+VALID_TYPE_ENUM = {t for t in VALID_ENUMS.get('type', set()) if t}
+if not VALID_TYPE_ENUM:
+    VALID_TYPE_ENUM = {'entity', 'concept', 'source', 'comparison', 'overview', 'decision'}
+
+
+def writeback(reason_msg):
+    buf = io.StringIO()
+    yaml.dump(decisions, buf)
+    with open(decisions_path, 'w', encoding='utf-8') as fh:
+        fh.write(dec_header)
+        fh.write(buf.getvalue())
+    sys.stderr.write(f"\nreview-typing: {reason_msg} {decisions_path}\n")
+
+
+if force_large_batch:
+    prompt_path = os.path.join(os.environ['BROWNFIELD_ROOT'], '.brownfield', 'review-typing-prompt.md')
+    with open(prompt_path, 'w', encoding='utf-8') as fh:
+        fh.write("# Review typing — AI-guided batch session\n\n")
+        fh.write(f"**Pending clusters:** {len(pending)} (threshold: {n_thresh})\n\n")
+        fh.write("Open these two files:\n\n")
+        fh.write("- `.brownfield/page-typing-candidates.yaml` — read-only reference: each cluster's signals, proposed label, member pages.\n")
+        fh.write("- `.brownfield/page-typing-decisions.yaml` — edit target: each cluster has `decision: pending`. Change to `approve` / `reject`; add `resolved_label` on approve; optionally add per-page overrides under a cluster's `overrides:` key.\n\n")
+        fh.write("## Your job\n\n")
+        fh.write("For each pending cluster:\n\n")
+        fh.write("1. Read the signals and sample pages.\n")
+        fh.write("2. Consider: does the proposed label fit the semantic role of these pages? Would splitting the cluster into sub-groups make sense? Are there outlier pages that need per-page overrides?\n")
+        fh.write("3. **Edit ONLY the decisions manifest. Do not modify vault pages.** Do NOT modify `page-typing-candidates.yaml`.\n")
+        fh.write("4. When all clusters are resolved, inform the user that they can now run:\n\n")
+        fh.write("   ```\n")
+        fh.write("   bash .brownfield/migrations/01-page-typing.sh --apply\n")
+        fh.write("   ```\n\n")
+        fh.write("## Constraints\n\n")
+        fh.write("- Legal labels for `resolved_label`: `entity`, `concept`, `source`, `comparison`, `overview`, `decision`.\n")
+        fh.write("- Per-page overrides go under a cluster's `overrides:` key; each entry has `path:` and `label:`.\n")
+        fh.write("- Do not merge or split clusters by editing cluster membership — if a cluster needs splitting, mark it `reject` and the user re-runs `suggest` after manually splitting the vault.\n\n")
+        fh.write("## Decision boundary\n\n")
+        fh.write("*Review may be interactive and AI-guided; apply must always be deterministic.*\n\n")
+        fh.write("This prompt lives outside the `bin/brownfield.sh` CLI by design: the CLI never calls an LLM. You — the AI assistant reading this file — operate on the manifest from outside the CLI. The user then runs a deterministic apply script.\n")
+    sys.stderr.write(f"review-typing: {len(pending)} pending clusters >= threshold {n_thresh} OR non-TTY environment.\n")
+    sys.stderr.write(f"Wrote {prompt_path}. Open this file in your AI session to review.\n")
+    sys.stderr.write("When done, run: bash .brownfield/migrations/01-page-typing.sh --apply\n")
+    sys.exit(0)
+
+# ===== Small-batch TTY mode =====
+sys.stderr.write(f"review-typing: {len(pending)} pending clusters; TTY mode.\n\n")
+_eof_abort = False
+
+for cluster_dec in pending:
+    if _eof_abort:
+        break
+    cid = cluster_dec['cluster_id']
+    cand = cand_by_id.get(cid)
+    if cand is None:
+        sys.stderr.write(f"WARN: cluster {cid} missing from candidates; leaving pending.\n")
+        continue
+
+    sys.stderr.write(f"\n{CLR_BOLD}=== {cid} ({cand.get('page_count', '?')} pages, confidence={cand.get('confidence', '?')}) ==={CLR_RESET}\n")
+    sys.stderr.write(f"Proposed label: {cand.get('proposed_label', '?')}\n")
+    signals_obj = cand.get('signals', {})
+    try:
+        signals_dict = dict(signals_obj)
+    except Exception:
+        signals_dict = signals_obj
+    sys.stderr.write(f"{CLR_DIM}Signals:{CLR_RESET} {signals_dict}\n")
+    pages_list = list(cand.get('pages', []))
+    sys.stderr.write(f"{CLR_DIM}Sample pages (first 5):{CLR_RESET}\n")
+    for p in pages_list[:5]:
+        sys.stderr.write(f"  - {p}\n")
+    if len(pages_list) > 5:
+        sys.stderr.write(f"  ... and {len(pages_list) - 5} more\n")
+
+    reprompts = 0
+    while True:
+        choice = prompt("\n[a]pprove all / [r]eject all / [i]nspect / [o]verride / [s]kip: ")
+        if choice is _EOF_SENTINEL:
+            # REVIEWS item 4: true EOF → clean abort (partial progress preserved by writeback below)
+            sys.stderr.write(
+                "\nreview-typing: stdin EOF detected; aborting session cleanly. "
+                "Remaining clusters stay pending. Progress saved.\n"
+            )
+            _eof_abort = True
+            break
+
+        c = (choice or '').strip().lower()[:1]
+        if c == 'a':
+            cluster_dec['decision'] = 'approve'
+            cluster_dec['resolved_label'] = cand.get('proposed_label')
+            sys.stderr.write(f"-> approved (all {cand.get('page_count', '?')} pages -> {cand.get('proposed_label')})\n")
+            break
+        elif c == 'r':
+            cluster_dec['decision'] = 'reject'
+            cluster_dec['resolved_label'] = None
+            sys.stderr.write("-> rejected\n")
+            break
+        elif c == 'i':
+            sys.stderr.write("Pages in this cluster:\n")
+            for p in pages_list:
+                sys.stderr.write(f"  - {p}\n")
+            reprompts = 0
+            continue
+        elif c == 'o':
+            sys.stderr.write("Enter comma-separated page paths to override, then label.\n")
+            sys.stderr.write("  example: wiki/concepts/foo.md, wiki/concepts/bar.md\n")
+            paths_raw = prompt("paths: ")
+            if paths_raw is _EOF_SENTINEL:
+                _eof_abort = True
+                break
+            label = prompt("label (entity/concept/source/comparison/overview/decision): ")
+            if label is _EOF_SENTINEL:
+                _eof_abort = True
+                break
+            label = label.strip()
+            paths = [p.strip() for p in paths_raw.split(',') if p.strip()]
+            if not paths or not label:
+                sys.stderr.write("override cancelled (empty input)\n")
+                reprompts = 0
+                continue
+            # REVIEWS item 11: validate label against VALID_TYPE_ENUM BEFORE writing.
+            if label not in VALID_TYPE_ENUM:
+                sys.stderr.write(
+                    f"review-typing: invalid label: {label!r}; must be one of "
+                    f"{sorted(VALID_TYPE_ENUM)}. Override discarded.\n"
+                )
+                reprompts = 0
+                continue
+            if cluster_dec.get('overrides') is None:
+                cluster_dec['overrides'] = []
+            for p in paths:
+                cluster_dec['overrides'].append({'path': p, 'label': label})
+            sys.stderr.write(f"-> added {len(paths)} override(s); cluster still in prompt — choose a/r/s.\n")
+            reprompts = 0
+            continue
+        elif c == 's':
+            sys.stderr.write("-> skipped (cluster remains pending)\n")
+            break
+        else:
+            reprompts += 1
+            if reprompts >= _MAX_REPROMPTS_PER_CLUSTER:
+                sys.stderr.write(
+                    f"review-typing: {_MAX_REPROMPTS_PER_CLUSTER} consecutive invalid inputs; "
+                    f"skipping cluster {cid}.\n"
+                )
+                break
+            sys.stderr.write("Unrecognized choice. Try a/r/i/o/s.\n")
+            continue
+
+# Always write back (preserves partial progress even on EOF abort per REVIEWS item 4).
+writeback("wrote")
+PYEOF
+)
+
+    exit 0
+fi
+
+# --- verify subcommand (Phase 11 Plan 11-04) --------------------------------
+# D-13 read-only wrapper over bin/lint.sh --ci --format json --category ...
+# Plus REVIEWS item 9: stale candidate artifact WARN when a candidate YAML's
+# recorded source_script_hash no longer matches the current byte-copy's body.
+# --promote flag adds D-14 5-gate per-page promotion bootstrapped -> verified.
+if [ "$SUBCOMMAND" = "verify" ]; then
+    VF_ROOT="."
+    VF_PROMOTE=0
+    while [ "$#" -gt 0 ]; do
+        case "$1" in
+            --root)
+                if [ "$#" -lt 2 ]; then
+                    echo "ERROR: --root requires a path" >&2
+                    exit 1
+                fi
+                VF_ROOT="$2"
+                shift 2
+                ;;
+            --promote)
+                VF_PROMOTE=1
+                shift
+                ;;
+            --help|-h)
+                cat <<'EOF'
+Usage: bin/brownfield.sh verify [--root DIR] [--promote]
+
+Read-only vault verification (default): wraps bin/lint.sh with the brownfield-
+appropriate category set (yaml, provenance, orphan, crossref, brownfield) —
+`privacy` is NOT checked here (see bin/check-privacy.sh for public paths).
+Also emits WARN for stale candidate artifacts when .brownfield/*.yaml
+metadata header's source_script_hash no longer matches the byte-copied
+migration script (review item 9 — operational D-09 enforcement).
+
+--promote  Run verify, then flip bootstrap_stage: bootstrapped -> verified on
+           pages passing the D-14 5-gate pass-list:
+             1. currently bootstrapped
+             2. type: is a valid enum
+             3. zero error-severity lint findings for the page
+             4. type-specific required fields present (e.g., source pages
+                have path/content_hash/ingested_at/source_type)
+             5. no pending review decision in page-typing-decisions.yaml
+--root DIR  Vault root (default: .)
+--help      Print this help and exit 0.
+
+Design principle: Review may be interactive and AI-guided; apply must always be deterministic.
+EOF
+                exit 0
+                ;;
+            *) echo "ERROR: unknown verify argument: $1" >&2; exit 1 ;;
+        esac
+    done
+
+    if [ ! -d "$VF_ROOT" ]; then
+        echo "ERROR: --root path does not exist or is not a directory: $VF_ROOT" >&2
+        exit 1
+    fi
+    VF_ROOT_ABS="$(cd "$VF_ROOT" && pwd)"
+    VF_REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+    VF_LIB_DIR="$(cd "$VF_REPO_ROOT/bin/lib" && pwd)"
+    VF_LINT_SH="$VF_REPO_ROOT/bin/lint.sh"
+
+    export BROWNFIELD_ROOT="$VF_ROOT_ABS"
+    export BROWNFIELD_LIB_DIR="$VF_LIB_DIR"
+    export BROWNFIELD_LINT_SH="$VF_LINT_SH"
+    export BF_PROMOTE="$VF_PROMOTE"
+
+    python3 <<'PYEOF'
+import hashlib
+import json
+import os
+import pathlib
+import re
+import subprocess
+import sys
+
+sys.path.insert(0, os.environ['BROWNFIELD_LIB_DIR'])
+
+from brownfield_yaml import VALID_ENUMS, read_fm_body, write_roundtrip  # noqa: E402
+from ruamel.yaml import YAML  # noqa: E402
+
+yaml = YAML(typ='rt')
+
+ROOT = os.environ['BROWNFIELD_ROOT']
+LINT_SH = os.environ['BROWNFIELD_LINT_SH']
+PROMOTE = os.environ.get('BF_PROMOTE') == '1'
+
+# ===== REVIEWS item 9: stale candidate artifact detection =====
+# For each candidate YAML mapped to its canonical script, compare the
+# source_script_hash recorded in the D-09 metadata header against the current
+# body-post-op_hash-strip sha256 of the byte-copy under .brownfield/migrations/.
+# (suggest records the CANONICAL script's sha256 as source_script_hash; the
+# byte-copy has an op_hash header prepended, so stripping it yields the
+# canonical body, whose sha256 should match the recorded value.)
+CANDIDATE_TO_SCRIPT = {
+    'page-typing-candidates.yaml':       '01-page-typing.sh',
+    'page-typing-decisions.yaml':        '01-page-typing.sh',
+    'provenance-bootstrap-report.yaml':  '02-provenance-bootstrap.sh',
+    'cross-link-candidates.yaml':        '03-cross-link-inference.sh',
+    'privacy-findings.yaml':             '04-privacy-review.sh',
+}
+HEADER_HASH_RE = re.compile(r'^# source_script_hash:\s*(sha256:[0-9a-f]+)\s*$', re.MULTILINE)
+
+
+def _body_post_op_hash_strip_sha256(path):
+    body = pathlib.Path(path).read_bytes()
+    lines = body.split(b'\n')
+    stripped = [
+        ln for ln in lines
+        if not ln.startswith(b'# op_hash:')
+        and not ln.startswith(b'# op_hash_scope:')
+    ]
+    return 'sha256:' + hashlib.sha256(b'\n'.join(stripped)).hexdigest()
+
+
+stale_count = 0
+for cand_name, script_name in CANDIDATE_TO_SCRIPT.items():
+    cand_path = os.path.join(ROOT, '.brownfield', cand_name)
+    script_path = os.path.join(ROOT, '.brownfield', 'migrations', script_name)
+    if not (os.path.isfile(cand_path) and os.path.isfile(script_path)):
+        continue
+    head_text = ''
+    with open(cand_path, 'r', encoding='utf-8') as fh:
+        for _ in range(10):
+            ln = fh.readline()
+            if not ln:
+                break
+            head_text += ln
+    m = HEADER_HASH_RE.search(head_text)
+    if not m:
+        continue
+    recorded = m.group(1)
+    current = _body_post_op_hash_strip_sha256(script_path)
+    if recorded != current:
+        stale_count += 1
+        sys.stderr.write(
+            f"verify: stale candidate artifact detected: {cand_name} "
+            f"(source_script_hash in header {recorded} != current body-post-op_hash-strip "
+            f"{current} for migrations/{script_name}); "
+            f"re-run `bin/brownfield.sh suggest` to refresh.\n"
+        )
+
+# ===== Lint wrapper (D-13) =====
+# Point WIKI_ROOT at <vault-root>/wiki/ if it exists; otherwise at the vault
+# root itself (so fixtures/vaults that look like wiki directories still lint).
+wiki_dir = os.path.join(ROOT, 'wiki')
+if not os.path.isdir(wiki_dir):
+    wiki_dir = ROOT
+
+env = os.environ.copy()
+env['WIKI_ROOT'] = wiki_dir
+
+lint_argv = [
+    'bash', LINT_SH,
+    '--ci', '--format', 'json',
+    '--category', 'yaml,provenance,orphan,crossref,brownfield',
+]
+
+print("verify: running bin/lint.sh --ci --format json --category yaml,provenance,orphan,crossref,brownfield")
+
+result = subprocess.run(lint_argv, capture_output=True, text=True, env=env)
+
+try:
+    findings = json.loads(result.stdout) if result.stdout.strip() else []
+except json.JSONDecodeError:
+    sys.stderr.write("verify: WARNING — could not parse lint JSON output; stderr follows\n")
+    sys.stderr.write(result.stderr)
+    findings = []
+
+errors_by_path = {}
+warnings_by_path = {}
+for f in findings:
+    p = f.get('path', '') or ''
+    if not p:
+        continue
+    try:
+        if os.path.isabs(p):
+            rel = os.path.relpath(p, ROOT)
+        else:
+            rel = os.path.relpath(os.path.join(ROOT, p), ROOT) if not p.startswith(ROOT) else os.path.relpath(p, ROOT)
+    except ValueError:
+        rel = p
+    sev = f.get('severity', '')
+    if sev == 'error':
+        errors_by_path.setdefault(rel, []).append(f)
+    elif sev == 'warning':
+        warnings_by_path.setdefault(rel, []).append(f)
+
+n_err = sum(len(v) for v in errors_by_path.values())
+n_warn = sum(len(v) for v in warnings_by_path.values())
+print(f"verify: lint findings: {n_err} error(s), {n_warn} warning(s); {stale_count} stale candidate artifact(s)")
+sys.stderr.write(
+    f"verify: lint findings: {n_err} error(s), {n_warn} warning(s); {stale_count} stale candidate artifact(s)\n"
+)
+
+if not PROMOTE:
+    if n_err:
+        sys.stderr.write(f"verify: {len(errors_by_path)} page(s) have blocking findings:\n")
+        for path in sorted(errors_by_path.keys())[:20]:
+            sys.stderr.write(f"  - {path} ({len(errors_by_path[path])} error(s))\n")
+    sys.exit(0)
+
+# ===== --promote: 5-gate pass-list per page =====
+# Gate 5 source: any page inside a `decision: pending` cluster of
+# page-typing-decisions.yaml is blocked from promotion.
+pending_pages = set()
+decisions_path = os.path.join(ROOT, '.brownfield', 'page-typing-decisions.yaml')
+if os.path.isfile(decisions_path):
+    with open(decisions_path, encoding='utf-8') as fh:
+        content = fh.read()
+    lines = content.splitlines(keepends=True)
+    seen_first = False
+    body_start = 0
+    for i, ln in enumerate(lines):
+        if ln.strip() == '# ---':
+            if seen_first:
+                body_start = i + 1
+                break
+            seen_first = True
+    try:
+        dec = yaml.load(''.join(lines[body_start:]))
+    except Exception:
+        dec = None
+
+    cand_path_pt = os.path.join(ROOT, '.brownfield', 'page-typing-candidates.yaml')
+    cand_by_id_pt = {}
+    if os.path.isfile(cand_path_pt):
+        with open(cand_path_pt, encoding='utf-8') as fh:
+            cand_content = fh.read()
+        cand_lines = cand_content.splitlines(keepends=True)
+        sf = False
+        bs = 0
+        for i, ln in enumerate(cand_lines):
+            if ln.strip() == '# ---':
+                if sf:
+                    bs = i + 1
+                    break
+                sf = True
+        try:
+            cand_data = yaml.load(''.join(cand_lines[bs:]))
+        except Exception:
+            cand_data = None
+        if cand_data:
+            for c in cand_data.get('clusters', []):
+                cand_by_id_pt[c['cluster_id']] = list(c.get('pages', []))
+
+    if dec:
+        for cluster_dec in dec.get('clusters', []):
+            if cluster_dec.get('decision') == 'pending':
+                for p in cand_by_id_pt.get(cluster_dec.get('cluster_id', ''), []):
+                    pending_pages.add(p)
+
+valid_types = {t for t in VALID_ENUMS.get('type', set()) if t}
+if not valid_types:
+    valid_types = {'entity', 'concept', 'source', 'comparison', 'overview', 'decision'}
+
+EXCLUDE_DIR_NAMES = {'.brownfield', '.git', '.obsidian', '.trash', 'node_modules'}
+promoted = []
+blocked = []
+
+for dirpath, dirnames, filenames in os.walk(ROOT, followlinks=False):
+    dirnames[:] = [d for d in dirnames if d not in EXCLUDE_DIR_NAMES]
+    for fn in filenames:
+        if not fn.endswith('.md'):
+            continue
+        full = os.path.join(dirpath, fn)
+        rel = os.path.relpath(full, ROOT)
+        try:
+            fm, body, raw = read_fm_body(full)
+        except Exception:
+            continue
+        if fm is None:
+            continue
+
+        # Gate 1: currently bootstrapped
+        if fm.get('bootstrap_stage') != 'bootstrapped':
+            continue
+
+        # Gate 2: type: is a valid enum
+        t = fm.get('type')
+        if not t or t not in valid_types:
+            blocked.append((rel, f'type not valid enum: {t!r}'))
+            continue
+
+        # Gate 3: zero error-severity lint findings for this page
+        if rel in errors_by_path:
+            blocked.append((rel, f'{len(errors_by_path[rel])} lint error(s)'))
+            continue
+
+        # Gate 4: type-specific required fields present
+        if t == 'source':
+            required = ('path', 'content_hash', 'ingested_at', 'source_type')
+            missing = [k for k in required if k not in fm or fm.get(k) in (None, '')]
+            if missing:
+                blocked.append((rel, f'source missing required fields: {missing}'))
+                continue
+
+        # Gate 5: no pending review decision
+        if rel in pending_pages:
+            blocked.append((rel, 'page has pending review decision'))
+            continue
+
+        # All 5 gates passed → flip bootstrap_stage to verified
+        fm['bootstrap_stage'] = 'verified'
+        try:
+            write_roundtrip(full, fm, body, raw)
+            promoted.append(rel)
+        except Exception as e:
+            blocked.append((rel, f'write_roundtrip failed: {e}'))
+
+print(f"verify --promote: {len(promoted)} page(s) promoted to verified; {len(blocked)} page(s) blocked")
+sys.stderr.write(
+    f"verify --promote: {len(promoted)} page(s) promoted to verified; {len(blocked)} page(s) blocked\n"
+)
+for rel in promoted[:10]:
+    sys.stderr.write(f"  [promoted] {rel}\n")
+for rel, reason in blocked[:10]:
+    sys.stderr.write(f"  [blocked]  {rel} — {reason}\n")
 PYEOF
 
     exit 0

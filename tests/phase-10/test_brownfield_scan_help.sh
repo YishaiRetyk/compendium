@@ -27,15 +27,16 @@ out=$(bash "$REPO_ROOT/bin/brownfield.sh" --help)
 # is covered by tests/phase-11/test_suggest_*.sh + test_op_hash_*.sh +
 # test_canonical_byte_equality.sh + test_01_highconf_multisignal_autoapprove.sh.
 #
-# `verify` remains a stub (Plan 11-04 pending); assertion updated to match
-# the new "Plan 11-04 pending" message emitted by the Plan-11-02 dispatcher.
+# Plan 11-04 populates `verify` (and `review-typing`); the Plan 10-02 stub-exit-2
+# assertion for `verify` is relaxed here (same precedent as bootstrap/suggest above).
+# verify-specific behaviour is covered by tests/phase-11/test_verify_*.sh.
+# The dispatcher now accepts all five subcommands (scan|bootstrap|suggest|review-typing|verify).
 set +e
-bash "$REPO_ROOT/bin/brownfield.sh" verify >/dev/null 2>ver.err
-ver_exit=$?
+bash "$REPO_ROOT/bin/brownfield.sh" verify --help >/dev/null 2>ver.err
+ver_help_exit=$?
 set -e
-[ "$ver_exit" -eq 2 ]                               || { echo "FAIL: verify exit=$ver_exit (want 2)" >&2; rm -f ver.err; exit 1; }
-grep -q "not yet implemented — Plan 11-04 pending" ver.err \
-    || { echo "FAIL: verify missing Plan-11-04-pending stub message" >&2; cat ver.err >&2; rm -f ver.err; exit 1; }
+[ "$ver_help_exit" -eq 0 ] \
+    || { echo "FAIL: verify --help exit=$ver_help_exit (want 0 after Plan-11-04 populate)" >&2; cat ver.err >&2; rm -f ver.err; exit 1; }
 rm -f ver.err
 
 # unknown subcommand exits 1 with "unknown subcommand"
