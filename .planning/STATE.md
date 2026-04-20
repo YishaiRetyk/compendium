@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Shareability
 status: Ready to execute
-stopped_at: Completed 11-03-PLAN.md
-last_updated: "2026-04-20T21:14:47.595Z"
+stopped_at: Completed 11-04-PLAN.md
+last_updated: "2026-04-20T21:34:55.918Z"
 progress:
   total_phases: 6
   completed_phases: 5
   total_plans: 29
-  completed_plans: 27
-  percent: 93
+  completed_plans: 28
+  percent: 97
 ---
 
 # Project State
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-04-15)
 ## Current Position
 
 Phase: 11 (brownfield-suggest-verify) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 
 ## Performance Metrics
 
@@ -91,6 +91,7 @@ Plan: 4 of 5
 | Phase 11-brownfield-suggest-verify P01 | 45 | 2 tasks | 114 files |
 | Phase 11-brownfield-suggest-verify P02 | 90min | 2 tasks | 4 files |
 | Phase 11-brownfield-suggest-verify P03 | 35min | 3 tasks | 6 files |
+| Phase 11-brownfield-suggest-verify P04 | 70min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -258,6 +259,11 @@ Recent decisions affecting current work:
 - [Phase 11-brownfield-suggest-verify]: [Phase 11-03] TASK_RE \b anchor replaced with (\s|$) — \b is zero-width at ]-space boundary so '- [ ] TODO item' leaked as eligible; correctness fix enforced by Task 1 smoke test
 - [Phase 11-brownfield-suggest-verify]: [Phase 11-03] test_04_advisory_only.sh SSN-redaction fix: plan must_haves + threat model + Plan 11-02 suggest implementation all agree SSN redacts to [redacted-SSN]; Wave-0 RED test expectation of raw '123-45-6789' was buggy; fixed test preserves plan policy
 - [Phase 11-brownfield-suggest-verify]: [Phase 11-03] applied.log 03/04 emit unconditionally (even on 0 findings) — plan text 'appends on findings' conflicts with test_applied_log_advisory_schema asserting 03's block on privacy-sensitive-vault (0 cross-link candidates); test-as-contract wins, always-emit
+- [Phase 11-brownfield-suggest-verify]: [Phase 11-04] Process substitution python3 <(cat <<EOF) replaces heredoc in review-typing — heredoc consumes Python stdin preventing scripted-input small-batch path; suggest+verify keep heredoc (no stdin read)
+- [Phase 11-brownfield-suggest-verify]: [Phase 11-04] Stdin pre-peek buffer (sys.stdin.read() on non-TTY) discriminates scripted-input (small-batch) from immediate-EOF / </dev/null (large-batch) — resolves CONTEXT D-04 spec ambiguity between 'non-TTY stdout forces large-batch' and 'scripted stdin stays small-batch'
+- [Phase 11-brownfield-suggest-verify]: [Phase 11-04] VALID_TYPE_ENUM for review-typing override excludes empty-string sentinel; {''} is a D-14 scaffolding value but not a valid resolved_label
+- [Phase 11-brownfield-suggest-verify]: [Phase 11-04] Stale-artifact comparison strips op_hash header from .brownfield/migrations/ copy then sha256 → matches the canonical body sha256 recorded as source_script_hash; on divergence suggest must re-run
+- [Phase 11-brownfield-suggest-verify]: [Phase 11-04] verify --promote performance: 500-page synthetic vault completes in ~1.5s (budget <20s); O(n) single os.walk + indexed O(1) lookups; no per-page subprocess
 
 ### Pending Todos
 
@@ -284,6 +290,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-20T21:14:47.593Z
-Stopped at: Completed 11-03-PLAN.md
+Last session: 2026-04-20T21:34:55.915Z
+Stopped at: Completed 11-04-PLAN.md
 Resume file: None

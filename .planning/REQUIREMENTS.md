@@ -99,7 +99,7 @@ Numbering continues from v1.0. New REQ-ID prefixes: `TMPL`, `NEUT`, `WZRD`, `MAN
 - [x] **BRWN-14**: Each migration script header contains `# op_hash: <sha256>` derived from normalized operation descriptors (not the rendered shell); idempotency recorded in `.brownfield/applied.log`
 - [x] **BRWN-15**: `02-provenance-bootstrap.sh` tags pre-existing claims using the **existing epistemic vocabulary only** (`inferred` per EPST-01). **Zero claim-level schema expansion.** The imported-vs-LLM-generated distinction is captured at the page level via `bootstrap_stage` (BRWN-07) — no magic-string provenance values, no new epistemic sub-markers. AGENTS.md §5 documents `bootstrap_stage` as the canonical provenance-lineage field for imported pages.
 - [x] **BRWN-16**: Classification heuristics in `scan` are rule-based (frontmatter fields, filename conventions, link density) — no LLM calls inside `brownfield.sh`
-- [ ] **BRWN-17**: `bin/brownfield.sh verify` is a thin wrapper over `bin/lint.sh` with brownfield-appropriate severity thresholds
+- [x] **BRWN-17**: `bin/brownfield.sh verify` is a thin wrapper over `bin/lint.sh` with brownfield-appropriate severity thresholds
 - [ ] **BRWN-18**: `docs/reference/brownfield.md` explains the mechanical-vs-judgment boundary explicitly ("this is why `bootstrap` won't ever do X; use `suggest`")
 - [ ] **BRWN-19**: `docs/reference/brownfield.md` documents `git reset` recipe as the canonical undo path
 - [ ] **BRWN-20**: New `AGENTS.md §11.5 Brownfield Workflow` documents scan/bootstrap/suggest/verify, idempotency contract, mechanical/judgment boundary
@@ -231,7 +231,7 @@ Explicitly excluded from v1.1. Documented to prevent scope creep.
 | BRWN-14 | Phase 11 | Complete |
 | BRWN-15 | Phase 11 | Complete |
 | BRWN-16 | Phase 11 | Complete |
-| BRWN-17 | Phase 11 | Pending |
+| BRWN-17 | Phase 11 | Complete |
 | BRWN-18 | Phase 11 | Pending |
 | BRWN-19 | Phase 11 | Pending |
 | BRWN-20 | Phase 11 | Pending |
