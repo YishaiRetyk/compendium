@@ -55,6 +55,10 @@ The wiki is a persistent, compounding artifact — cross-references are already 
 - [x] Manual setup track preserved for power users — Validated in Phase 08: two-track-setup-wizard-manual
 - [x] Git-based PR workflow for collaborative curation with lint gate — Validated in Phase 09: collaborative-pr-workflow-ci-lint-gate
 - [x] Per-ingest contributor field in `log.md` (git authorship remains source of truth) — Validated in Phase 09: collaborative-pr-workflow-ci-lint-gate
+- [x] `bin/brownfield.sh suggest` — hybrid script-copy + vault-specific classifier emitting `candidates.yaml` + `decisions.yaml` review manifest — Validated in Phase 11: brownfield-suggest-verify
+- [x] `bin/brownfield.sh review-typing` — EOF-safe deterministic page-typing review surface (TTY small-batch + AI-handoff large-batch) — Validated in Phase 11: brownfield-suggest-verify
+- [x] `bin/brownfield.sh verify` (+ `--promote`) — read-only lint wrapper with 5-gate `bootstrapped → verified` promotion — Validated in Phase 11: brownfield-suggest-verify
+- [x] Four canonical migration scripts — 01 page-typing + 02 provenance-bootstrap (apply-class), 03 cross-link-inference + 04 privacy-review (advisory-class) — Validated in Phase 11: brownfield-suggest-verify
 
 ### Active (v1.1 focus areas — formal REQ-IDs in REQUIREMENTS.md)
 
@@ -62,8 +66,6 @@ The wiki is a persistent, compounding artifact — cross-references are already 
 - [ ] Kahneman cluster moved to `examples/`; starter vault neutral
 - [ ] `bin/brownfield.sh scan` — dry-run markdown report
 - [ ] `bin/brownfield.sh bootstrap` — mechanical-only auto (sentinel frontmatter, hashes, skeleton, YAML normalization)
-- [ ] `bin/brownfield.sh suggest` — staged idempotent migration scripts for judgment-heavy work
-- [ ] `bin/brownfield.sh verify` — lint integration after user-applied migrations
 - [ ] Multi-agent validation (Codex or other) against v1.0 workflows
 - [ ] Obsidian render/Dataview verification (deferred from Phase 4)
 
@@ -125,4 +127,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-16 — Phase 09.1 (Progressive Disclosure Extraction) complete: AGENTS.md/CLAUDE.md reduced 1,785 → 1,412 lines (~21%) by extracting §4 worked examples to schema/examples/ and §16 Appendices A/B to docs/reference/, with the "sole authoritative specification" framing preserved via uniform `See:` pointers.*
+*Last updated: 2026-04-20 — Phase 11 (Brownfield Suggest-Verify) complete: `suggest` + `review-typing` + `verify` + `verify --promote` subcommands + four canonical migration scripts (01 page-typing & 02 provenance-bootstrap apply-class, 03 cross-link-inference & 04 privacy-review advisory-class) + AGENTS.md §11.5 schema section + Tier-1 DR documenting apply-vs-advisory architecture. 47/47 Phase 11 tests GREEN; BRWN-16 hard-lock (no LLM/network calls) enforced at runtime.*
