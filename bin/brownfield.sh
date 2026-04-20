@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # bin/brownfield.sh -- Phase 10 BRWN-01..07, BRWN-16, BRWN-21:
 # Brownfield onboarding dispatcher.  Subcommands:
-#   scan      Dry-run vault inventory; writes .brownfield/REPORT.md (no mutation).
-#   bootstrap Idempotent mechanical transforms (default: dry-run; --apply writes).
-#   suggest   NOT YET IMPLEMENTED — see Phase 11 (BRWN-11..20)
-#   verify    NOT YET IMPLEMENTED — see Phase 11 (BRWN-17)
+#   scan         Dry-run vault inventory; writes .brownfield/REPORT.md (no mutation).
+#   bootstrap    Idempotent mechanical transforms (default: dry-run; --apply writes).
+#   suggest      Byte-copy migration scripts + generate candidate YAMLs (Phase 11 Plan 11-02).
+#   review-typing NOT YET IMPLEMENTED — Plan 11-04 pending
+#   verify       NOT YET IMPLEMENTED — Plan 11-04 pending
 #
 # D-16 classifier lives in bin/lib/brownfield_classify.py (reusable by
 # Phase 11's 01-page-typing.sh).  D-02 typed-merge + D-14 sentinel set live
@@ -18,8 +19,9 @@ Usage: bin/brownfield.sh <subcommand> [options]
 Subcommands:
   scan                   Dry-run vault inventory; writes .brownfield/REPORT.md
   bootstrap              Idempotent mechanical transforms (default: dry-run)
-  suggest                NOT YET IMPLEMENTED (Phase 11 BRWN-11..20)
-  verify                 NOT YET IMPLEMENTED (Phase 11 BRWN-17)
+  suggest                Byte-copy migration scripts + generate candidate YAMLs
+  review-typing          NOT YET IMPLEMENTED (Plan 11-04 pending)
+  verify                 NOT YET IMPLEMENTED (Plan 11-04 pending)
 
 scan options:
   --list-excluded        List every excluded file in REPORT.md (default: counts only)
@@ -49,9 +51,9 @@ esac
 shift
 
 case "$SUBCOMMAND" in
-    scan|bootstrap) ;;
-    suggest|verify)
-        echo "ERROR: '$SUBCOMMAND' not yet implemented — see Phase 11 (BRWN-11..20)" >&2
+    scan|bootstrap|suggest) ;;
+    review-typing|verify)
+        echo "ERROR: '$SUBCOMMAND' not yet implemented — Plan 11-04 pending" >&2
         exit 2
         ;;
     *)
@@ -633,6 +635,663 @@ PYEOF
 
     # Safety net: python3 heredoc exits the process on sys.exit(), so reaching
     # here means no Python block ran (e.g., python3 missing).
+    exit 0
+fi
+
+# --- suggest subcommand (Phase 11 Plan 11-02) -------------------------------
+#
+# Byte-copies the four canonical migration scripts from
+# schema/brownfield/migrations/ into <root>/.brownfield/migrations/ and
+# prepends a deterministic op_hash header (lines 2+3, immediately after the
+# shebang) to each copy.  Also generates five vault-specific candidate
+# YAMLs and extends <root>/.brownfield/REPORT.md with Phase 11 advisory
+# sections.  Read-only w.r.t. vault content — writes only under .brownfield/
+# (which is gitignored per TMPL-04).
+#
+# REVIEWS item 3:  re-uses bin/lib/brownfield_walk.walk_vault_respecting_ignore
+# so scan + suggest cannot fork their exclusion semantics.
+# REVIEWS item 7:  auto-approve predicate covers BOTH explicit-frontmatter
+# and 3+ non-frontmatter signals agree paths per D-03 widened reading.
+# REVIEWS item 8:  all hashing via Python hashlib (macOS-portable).
+# REVIEWS item 10: decisions.yaml carries a top-note referencing
+# schema/brownfield/migrations/README.md for per-script applied.log variance.
+# REVIEWS item 13: op_hash headers inserted on lines 2+3 (shebang preserved
+# on line 1) via Python list manipulation — no `head -n 1` / `tail -n +2`
+# bash pipelines that risk off-by-one.
+
+if [ "$SUBCOMMAND" = "suggest" ]; then
+    SG_ROOT="."
+    while [ "$#" -gt 0 ]; do
+        case "$1" in
+            --root)
+                if [ "$#" -lt 2 ]; then
+                    echo "ERROR: --root requires a path" >&2
+                    exit 1
+                fi
+                SG_ROOT="$2"
+                shift 2
+                ;;
+            --help|-h)
+                cat <<'EOF'
+Usage: bin/brownfield.sh suggest [--root DIR]
+
+Generate migration scripts + candidate data files for the brownfield workflow.
+
+Suggest does two things:
+  1. Byte-copies canonical migration scripts from schema/brownfield/migrations/
+     into <root>/.brownfield/migrations/, prepending a deterministic op_hash
+     header (on lines 2 and 3, immediately after the shebang) to each copy.
+  2. Generates vault-specific candidate YAMLs under <root>/.brownfield/
+     (page-typing-candidates.yaml, page-typing-decisions.yaml,
+      provenance-bootstrap-report.yaml, cross-link-candidates.yaml,
+      privacy-findings.yaml) and appends ## Cross-link candidates + ## Privacy
+     review sections to <root>/.brownfield/REPORT.md.
+
+Vault scope: uses the same .brownfield-ignore logic as `scan` (Phase 10) via
+a shared walker helper.  Control-plane files (docs/, schema/, examples/,
+AGENTS.md, etc.) listed in .brownfield-ignore are never classified.
+
+Prerequisite: vault should be bootstrapped (bin/brownfield.sh bootstrap --apply)
+so pages carry bootstrap_stage: bootstrapped.  If no bootstrapped pages are
+found, suggest warns but still writes skeleton candidate files.
+
+Flags:
+  --root DIR   Vault root (default: .)
+  --help       Print this help and exit 0.
+
+Design principle: Review may be interactive and AI-guided; apply must always
+be deterministic.
+EOF
+                exit 0
+                ;;
+            *) echo "ERROR: unknown suggest argument: $1" >&2; exit 1 ;;
+        esac
+    done
+
+    if [ ! -d "$SG_ROOT" ]; then
+        echo "ERROR: --root path does not exist or is not a directory: $SG_ROOT" >&2
+        exit 1
+    fi
+    SG_ROOT_ABS="$(cd "$SG_ROOT" && pwd)"
+
+    # Resolve repo root — same upward-walk pattern as bootstrap.  We need
+    # schema/brownfield/migrations/ to live under the repo root.
+    SG_REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+
+    if [ ! -d "$SG_REPO_ROOT/schema/brownfield/migrations" ]; then
+        echo "ERROR: schema/brownfield/migrations/ not found under $SG_REPO_ROOT" >&2
+        exit 1
+    fi
+
+    SG_LIB_DIR="$(cd "$SG_REPO_ROOT/bin/lib" && pwd)"
+
+    export BROWNFIELD_ROOT="$SG_ROOT_ABS"
+    export BROWNFIELD_LIB_DIR="$SG_LIB_DIR"
+    export BROWNFIELD_SCHEMA_MIG_DIR="$SG_REPO_ROOT/schema/brownfield/migrations"
+    export BROWNFIELD_TOOL_VERSION="${BROWNFIELD_TOOL_VERSION:-1.1.0}"
+    export BROWNFIELD_FIXTURE_TODAY="${BROWNFIELD_FIXTURE_TODAY:-}"
+
+    python3 << 'PYEOF'
+import datetime
+import hashlib
+import os
+import pathlib
+import re
+import sys
+
+import yaml as pyyaml
+
+sys.path.insert(0, os.environ['BROWNFIELD_LIB_DIR'])
+from brownfield_classify import (  # noqa: E402
+    VALID_TYPES,
+    classify_page,
+    cluster_by_signals,
+    cluster_is_autoapproveable,
+    PASCAL_CASE_RE,
+    DATE_PREFIX_RE,
+)
+from brownfield_walk import walk_vault_respecting_ignore  # noqa: E402  (REVIEWS item 3)
+
+
+ROOT = os.environ['BROWNFIELD_ROOT']
+TOOL = os.environ['BROWNFIELD_TOOL_VERSION']
+SCHEMA_MIG_DIR = os.environ['BROWNFIELD_SCHEMA_MIG_DIR']
+BF_DIR = os.path.join(ROOT, '.brownfield')
+BF_MIG_DIR = os.path.join(BF_DIR, 'migrations')
+os.makedirs(BF_MIG_DIR, exist_ok=True)
+
+# --- Date determinism (mirrors bootstrap's pattern) -----------------------
+fx_today = os.environ.get('BROWNFIELD_FIXTURE_TODAY') or ''
+if fx_today:
+    try:
+        datetime.date.fromisoformat(fx_today)
+    except ValueError as e:
+        sys.stderr.write(
+            f'ERROR: BROWNFIELD_FIXTURE_TODAY="{fx_today}" is not valid YYYY-MM-DD: {e}\n'
+        )
+        sys.exit(1)
+    GENERATED_AT = f'{fx_today}T00:00:00Z'
+else:
+    GENERATED_AT = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+
+
+# --- Hashing helpers (REVIEWS item 8: Python hashlib, macOS-portable) ---
+def sha256_bytes(b: bytes) -> str:
+    return 'sha256:' + hashlib.sha256(b).hexdigest()
+
+
+def sha256_file(path: str) -> str:
+    return sha256_bytes(pathlib.Path(path).read_bytes())
+
+
+def compute_op_hash(canonical_path: str, data_schema_version: int = 1) -> str:
+    """op_hash covers canonical script body (post-op_hash-header-strip) + schema
+    version.  No vault content; stable across vaults per D-10."""
+    body = pathlib.Path(canonical_path).read_bytes()
+    lines = body.split(b'\n')
+    stripped = [
+        ln for ln in lines
+        if not ln.startswith(b'# op_hash:')
+        and not ln.startswith(b'# op_hash_scope:')
+    ]
+    h = hashlib.sha256()
+    h.update(b'\n'.join(stripped))
+    h.update(f'\n# data_schema_version: {data_schema_version}\n'.encode())
+    return 'sha256:' + h.hexdigest()
+
+
+# --- Byte-copy canonical scripts + inject op_hash header on lines 2+3 -----
+SCRIPTS = (
+    '01-page-typing.sh',
+    '02-provenance-bootstrap.sh',
+    '03-cross-link-inference.sh',
+    '04-privacy-review.sh',
+)
+
+for script in SCRIPTS:
+    canon = os.path.join(SCHEMA_MIG_DIR, script)
+    target = os.path.join(BF_MIG_DIR, script)
+    if not os.path.isfile(canon):
+        sys.stderr.write(f'ERROR: canonical migration script not found: {canon}\n')
+        sys.exit(1)
+    op_hash = compute_op_hash(canon)
+    body_text = pathlib.Path(canon).read_text(encoding='utf-8')
+    lines = body_text.split('\n')
+    if not lines or not lines[0].startswith('#!'):
+        sys.stderr.write(
+            f'ERROR: canonical {script} does not start with a shebang '
+            f'— REVIEWS item 13 invariant broken\n'
+        )
+        sys.exit(1)
+    output_lines = [
+        lines[0],
+        f'# op_hash: {op_hash}',
+        '# op_hash_scope: canonical-script-body + data-schema-version',
+    ] + lines[1:]
+    pathlib.Path(target).write_text('\n'.join(output_lines), encoding='utf-8')
+    os.chmod(target, 0o755)
+
+# Canonical script source hashes (for D-09 metadata header's source_script_hash field)
+SCRIPT_HASHES = {s: sha256_file(os.path.join(SCHEMA_MIG_DIR, s)) for s in SCRIPTS}
+
+
+# --- Slug-form signal derivation (matches cluster_by_signals' shape) -----
+# These must align with _LABEL_HINTS in bin/lib/brownfield_classify.py so
+# cluster_is_autoapproveable() can count agreement.  classify_page's
+# internal signals dict uses LABEL slugs (entity/concept/...); here we
+# derive SHAPE slugs (pascal/kebab/entity-like/inbound-heavy/...) from
+# the same raw page data.
+KEBAB_RE = re.compile(r'^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$')
+DR_PREFIX_RE = re.compile(r'^dr-\d{4}-\d{2}-\d{2}-')
+
+
+def filename_slug(rel_path: str) -> str:
+    stem = pathlib.Path(rel_path).stem
+    if DR_PREFIX_RE.match(stem):
+        return 'dr-prefixed'
+    if DATE_PREFIX_RE.match(stem) or stem.startswith('src-'):
+        return 'date-prefixed'
+    if PASCAL_CASE_RE.match(stem):
+        return 'pascal'
+    if KEBAB_RE.match(stem):
+        return 'kebab'
+    return 'none'
+
+
+SECTION_RE = re.compile(r'^##\s+(.+?)\s*$', re.MULTILINE)
+
+
+def heading_slug(body: str) -> str:
+    secs = set(SECTION_RE.findall(body or ''))
+    # Order matters: source + comparison shapes are more specific than
+    # the generic TL;DR/Key Facts/Detail triad.
+    if 'Extracted Claims' in secs and 'Source Metadata' in secs:
+        return 'source-like'
+    if 'Comparison Table' in secs:
+        return 'comparison-like'
+    if 'Decision' in secs and 'Alternatives Considered' in secs:
+        return 'decision-like'
+    if 'TL;DR' in secs and 'Key Facts' in secs and 'Detail' in secs:
+        # Directory hint disambiguates entity vs concept vs overview — but
+        # only when path clearly signals.  Default to 'entity-like' since
+        # that maps to the most common brownfield page shape.
+        return 'entity-like'
+    return 'none'
+
+
+def dir_label_hint(rel_path: str) -> str | None:
+    """Use directory-under-wiki/ as a weak label hint for heading slug.
+
+    Returns a heading slug override when the path clearly signals (concepts/
+    -> concept-like, overviews/ -> overview-like, etc.).  None otherwise.
+    """
+    parts = rel_path.replace('\\', '/').split('/')
+    try:
+        wiki_idx = parts.index('wiki')
+        subdir = parts[wiki_idx + 1] if len(parts) > wiki_idx + 1 else None
+    except ValueError:
+        subdir = parts[0] if parts else None
+    if subdir == 'concepts':
+        return 'concept-like'
+    if subdir == 'entities':
+        return 'entity-like'
+    if subdir == 'overviews':
+        return 'overview-like'
+    if subdir == 'sources':
+        return 'source-like'
+    if subdir == 'comparisons':
+        return 'comparison-like'
+    if subdir == 'decisions':
+        return 'decision-like'
+    return None
+
+
+# --- Walk vault via shared walker (REVIEWS item 3) ------------------------
+FM_RE = re.compile(r'^---\r?\n(.*?)\r?\n---\r?\n(.*)$', re.DOTALL)
+WIKILINK_RE = re.compile(r'\[\[([^\]|#]+)')
+
+
+def parse_fm_body(path: str):
+    try:
+        raw = pathlib.Path(path).read_text(encoding='utf-8', errors='replace')
+    except OSError:
+        return None, ''
+    m = FM_RE.match(raw)
+    if not m:
+        return None, raw
+    try:
+        fm = pyyaml.safe_load(m.group(1)) or {}
+    except Exception:
+        return None, raw
+    if not isinstance(fm, dict):
+        return None, m.group(2)
+    return fm, m.group(2)
+
+
+pages_data = []  # list of (abs_path, rel_path, fm, body)
+inbound: dict[str, int] = {}
+
+for abs_path in walk_vault_respecting_ignore(ROOT):
+    rel = os.path.relpath(abs_path, ROOT).replace(os.sep, '/')
+    fm, body = parse_fm_body(abs_path)
+    pages_data.append((abs_path, rel, fm, body))
+    for m in WIKILINK_RE.finditer(body or ''):
+        target_title = m.group(1).strip()
+        inbound[target_title] = inbound.get(target_title, 0) + 1
+
+# Sort for determinism
+pages_data.sort(key=lambda t: t[1])
+
+
+def inbound_count_for(fm, rel):
+    title = (fm or {}).get('title') or pathlib.Path(rel).stem
+    return inbound.get(str(title), 0)
+
+
+_DIR_TO_LABEL = {
+    'concept-like':    'concept',
+    'entity-like':     'entity',
+    'overview-like':   'overview',
+    'source-like':     'source',
+    'comparison-like': 'comparison',
+    'decision-like':   'decision',
+}
+
+classifications = []
+bootstrapped_paths = []
+for abs_path, rel, fm, body in pages_data:
+    ic = inbound_count_for(fm, rel)
+    label, confidence, _trace = classify_page(rel, fm, body or '', inbound_count=ic)
+    fm_slug = 'none'
+    if fm and isinstance(fm.get('type'), str):
+        t = fm['type'].strip()
+        if t in VALID_TYPES:
+            fm_slug = t
+
+    # Heading slug: prefer directory hint (unambiguous when the page lives
+    # under wiki/concepts/, wiki/entities/, etc.); fall back to body-based
+    # shape detection for flat vaults that don't use the wiki/<type>/ layout.
+    h_from_dir = dir_label_hint(rel)
+    h_from_body = heading_slug(body or '')
+    if h_from_dir:
+        h = h_from_dir
+    elif h_from_body != 'none':
+        h = h_from_body
+    else:
+        h = 'none'
+
+    # Proposed label: explicit frontmatter wins; directory hint second;
+    # classify_page's rule-based output third.  This is the label used
+    # to look up _LABEL_HINTS for auto-approve agreement counting.
+    if fm_slug != 'none':
+        proposed_label = fm_slug
+    elif h_from_dir:
+        proposed_label = _DIR_TO_LABEL.get(h_from_dir, label)
+    else:
+        proposed_label = label
+
+    outbound = len(WIKILINK_RE.findall(body or ''))
+    if outbound >= 5:
+        links_slug = 'outbound-heavy'
+    elif outbound == 0:
+        links_slug = 'none'
+    else:
+        links_slug = 'outbound-light'
+
+    inbound_slug = 'inbound-heavy' if ic >= 5 else 'inbound-light'
+
+    classifications.append({
+        'path': rel,
+        'label': proposed_label,
+        'confidence': confidence,
+        'signals': {
+            'frontmatter': fm_slug,
+            'filename': filename_slug(rel),
+            'heading': h,
+            'inbound': inbound_slug,
+            'links': links_slug,
+        },
+        'inbound_count': ic,
+    })
+
+    if fm and fm.get('bootstrap_stage') == 'bootstrapped':
+        bootstrapped_paths.append(rel)
+
+clusters = cluster_by_signals(classifications)
+
+
+# --- Write metadata header helper ----------------------------------------
+def write_metadata_header(fh, source_script: str):
+    fh.write('# ---\n')
+    fh.write('# schema_version: 1\n')
+    fh.write(f'# tool_version: {TOOL}\n')
+    fh.write(f'# generated_at: {GENERATED_AT}\n')
+    fh.write(f'# vault_root: {ROOT}\n')
+    fh.write(f'# source_script_hash: {SCRIPT_HASHES[source_script]}\n')
+    fh.write('# ---\n')
+
+
+# --- page-typing-candidates.yaml -----------------------------------------
+candidates_path = os.path.join(BF_DIR, 'page-typing-candidates.yaml')
+with open(candidates_path, 'w', encoding='utf-8') as fh:
+    write_metadata_header(fh, '01-page-typing.sh')
+    # Emit clusters AND per-page classifications so consumers can inspect
+    # individual paths.  The "pages" list on each cluster is the authoritative
+    # membership record used by 01-page-typing.sh --apply in Plan 11-03.
+    payload = {
+        'clusters': clusters,
+        'pages': [
+            {'path': c['path'], 'label': c['label'], 'confidence': c['confidence']}
+            for c in classifications
+        ],
+    }
+    pyyaml.safe_dump(payload, fh, sort_keys=False, default_flow_style=False, allow_unicode=True)
+
+
+# --- page-typing-decisions.yaml (REVIEWS item 7: D-03 widened predicate) --
+decisions = {'clusters': []}
+for cl in clusters:
+    auto = cluster_is_autoapproveable(cl)
+    decisions['clusters'].append({
+        'cluster_id': cl['cluster_id'],
+        'page_count': cl['page_count'],
+        'proposed_label': cl['proposed_label'],
+        'confidence': cl['confidence'],
+        'decision': 'approve' if auto else 'pending',
+        'resolved_label': cl['proposed_label'] if auto else None,
+        'overrides': [],
+    })
+
+decisions_path = os.path.join(BF_DIR, 'page-typing-decisions.yaml')
+with open(decisions_path, 'w', encoding='utf-8') as fh:
+    write_metadata_header(fh, '01-page-typing.sh')
+    # REVIEWS item 10: point readers at the per-script applied.log variance doc.
+    fh.write('# Note: per-script applied.log block shapes documented in schema/brownfield/migrations/README.md.\n')
+    pyyaml.safe_dump(decisions, fh, sort_keys=False, default_flow_style=False, allow_unicode=True)
+
+
+# --- provenance-bootstrap-report.yaml (02 dry-run preview) ---------------
+# Top-level bullets only per REVIEWS item 5.  Claims eligible for provenance
+# markers under TL;DR / Key Facts when they are NOT wikilink-only,
+# question, task, source-id, placeholder, or already-tagged.
+WIKILINK_ONLY = re.compile(r'^- \[\[[^\]]+\]\]\s*$')
+QUESTION = re.compile(r'\?\s*$')
+TASK = re.compile(r'^- (\[[ x]\]|TODO:?|FIXME:?)\b', re.IGNORECASE)
+SOURCE_ID = re.compile(r'^- src-\d{4}-\d{2}-\d{2}-')
+PLACEHOLDER = re.compile(r'^- (TBD|TBC|pending|placeholder)\b', re.IGNORECASE)
+BULLET_TOP_LEVEL = re.compile(r'^- (.+)$')  # col-0 '-' only; nested indented bullets never match
+EP_PRESENT = re.compile(r'\[epistemic::')
+PV_PRESENT = re.compile(r'\[prov:')
+SECTION_HDR = re.compile(r'^##\s+(.+?)\s*$')
+
+
+def is_eligible_top_level(line: str) -> bool:
+    if not BULLET_TOP_LEVEL.match(line):
+        return False
+    if WIKILINK_ONLY.match(line):
+        return False
+    if QUESTION.search(line):
+        return False
+    if TASK.match(line):
+        return False
+    if SOURCE_ID.match(line):
+        return False
+    if PLACEHOLDER.match(line):
+        return False
+    if EP_PRESENT.search(line):
+        return False
+    if PV_PRESENT.search(line):
+        return False
+    return True
+
+
+def section_scan_top_level(body: str, targets: set) -> list:
+    eligible = []
+    in_target = False
+    for ln in body.splitlines():
+        m = SECTION_HDR.match(ln)
+        if m:
+            in_target = m.group(1).strip() in targets
+            continue
+        if in_target and is_eligible_top_level(ln):
+            eligible.append(ln)
+    return eligible
+
+
+prov_report = {'pages': []}
+for abs_path, rel, fm, body in pages_data:
+    if not fm or fm.get('bootstrap_stage') != 'bootstrapped':
+        continue
+    eligible = section_scan_top_level(body or '', {'TL;DR', 'Key Facts'})
+    entry = {'path': rel, 'eligible_bullets': len(eligible), 'sample': eligible[:3]}
+    if not eligible:
+        entry['note'] = 'no eligible claim bullets found'
+    prov_report['pages'].append(entry)
+
+prov_path = os.path.join(BF_DIR, 'provenance-bootstrap-report.yaml')
+with open(prov_path, 'w', encoding='utf-8') as fh:
+    write_metadata_header(fh, '02-provenance-bootstrap.sh')
+    pyyaml.safe_dump(prov_report, fh, sort_keys=False, default_flow_style=False, allow_unicode=True)
+
+
+# --- cross-link-candidates.yaml (03 output) ------------------------------
+TITLE_MAP: dict[str, str] = {}
+ALIAS_MAP: dict[str, str] = {}
+for abs_path, rel, fm, body in pages_data:
+    t = (fm or {}).get('title') or pathlib.Path(rel).stem
+    TITLE_MAP[str(t)] = rel
+    for a in ((fm or {}).get('aliases') or []):
+        ALIAS_MAP[str(a)] = rel
+
+CODE_FENCE = re.compile(r'^```')
+EXISTING_WL = re.compile(r'\[\[[^\]]+\]\]')
+
+
+def eligible_title(t: str) -> bool:
+    if not t:
+        return False
+    tokens = t.split()
+    return len(tokens) >= 2 or len(t) >= 8
+
+
+cross_links = {'candidates': []}
+for abs_path, rel, fm, body in pages_data:
+    if not body:
+        continue
+    in_fence = False
+    seen_pairs: set = set()
+    for ln_no, ln in enumerate(body.splitlines(), start=1):
+        if CODE_FENCE.match(ln):
+            in_fence = not in_fence
+            continue
+        if in_fence:
+            continue
+        masked = EXISTING_WL.sub(lambda m: ' ' * len(m.group(0)), ln)
+        for title, target in list(TITLE_MAP.items()) + list(ALIAS_MAP.items()):
+            if target == rel:
+                continue
+            if not eligible_title(title):
+                continue
+            pattern = re.compile(r'\b' + re.escape(title) + r'\b')
+            if pattern.search(masked):
+                pair = (rel, target)
+                if pair in seen_pairs:
+                    continue
+                seen_pairs.add(pair)
+                existing_link = ('[[' + title + ']]') in body
+                match_type = 'exact-title' if title in TITLE_MAP else 'alias'
+                cross_links['candidates'].append({
+                    'source_page': rel,
+                    'line_number': ln_no,
+                    'matched_text': ln.strip()[:120],
+                    'proposed_target': target,
+                    'match_type': match_type,
+                    'target_already_linked_from_source': bool(existing_link),
+                })
+                break
+
+cross_links_path = os.path.join(BF_DIR, 'cross-link-candidates.yaml')
+with open(cross_links_path, 'w', encoding='utf-8') as fh:
+    write_metadata_header(fh, '03-cross-link-inference.sh')
+    pyyaml.safe_dump(cross_links, fh, sort_keys=False, default_flow_style=False, allow_unicode=True)
+
+
+# --- privacy-findings.yaml (04 output) -----------------------------------
+# REVIEWS item 12: .brownfield/ is gitignored; raw email/phone intentionally
+# preserved so operators can triage.  SSN values redacted to '[redacted-SSN]'.
+EMAIL_RE = re.compile(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b')
+PHONE_RE = re.compile(r'\b(?:\+?1[-.\s]?)?\(?[2-9][0-9]{2}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}\b')
+SSN_RE = re.compile(r'\b\d{3}[-\s]\d{2}[-\s]\d{4}\b')
+EXAMPLE_TLDS = ('@example.com', '@example.org', '@example.net', '@test.invalid')
+BACKTICK = re.compile(r'`[^`]*`')
+
+privacy = {'findings': []}
+for abs_path, rel, fm, body in pages_data:
+    if not body:
+        continue
+    in_fence = False
+    for ln_no, ln in enumerate(body.splitlines(), start=1):
+        if CODE_FENCE.match(ln):
+            in_fence = not in_fence
+            continue
+        if in_fence:
+            continue
+        masked = BACKTICK.sub(lambda m: ' ' * len(m.group(0)), ln)
+        for m in EMAIL_RE.finditer(masked):
+            if any(tld in m.group(0) for tld in EXAMPLE_TLDS):
+                continue
+            privacy['findings'].append({
+                'path': rel, 'line_number': ln_no,
+                'pattern_type': 'email', 'matched_text': m.group(0),
+                'risk_level': 'medium',
+                'suggestion': 'Review whether this email should appear in a cloud_safe page',
+            })
+        for m in PHONE_RE.finditer(masked):
+            privacy['findings'].append({
+                'path': rel, 'line_number': ln_no,
+                'pattern_type': 'phone', 'matched_text': m.group(0),
+                'risk_level': 'medium',
+                'suggestion': 'Review whether this phone number should appear in a cloud_safe page',
+            })
+        for m in SSN_RE.finditer(masked):
+            privacy['findings'].append({
+                'path': rel, 'line_number': ln_no,
+                'pattern_type': 'ssn', 'matched_text': '[redacted-SSN]',
+                'risk_level': 'high',
+                'suggestion': 'SSN-like pattern detected; verify this is not real PII',
+            })
+
+privacy_path = os.path.join(BF_DIR, 'privacy-findings.yaml')
+with open(privacy_path, 'w', encoding='utf-8') as fh:
+    write_metadata_header(fh, '04-privacy-review.sh')
+    pyyaml.safe_dump(privacy, fh, sort_keys=False, default_flow_style=False, allow_unicode=True)
+
+
+# --- Extend REPORT.md with Phase 11 advisory sections --------------------
+report_path = os.path.join(BF_DIR, 'REPORT.md')
+with open(report_path, 'a', encoding='utf-8') as fh:
+    fh.write('\n## Cross-link candidates\n\n')
+    if cross_links['candidates']:
+        for c in cross_links['candidates']:
+            mark = ' (already linked)' if c['target_already_linked_from_source'] else ''
+            fh.write(
+                f"- `{c['source_page']}`:{c['line_number']} -> "
+                f"`{c['proposed_target']}` ({c['match_type']}){mark}\n"
+            )
+    else:
+        fh.write('_No cross-link candidates found._\n')
+    fh.write('\n## Privacy review\n\n')
+    if privacy['findings']:
+        for f in privacy['findings']:
+            fh.write(f"- `{f['path']}`:{f['line_number']} — {f['pattern_type']} ({f['risk_level']})\n")
+    else:
+        fh.write('_No privacy-sensitive patterns detected._\n')
+
+
+# --- Summary line(s) -----------------------------------------------------
+sys.stderr.write(f'suggest: byte-copied 4 migration scripts to {BF_MIG_DIR}/\n')
+n_pending = sum(1 for c in decisions['clusters'] if c['decision'] == 'pending')
+n_approve = sum(1 for c in decisions['clusters'] if c['decision'] == 'approve')
+sys.stderr.write(
+    f'suggest: wrote {len(clusters)} typing clusters '
+    f'({n_pending} pending / {n_approve} auto-approved)\n'
+)
+sys.stderr.write(
+    f"suggest: wrote {len(prov_report['pages'])} provenance-bootstrap eligible previews\n"
+)
+sys.stderr.write(
+    f"suggest: wrote {len(cross_links['candidates'])} cross-link candidates\n"
+)
+sys.stderr.write(
+    f"suggest: wrote {len(privacy['findings'])} privacy findings\n"
+)
+if not bootstrapped_paths:
+    sys.stderr.write(
+        'suggest: WARN no bootstrapped pages found '
+        '— run `bin/brownfield.sh bootstrap --apply` first for best results\n'
+    )
+PYEOF
+
     exit 0
 fi
 

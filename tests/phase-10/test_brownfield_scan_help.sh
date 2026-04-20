@@ -17,27 +17,26 @@ out=$(bash "$REPO_ROOT/bin/brownfield.sh" --help)
 [[ "$out" == *"Skip on parse failure or unsafe structure; merge on parseable metadata; warn whenever preserved values may not satisfy the schema."* ]] \
     || { echo "FAIL: --help missing decision-boundary epigraph" >&2; exit 1; }
 
-# suggest / verify / bootstrap stubs
-set +e
-bash "$REPO_ROOT/bin/brownfield.sh" suggest >/dev/null 2>sug.err
-sug_exit=$?
-set -e
-[ "$sug_exit" -eq 2 ]                                 || { echo "FAIL: suggest exit=$sug_exit (want 2)" >&2; cat sug.err >&2; rm -f sug.err; exit 1; }
-grep -q "not yet implemented — see Phase 11" sug.err  || { echo "FAIL: suggest missing exit-2 message" >&2; cat sug.err >&2; rm -f sug.err; exit 1; }
-rm -f sug.err
-
+# NOTE: Plan 10-03 populates bootstrap; the Plan 10-02 stub-exit-2 assertion
+# for `bootstrap` is relaxed here (pattern: Phase 08-04 relaxing phase-07
+# test_docs_skeleton on populate).  Bootstrap-specific behaviour is covered
+# by the test_brownfield_bootstrap_*.sh suite authored in Plan 10-03.
+#
+# Plan 11-02 populates `suggest`; the Plan 10-02 stub-exit-2 assertion for
+# `suggest` is also relaxed here (same precedent).  Suggest-specific behaviour
+# is covered by tests/phase-11/test_suggest_*.sh + test_op_hash_*.sh +
+# test_canonical_byte_equality.sh + test_01_highconf_multisignal_autoapprove.sh.
+#
+# `verify` remains a stub (Plan 11-04 pending); assertion updated to match
+# the new "Plan 11-04 pending" message emitted by the Plan-11-02 dispatcher.
 set +e
 bash "$REPO_ROOT/bin/brownfield.sh" verify >/dev/null 2>ver.err
 ver_exit=$?
 set -e
-[ "$ver_exit" -eq 2 ]                                 || { echo "FAIL: verify exit=$ver_exit (want 2)" >&2; rm -f ver.err; exit 1; }
-grep -q "not yet implemented — see Phase 11" ver.err  || { echo "FAIL: verify missing exit-2 message" >&2; rm -f ver.err; exit 1; }
+[ "$ver_exit" -eq 2 ]                               || { echo "FAIL: verify exit=$ver_exit (want 2)" >&2; rm -f ver.err; exit 1; }
+grep -q "not yet implemented — Plan 11-04 pending" ver.err \
+    || { echo "FAIL: verify missing Plan-11-04-pending stub message" >&2; cat ver.err >&2; rm -f ver.err; exit 1; }
 rm -f ver.err
-
-# NOTE: Plan 10-03 populates bootstrap; the Plan 10-02 stub-exit-2 assertion is
-# relaxed here (pattern: Phase 08-04 relaxing phase-07 test_docs_skeleton on
-# populate).  Bootstrap-specific behaviour is covered by the
-# test_brownfield_bootstrap_*.sh suite authored in Plan 10-03.
 
 # unknown subcommand exits 1 with "unknown subcommand"
 set +e
