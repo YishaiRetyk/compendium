@@ -167,17 +167,166 @@ If a user ingests a source whose frontmatter carries `bootstrap_stage` or `boots
 
 See AGENTS.md §5 for the authoritative field definition and the explicit contrast with claim-level provenance (PROV-01..05 are the authoritative provenance mechanism; `bootstrap_stage` tracks page-level migration state only).
 
+> See AGENTS.md §11.5 Brownfield Workflow for the authoritative contract. This section covers operator workflow, examples, and troubleshooting — it does not restate normative semantics.
+
 ## suggest subcommand
 
-[Populated in Phase 11]
+`bin/brownfield.sh suggest` generates the migration scripts + candidate data files needed for page typing, provenance bootstrap, cross-link inference, and privacy review. It is a generator — it writes to `.brownfield/` (gitignored) but never mutates vault pages.
 
-The `suggest` subcommand generates four staged, idempotent migration scripts for judgment-heavy transforms (BRWN-11..14): `01-page-typing.sh`, `02-provenance-bootstrap.sh`, `03-cross-link-inference.sh`, `04-privacy-classification.sh`. Each is user-invoked, dry-run by default, with `--apply` to execute. See REQUIREMENTS.md §BRWN-11..14 for the Phase 11 contract.
+### Flags
+
+| Flag | Default | Effect |
+|------|---------|--------|
+| `--root DIR` | `.` | Vault root |
+| `--help` | — | Print help and exit 0 |
+
+### Output contract
+
+After `suggest` runs:
+
+- `<root>/.brownfield/migrations/` contains byte-copies of the four canonical migration scripts, each carrying an `# op_hash: sha256:<hex>` header (line 2) + `# op_hash_scope: canonical-script-body + data-schema-version` (line 3) prepended at copy time. The shebang stays on line 1.
+- `<root>/.brownfield/` contains five candidate/data YAML files, each opening with a D-09 metadata header (including `source_script_hash:` — consumed by `verify` for stale-artifact detection):
+  - `page-typing-candidates.yaml` — clusters + signals per page typing decisions.
+  - `page-typing-decisions.yaml` — policy manifest with `decision: pending` on all clusters except auto-approved high-confidence (explicit frontmatter type OR 3+ non-frontmatter signals agree — D-03 verbatim).
+  - `provenance-bootstrap-report.yaml` — dry-run preview of 02's eligible-TOP-LEVEL-bullet counts per page.
+  - `cross-link-candidates.yaml` — advisory cross-link proposals for 03.
+  - `privacy-findings.yaml` — advisory privacy-sensitive findings for 04.
+- `<root>/.brownfield/REPORT.md` gains `## Cross-link candidates` and `## Privacy review` sections (appended; does not overwrite Phase 10 sections).
+
+### Scan scope
+
+`suggest` reuses the Phase 10 `.brownfield-ignore` walker (`bin/lib/brownfield_walk.py walk_vault_respecting_ignore()`) — the SAME helper `scan` uses. Control-plane files (`docs/`, `schema/`, `examples/`, `AGENTS.md`, `CLAUDE.md`, `README.md`, `.github/`) listed in `.brownfield-ignore` are never classified. This prevents sweeping control-plane material into page-typing candidates when suggest is run at repo root.
+
+### Metadata header example
+
+Each candidate YAML opens with the D-09 block:
+
+```yaml
+# ---
+# schema_version: 1
+# tool_version: 1.1.0
+# generated_at: 2026-04-20T00:00:00Z
+# vault_root: /home/user/vault
+# source_script_hash: sha256:...
+# ---
+clusters:
+  - cluster_id: cluster_1
+    ...
+```
+
+The `generated_at` field is pinned to `BROWNFIELD_FIXTURE_TODAY` when that env var is set (useful for fixture determinism); otherwise uses wall-clock UTC. `source_script_hash` lets `verify` detect stale review artifacts when the canonical script changes.
+
+## review-typing subcommand
+
+`bin/brownfield.sh review-typing` is the orchestrator that resolves pending clusters in `.brownfield/page-typing-decisions.yaml`. It branches on pending-cluster count:
+
+- **Small batch (< threshold, default 20) AND TTY available:** cluster-by-cluster prompts with primitives `[a]pprove all / [r]eject all / [i]nspect / [o]verride / [s]kip`. On stdin EOF (piped `</dev/null`) the session aborts cleanly; partial progress is saved. Override labels are validated against the `type:` enum at entry time.
+- **Large batch (≥ threshold) OR non-TTY:** emits `.brownfield/review-typing-prompt.md` — a directive template pointing at the candidates + decisions manifests. Open the prompt in your AI session (Claude Code, Codex, etc.). The AI assists with tradeoff articulation + cluster merge/split suggestions but edits ONLY the decisions manifest.
+
+### Flags
+
+| Flag | Default | Effect |
+|------|---------|--------|
+| `--root DIR` | `.` | Vault root |
+| `--threshold N` | 20 | Pending-cluster count threshold for large-batch mode |
+| `--help` | — | Print help and exit 0 |
+
+### Small-batch TTY session example
+
+```
+$ bash bin/brownfield.sh review-typing
+review-typing: 3 pending clusters; TTY mode.
+
+=== cluster_2 (4 pages, confidence=medium) ===
+Proposed label: concept
+Signals: {'frontmatter': 'none', 'filename': 'kebab', 'heading': 'concept-like', 'inbound': 'inbound-light', 'links': 'outbound-heavy'}
+Sample pages (first 5):
+  - wiki/concepts/attention-mechanism.md
+  - wiki/concepts/transformer.md
+  ...
+
+[a]pprove all / [r]eject all / [i]nspect / [o]verride / [s]kip: a
+-> approved (all 4 pages -> concept)
+...
+```
+
+Color output honors `NO_COLOR` env var (Phase 8 D-20 precedent).
+
+### Large-batch AI handoff
+
+When pending ≥ threshold or when stdout is not a TTY, review-typing writes `.brownfield/review-typing-prompt.md` with instructions for your AI session. The CLI itself never calls an LLM — the prompt.md artifact is a plain markdown file that you open in your assistant's context. The assistant edits the decisions manifest; you then run `bash .brownfield/migrations/01-page-typing.sh --apply`.
+
+**Decision boundary:** *Review may be interactive and AI-guided; apply must always be deterministic.*
 
 ## verify subcommand
 
-[Populated in Phase 11]
+`bin/brownfield.sh verify` wraps `bin/lint.sh` with brownfield-appropriate severity thresholds AND detects stale candidate artifacts. By default it is read-only — it prints a summary of blockers and stale-artifact WARNs, then exits 0 regardless of findings. `--promote` is the mutation path that flips `bootstrap_stage: bootstrapped → verified` on pages that pass the 5-gate list.
 
-The `verify` subcommand wraps `bin/lint.sh` with brownfield-appropriate severity thresholds to confirm the vault passes after user-applied migrations (BRWN-17). See REQUIREMENTS.md §BRWN-17.
+### Flags
+
+| Flag | Default | Effect |
+|------|---------|--------|
+| `--root DIR` | `.` | Vault root |
+| `--promote` | off | Flip `bootstrap_stage` on passing pages |
+| `--help` | — | Print help and exit 0 |
+
+### Stale candidate artifact WARN
+
+Before running lint, verify compares each `.brownfield/*.yaml` candidate file's D-09 `source_script_hash:` header against the current body-post-op_hash-strip sha256 of the corresponding `.brownfield/migrations/*.sh` byte-copy. If they differ (meaning the byte-copy has been hand-edited or the canonical script has changed since suggest was last run), verify emits a stderr WARN:
+
+```
+verify: stale candidate artifact detected: page-typing-candidates.yaml (source_script_hash in header sha256:abc... != current sha256:def... for migrations/01-page-typing.sh); re-run `bin/brownfield.sh suggest` to refresh.
+```
+
+The WARN is non-blocking — verify exits 0 regardless. Re-run `bin/brownfield.sh suggest` to regenerate the candidate files against the current scripts.
+
+### The 5-gate pass-list (D-14)
+
+A page is promoted to `bootstrap_stage: verified` iff ALL of:
+
+1. **Currently bootstrapped** — `bootstrap_stage: bootstrapped` (not already `verified` / `archived`).
+2. **Valid type:** — `type:` is one of `entity | concept | source | comparison | overview | decision` per §4.
+3. **Zero blocking lint findings** — no `severity: error` lint findings for this page path in the 5 checked categories (`yaml`, `provenance`, `orphan`, `crossref`, `brownfield`).
+4. **Type-specific required fields present** — e.g., `type: source` requires `path`, `content_hash`, `ingested_at`, `source_type`.
+5. **No pending review decision** — page is not listed in any cluster with `decision: pending` in `.brownfield/page-typing-decisions.yaml`.
+
+Privacy is NOT a gate — `bin/check-privacy.sh` handles the public-paths leak guard separately (Phase 9 D-15). The `--promote` run is the human sign-off for advisory work (privacy review especially): by running it, you assert you've examined advisory outputs.
+
+### Performance
+
+RESEARCH Q9 budget: `verify --promote` completes in <20s on a 500-page vault. Bottleneck is the single lint subprocess invocation; gate evaluation itself is O(n) with O(1) per-page lookups.
+
+## Lifecycle walkthrough
+
+The full happy-path after `bootstrap` ships:
+
+1. `bash bin/brownfield.sh suggest` — generate migration scripts + candidates.
+2. `bash bin/brownfield.sh review-typing` — resolve clusters (TTY or AI handoff).
+3. `bash .brownfield/migrations/01-page-typing.sh --apply` — commit typing decisions deterministically from paired immutable inputs (candidates.yaml + decisions.yaml).
+4. `bash .brownfield/migrations/02-provenance-bootstrap.sh --apply` — tag claim-like TOP-LEVEL TL;DR + Key Facts bullets (nested bullets untouched).
+5. `bash .brownfield/migrations/03-cross-link-inference.sh` — advisory cross-link report.
+6. `bash .brownfield/migrations/04-privacy-review.sh` — advisory privacy-sensitive findings report.
+7. `bash bin/brownfield.sh verify` — read-only lint check + stale-artifact WARN.
+8. `bash bin/brownfield.sh verify --promote` — flip `bootstrap_stage: verified` on pages passing all 5 gates.
+
+Each migration script appends one block to `.brownfield/applied.log` per meaningful execution (apply-class on `--apply` only; advisory-class on findings). Plain `--dry-run` does NOT append. See `schema/brownfield/migrations/README.md` for the per-script applied.log block shapes.
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| `ImportError: No module named 'ruamel.yaml'` | ruamel.yaml not installed | `pip install ruamel.yaml` or set `PYTHONPATH=$HOME/.local/lib/python3/dist-packages` |
+| `suggest` warns "no bootstrapped pages found" | bootstrap hasn't run yet on this vault | Run `bash bin/brownfield.sh bootstrap --apply` first |
+| `01 --apply` skips everything | All clusters still `decision: pending` in decisions.yaml | Run `review-typing` to resolve, or manually edit decisions.yaml |
+| `01 --apply` errors "page-typing-candidates.yaml not found" | candidates.yaml deleted; 01 requires BOTH files as paired immutable inputs | Re-run `bash bin/brownfield.sh suggest` to regenerate both |
+| `02 --apply` emits `WARN: N bootstrapped pages still have empty type:...` | Soft D-12 prereq — most pages lack `type:` | Expected on fresh-bootstrap vault; proceeds anyway. Running 01 --apply first produces better results. |
+| `02 --apply` skipped nested bullets | By design (item 5) — 02 only tags TOP-LEVEL bullets under TL;DR + Key Facts | Nested bullets are intentionally untouched. Flatten to top-level if you want them tagged. |
+| `review-typing` hangs on piped stdin | Should not happen on current build | Check you're on post-Plan-11-04 code (EOF handling added per review item 4). Piping `</dev/null` aborts the session cleanly. |
+| `review-typing` rejects override label | Label must be one of `entity \| concept \| source \| comparison \| overview \| decision` — validated at entry time per review item 11 | Retry with a valid label. |
+| `verify` WARNs `stale candidate artifact detected` | `source_script_hash` in candidate header drifted from current migration script body | Re-run `bash bin/brownfield.sh suggest` to refresh byte-copies and metadata headers. Non-blocking — you can still run --promote if you're confident the change is safe. |
+| `verify --promote` blocks most pages | Usually Gate 2 (unset type:) or Gate 5 (pending clusters) | Inspect the `[blocked] <path> — <reason>` list; fix the root cause and re-run. |
+| `applied.log` has no block after a migration ran | Migration invoked in `--dry-run` (the default) | Re-run with `--apply` for apply-class; advisory-class appends only when findings exist. |
+| `.brownfield/` contents look stale after code changes | Your schema/brownfield/migrations/*.sh changed after last suggest; verify will WARN on this | Re-run `suggest` to refresh byte-copies and regenerate op_hash headers. |
 
 ## Known limitations
 

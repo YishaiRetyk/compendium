@@ -19,12 +19,14 @@ else
   fail "UNEXPECTED in wiki/: $UNEXPECTED"
 fi
 
-# index.md skeleton — ≤ 30 lines total.
+# index.md skeleton — ≤ 40 lines total (raised from 30 in Phase 11 to
+# accommodate natural growth of the ## Decisions section; Phase 7 baseline
+# was 3 DRs + skeleton prose, Phase 9.1 added 1, Phase 11 added 1).
 LINES=$(wc -l < wiki/index.md)
-if [ "$LINES" -le 30 ]; then
-  pass "wiki/index.md is skeleton ($LINES lines ≤ 30)"
+if [ "$LINES" -le 40 ]; then
+  pass "wiki/index.md is skeleton ($LINES lines ≤ 40)"
 else
-  fail "wiki/index.md too long ($LINES lines > 30)"
+  fail "wiki/index.md too long ($LINES lines > 40)"
 fi
 
 echo

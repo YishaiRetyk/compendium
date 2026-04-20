@@ -25,9 +25,15 @@ for section in "## Prerequisites" "## scan subcommand" "## bootstrap subcommand"
         || { echo "FAIL: missing section heading: $section" >&2; exit 1; }
 done
 
-# Assert Phase-11 stubs present
-count=$(grep -c '\[Populated in Phase 11\]' "$doc")
-[ "$count" -ge 2 ] || { echo "FAIL: expected ≥2 [Populated in Phase 11] markers, found $count" >&2; exit 1; }
+# Phase-11 Plan 11-05 populated the suggest + verify sections.  This test
+# originally asserted ≥2 `[Populated in Phase 11]` stub markers; now that
+# Phase 11 has landed, the markers are gone.  The Plan 11-05 test suite
+# (test_docs_suggest_section.sh, test_docs_review_typing_section.sh,
+# test_docs_verify_section.sh) owns the populated-content assertions — see
+# tests/phase-11/.  The precedent for relaxing a Phase-N test after Phase-M
+# (M>N) populates the referenced content is established by Plan 08-04
+# (phase-07 test_docs_skeleton.sh) and Plan 09.1-02 (phase-07
+# test_reference_stubs.sh).
 
 # Assert typed-merge taxonomy present
 for klass in "Class A" "Class B" "Class C"; do

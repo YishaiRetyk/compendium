@@ -94,16 +94,17 @@ Numbering continues from v1.0. New REQ-ID prefixes: `TMPL`, `NEUT`, `WZRD`, `MAN
 - [ ] **BRWN-09**: `bin/lint.sh` new `brownfield` category reports counts of pages still in `bootstrapped` state; warns on pages `bootstrapped` older than 30 days
 - [ ] **BRWN-10**: `bin/ingest.sh` strips `bootstrap_stage` if encountered on normal ingest (prevents pollution)
 - [x] **BRWN-11**: `bin/brownfield.sh suggest` writes `.brownfield/REPORT.md` + `.brownfield/migrations/*.sh`
-- [x] **BRWN-12**: Four staged migration script classes: `01-page-typing.sh`, `02-provenance-bootstrap.sh`, `03-cross-link-inference.sh`, `04-privacy-classification.sh`
+- [x] **BRWN-12**: Four staged migration script classes: `01-page-typing.sh`, `02-provenance-bootstrap.sh`, `03-cross-link-inference.sh`, `04-privacy-review.sh` (renamed from `04-privacy-classification.sh` in Phase 11 per D-07 — fail-closed `privacy: local_only` preserved; script is advisory-only and never flips `privacy:` frontmatter).
 - [x] **BRWN-13**: Each migration script is **user-invoked manually** (`bash .brownfield/migrations/02-provenance-bootstrap.sh`); self-describing (prints what it will change); dry-run default; per-script `--apply` flag executes the change on that single class; idempotent when re-run. v1.1 does NOT ship a single-command chain-runner that auto-applies all classes — that is explicitly deferred to v1.2 (see BRWNAPPLY-01).
 - [x] **BRWN-14**: Each migration script header contains `# op_hash: <sha256>` derived from normalized operation descriptors (not the rendered shell); idempotency recorded in `.brownfield/applied.log`
 - [x] **BRWN-15**: `02-provenance-bootstrap.sh` tags pre-existing claims using the **existing epistemic vocabulary only** (`inferred` per EPST-01). **Zero claim-level schema expansion.** The imported-vs-LLM-generated distinction is captured at the page level via `bootstrap_stage` (BRWN-07) — no magic-string provenance values, no new epistemic sub-markers. AGENTS.md §5 documents `bootstrap_stage` as the canonical provenance-lineage field for imported pages.
 - [x] **BRWN-16**: Classification heuristics in `scan` are rule-based (frontmatter fields, filename conventions, link density) — no LLM calls inside `brownfield.sh`
 - [x] **BRWN-17**: `bin/brownfield.sh verify` is a thin wrapper over `bin/lint.sh` with brownfield-appropriate severity thresholds
-- [ ] **BRWN-18**: `docs/reference/brownfield.md` explains the mechanical-vs-judgment boundary explicitly ("this is why `bootstrap` won't ever do X; use `suggest`")
-- [ ] **BRWN-19**: `docs/reference/brownfield.md` documents `git reset` recipe as the canonical undo path
-- [ ] **BRWN-20**: New `AGENTS.md §11.5 Brownfield Workflow` documents scan/bootstrap/suggest/verify, idempotency contract, mechanical/judgment boundary
+- [x] **BRWN-18**: `docs/reference/brownfield.md` explains the mechanical-vs-judgment boundary explicitly ("this is why `bootstrap` won't ever do X; use `suggest`")
+- [x] **BRWN-19**: `docs/reference/brownfield.md` documents `git reset` recipe as the canonical undo path
+- [x] **BRWN-20**: New `AGENTS.md §11.5 Brownfield Workflow` documents scan/bootstrap/suggest/verify, idempotency contract, mechanical/judgment boundary
 - [x] **BRWN-21**: Byte-exact fixture tests: bootstrap produces identical output on sample vaults across runs (pitfall M-11 mitigation)
+- [x] **BRWN-22**: `bin/brownfield.sh review-typing` orchestrator resolves pending page-typing clusters with two modes: **small-batch TTY** (< threshold, default 20, and stdout is a TTY) with cluster primitives `approve all / reject all / inspect / override / skip`; **large-batch AI handoff** (≥ threshold OR non-TTY) via a static `.brownfield/review-typing-prompt.md` artifact consumed OUTSIDE the CLI. Both modes write back to `.brownfield/page-typing-decisions.yaml` via ruamel.yaml round-trip (preserves user comments). Small-batch prompt loop handles stdin EOF cleanly (aborts session without hanging). Override labels are validated against the `type:` enum at entry time. No LLM calls inside `bin/brownfield.sh` (BRWN-16 hard-lock).
 
 ### v1.0 Debt Closure (DEBT)
 
@@ -232,16 +233,17 @@ Explicitly excluded from v1.1. Documented to prevent scope creep.
 | BRWN-15 | Phase 11 | Complete |
 | BRWN-16 | Phase 11 | Complete |
 | BRWN-17 | Phase 11 | Complete |
-| BRWN-18 | Phase 11 | Pending |
-| BRWN-19 | Phase 11 | Pending |
-| BRWN-20 | Phase 11 | Pending |
+| BRWN-18 | Phase 11 | Complete |
+| BRWN-19 | Phase 11 | Complete |
+| BRWN-20 | Phase 11 | Complete |
+| BRWN-22 | Phase 11 | Complete |
 | DEBT-01 | Phase 12 | Pending |
 | DEBT-02 | Phase 12 | Pending |
 | DEBT-04 | Phase 12 | Pending |
 
 **Coverage:**
-- v1.1 requirements: 78 total (TMPL: 11, NEUT: 8, WZRD: 11, MANUAL: 6, COLAB: 8, CI: 9, BRWN: 21, DEBT: 4)
-- Mapped to phases: 78 (Phase 7: 20, Phase 8: 17, Phase 9: 17, Phase 10: 11, Phase 11: 10, Phase 12: 3)
+- v1.1 requirements: 79 total (TMPL: 11, NEUT: 8, WZRD: 11, MANUAL: 6, COLAB: 8, CI: 9, BRWN: 22, DEBT: 4)
+- Mapped to phases: 79 (Phase 7: 20, Phase 8: 17, Phase 9: 17, Phase 10: 11, Phase 11: 11, Phase 12: 3)
 - Unmapped: 0
 
 ---
