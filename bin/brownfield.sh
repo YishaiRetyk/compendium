@@ -1094,59 +1094,20 @@ with open(decisions_path, 'w', encoding='utf-8') as fh:
 
 
 # --- provenance-bootstrap-report.yaml (02 dry-run preview) ---------------
-# Top-level bullets only per REVIEWS item 5.  Claims eligible for provenance
-# markers under TL;DR / Key Facts when they are NOT wikilink-only,
-# question, task, source-id, placeholder, or already-tagged.
-WIKILINK_ONLY = re.compile(r'^- \[\[[^\]]+\]\]\s*$')
-QUESTION = re.compile(r'\?\s*$')
-TASK = re.compile(r'^- (\[[ x]\]|TODO:?|FIXME:?)\b', re.IGNORECASE)
-SOURCE_ID = re.compile(r'^- src-\d{4}-\d{2}-\d{2}-')
-PLACEHOLDER = re.compile(r'^- (TBD|TBC|pending|placeholder)\b', re.IGNORECASE)
-BULLET_TOP_LEVEL = re.compile(r'^- (.+)$')  # col-0 '-' only; nested indented bullets never match
-EP_PRESENT = re.compile(r'\[epistemic::')
-PV_PRESENT = re.compile(r'\[prov:')
-SECTION_HDR = re.compile(r'^##\s+(.+?)\s*$')
-
-
-def is_eligible_top_level(line: str) -> bool:
-    if not BULLET_TOP_LEVEL.match(line):
-        return False
-    if WIKILINK_ONLY.match(line):
-        return False
-    if QUESTION.search(line):
-        return False
-    if TASK.match(line):
-        return False
-    if SOURCE_ID.match(line):
-        return False
-    if PLACEHOLDER.match(line):
-        return False
-    if EP_PRESENT.search(line):
-        return False
-    if PV_PRESENT.search(line):
-        return False
-    return True
-
-
-def section_scan_top_level(body: str, targets: set) -> list:
-    eligible = []
-    in_target = False
-    for ln in body.splitlines():
-        m = SECTION_HDR.match(ln)
-        if m:
-            in_target = m.group(1).strip() in targets
-            continue
-        if in_target and is_eligible_top_level(ln):
-            eligible.append(ln)
-    return eligible
+# WR-01/WR-02 fix: import canonical eligibility helpers from
+# brownfield_provenance instead of re-implementing the regexes here. The
+# library is the same code 02-provenance-bootstrap.sh consumes on --apply,
+# so the suggest preview and apply results cannot drift.
+from brownfield_provenance import section_scan  # noqa: E402
 
 
 prov_report = {'pages': []}
 for abs_path, rel, fm, body in pages_data:
     if not fm or fm.get('bootstrap_stage') != 'bootstrapped':
         continue
-    eligible = section_scan_top_level(body or '', {'TL;DR', 'Key Facts'})
-    entry = {'path': rel, 'eligible_bullets': len(eligible), 'sample': eligible[:3]}
+    eligible = section_scan(body or '', ['TL;DR', 'Key Facts'])
+    sample = [ln for _, ln in eligible[:3]]
+    entry = {'path': rel, 'eligible_bullets': len(eligible), 'sample': sample}
     if not eligible:
         entry['note'] = 'no eligible claim bullets found'
     prov_report['pages'].append(entry)
