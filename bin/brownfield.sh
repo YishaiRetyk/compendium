@@ -1232,7 +1232,20 @@ with open(privacy_path, 'w', encoding='utf-8') as fh:
 
 
 # --- Extend REPORT.md with Phase 11 advisory sections --------------------
+# WR-03 fix: iterative `suggest` re-runs must not duplicate the Phase 11
+# advisory sections. Before appending, truncate any existing content from
+# the first Phase-11 marker (`## Cross-link candidates`) onward so the
+# bootstrap-produced prefix is preserved and the Phase-11 sections are
+# rewritten fresh on every run.
 report_path = os.path.join(BF_DIR, 'REPORT.md')
+if os.path.exists(report_path):
+    with open(report_path, 'r', encoding='utf-8') as fh:
+        existing = fh.read()
+    cutoff = existing.find('\n## Cross-link candidates\n')
+    if cutoff >= 0:
+        existing = existing[:cutoff]
+    with open(report_path, 'w', encoding='utf-8') as fh:
+        fh.write(existing)
 with open(report_path, 'a', encoding='utf-8') as fh:
     fh.write('\n## Cross-link candidates\n\n')
     if cross_links['candidates']:
