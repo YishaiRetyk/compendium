@@ -133,10 +133,18 @@ candidates_path = os.environ['CANDIDATES_FILE']
 
 # Load both paired inputs (item 2) — candidates.yaml is READ for cluster-member
 # lookup, NOT re-classified. Decisions.yaml is the AUTHORITATIVE policy source.
+# WR-04: fall back to empty-dict when yaml.load returns None (empty/whitespace
+# YAML is valid and parses to None; without the fallback, candidates.get(...)
+# and decisions.get(...) below raise AttributeError on NoneType).
 with open(decisions_path) as fh:
-    decisions = yaml.load(fh)
+    decisions = yaml.load(fh) or {}
 with open(candidates_path) as fh:
-    candidates = yaml.load(fh)
+    candidates = yaml.load(fh) or {}
+if not decisions.get('clusters') or not candidates.get('clusters'):
+    sys.stderr.write(
+        "ERROR: decisions or candidates YAML is empty — "
+        "re-run `bin/brownfield.sh suggest` to regenerate.\n")
+    sys.exit(1)
 
 # Build cluster_id -> member-page list from candidates.yaml
 cid_to_pages = {c['cluster_id']: list(c['pages']) for c in (candidates.get('clusters') or [])}
