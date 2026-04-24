@@ -34,3 +34,23 @@ This is a pre-existing tooling/environment issue (ruamel.yaml not on
 fixture harness) — scope boundary per AGENTS.md / SCOPE BOUNDARY in
 executor deviation rules. Not in scope for Plan 11-05. A follow-up debt item
 should be filed against Phase 10 regression.
+
+## Pending Human UAT From Scratch Note
+
+An untracked `11-UAT.md` scratch file captured three pending manual checks for
+Phase 11. Do not treat these as completed verification evidence. They are
+operator-facing UAT prompts to run only when Phase 11 brownfield behavior is
+being revalidated:
+
+1. TTY small-batch `review-typing` loop UX: confirm dimmed signal line, bold
+   cluster header, single-letter primitives, invalid override rejection, and
+   clean decisions write.
+2. Large-batch / non-TTY AI-handoff prompt usability: confirm
+   `.brownfield/review-typing-prompt.md` contains enough cluster signals and
+   schema context for an external AI review loop.
+3. `verify --promote` on a real bootstrapped vault: confirm only pages passing
+   all five gates move from `bootstrapped` to `verified`, with blocked reasons
+   reported.
+
+These are deferred human-UAT items, not blockers on the existing Phase 11
+engineering verification.
