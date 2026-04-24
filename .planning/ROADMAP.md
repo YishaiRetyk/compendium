@@ -3,7 +3,7 @@
 ## Milestones
 
 - ✅ **v1.0 LLM Wiki Compiler MVP** — Phases 1–6 (shipped 2026-04-15) — [archive](milestones/v1.0-ROADMAP.md)
-- 🚧 **v1.1 Shareability** — Phases 7–12 (started 2026-04-15)
+- 🚧 **v1.1 Shareability** — Phases 7–13 (started 2026-04-15)
 
 ## Phases
 
@@ -19,14 +19,17 @@
 
 </details>
 
-### 🚧 v1.1 Shareability (Phases 7–12)
+### 🚧 v1.1 Shareability (Phases 7–13)
 
 - [x] **Phase 7: Neutral Template Foundation** — Public orphan-branch template, Kahneman → `examples/`, neutrality CI gate, `requirements-sync` mechanical check. (5/5 plans complete 2026-04-15)
 - [x] **Phase 8: Two-Track Setup (Wizard + Manual)** — `bin/init-wizard.sh` plus byte-equivalent manual track, co-shipped to prevent drift. (5/5 plans complete 2026-04-16)
 - [x] **Phase 9: Collaborative PR Workflow + CI Lint Gate** — Git-based PR workflow, `log.md` contributor field, `bin/lint.sh --ci --format json` severity policy, privacy-leak guard. (6/6 plans complete 2026-04-16)
 - [x] **Phase 10: Brownfield Scan + Bootstrap** — `bin/brownfield.sh scan|bootstrap` with `bootstrap_stage` sentinel, ruamel.yaml round-trip, byte-exact fixture tests. (completed 2026-04-17)
 - [x] **Phase 11: Brownfield Suggest + Verify** — Four staged migration script classes, `verify` wrapper over lint. (completed 2026-04-20)
-- [ ] **Phase 12: Docs Finalization + v1.0 Debt Verification Gate** — `/docs/reference/` fill-out, Obsidian render check, Codex agent-parity, write-back scenario re-run.
+- [ ] **Phase 12: Docs Finalization + Obsidian Starter + v1.0 Debt Verification Gate** — `/docs/reference/` fill-out, Obsidian render check, Codex agent-parity, write-back scenario re-run, minimal Obsidian starter (templates + reference doc only; no prescribed workflows).
+- [ ] **Phase 12.1: Complementary Systems Boundary + GTD Alignment** — Decision record + reference doc defining compendium as durable wiki memory inside a multi-system agent stack; routes capture/clarify/organize/review without expanding schema or directory taxonomies.
+- [ ] **Phase 12.2: Local Wiki Write Gate** — Pre-commit gate over staged `wiki/{entities,concepts,overviews,comparisons}/` changes reusing `bin/lint.sh --strict` semantics; blocks new pages with zero `[prov:…]` markers before they land locally.
+- [ ] **Phase 13: Claim Faithfulness Audit** — `bin/audit-claims.sh` samples high-risk claims (inferred/tentative/stale/high-fanout) and emits structured verdicts (supports / weak / contradicts / insufficient) against the cited source passage; review-only, privacy-respecting, no auto-fix.
 
 ## Phase Details
 
@@ -136,8 +139,10 @@ Plans:
 - [x] 11-04-PLAN.md — `bin/brownfield.sh review-typing` (TTY + AI-handoff) + `verify [--promote]` (D-14 5-gate) + end-to-end golden fixture
 - [x] 11-05-PLAN.md — AGENTS.md §11.5 populate (Option C renumber §11.5→§11.6; closes WR-03) + docs/reference/brownfield.md + REQUIREMENTS BRWN-12 rename + BRWN-22 new + Tier-1 DR
 
-### Phase 12: Docs Finalization + v1.0 Debt Verification Gate
-**Goal**: All `/docs/reference/` material is filled out against the now-stable v1.1 feature surface, and every deferred v1.0 verification (Obsidian render, multi-agent parity, write-back scenario) is executed end-to-end before v1.1 ships.
+### Phase 12: Docs Finalization + Obsidian Starter + v1.0 Debt Verification Gate
+**Goal**: All `/docs/reference/` material is filled out against the now-stable v1.1 feature surface, every deferred v1.0 verification (Obsidian render, multi-agent parity, write-back scenario) is executed end-to-end before v1.1 ships, and a minimal shipped Obsidian starter — page-type templates derived from the schema templates plus a reference doc — closes the day-1 page-creation ergonomics gap without prescribing review workflows.
+
+**Scope note**: Phase 12's Obsidian scope is intentionally minimal: verify renderability and ship page-creation ergonomics only. Review dashboards, GTD-specific views, hotkey bundles, and workflow-specific Dataview surfaces remain deferred until observed practice justifies them (see backlog Phase 999.6).
 **Depends on**: Phases 7–11 (all feature surfaces stable and documented).
 **Requirements**: DEBT-01, DEBT-02, DEBT-04
 **Success Criteria** (what must be TRUE):
@@ -146,6 +151,67 @@ Plans:
   3. User executes the Phase 4 genuine write-back query scenario (the one that produced NO-WRITE-BACK in the v1.0 re-run) end-to-end; the query produces synthesized claims that are compiled back into the wiki with correct provenance and no drift.
   4. Every `/docs/reference/` file (`schema-tour.md`, `brownfield.md`, `privacy-model.md`, `ci.md`, `examples.md`, plus `agent-parity.md` and any Dataview/merge-conflict reference) is filled out with accurate descriptions of the shipped v1.1 features.
   5. Final run of `bin/requirements-sync.sh` across all v1.1 phases shows zero drift between VERIFICATION.md truths and REQUIREMENTS.md checkboxes before milestone closure.
+  6. A minimal Obsidian starter ships for day-1 use: page-type templates derived from the schema templates plus a reference doc explaining how to use them. This starter improves page creation ergonomics without introducing canonical dashboards, hotkey bundles, or workflow prescriptions.
+**Plans**: TBD
+
+### Phase 12.1: Complementary Systems Boundary + GTD Alignment (INSERTED)
+
+**Goal**: Explicitly define compendium's role inside a multi-system agent stack — durable wiki memory and review support, not task execution, reminders, calendar, or high-churn operational state — before v1.1 closes.
+**Depends on**: Phase 12
+**Why this phase exists**: The project now has a concrete GTD/backend framing, but the boundary still lives in exploratory notes rather than the canonical shipped surface. This phase makes the intended architecture explicit before scope creep hardens into accidental features.
+**Requirements**: TBD
+**Success Criteria** (what must be TRUE):
+  1. A decision record states that compendium owns durable, provenance-backed synthesis and reflective memory, while complementary systems own executable commitments, reminders, calendars, and transactional/operational state.
+  2. A reference doc explains the 3-layer model: task layer, working-memory layer, wiki-compiler layer.
+  3. The doc gives routing rules for capture / clarify / organize / review without adding new wiki page types or new `wiki/` directory taxonomies.
+  4. The shipped docs make clear that compendium is meant to complement a GTD/task backend, not replace it.
+  5. The boundary is reflected consistently across README / docs / decision records with no contradictory "all-in-one PKM/task system" framing.
+**Non-goals**:
+- No task manager features
+- No reminders/calendar support
+- No Slack/ticket/event ingest pipeline
+- No GTD-specific filesystem expansion
+- No canonical review dashboards
+**Plans**: TBD
+
+### Phase 12.2: Local Wiki Write Gate (INSERTED)
+
+**Goal**: Catch structurally invalid or unprovenanced new wiki claims before they are committed locally, not only later in CI or during periodic lint.
+**Depends on**: Phase 9 (CI / `--strict` infrastructure), Phase 12
+**Why this phase exists**: `bin/lint.sh --strict` already enforces a merge-time quality ratchet in PRs, but the local ingest/query write path has no equivalent gate. This leaves a gap where low-quality wiki writes can land in history before the next lint run.
+**Requirements**: TBD
+**Success Criteria** (what must be TRUE):
+  1. The local commit path runs a deterministic gate against staged wiki changes before commit completes.
+  2. New staged pages under `wiki/{entities,concepts,overviews,comparisons}/` fail the gate if they contain zero `[prov:...]` markers.
+  3. The gate reuses existing `bin/lint.sh --strict` semantics where possible rather than inventing a second policy surface.
+  4. Exemptions remain aligned with current schema/tooling: `type: source`, `type: decision`, `examples/`, and brownfield-specific transitional cases are not falsely blocked.
+  5. The pre-commit UX is actionable: failures point the user to the relevant file/path and the exact reason.
+  6. The existing `AGENTS.md` ↔ `CLAUDE.md` sync hook continues to work unchanged or is cleanly composed with the new gate.
+**Non-goals**:
+- No semantic claim-faithfulness checking (see Phase 13)
+- No cloud API use
+- No auto-rewrite of pages
+- No full-vault lint on every commit
+**Plans**: TBD
+
+### Phase 13: Claim Faithfulness Audit
+
+**Goal**: Add a source-grounded audit workflow that checks whether wiki claims faithfully reflect the cited source passage, not just whether `[prov:]` markers exist.
+**Depends on**: Phase 5 (lint foundations), Phase 6 (drift detection), Phase 9 (privacy / CI infrastructure), Phase 12.1 (boundary clarification), Phase 12.2 (local write gate)
+**Why this phase exists**: The current system validates provenance presence and locator syntax, but not semantic faithfulness. This is the highest-leverage remaining integrity gap behind the "error compounding" critique.
+**Requirements**: TBD
+**Success Criteria** (what must be TRUE):
+  1. `bin/audit-claims.sh` exists and can sample claims from recently modified pages plus high-risk claims (`[epistemic:: inferred]`, `[epistemic:: tentative]`, stale-source claims, and claims on high-fanout pages).
+  2. The audit resolves each claim's `[prov:source_id#locator]` to the relevant source passage and checks whether the passage supports, weakly supports, contradicts, or does not establish the claim.
+  3. `privacy: local_only` claims are never sent to cloud APIs; the audit either uses a local verifier or emits an explicit skipped/privacy finding.
+  4. The audit writes structured review findings with page path, line number, source ID, locator, verdict, and rationale.
+  5. The workflow is review-only by default: no automatic wiki edits, no auto-fix, no default CI gate.
+  6. The audit can optionally emit machine-readable findings that future lint/report tooling can consume.
+**Non-goals**:
+- No auto-rewrite of claims
+- No required CI blocking gate in the first shipped version
+- No SQLite requirement
+- No full-vault audit by default
 **Plans**: TBD
 
 ## Backlog
@@ -206,6 +272,57 @@ Plans:
 Plans:
 - [ ] TBD (promote with /gsd-review-backlog when ready)
 
+### Phase 999.5: External Source Drift Detection (BACKLOG)
+
+**Goal:** [Captured for future planning] Extend drift detection from local source-file hash changes to URL-backed sources, marking affected source summaries `stale` when upstream content changes.
+**Origin:** Surfaced 2026-04-24 during roadmap review. Valuable once the wiki contains more live web-backed sources, but lower leverage than local write gating (Phase 12.2), boundary clarification (Phase 12.1), and claim faithfulness audit (Phase 13).
+**Non-goals:**
+- No broad web-ingestion system
+- No automatic re-compilation by default
+- No mandatory network dependency for core workflows
+**Requirements:** TBD
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (promote with /gsd-review-backlog when ready)
+
+### Phase 999.6: Observed GTD Review Patterns (BACKLOG)
+
+**Goal:** [Captured for future planning] Document GTD-review and agent-backend integration patterns only after they have been used repeatedly in real practice.
+**Origin:** Surfaced 2026-04-24 during roadmap review. The system should document what has worked, not what ought to work in theory — this prevents speculative template-kit documentation.
+
+**Trigger to promote:**
+- Compendium has been used in a GTD review loop for at least 2 months
+- At least 3 Dataview queries or review views are actually re-run in practice
+- At least 2–3 review behaviors have proven durable enough to describe as patterns rather than experiments
+
+**Scope when promoted:**
+- Capture observed review patterns
+- Distinguish durable patterns from one-off experiments
+- Document how compendium complements task/working-memory systems in practice
+
+**Non-goals:**
+- No task-manager features
+- No premature dashboards marketed as canonical
+- No GTD-specific filesystem/schema expansion without separate justification
+
+**Requirements:** TBD
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (promote with /gsd-review-backlog when ready)
+
+### Explicitly Deferred
+
+The following are intentionally deferred until real usage demands them, captured here so the roadmap does not drift into "compendium as everything":
+
+- **Tier 2–4 scaling work** (`split index`, `incremental lint`, SQLite metadata) — see AGENTS.md §14 scaling tiers; only promote when observed signals warrant it.
+- **Multi-agent merge UX beyond current git/PR discipline** — `CONTRIBUTING.md` + `docs/reference/ci.md` cover the current Phase 9 contract.
+- **Canonical GTD review dashboards or workflow-specific Dataview surfaces** — review surfaces emerge from observed practice (see Phase 999.6), not speculative design.
+- **Hotkey bundles / editor-personalization packs** — out of scope for the shipped starter; users personalize their own Obsidian config.
+- **Task, reminder, calendar, inbox, or waiting-for engine features inside compendium** — excluded by the Phase 12.1 system boundary.
+- **High-frequency event / Slack / ticket / operational data ingestion** — excluded by the Phase 12.1 system boundary.
+
 ## Progress
 
 | Phase | Milestone | Plans | Status | Completed |
@@ -221,4 +338,7 @@ Plans:
 | 9. Collaborative PR Workflow + CI Lint Gate | v1.1 | 6/6 | Complete | 2026-04-16 |
 | 10. Brownfield Scan + Bootstrap | v1.1 | 6/6 | Complete    | 2026-04-18 |
 | 11. Brownfield Suggest + Verify | v1.1 | 5/5 | Complete    | 2026-04-20 |
-| 12. Docs Finalization + v1.0 Debt Verification Gate | v1.1 | 0/0 | Not started | - |
+| 12. Docs Finalization + Obsidian Starter + v1.0 Debt Verification Gate | v1.1 | 0/0 | Not started | - |
+| 12.1. Complementary Systems Boundary + GTD Alignment | v1.1 | 0/0 | Not started | - |
+| 12.2. Local Wiki Write Gate | v1.1 | 0/0 | Not started | - |
+| 13. Claim Faithfulness Audit | v1.1 | 0/0 | Not started | - |
