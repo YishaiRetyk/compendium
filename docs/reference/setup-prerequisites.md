@@ -41,7 +41,11 @@ sudo dnf install bash git python3 python3-pyyaml
 
 ### Windows (native, no WSL)
 
-Use Git Bash + Python from python.org. The wizard has not been tested on PowerShell or cmd.exe; WSL is the recommended path.
+1. Install [Git for Windows](https://git-scm.com/download/win) — bundles Git Bash (bash 5.x) and the POSIX tools the scripts rely on (`sha256sum`, `grep`, `sed`, etc.).
+2. Install [Python 3](https://www.python.org/downloads/windows/). Tick "Add python.exe to PATH" in the installer.
+3. In Git Bash: `pip install pyyaml` (optional; scripts fall back to a stdlib parser without it).
+
+Run all `bin/*.sh` commands from Git Bash, not PowerShell or cmd.exe. The wizard has not been tested on PowerShell; WSL remains the more thoroughly tested path.
 
 ## Verify
 

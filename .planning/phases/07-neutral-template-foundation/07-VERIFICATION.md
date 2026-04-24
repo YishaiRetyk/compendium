@@ -1,26 +1,28 @@
 ---
 phase: 07-neutral-template-foundation
 verified: 2026-04-15T00:00:00Z
-status: human_needed
-score: 20/20 must-haves verified (with 2 deferred scope items awaiting human confirmation)
-human_verification:
+human_verified: 2026-04-16T09:18:00Z
+status: verified
+score: 20/20 must-haves verified; 2 of 3 human-UAT items confirmed (NEUT-08 denylist curation explicitly postponed as a scope decision tracked in REQUIREMENTS.md and .planning/backlog-neutrality-denylist-candidate.txt)
+human_verification_resolved:
   - test: "Real public template repo push"
-    expected: "bin/release.sh --apply run against the real public remote; resulting repo has is_template: true, branch protection with required 'neutrality' check, 'Use this template' button visible, and git rev-list --all --count == 1"
-    why_human: "TMPL-01 mechanics proven on throwaway repo YishaiRetyk/template-smoke-test; real public repo name intentionally deferred per scope decision. Requires human to pick the real repo name, run release.sh --apply, and confirm the post-publish assertions."
-  - test: "NEUT-08 personal-term denylist follow-up"
-    expected: "Hand-curated personal domain terms added to .neutrality-denylist.txt (currently only the Kahneman category ships); candidate material at .planning/backlog-neutrality-denylist-candidate.txt used as input for human review"
-    why_human: "Explicit deferred-scope decision per user (approved — minimal). Infrastructure shipped (NEUT-06 gate enforces denylist on public control-plane paths, --suggest-denylist is deterministic, backlog candidate preserved). Remaining work is curation, not engineering."
+    resolved_at: 2026-04-16
+    evidence: "bin/release.sh --apply --remote https://github.com/YishaiRetyk/compendium.git executed. Post-publish state on YishaiRetyk/compendium: is_template:true, branch protection enforces required checks [lint, privacy-leak, strict, neutrality, setup-parity], single commit d2ae57a v1.1 release (git rev-list --all --count == 1 on fresh clone), v1.1 tag present, denylist paths (.planning, .brownfield, wiki/entities/concepts/maintenance/sources) absent from published tree, AGENTS.md == CLAUDE.md byte-identical."
   - test: "Subjective 'tech-Obsidian-user voice' of README.md"
-    expected: "README.md reads as a welcoming pitch for a technical Obsidian user and links to docs/quickstart.md"
-    why_human: "Voice/tone is not programmatically verifiable; link presence and docs/quickstart.md existence confirmed mechanically."
+    resolved_at: 2026-04-16
+    evidence: "Confirmed by user on walkthrough."
+human_verification_deferred:
+  - test: "NEUT-08 personal-term denylist follow-up"
+    postponed_at: 2026-04-16
+    reason: "Explicit deferred-scope decision per user (approved — minimal; reaffirmed 2026-04-16). Infrastructure shipped (NEUT-06 gate enforces denylist on public control-plane paths, --suggest-denylist is deterministic, backlog candidate at .planning/backlog-neutrality-denylist-candidate.txt preserved). Remaining work is human curation, not engineering. REQUIREMENTS.md tracks NEUT-08 as 'Deferred (partial)'."
 ---
 
 # Phase 7: Neutral Template Foundation - Verification Report
 
 **Phase Goal:** A stranger can clone the public template repo and get a Kahneman-free, license-clean, traceability-enforced starter; the creator's private vault history never reaches the public release.
 
-**Verified:** 2026-04-15
-**Status:** human_needed (all mechanics pass; two scope-deferred items require human confirmation)
+**Verified:** 2026-04-15 (mechanics) | 2026-04-16 (human-UAT walkthrough)
+**Status:** verified (2 of 3 human-UAT items resolved; NEUT-08 denylist curation postponed as explicit scope decision)
 **Re-verification:** No - initial verification
 
 ## Goal Achievement
@@ -29,13 +31,13 @@ human_verification:
 
 | # | Truth | Status | Evidence |
 |---|-------|--------|----------|
-| 1 | Public template repo has "Use this template" button; clone contains README/LICENSE/docs skeleton/empty wiki/PRIVACY/CLAUDE+AGENTS; public surfaces Kahneman-free; examples/kahneman/** is the sole permitted home | PARTIAL (mechanics VERIFIED; real repo push deferred) | Mechanics proven on YishaiRetyk/template-smoke-test (is_template:true, required neutrality check, button present). Top-level files present: README.md, LICENSE, PRIVACY.md, CLAUDE.md, AGENTS.md, .gitignore, docs/ (quickstart/guided-setup/manual-setup/README + reference/{ci,brownfield,privacy-model,examples,release,schema-tour,index}), wiki/ contains only index.md, log.md, decisions/. Kahneman cluster intact under examples/kahneman/ (7 pages + 2 sources + README + log.md). AGENTS.md contains only 5 structural/pointer references to kahneman (lines 56, 611, 880, 1317, 1515) — all are either tree illustrations, schema-field examples, or "See: examples/kahneman/..." pointers, not content. |
-| 2 | Fresh git log on published repo shows only the v1.1 release commit; no v1.0 history reachable | VERIFIED on throwaway; human-needed for real push | TMPL-11 smoke verified: `git rev-list --all --count == 1` on fresh clone of throwaway; all denylist paths absent, allowlist essentials present. bin/release.sh implements fresh-temp-dir + explicit ALLOWLIST staging with SIGINT/ERR/EXIT cleanup trap; never mutates live worktree. Runbook at docs/reference/release.md. |
+| 1 | Public template repo has "Use this template" button; clone contains README/LICENSE/docs skeleton/empty wiki/PRIVACY/CLAUDE+AGENTS; public surfaces Kahneman-free; examples/kahneman/** is the sole permitted home | VERIFIED | Published live 2026-04-16 to YishaiRetyk/compendium: is_template:true confirmed via API, required status checks [lint, privacy-leak, strict, neutrality, setup-parity] applied on main, fresh clone contains only allowlisted paths. Top-level files present: README.md, LICENSE, PRIVACY.md, CLAUDE.md, AGENTS.md, .gitignore, docs/ (quickstart/guided-setup/manual-setup/README + reference/{ci,brownfield,privacy-model,examples,release,schema-tour,index}), wiki/ contains only index.md, log.md, decisions/. Kahneman cluster intact under examples/kahneman/ (7 pages + 2 sources + README + log.md). AGENTS.md contains only 5 structural/pointer references to kahneman — all tree illustrations, schema-field examples, or "See: examples/kahneman/..." pointers, not content. |
+| 2 | Fresh git log on published repo shows only the v1.1 release commit; no v1.0 history reachable | VERIFIED | Fresh clone of YishaiRetyk/compendium shows `git rev-list --all --count == 1` (single commit d2ae57a "v1.1 release"), v1.1 tag present, all denylist paths absent, allowlist essentials present. bin/release.sh implements fresh-temp-dir + explicit ALLOWLIST staging with SIGINT/ERR/EXIT cleanup trap; never mutates live worktree. Runbook at docs/reference/release.md. |
 | 3 | examples/kahneman/ has 7-page cluster with intact wikilinks + README explaining reference status; bin/lint.sh does not warn due to EXCLUDE_DIRS / example:true | VERIFIED | examples/kahneman/ contains entities/daniel-kahneman.md, concepts/{prospect-theory,loss-aversion,cognitive-biases}.md, comparisons/system-1-vs-system-2.md, overviews/decision-making.md, sources/src-2026-04-09-thinking-fast-and-slow-part1.md, sources/src-2026-04-10-kahneman-prospect-theory.md, README.md, log.md. bin/lint.sh:180 defines `EXCLUDE_DIRS = {'maintenance', 'examples'}`; bin/lint.sh:231 also honors `example: true` frontmatter. test_lint_exclude.sh + test_kahneman_moved.sh + test_kahneman_readme.sh all pass. |
 | 4 | PR reintroducing Kahneman terms into public paths or personal-vault denylist terms fails CI via neutrality+denylist gate | VERIFIED (Kahneman enforced; personal-term denylist shipped as empty-list + deferred) | bin/check-neutrality.sh executable, exits 0 on current tree. .neutrality-denylist.txt present (10 lines — Kahneman-only category shipped). .github/workflows/neutrality.yml runs check-neutrality + sync-claude --check + tests/phase-07/run.sh on every PR; pull_request = hard gate, push = advisory (per REVIEWS.md HIGH #6). test_neutrality_gate.sh + test_denylist_gate.sh pass with fixture repros of leaks. |
 | 5 | bin/requirements-sync.sh emits mechanical diff of REQUIREMENTS.md vs VERIFICATION.md truths | VERIFIED | bin/requirements-sync.sh executable; supports --help, --format text|json, --strict (exit 2), --phase N, --root DIR. All 6 behavior tests (t1..t6) pass. Phase-7 scoped run shows 0/19 drift across all TMPL-/NEUT-/DEBT- IDs (NEUT-08 carries Deferred status note, not Complete). |
 
-**Score:** 5/5 Success Criteria mechanically verified; two scope decisions (real-repo push, NEUT-08 denylist curation) explicitly deferred per user and routed to human_verification.
+**Score:** 5/5 Success Criteria verified. Real-repo push executed and confirmed 2026-04-16 (YishaiRetyk/compendium). NEUT-08 denylist curation explicitly postponed per user scope decision.
 
 ### Required Artifacts
 
@@ -125,34 +127,34 @@ No blocker or warning anti-patterns detected. Spot-scan of modified files shows:
 - Reference-stub marker pattern in docs/reference/ is intentional (test_reference_stubs.sh enforces the invariant: 5 stubs marked, release.md deliberately NOT a stub).
 - .neutrality-denylist.txt at 10 lines is a deliberate scope decision (NEUT-08 content deferred), not an empty stub; the gate infrastructure is fully functional.
 
-### Human Verification Required
+### Human Verification -- Resolution Status
 
-1. **Real public template repo push**
-   - Test: `bin/release.sh --apply --remote <REAL_REPO_URL>` against the real public remote (repo name to be chosen by user).
-   - Expected: is_template:true on the published repo, branch protection requiring 'neutrality' status check, green "Use this template" button, `git rev-list --all --count == 1` on the published main branch.
-   - Why human: Real repo name and the actual push are intentionally deferred per user scope decision. Mechanics have been proven on throwaway YishaiRetyk/template-smoke-test.
+1. **Real public template repo push** -- ✅ RESOLVED 2026-04-16
+   - Executed: `bin/release.sh --apply --remote https://github.com/YishaiRetyk/compendium.git` (after old mirror-push state was deleted and the remote recreated empty).
+   - Post-publish verification on YishaiRetyk/compendium:
+     - `is_template: true` (API-confirmed; "Use this template" button exposed).
+     - Branch protection on main requires: `lint`, `privacy-leak`, `strict`, `neutrality`, `setup-parity`.
+     - Fresh clone: `git rev-list --all --count == 1` (single commit `d2ae57a v1.1 release`); tag `v1.1` present.
+     - Denylist paths (`.planning`, `.brownfield`, `wiki/entities`, `wiki/concepts`, `wiki/maintenance`, `wiki/sources`) absent from published tree.
+     - `AGENTS.md == CLAUDE.md` byte-identical on the published tree.
 
-2. **NEUT-08 personal-term denylist follow-up**
-   - Test: Hand-review `.planning/backlog-neutrality-denylist-candidate.txt` and curate a final personal-domain term set into `.neutrality-denylist.txt`.
-   - Expected: Curated denylist commits in a follow-up PR; neutrality gate then blocks any personal-vault term leak into public control-plane paths.
-   - Why human: Explicit deferred-scope decision ("approved — minimal"). Infrastructure (gate + --suggest-denylist + candidate output) is shipped; remaining work is human curation, not engineering.
+2. **NEUT-08 personal-term denylist follow-up** -- POSTPONED 2026-04-16 (explicit scope decision)
+   - User reaffirmed the deferral on walkthrough. Infrastructure (gate + `--suggest-denylist` + candidate output at `.planning/backlog-neutrality-denylist-candidate.txt`) is shipped. Remaining work is human curation, not engineering. REQUIREMENTS.md tracks NEUT-08 as "Deferred (partial)".
 
-3. **README.md "tech-Obsidian-user voice" subjective review**
-   - Test: Read README.md and confirm it reads as a pitch addressed to a technical Obsidian user.
-   - Expected: Welcoming, accurate framing; link to docs/quickstart.md present (mechanically confirmed).
-   - Why human: Voice and tone are not mechanically verifiable.
+3. **README.md "tech-Obsidian-user voice" subjective review** -- ✅ RESOLVED 2026-04-16
+   - Confirmed by user on walkthrough. Link to `docs/quickstart.md` mechanically confirmed earlier.
 
 ### Gaps Summary
 
 No engineering gaps. Phase 7 ships the complete neutral template foundation:
 
-- All 5 Success Criteria from ROADMAP are met in the working tree.
+- All 5 Success Criteria from ROADMAP are met in the working tree AND on the published template repo (YishaiRetyk/compendium).
 - 22/22 phase 7 automated tests pass.
-- All 20 REQ-IDs accounted for (18 fully Complete; 2 explicitly Deferred as scope decisions with documented infrastructure + backlog).
+- All 20 REQ-IDs accounted for (19 Complete or verified-resolved; 1 explicitly Deferred as a scope decision with documented infrastructure + backlog).
 - All scripts wired to their consumers (CI workflow, pre-commit hook, release runbook).
-- The two items routed to `human_verification` are scope decisions (real-repo push, NEUT-08 denylist curation), not build failures; they are tracked in REQUIREMENTS.md (NEUT-08 = "Deferred (partial)") and in the backlog candidate file.
+- Of the three human-UAT items, 2 are confirmed resolved (real-repo push, README voice review); NEUT-08 denylist curation is explicitly postponed per user scope decision and tracked in REQUIREMENTS.md as "Deferred (partial)".
 
 ---
 
-_Verified: 2026-04-15_
-_Verifier: Claude (gsd-verifier)_
+_Verified: 2026-04-15 (mechanics) | 2026-04-16 (human-UAT walkthrough)_
+_Verifier: Claude (gsd-verifier, then user walkthrough 2026-04-16)_
