@@ -106,14 +106,14 @@ sentinel = os.environ["SENTINEL"]
 # --- Parse REQUIREMENTS.md traceability table ---
 # Rows: | REQ-ID | Phase N | Status |
 req_row_re = re.compile(
-    r'^\|\s*([A-Z]+-\d+)\s*\|\s*Phase\s*(\d+)\s*\|\s*(\w[\w ]*?)\s*\|'
+    r'^\|\s*([A-Z]+-\d+)\s*\|\s*Phase\s*([0-9]+(?:\.[0-9]+)?)\s*\|\s*([^|]+?)\s*\|'
 )
-requirements = []  # list of (req_id, phase_int, status)
+requirements = []  # list of (req_id, phase_label, status)
 with open(req_file, encoding="utf-8") as f:
     for line in f:
         m = req_row_re.match(line)
         if m:
-            requirements.append((m.group(1), int(m.group(2)), m.group(3)))
+            requirements.append((m.group(1), m.group(2), m.group(3)))
 
 # --- Parse VERIFICATION.md files (lexicographic order, last-write-wins) ---
 # Strip checkbox / emoji / bold prefixes before REQ-ID, then capture status after colon.

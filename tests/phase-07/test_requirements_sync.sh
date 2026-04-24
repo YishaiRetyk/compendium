@@ -115,6 +115,35 @@ t6_missing_verification() {
     rm -rf "$tmp"
 }
 
+# --- Test 7: decimal phase filter and punctuated status ---
+t7_decimal_phase_filter() {
+    local tmp out rc
+    tmp=$(mktemp -d)
+    cat > "$tmp/REQUIREMENTS.md" <<'EOF'
+# Requirements
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| BOUND-01 | Phase 12.1 | Pending |
+| NEUT-08 | Phase 7 | Deferred (partial - infrastructure shipped) |
+EOF
+    out=$(bash "$SCRIPT" --root "$tmp" --phase 12.1 2>/dev/null); rc=$?
+    if [ "$rc" -ne 0 ]; then _fail t7_decimal_phase_filter "expected exit 0, got $rc"; rm -rf "$tmp"; return; fi
+    if ! echo "$out" | grep -q 'BOUND-01'; then
+        _fail t7_decimal_phase_filter "BOUND-01 (Phase 12.1) should be present"; rm -rf "$tmp"; return
+    fi
+    if echo "$out" | grep -q 'NEUT-08'; then
+        _fail t7_decimal_phase_filter "NEUT-08 (Phase 7) should be filtered out"; rm -rf "$tmp"; return
+    fi
+    out=$(bash "$SCRIPT" --root "$tmp" 2>/dev/null); rc=$?
+    if [ "$rc" -ne 0 ]; then _fail t7_decimal_phase_filter "expected unfiltered exit 0, got $rc"; rm -rf "$tmp"; return; fi
+    if ! echo "$out" | grep -q 'Deferred (partial - infrastructure shipped)'; then
+        _fail t7_decimal_phase_filter "punctuated status should be preserved"; rm -rf "$tmp"; return
+    fi
+    _pass t7_decimal_phase_filter
+    rm -rf "$tmp"
+}
+
 # Execute tests
 if [ ! -x "$SCRIPT" ] && [ ! -f "$SCRIPT" ]; then
     echo "FAIL setup: bin/requirements-sync.sh not found at $SCRIPT"
@@ -127,6 +156,7 @@ t3_drift_strict
 t4_json_format
 t5_phase_filter
 t6_missing_verification
+t7_decimal_phase_filter
 
 TOTAL=$((PASS + FAIL))
 echo ""

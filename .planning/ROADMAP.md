@@ -3,7 +3,7 @@
 ## Milestones
 
 - ✅ **v1.0 LLM Wiki Compiler MVP** — Phases 1–6 (shipped 2026-04-15) — [archive](milestones/v1.0-ROADMAP.md)
-- 🚧 **v1.1 Shareability** — Phases 7–13 (started 2026-04-15)
+- 🚧 **v1.1 Shareability** — Phases 7–13.1 (started 2026-04-15)
 
 ## Phases
 
@@ -19,17 +19,18 @@
 
 </details>
 
-### 🚧 v1.1 Shareability (Phases 7–13)
+### 🚧 v1.1 Shareability (Phases 7–13.1)
 
 - [x] **Phase 7: Neutral Template Foundation** — Public orphan-branch template, Kahneman → `examples/`, neutrality CI gate, `requirements-sync` mechanical check. (5/5 plans complete 2026-04-15)
 - [x] **Phase 8: Two-Track Setup (Wizard + Manual)** — `bin/init-wizard.sh` plus byte-equivalent manual track, co-shipped to prevent drift. (5/5 plans complete 2026-04-16)
 - [x] **Phase 9: Collaborative PR Workflow + CI Lint Gate** — Git-based PR workflow, `log.md` contributor field, `bin/lint.sh --ci --format json` severity policy, privacy-leak guard. (6/6 plans complete 2026-04-16)
 - [x] **Phase 10: Brownfield Scan + Bootstrap** — `bin/brownfield.sh scan|bootstrap` with `bootstrap_stage` sentinel, ruamel.yaml round-trip, byte-exact fixture tests. (completed 2026-04-17)
 - [x] **Phase 11: Brownfield Suggest + Verify** — Four staged migration script classes, `verify` wrapper over lint. (completed 2026-04-20)
-- [ ] **Phase 12: Docs Finalization + Obsidian Starter + v1.0 Debt Verification Gate** — `/docs/reference/` fill-out, Obsidian render check, Codex agent-parity, write-back scenario re-run, minimal Obsidian starter (templates + reference doc only; no prescribed workflows).
+- [ ] **Phase 12: Docs Finalization + Obsidian Starter** — `/docs/reference/` fill-out, Obsidian render check, Codex agent-parity, write-back scenario re-run, minimal Obsidian starter (templates + reference doc only; no prescribed workflows).
 - [ ] **Phase 12.1: Complementary Systems Boundary + GTD Alignment** — Decision record + reference doc defining compendium as durable wiki memory inside a multi-system agent stack; routes capture/clarify/organize/review without expanding schema or directory taxonomies.
-- [ ] **Phase 12.2: Local Wiki Write Gate** — Pre-commit gate over staged `wiki/{entities,concepts,overviews,comparisons}/` changes reusing `bin/lint.sh --strict` semantics; blocks new pages with zero `[prov:…]` markers before they land locally.
+- [ ] **Phase 12.2: Local Wiki Write Gate** — Pre-commit gate over staged `wiki/{entities,concepts,overviews,comparisons}/` changes reusing `bin/lint.sh --strict` semantics where possible; blocks zero-provenance new synthesized pages before they land locally.
 - [ ] **Phase 13: Claim Faithfulness Audit** — `bin/audit-claims.sh` samples high-risk claims (inferred/tentative/stale/high-fanout) and emits structured verdicts (supports / weak / contradicts / insufficient) against the cited source passage; review-only, privacy-respecting, no auto-fix.
+- [ ] **Phase 13.1: v1.1 Closure Verification Gate** — Final requirements-sync, Obsidian render, agent-parity, write-back, docs consistency, and scope-leak checks after all v1.1 work is complete.
 
 ## Phase Details
 
@@ -139,18 +140,18 @@ Plans:
 - [x] 11-04-PLAN.md — `bin/brownfield.sh review-typing` (TTY + AI-handoff) + `verify [--promote]` (D-14 5-gate) + end-to-end golden fixture
 - [x] 11-05-PLAN.md — AGENTS.md §11.5 populate (Option C renumber §11.5→§11.6; closes WR-03) + docs/reference/brownfield.md + REQUIREMENTS BRWN-12 rename + BRWN-22 new + Tier-1 DR
 
-### Phase 12: Docs Finalization + Obsidian Starter + v1.0 Debt Verification Gate
-**Goal**: All `/docs/reference/` material is filled out against the now-stable v1.1 feature surface, every deferred v1.0 verification (Obsidian render, multi-agent parity, write-back scenario) is executed end-to-end before v1.1 ships, and a minimal shipped Obsidian starter — page-type templates derived from the schema templates plus a reference doc — closes the day-1 page-creation ergonomics gap without prescribing review workflows.
+### Phase 12: Docs Finalization + Obsidian Starter
+**Goal**: All `/docs/reference/` material is filled out against the now-stable v1.1 feature surface, every deferred v1.0 verification (Obsidian render, multi-agent parity, write-back scenario) is executed end-to-end, and a minimal shipped Obsidian starter -- page-type templates derived from the schema templates plus a reference doc -- closes the day-1 page-creation ergonomics gap without prescribing review workflows.
 
 **Scope note**: Phase 12's Obsidian scope is intentionally minimal: verify renderability and ship page-creation ergonomics only. Review dashboards, GTD-specific views, hotkey bundles, and workflow-specific Dataview surfaces remain deferred until observed practice justifies them (see backlog Phase 999.6).
 **Depends on**: Phases 7–11 (all feature surfaces stable and documented).
-**Requirements**: DEBT-01, DEBT-02, DEBT-04
+**Requirements**: DEBT-01, DEBT-02, DEBT-04, OBSID-01, OBSID-02, OBSID-03
 **Success Criteria** (what must be TRUE):
   1. User opens the generated wiki (both fresh-starter and post-bootstrap fixtures) in Obsidian and confirms that wikilinks resolve, Dataview queries render with expected row counts against `examples/dataview-fixtures/`, and graph view is not contaminated by `examples/` — closing v1.0's deferred Phase 4 verification.
   2. User runs the canonical v1.0 ingest scenario end-to-end against the Kahneman example cluster under a second agent (Codex or other non-Claude), diffs against a golden reference, and documents the findings plus agent-parity tolerance in `docs/reference/agent-parity.md` — closing v1.0's untested Codex path.
   3. User executes the Phase 4 genuine write-back query scenario (the one that produced NO-WRITE-BACK in the v1.0 re-run) end-to-end; the query produces synthesized claims that are compiled back into the wiki with correct provenance and no drift.
   4. Every `/docs/reference/` file (`schema-tour.md`, `brownfield.md`, `privacy-model.md`, `ci.md`, `examples.md`, plus `agent-parity.md` and any Dataview/merge-conflict reference) is filled out with accurate descriptions of the shipped v1.1 features.
-  5. Final run of `bin/requirements-sync.sh` across all v1.1 phases shows zero drift between VERIFICATION.md truths and REQUIREMENTS.md checkboxes before milestone closure.
+  5. Phase 12 verification notes document the Obsidian render, agent-parity, and write-back results so the final closure gate can re-run or audit them after later v1.1 phases land.
   6. A minimal Obsidian starter ships for day-1 use: page-type templates derived from the schema templates plus a reference doc explaining how to use them. This starter improves page creation ergonomics without introducing canonical dashboards, hotkey bundles, or workflow prescriptions.
 **Plans**: TBD
 
@@ -159,7 +160,7 @@ Plans:
 **Goal**: Explicitly define compendium's role inside a multi-system agent stack — durable wiki memory and review support, not task execution, reminders, calendar, or high-churn operational state — before v1.1 closes.
 **Depends on**: Phase 12
 **Why this phase exists**: The project now has a concrete GTD/backend framing, but the boundary still lives in exploratory notes rather than the canonical shipped surface. This phase makes the intended architecture explicit before scope creep hardens into accidental features.
-**Requirements**: TBD
+**Requirements**: BOUND-01, BOUND-02, BOUND-03
 **Success Criteria** (what must be TRUE):
   1. A decision record states that compendium owns durable, provenance-backed synthesis and reflective memory, while complementary systems own executable commitments, reminders, calendars, and transactional/operational state.
   2. A reference doc explains the 3-layer model: task layer, working-memory layer, wiki-compiler layer.
@@ -176,10 +177,10 @@ Plans:
 
 ### Phase 12.2: Local Wiki Write Gate (INSERTED)
 
-**Goal**: Catch structurally invalid or unprovenanced new wiki claims before they are committed locally, not only later in CI or during periodic lint.
+**Goal**: Catch structurally invalid wiki writes and zero-provenance new synthesized pages before they are committed locally, while preserving semantic claim-faithfulness checking for Phase 13.
 **Depends on**: Phase 9 (CI / `--strict` infrastructure), Phase 12
 **Why this phase exists**: `bin/lint.sh --strict` already enforces a merge-time quality ratchet in PRs, but the local ingest/query write path has no equivalent gate. This leaves a gap where low-quality wiki writes can land in history before the next lint run.
-**Requirements**: TBD
+**Requirements**: WGATE-01, WGATE-02, WGATE-03, WGATE-04
 **Success Criteria** (what must be TRUE):
   1. The local commit path runs a deterministic gate against staged wiki changes before commit completes.
   2. New staged pages under `wiki/{entities,concepts,overviews,comparisons}/` fail the gate if they contain zero `[prov:...]` markers.
@@ -187,6 +188,7 @@ Plans:
   4. Exemptions remain aligned with current schema/tooling: `type: source`, `type: decision`, `examples/`, and brownfield-specific transitional cases are not falsely blocked.
   5. The pre-commit UX is actionable: failures point the user to the relevant file/path and the exact reason.
   6. The existing `AGENTS.md` ↔ `CLAUDE.md` sync hook continues to work unchanged or is cleanly composed with the new gate.
+  7. The gate is explicitly staged-index aware; it does not rely blindly on PR-mode `origin/main...HEAD` behavior from `bin/lint.sh --strict`.
 **Non-goals**:
 - No semantic claim-faithfulness checking (see Phase 13)
 - No cloud API use
@@ -199,7 +201,7 @@ Plans:
 **Goal**: Add a source-grounded audit workflow that checks whether wiki claims faithfully reflect the cited source passage, not just whether `[prov:]` markers exist.
 **Depends on**: Phase 5 (lint foundations), Phase 6 (drift detection), Phase 9 (privacy / CI infrastructure), Phase 12.1 (boundary clarification), Phase 12.2 (local write gate)
 **Why this phase exists**: The current system validates provenance presence and locator syntax, but not semantic faithfulness. This is the highest-leverage remaining integrity gap behind the "error compounding" critique.
-**Requirements**: TBD
+**Requirements**: FAITH-01, FAITH-02, FAITH-03, FAITH-04
 **Success Criteria** (what must be TRUE):
   1. `bin/audit-claims.sh` exists and can sample claims from recently modified pages plus high-risk claims (`[epistemic:: inferred]`, `[epistemic:: tentative]`, stale-source claims, and claims on high-fanout pages).
   2. The audit resolves each claim's `[prov:source_id#locator]` to the relevant source passage and checks whether the passage supports, weakly supports, contradicts, or does not establish the claim.
@@ -212,6 +214,23 @@ Plans:
 - No required CI blocking gate in the first shipped version
 - No SQLite requirement
 - No full-vault audit by default
+**Plans**: TBD
+
+### Phase 13.1: v1.1 Closure Verification Gate (INSERTED)
+
+**Goal**: Close v1.1 only after all active v1.1 phases have been implemented, verified, documented, and checked for scope creep.
+**Depends on**: Phase 13
+**Why this phase exists**: Phase 12 used to carry the final verification role, but Phases 12.1, 12.2, and 13 now land after it. The milestone needs a true end-of-line gate that can verify the whole v1.1 surface.
+**Requirements**: CLOSE-01, CLOSE-02, CLOSE-03, CLOSE-04
+**Success Criteria** (what must be TRUE):
+  1. `bin/requirements-sync.sh --strict` shows zero drift between `REQUIREMENTS.md` and phase verification artifacts across all v1.1 phases.
+  2. Obsidian render, non-Claude agent-parity, and genuine write-back scenarios have been re-run or explicitly audited after Phases 12.1, 12.2, and 13 are in place.
+  3. README, docs, decision records, and roadmap consistently describe the final v1.1 feature surface, including complementary-system boundaries and explicitly deferred work.
+  4. A final scope-leak check confirms no task engine, reminder/calendar layer, high-frequency event ingest, premature scaling tier, or canonical GTD dashboard has entered v1.1.
+**Non-goals**:
+- No new product features
+- No new schema expansion except fixes required by failed verification
+- No speculative GTD review pattern documentation
 **Plans**: TBD
 
 ## Backlog
@@ -338,7 +357,8 @@ The following are intentionally deferred until real usage demands them, captured
 | 9. Collaborative PR Workflow + CI Lint Gate | v1.1 | 6/6 | Complete | 2026-04-16 |
 | 10. Brownfield Scan + Bootstrap | v1.1 | 6/6 | Complete    | 2026-04-18 |
 | 11. Brownfield Suggest + Verify | v1.1 | 5/5 | Complete    | 2026-04-20 |
-| 12. Docs Finalization + Obsidian Starter + v1.0 Debt Verification Gate | v1.1 | 0/0 | Not started | - |
+| 12. Docs Finalization + Obsidian Starter | v1.1 | 0/0 | Not started | - |
 | 12.1. Complementary Systems Boundary + GTD Alignment | v1.1 | 0/0 | Not started | - |
 | 12.2. Local Wiki Write Gate | v1.1 | 0/0 | Not started | - |
 | 13. Claim Faithfulness Audit | v1.1 | 0/0 | Not started | - |
+| 13.1. v1.1 Closure Verification Gate | v1.1 | 0/0 | Not started | - |

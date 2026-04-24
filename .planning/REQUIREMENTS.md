@@ -4,7 +4,7 @@
 **Core Value:** The wiki is a persistent, compounding artifact — cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested.
 **Milestone Focus:** Make the v1.0 starter kit usable by technically comfortable early adopters — template-based starter repo, two-track setup, git-based collaborative curation, safe brownfield onboarding.
 
-Numbering continues from v1.0. New REQ-ID prefixes: `TMPL`, `NEUT`, `WZRD`, `MANUAL`, `COLAB`, `CI`, `BRWN`, `DEBT`.
+Numbering continues from v1.0. New REQ-ID prefixes: `TMPL`, `NEUT`, `WZRD`, `MANUAL`, `COLAB`, `CI`, `BRWN`, `DEBT`, `OBSID`, `BOUND`, `WGATE`, `FAITH`, `CLOSE`.
 
 ---
 
@@ -112,6 +112,39 @@ Numbering continues from v1.0. New REQ-ID prefixes: `TMPL`, `NEUT`, `WZRD`, `MAN
 - [ ] **DEBT-02**: Codex (or other non-Claude) agent-parity: run v1.0 ingest workflow end-to-end against Kahneman example cluster using a second agent; document diffs; set agent-parity tolerance
 - [x] **DEBT-03**: `bin/requirements-sync.sh` mechanical check: compares `VERIFICATION.md` truths against `REQUIREMENTS.md` status checkboxes; flags drift (retrospective lesson)
 - [ ] **DEBT-04**: Genuine write-back query scenario executed end-to-end (Phase 4 validation scenario that produced NO-WRITE-BACK in v1.0 re-run)
+
+### Obsidian Starter (OBSID)
+
+- [ ] **OBSID-01**: `schema/obsidian/` ships page-type templates derived from the canonical schema templates, covering the supported wiki page types without introducing divergent field names or section order.
+- [ ] **OBSID-02**: A reference doc explains how to use the Obsidian starter for day-1 page creation ergonomics, including what is generated and what remains user-owned.
+- [ ] **OBSID-03**: The Obsidian starter does not ship canonical GTD dashboards, workflow-specific Dataview surfaces, hotkey bundles, custom CSS/theme files, or prescribed review workflows.
+
+### Complementary Systems Boundary (BOUND)
+
+- [ ] **BOUND-01**: A decision record states that compendium owns durable, provenance-backed synthesis and reflective wiki memory, while complementary systems own executable commitments, reminders, calendars, transactional state, and high-churn operational events.
+- [ ] **BOUND-02**: A reference doc explains the 3-layer model: task layer, working-memory layer, and wiki-compiler layer.
+- [ ] **BOUND-03**: README, docs, and decision records consistently exclude "all-in-one PKM/task system" framing and do not add new wiki page types or `wiki/` directory taxonomies for GTD.
+
+### Local Wiki Write Gate (WGATE)
+
+- [ ] **WGATE-01**: The local commit path runs a deterministic pre-commit gate against staged wiki changes before commit completes.
+- [ ] **WGATE-02**: New staged pages under `wiki/{entities,concepts,overviews,comparisons}/` fail the gate when they contain zero `[prov:...]` markers.
+- [ ] **WGATE-03**: The gate is staged-index aware and composes with existing `bin/lint.sh --strict` policy where possible without relying blindly on PR-mode `origin/main...HEAD` behavior.
+- [ ] **WGATE-04**: Exemptions match the schema/tooling contract: `type: source`, `type: decision`, `examples/`, and brownfield transitional cases are not falsely blocked, and the existing `AGENTS.md` / `CLAUDE.md` sync hook remains intact.
+
+### Claim Faithfulness Audit (FAITH)
+
+- [ ] **FAITH-01**: `bin/audit-claims.sh` samples recently modified claims plus high-risk claims (`[epistemic:: inferred]`, `[epistemic:: tentative]`, stale-source claims, and high-fanout page claims).
+- [ ] **FAITH-02**: The audit resolves each sampled claim's `[prov:source_id#locator]` marker to the cited source passage and evaluates whether the passage supports, weakly supports, contradicts, or does not establish the claim.
+- [ ] **FAITH-03**: Audit output is structured and review-only by default, including page path, line number, source ID, locator, verdict, and rationale; no automatic wiki rewrites occur.
+- [ ] **FAITH-04**: `privacy: local_only` claims are never sent to cloud APIs; the audit uses a local verifier or emits an explicit skipped/privacy finding.
+
+### v1.1 Closure Gate (CLOSE)
+
+- [ ] **CLOSE-01**: `bin/requirements-sync.sh --strict` shows zero drift between `REQUIREMENTS.md` and phase verification artifacts across all v1.1 phases before milestone closure.
+- [ ] **CLOSE-02**: Obsidian render, non-Claude agent-parity, and genuine write-back scenarios are re-run or explicitly audited after Phases 12.1, 12.2, and 13 land.
+- [ ] **CLOSE-03**: README, docs, decision records, and roadmap consistently describe the final v1.1 feature surface, complementary-system boundary, and explicitly deferred work.
+- [ ] **CLOSE-04**: A final scope-leak check confirms no task engine, reminder/calendar layer, high-frequency event ingest, premature scaling tier, or canonical GTD dashboard has entered v1.1.
 
 ## v2 Requirements
 
@@ -240,12 +273,30 @@ Explicitly excluded from v1.1. Documented to prevent scope creep.
 | DEBT-01 | Phase 12 | Pending |
 | DEBT-02 | Phase 12 | Pending |
 | DEBT-04 | Phase 12 | Pending |
+| OBSID-01 | Phase 12 | Pending |
+| OBSID-02 | Phase 12 | Pending |
+| OBSID-03 | Phase 12 | Pending |
+| BOUND-01 | Phase 12.1 | Pending |
+| BOUND-02 | Phase 12.1 | Pending |
+| BOUND-03 | Phase 12.1 | Pending |
+| WGATE-01 | Phase 12.2 | Pending |
+| WGATE-02 | Phase 12.2 | Pending |
+| WGATE-03 | Phase 12.2 | Pending |
+| WGATE-04 | Phase 12.2 | Pending |
+| FAITH-01 | Phase 13 | Pending |
+| FAITH-02 | Phase 13 | Pending |
+| FAITH-03 | Phase 13 | Pending |
+| FAITH-04 | Phase 13 | Pending |
+| CLOSE-01 | Phase 13.1 | Pending |
+| CLOSE-02 | Phase 13.1 | Pending |
+| CLOSE-03 | Phase 13.1 | Pending |
+| CLOSE-04 | Phase 13.1 | Pending |
 
 **Coverage:**
-- v1.1 requirements: 79 total (TMPL: 11, NEUT: 8, WZRD: 11, MANUAL: 6, COLAB: 8, CI: 9, BRWN: 22, DEBT: 4)
-- Mapped to phases: 79 (Phase 7: 20, Phase 8: 17, Phase 9: 17, Phase 10: 11, Phase 11: 11, Phase 12: 3)
+- v1.1 requirements: 97 total (TMPL: 11, NEUT: 8, WZRD: 11, MANUAL: 6, COLAB: 8, CI: 9, BRWN: 22, DEBT: 4, OBSID: 3, BOUND: 3, WGATE: 4, FAITH: 4, CLOSE: 4)
+- Mapped to phases: 97 (Phase 7: 20, Phase 8: 17, Phase 9: 17, Phase 10: 11, Phase 11: 11, Phase 12: 6, Phase 12.1: 3, Phase 12.2: 4, Phase 13: 4, Phase 13.1: 4)
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-15 — v1.1 Shareability milestone*
-*Roadmap traceability filled: 2026-04-15 — 6 phases (7–12)*
+*Roadmap traceability updated: 2026-04-24 — 10 active v1.1 phases (7–13.1)*
