@@ -41,6 +41,19 @@ Specifically:
 - **Core target is 500–700 lines**, not 180. Safety-critical invariants (privacy defaults, provenance requirement, MUST NOT list, write-back mandatory, structured-op vocabulary) must stay always-loaded.
 - **Skills come last as thin wrappers.** If added, skill body is one paragraph pointing to the canonical markdown. Skills are runtime accelerators for Claude Code, not the source of truth.
 
+## Clarification From Post-v1.1 Discussion
+
+This note was refined after a follow-up architectural discussion. The intent is:
+
+- **v1.1 is considered shipped only after the Phase 13.1 closure gate clears.** Do not concretize the extraction map or deterministic helper surface until that validation pass is complete.
+- **Post-v1.1 shrink is explicitly about progressive disclosure first.** Step 1 is extracting on-demand material from `AGENTS.md` / `CLAUDE.md` into plain markdown under `schema/reference/` and `schema/workflows/`.
+- **Determinism is a second pass, not the first move.** After the markdown split lands, evaluate which workflows benefit from additional determinism such as helper scripts, validators, generators, or machine-readable manifests.
+- **Authority model stays markdown-first.** Markdown remains the normative source of truth for behavior and workflow semantics; code and data surfaces support or enforce it.
+- **Use manifests only for repeated structured facts.** Enums, tables, field schemas, and other duplicated structured values are candidates for YAML/JSON authority to reduce drift across docs, templates, and scripts.
+- **Use scripts for mechanical, idempotent, testable behavior.** File mutation, validation, normalization, generation, and other binary execution paths should move into deterministic helpers where they materially reduce ambiguity.
+- **Skills remain thin routers or accelerators.** They may improve invocation ergonomics for specific runtimes, but they are not the primary home for workflow truth.
+- **The exact extraction table, manifest set, and script-first workflow list are deferred to the actual planning phase.** Decide those from post-Phase-13.1 evidence, not from pre-ship speculation.
+
 ## What Stays In The Always-Loaded Core (~500–700 lines)
 
 These must remain resident because an agent cannot safely begin work without them:
@@ -169,7 +182,7 @@ Beyond the extraction itself:
 - [ ] `bin/lint.sh` continues to enforce frontmatter rules regardless of where schema text lives
 - [ ] `bin/validate-op.sh` continues to enforce operation preconditions
 - [ ] `bin/check-privacy.sh` continues to block `local_only` in public paths — including new `schema/reference/*.md` and `schema/workflows/*.md`
-- [ ] Codex / Cursor / Gemini-CLI path: a non-Claude agent reading `AGENTS.md` can reach the same operational knowledge by following the routing table (manual verification via Phase 12 agent-parity test)
+- [ ] Codex / Cursor / Gemini-CLI path: a non-Claude agent reading `AGENTS.md` can reach the same operational knowledge by following the routing table (manual verification via the v1.1 closure agent-parity check)
 - [ ] `schema:` commit convention covers changes to the extracted tree
 - [ ] Decision record created documenting the split (`trigger_type: schema-update`)
 
