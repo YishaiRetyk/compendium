@@ -1,7 +1,12 @@
 # Obsidian noise
+.obsidian/
 .obsidian/workspace*.json
 .obsidian/cache
 .trash/
+
+# Local agent/tool state
+.claude/
+.git.backup-*/
 
 # Brownfield workflow artifacts
 .brownfield/
@@ -10,6 +15,7 @@
 .DS_Store
 Thumbs.db
 *.swp
+*.err
 .idea/
 .vscode/
 
