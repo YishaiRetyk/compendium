@@ -20,13 +20,16 @@ autonomous: true
 must_haves:
   truths:
     - "12-VERIFICATION.md exists and records BOUND-01/02/03 as Complete with explicit file-path evidence for each."
-    - "12-VERIFICATION.md contains the captured phase-base SHA used for the diff acceptance check, the verbatim audit grep command, and an annotated reviewed-match audit table where every grep hit carries verdict `negative-framing` or `positive-claim`."
+    - "12-VERIFICATION.md contains the MANDATORY SPEC-anchored phase-base SHA (derived from `git log --format=%H -n 1 -- .planning/phases/12-complementary-systems-boundary-gtd-alignment/12-SPEC.md`) used for the diff acceptance check, the verbatim audit grep command, and an annotated reviewed-match audit table where every grep hit carries verdict `negative-framing` or `positive-claim`."
     - "Zero match rows in the audit table carry the `positive-claim` verdict."
+    - "Audit table row count equals raw grep hit count: `RAW_COUNT == TABLE_COUNT` equivalence check passes (every grep hit is enumerated as a table row, no rows missed)."
+    - "12-VERIFICATION.md contains the actual `git diff --name-only <PHASE_BASE_SHA>..HEAD` output (a fenced block of file paths), not just the expected files list."
     - "REQUIREMENTS.md BOUND-01/02/03 checkboxes are flipped from [ ] to [x] and the traceability rows are updated from Pending to Complete."
     - "bin/requirements-sync.sh --strict --phase 12 exits 0 after VERIFICATION.md and REQUIREMENTS.md edits."
-    - "git diff over phase-12 commits (anchored on the captured phase-base SHA) shows zero files under bin/ or schema/, and zero content edits to AGENTS.md / CLAUDE.md."
+    - "git diff over phase-12 commits (anchored on the SPEC-commit-derived phase-base SHA) shows zero files under bin/ or schema/, and zero content edits to AGENTS.md / CLAUDE.md."
     - "find wiki -maxdepth 1 -type d returns the same set as before Phase 12 (no new top-level wiki directories)."
     - "AGENTS.md §4 page-type enum still lists exactly 6 types (entity, concept, source, comparison, overview, decision)."
+    - "wiki/log.md reflect entry from Plan 12-03 has been moved into Plan 12-04 (after audit + REQUIREMENTS flip pass), OR uses 'Supports BOUND-01, BOUND-02, BOUND-03; verification closes them in Plan 12-04' wording — never 'Closes' before requirements-sync exits 0."
     - "Implementation honors locked CONTEXT.md decisions D-12 (Core 6 grep patterns + bounded `(replaces|replacement for) (a |an |your )?(task|gtd|todo|reminder|calendar|inbox)` regex), D-13 (audit scope is exactly `README.md AGENTS.md docs/ wiki/decisions/`, excluding `.planning/`, `examples/`, and other `wiki/` subtrees), D-14 (reviewed-match audit procedure: capture every grep hit with `path:line:text`, annotate verdict `negative-framing` or `positive-claim`, PASS iff zero `positive-claim` rows; audit lives as inline shell snippet in 12-VERIFICATION.md, NOT as a versioned `bin/check-boundary.sh`)."
   artifacts:
     - path: .planning/phases/12-complementary-systems-boundary-gtd-alignment/12-VERIFICATION.md
@@ -89,26 +92,32 @@ The reviewed-match audit (BOUND-03) is the closest analog to a threat-mitigation
     - README.md, docs/reference/index.md, wiki/index.md, wiki/log.md (must have Plan 12-03 edits — evidence paths for BOUND-02 / BOUND-03)
   </read_first>
   <action>
-**Step 1 — Capture the phase-base SHA:**
+**Step 1 — Capture the phase-base SHA (MANDATORY SPEC-COMMIT ANCHOR):**
 
-Run:
+Per cross-AI review feedback (REVIEWS.md HIGH concern), the phase-base SHA MUST be derived from the SPEC commit, NOT from `git rev-parse HEAD` at execute time. Using `HEAD` at the start of Plan 12-04 would exclude Plans 12-01..12-03 commits from the diff scope, allowing the diff acceptance check to pass while failing to cover the actual Phase 12 surface.
 
-```bash
-PHASE_BASE_SHA=$(git rev-parse HEAD)
-echo "$PHASE_BASE_SHA"
-```
-
-**IMPORTANT:** This SHA must be captured BEFORE writing 12-VERIFICATION.md. The captured SHA is the anchor for the diff acceptance check (SPEC requirement #6 / AC #14). The repo has `branching_strategy: none` (per `.planning/config.json`), so Phase 12 commits land directly on `main`. The SHA captured here is the "phase-base SHA" referenced in 12-VERIFICATION.md.
-
-Note: At plan time, HEAD is the SPEC commit `ef3afecf` (commit hash `ef3afec61fe211c88f3b965b83e96d67dd0b609d`). At execute-phase time, HEAD may be one or more commits ahead if Plans 12-01 / 12-02 / 12-03 have already committed. The executor MUST capture HEAD AT THE START of Plan 12-04 execution — that is the SHA *before* any Plan 12-04 commit lands. Record both the long form (40-char) and short form (7+ char) so future operators can reproduce the diff.
-
-If at execute time the executor wants to re-anchor to the original SPEC-commit SHA (the safer / more conservative anchor that captures every Plan 12-01..12-03 file as part of the diff), use:
+Run THIS command verbatim (no operator discretion — the SPEC-commit anchor is the only valid anchor):
 
 ```bash
 PHASE_BASE_SHA=$(git log --format=%H -n 1 -- .planning/phases/12-complementary-systems-boundary-gtd-alignment/12-SPEC.md)
+echo "PHASE_BASE_SHA=$PHASE_BASE_SHA"
+
+# Sanity check the SHA is valid:
+git cat-file -e "$PHASE_BASE_SHA" || { echo "ERROR: phase-base SHA invalid"; exit 1; }
+
+# Sanity check the SHA points to the SPEC commit (or its predecessor):
+git log --format='%H %s' -n 1 "$PHASE_BASE_SHA"
 ```
 
-The decision between the two anchors is operator discretion — the second form is more conservative (captures the full Phase 12 diff including this plan's predecessors) and is recommended.
+**Why this anchor:** `git log --format=%H -n 1 -- <SPEC.md>` returns the most recent commit that touched the SPEC file. At plan-revision time, that is the commit `ef3afec` (`docs(12): apply review-driven amendments to SPEC + CONTEXT`). Anchoring to this SHA means `git diff <PHASE_BASE_SHA>..HEAD` captures every Phase 12 content commit (Plans 12-01, 12-02, 12-03, AND 12-04) — even if some of those commits land before Plan 12-04 starts. This makes the diff acceptance check actually cover the full phase surface.
+
+**Record BOTH forms in 12-VERIFICATION.md:**
+- Long form (40-char hex): captured directly from the command above.
+- Short form (7+ char): `git log --format=%h -n 1 -- .planning/phases/12-complementary-systems-boundary-gtd-alignment/12-SPEC.md`.
+
+The captured SHA is the anchor for the diff acceptance check (SPEC requirement #6 / AC #14). The repo has `branching_strategy: none` (per `.planning/config.json`), so Phase 12 commits land directly on `main`. The SHA captured here is the "phase-base SHA" referenced in 12-VERIFICATION.md.
+
+If `git log --format=%H -n 1 -- .planning/phases/12-complementary-systems-boundary-gtd-alignment/12-SPEC.md` returns empty (e.g., the SPEC.md was renamed or its history was rewritten), STOP — do NOT fall back to `git rev-parse HEAD`. Investigate the path mismatch and fix it before proceeding.
 
 **Step 2 — Run the reviewed-match audit grep (per D-12 + D-14):**
 
@@ -179,11 +188,27 @@ grep -rEni 'all-in-one|task manager|task backend|reminder system|calendar app|in
 **Negative-framing rows:** N (must equal total).
 **Positive-claim rows:** 0 (PASS condition; phase fails if > 0).
 
-**Audit verdict:** PASS — zero `positive-claim` rows.
+**Audit table equivalence check (per REVIEWS.md MEDIUM — guards against missed rows when populating the table by hand):**
+
+```bash
+# Raw grep hit count from the audit command above:
+RAW_COUNT=$(grep -rEni 'all-in-one|task manager|task backend|reminder system|calendar app|inbox interface|(replaces|replacement for) (a |an |your )?(task|gtd|todo|reminder|calendar|inbox)' README.md AGENTS.md docs/ wiki/decisions/ | wc -l)
+
+# Populated audit table row count (every match becomes a row of shape `| <N> | path:line | ... | (negative-framing|positive-claim) |`):
+TABLE_COUNT=$(grep -cE '^\| [0-9]+ \|.*\| (negative-framing|positive-claim) \|$' .planning/phases/12-complementary-systems-boundary-gtd-alignment/12-VERIFICATION.md)
+
+# These MUST be equal:
+echo "RAW_COUNT=$RAW_COUNT  TABLE_COUNT=$TABLE_COUNT"
+test "$RAW_COUNT" -eq "$TABLE_COUNT" && echo "AUDIT-TABLE-EQUIVALENCE=PASS" || echo "AUDIT-TABLE-EQUIVALENCE=FAIL"
+```
+
+If the equivalence check FAILS, the executor MUST add the missing rows to the table before the phase can pass. Do NOT bypass this check by editing either count.
+
+**Audit verdict:** PASS — zero `positive-claim` rows AND `RAW_COUNT == TABLE_COUNT`.
 
 ## Diff Scope Verification (SPEC requirement #6 / AC #14)
 
-**Phase-base SHA:** `<PHASE_BASE_SHA>` (captured at Plan 12-04 execute-time; recorded above).
+**Phase-base SHA:** `<PHASE_BASE_SHA>` (derived from `git log --format=%H -n 1 -- .planning/phases/12-complementary-systems-boundary-gtd-alignment/12-SPEC.md`; mandatory SPEC-commit anchor per REVIEWS.md HIGH).
 
 **Diff command (reproducible):**
 
@@ -191,7 +216,13 @@ grep -rEni 'all-in-one|task manager|task backend|reminder system|calendar app|in
 git diff --name-only <PHASE_BASE_SHA>..HEAD
 ```
 
-**Expected files-modified set:** Some subset of these allowed paths only:
+**Actual diff output (paste verbatim from the command above run at execute time):**
+
+```
+<paste actual `git diff --name-only <PHASE_BASE_SHA>..HEAD` output here — every file path on its own line>
+```
+
+**Expected files-modified set:** The actual output above MUST be a subset of these allowed paths only:
 - `wiki/decisions/dr-2026-05-01-complementary-systems-boundary.md` (BOUND-01)
 - `docs/reference/three-layer-model.md` (BOUND-02)
 - `docs/reference/index.md` (BOUND-02 surface)
@@ -290,20 +321,29 @@ This MUST exit 0. If it exits non-zero, inspect the drift output and fix the dis
 **Step 6 — Final pre-commit checks (read-only, do NOT edit):**
 
 ```bash
-# Verify no AGENTS.md / CLAUDE.md content drift since the captured SHA:
-git diff <PHASE_BASE_SHA>..HEAD -- AGENTS.md CLAUDE.md | wc -l   # expect 0
+# Re-derive the SPEC-commit anchor (must match what was recorded in 12-VERIFICATION.md):
+PHASE_BASE_SHA=$(git log --format=%H -n 1 -- .planning/phases/12-complementary-systems-boundary-gtd-alignment/12-SPEC.md)
+
+# Verify no AGENTS.md / CLAUDE.md content drift since the SPEC-commit anchor:
+git diff "$PHASE_BASE_SHA"..HEAD -- AGENTS.md CLAUDE.md | wc -l   # expect 0
 
 # Verify no bin/ or schema/ files in the diff:
-git diff --name-only <PHASE_BASE_SHA>..HEAD | grep -E '^(bin|schema)/' | wc -l   # expect 0
+git diff --name-only "$PHASE_BASE_SHA"..HEAD | grep -E '^(bin|schema)/' | wc -l   # expect 0
 
 # Verify wiki taxonomy invariant:
 find wiki -maxdepth 1 -type d | sort   # expect wiki / wiki/decisions / wiki/maintenance only
 
-# Verify AGENTS.md §4 page-type enum unchanged:
-grep -E 'entity|concept|source|comparison|overview|decision' AGENTS.md | head -20   # spot-check; full check is the diff above
+# Verify AGENTS.md §4 page-type enum unchanged (the diff check above is the actual guard; this grep is informational only — REVIEWS.md notes the awk/grep-cE check is weak):
+grep -E 'entity|concept|source|comparison|overview|decision' AGENTS.md | head -20
 
 # Verify the reviewed-match audit grep produces non-empty output AND zero positive-claim rows (operator review):
 grep -rEni 'all-in-one|task manager|task backend|reminder system|calendar app|inbox interface|(replaces|replacement for) (a |an |your )?(task|gtd|todo|reminder|calendar|inbox)' README.md AGENTS.md docs/ wiki/decisions/
+
+# Verify audit table equivalence (RAW_COUNT == TABLE_COUNT; per REVIEWS.md MEDIUM):
+RAW_COUNT=$(grep -rEni 'all-in-one|task manager|task backend|reminder system|calendar app|inbox interface|(replaces|replacement for) (a |an |your )?(task|gtd|todo|reminder|calendar|inbox)' README.md AGENTS.md docs/ wiki/decisions/ | wc -l)
+TABLE_COUNT=$(grep -cE '^\| [0-9]+ \|.*\| (negative-framing|positive-claim) \|$' .planning/phases/12-complementary-systems-boundary-gtd-alignment/12-VERIFICATION.md)
+echo "RAW_COUNT=$RAW_COUNT  TABLE_COUNT=$TABLE_COUNT"
+test "$RAW_COUNT" -eq "$TABLE_COUNT" || { echo "FAIL: audit table missing rows"; exit 1; }
 ```
 
 If any check fails, do NOT commit — investigate and fix the underlying issue. The orchestrator (gsd-execute-phase) will commit only on full pass.
@@ -318,6 +358,9 @@ If any check fails, do NOT commit — investigate and fix the underlying issue. 
     - 12-VERIFICATION.md contains the verbatim audit grep command: `grep -cE 'grep -rEni .*all-in-one.*task manager.*task backend' .planning/phases/12-complementary-systems-boundary-gtd-alignment/12-VERIFICATION.md` returns at least 1.
     - 12-VERIFICATION.md contains the audit results table with at least 1 row: `grep -cE '^\| [0-9]+ \|.*\| (negative-framing|positive-claim) \|$' .planning/phases/12-complementary-systems-boundary-gtd-alignment/12-VERIFICATION.md` returns at least 1.
     - 12-VERIFICATION.md has zero `positive-claim` verdicts: `grep -cE '\| positive-claim \|' .planning/phases/12-complementary-systems-boundary-gtd-alignment/12-VERIFICATION.md` returns exactly 0.
+    - Audit table row count equals raw grep hit count (per REVIEWS.md MEDIUM equivalence check): `RAW=$(grep -rEni 'all-in-one|task manager|task backend|reminder system|calendar app|inbox interface|(replaces|replacement for) (a |an |your )?(task|gtd|todo|reminder|calendar|inbox)' README.md AGENTS.md docs/ wiki/decisions/ | wc -l) && TBL=$(grep -cE '^\| [0-9]+ \|.*\| (negative-framing|positive-claim) \|$' .planning/phases/12-complementary-systems-boundary-gtd-alignment/12-VERIFICATION.md) && test "$RAW" -eq "$TBL"` exits 0.
+    - 12-VERIFICATION.md phase-base SHA is derived from the SPEC commit (per REVIEWS.md HIGH; MUST match `git log --format=%H -n 1 -- .planning/phases/12-complementary-systems-boundary-gtd-alignment/12-SPEC.md`): `SHA=$(grep -oE '[0-9a-f]{7,40}' .planning/phases/12-complementary-systems-boundary-gtd-alignment/12-VERIFICATION.md | head -1) && SPEC_SHA=$(git log --format=%H -n 1 -- .planning/phases/12-complementary-systems-boundary-gtd-alignment/12-SPEC.md) && [[ "$SPEC_SHA" == "$SHA"* ]]` exits 0.
+    - 12-VERIFICATION.md contains the actual `git diff --name-only` output as a fenced block (not just the expected files list): `awk '/Diff command/,/Expected files-modified set/' .planning/phases/12-complementary-systems-boundary-gtd-alignment/12-VERIFICATION.md | grep -cE '^\.planning/|^wiki/|^docs/|^README\.md$'` returns at least 1.
     - 12-VERIFICATION.md cites the BOUND-01 DR by file path: `grep -c 'wiki/decisions/dr-2026-05-01-complementary-systems-boundary.md' .planning/phases/12-complementary-systems-boundary-gtd-alignment/12-VERIFICATION.md` returns at least 1.
     - 12-VERIFICATION.md cites the BOUND-02 ref doc by file path: `grep -c 'docs/reference/three-layer-model.md' .planning/phases/12-complementary-systems-boundary-gtd-alignment/12-VERIFICATION.md` returns at least 1.
     - REQUIREMENTS.md BOUND-01/02/03 checkboxes flipped: `grep -cE '^- \[x\] \*\*BOUND-0[123]\*\*' .planning/REQUIREMENTS.md` returns exactly 3.

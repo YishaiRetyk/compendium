@@ -182,8 +182,10 @@ Use this format (per AGENTS.md §12 base log entry shape; entries describe what 
 
 ## [2026-05-01] reflect | Phase 12 complementary-systems boundary
 
-Created decision record [[dr-2026-05-01-complementary-systems-boundary]] (`trigger_type: schema-update`, `affected_pages: []`) capturing that compendium owns durable, provenance-backed wiki memory and review support, while complementary systems own task execution, reminders, calendars, and transactional state. Created `docs/reference/three-layer-model.md` with the 3-layer model, capture/clarify/organize/review routing table, and anti-features section. Added README pointer under "What this is", `docs/reference/index.md` bullet, and the Decisions entry above. Closes BOUND-01, BOUND-02, BOUND-03; unblocks the CLOSE-04 scope-leak gate for v1.1 closure.
+Created decision record [[dr-2026-05-01-complementary-systems-boundary]] (`trigger_type: schema-update`, `affected_pages: []`) capturing that compendium owns durable, provenance-backed wiki memory and review support, while complementary systems own task execution, reminders, calendars, and transactional state. Created `docs/reference/three-layer-model.md` with the 3-layer model, capture/clarify/organize/review routing table, and anti-features section. Added README pointer under "What this is", `docs/reference/index.md` bullet, and the Decisions entry above. Supports BOUND-01, BOUND-02, BOUND-03; verification closes them in Plan 12-04 (`bin/requirements-sync.sh --strict --phase 12` exits 0). Unblocks the CLOSE-04 scope-leak gate for v1.1 closure.
 ```
+
+**Note (per REVIEWS.md MEDIUM):** The wording uses "Supports... verification closes them in Plan 12-04" rather than "Closes" because Plan 12-03 commits before Plan 12-04 runs the audit and flips REQUIREMENTS.md. The phase is not actually closed until `bin/requirements-sync.sh --strict --phase 12` exits 0 in Plan 12-04. Do NOT use the literal word "Closes" in the log entry — the verbatim acceptance check in Plan 12-04 confirms the wording.
 
 The leading blank line is intentional — it separates the new entry from the prior `## [2026-04-30] lint | wiki health check` block.
 
@@ -205,6 +207,8 @@ Do NOT modify any pre-existing log entries (append-only per AGENTS.md §3).
     - The new log entry contains a wikilink to the new DR (first-mention-only): `awk '/^## \[2026-05-01\] reflect/,0' wiki/log.md | grep -Ec '\[\[dr-2026-05-01-complementary-systems-boundary\]\]'` returns at least `1`.
     - The new log entry references the new ref doc by relative path: `awk '/^## \[2026-05-01\] reflect/,0' wiki/log.md | grep -Ec 'docs/reference/three-layer-model\.md'` returns at least `1`.
     - The new log entry mentions BOUND-01, BOUND-02, BOUND-03: `awk '/^## \[2026-05-01\] reflect/,0' wiki/log.md | grep -Ec 'BOUND-01.*BOUND-02.*BOUND-03|BOUND-01, BOUND-02, BOUND-03'` returns at least `1`.
+    - The new log entry uses "Supports" wording (NOT premature "Closes" — per REVIEWS.md MEDIUM, the entry commits before Plan 12-04 runs requirements-sync; closure only happens in Plan 12-04): `awk '/^## \[2026-05-01\] reflect/,0' wiki/log.md | grep -c 'Supports BOUND-01, BOUND-02, BOUND-03'` returns at least `1`.
+    - The new log entry does NOT use the literal "Closes BOUND-01" wording: `awk '/^## \[2026-05-01\] reflect/,0' wiki/log.md | grep -c '^Closes BOUND-01\|^Closes BOUND-01, BOUND-02, BOUND-03'` returns 0.
     - wiki/log.md is still newest-at-bottom append-only (no pre-existing entries removed): `grep -c '^## \[' wiki/log.md` increases by exactly 1 compared to pre-Plan-12-03 baseline (i.e., from 4 to 5 entry headers if the two duplicate 2026-04-30 entries are both kept).
     - No `contributor::` field added (single-author repo per single-author-omit rule): `grep -c '^contributor::' wiki/log.md` returns 0 OR is unchanged from pre-edit count.
     - No pre-existing log entry text was modified: `git diff wiki/log.md | grep -c '^-' | tr -d ' '` returns 0 for non-context lines (only additions, no deletions).

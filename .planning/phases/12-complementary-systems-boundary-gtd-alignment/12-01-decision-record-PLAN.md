@@ -225,3 +225,14 @@ After completion, this DR is consumed by:
 - Plan 12-03 (wiki/index.md Decisions section adds bullet for this DR; wiki/log.md reflect entry names this DR by slug).
 - Plan 12-04 (reviewed-match audit grep scans this file's body — Alternatives Considered + body matches must all be `negative-framing` per BOUND-03; the audit annotates and verdicts each match in 12-VERIFICATION.md).
 </output>
+
+<wave_1_coordination_note>
+Per REVIEWS.md MEDIUM concern: Plans 12-01 and 12-02 both run in Wave 1 and cross-reference each other (12-01 cites the ref doc by relative path; 12-02 cites this DR by ID). The execute-phase orchestrator should sequence both files into a single Wave-1 commit, OR explicitly tolerate the transient red link / forward reference if the plans are committed independently. The cross-references resolve to non-existent paths until BOTH Wave-1 plans complete.
+
+This is acceptable because:
+- The DR's link to `docs/reference/three-layer-model.md` is a relative markdown path (NOT a wikilink), so AGENTS.md §6 provenance lint (which only cares about wikilinks resolving to wiki pages) does NOT flag it as broken.
+- The ref doc's reference to this DR's slug (`dr-2026-05-01-complementary-systems-boundary`) is a wiki-page-shaped link and WILL be flagged by lint as a red link if 12-01 has not committed yet.
+- The transient red link auto-resolves once both Wave-1 plans complete; lint runs in Plan 12-04 (after both Wave-1 commits land), so the final lint state is clean.
+
+If the executor chooses to commit Wave 1 as a single bundled commit, this note is informational only.
+</wave_1_coordination_note>

@@ -198,3 +198,11 @@ After completion, this ref doc is consumed by:
 - Plan 12-04 (audit grep scans the Anti-features section; matches must verdict `negative-framing`).
 - Plan 12-01 (BOUND-01 DR's Sources section cross-links this doc by relative path — already covered by Plan 12-01's content).
 </output>
+
+<wave_1_coordination_note>
+Per REVIEWS.md MEDIUM concern: Plans 12-01 and 12-02 both run in Wave 1 and cross-reference each other. This ref doc cites the BOUND-01 DR by ID (`dr-2026-05-01-complementary-systems-boundary`); the DR cites this ref doc by relative path. If the executor commits Plan 12-02 before Plan 12-01, this doc temporarily references a wiki page that does not yet exist. The execute-phase orchestrator should either:
+1. Bundle both Wave-1 plans into a single commit (preferred — eliminates the transient red-link state), OR
+2. Tolerate the transient red link knowing both plans complete in the same wave and lint runs only in Plan 12-04 (after both Wave-1 commits land).
+
+Since the cite from this ref doc to the DR is a markdown reference to `wiki/decisions/dr-2026-05-01-complementary-systems-boundary.md` (relative path with file extension, NOT a wikilink), AGENTS.md §6 provenance lint will not flag it as a broken wikilink. The reference is just temporarily inaccurate until 12-01 commits — not a hard error.
+</wave_1_coordination_note>
