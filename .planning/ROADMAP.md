@@ -160,7 +160,12 @@ Plans:
 - No Slack/ticket/event ingest pipeline
 - No GTD-specific filesystem expansion
 - No canonical review dashboards
-**Plans**: TBD
+**Plans:** 4 plans
+Plans:
+- [ ] 12-01-decision-record-PLAN.md — BOUND-01 decision record at wiki/decisions/dr-2026-05-01-complementary-systems-boundary.md (type: decision, trigger_type: schema-update, affected_pages: [], 7 required sections per AGENTS.md §4.6)
+- [ ] 12-02-reference-doc-PLAN.md — BOUND-02 reference doc at docs/reference/three-layer-model.md (3-layer model + 4-verb routing table + anti-features section)
+- [ ] 12-03-surface-integration-PLAN.md — README pointer (D-10 locked wording) + docs/reference/index.md bullet + wiki/index.md Decisions entry + wiki/log.md reflect entry
+- [ ] 12-04-audit-and-verification-PLAN.md — Capture phase-base SHA, run reviewed-match audit grep (D-12 patterns over D-13 scope), write 12-VERIFICATION.md, flip REQUIREMENTS.md BOUND-01/02/03 status, run bin/requirements-sync.sh --strict --phase 12
 
 ### Phase 12.1: NEUT-08 Personal-Term Denylist Curation (PROMOTED FROM 999.2)
 
@@ -399,7 +404,7 @@ The following are intentionally deferred until real usage demands them, captured
 | 9. Collaborative PR Workflow + CI Lint Gate | v1.1 | 6/6 | Complete | 2026-04-16 |
 | 10. Brownfield Scan + Bootstrap | v1.1 | 6/6 | Complete    | 2026-04-18 |
 | 11. Brownfield Suggest + Verify | v1.1 | 5/5 | Complete    | 2026-04-20 |
-| 12. Complementary Systems Boundary + GTD Alignment | v1.1 | 0/0 | Not started | - |
+| 12. Complementary Systems Boundary + GTD Alignment | v1.1 | 0/4 | In progress | - |
 | 12.1. NEUT-08 Personal-Term Denylist Curation | v1.1 | 0/0 | Not started | - |
 | 12.2. Local Wiki Write Gate | v1.1 | 0/0 | Not started | - |
 | 13. Claim Faithfulness Audit | v1.1 | 0/0 | Not started | - |
