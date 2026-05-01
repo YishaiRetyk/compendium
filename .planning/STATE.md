@@ -273,7 +273,7 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-None.
+- [planning] Fix planning artifact consistency after phase 12–13 reorder (.planning/todos/pending/2026-05-01-fix-planning-artifact-consistency-post-reorder.md)
 
 ### Roadmap Evolution
 
