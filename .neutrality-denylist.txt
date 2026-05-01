@@ -8,3 +8,17 @@ thinking fast and slow
 system 1
 system 2
 cognitive biases
+
+# Category: Personal-decision content archived from wiki/ (NEUT-08)
+# Source pages personal-decision-patterns.md and personal-decision-journal.md
+# were archived before v1.0 release. Defense-in-depth: keep these terms denied
+# so a future ingest cannot reintroduce the personal content by accident.
+personal-decision-patterns
+personal-decision-journal
+personal-decision-frameworks
+articulate-the-want
+autopilot-purchase
+flinch-level
+heuristic-origin
+pre-committed
+pre-commitment
