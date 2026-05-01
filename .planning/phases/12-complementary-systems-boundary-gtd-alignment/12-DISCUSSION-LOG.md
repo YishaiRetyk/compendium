@@ -179,6 +179,6 @@
 - **bin/check-boundary.sh as ongoing CI audit** — discussed (Q13) and rejected for Phase 12 (SPEC requirement #6 forbids bin/ changes). If future drift becomes recurring, promote to v1.2 phase.
 - **PROJECT.md core-value paragraph update** — discussed implicitly; not required (current PROJECT.md is already compatible with the boundary).
 - **"How this fits in your stack" as new README section** — discussed (Q8 option C); rejected as borderline scope creep against SPEC's "one new pointer line" wording.
-- **Adding a 5th GTD verb (engage) to the routing table** — discussed implicitly; not pursued. Allen's 4 classic verbs match the boundary framing.
+- **Adding a 5th GTD verb (engage) to the routing table** — discussed implicitly; not pursued. Classic GTD is five steps (capture / clarify / organize / reflect / engage); this phase uses the four roadmap-scoped verbs (capture / clarify / organize / review) intentionally because they map cleanly onto the three layers.
 - **decision_history back-links from existing 4 DRs to BOUND-01** — explicitly out of scope per SPEC; AGENTS.md §4.6 makes this optional.
 - **Promoting .planning/notes/2026-04-24-*.md into wiki/** — out of scope by design (notes are origin/inputs; canonical surface is the output).

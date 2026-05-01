@@ -32,10 +32,10 @@ This phase converts the exploratory notes into the canonical shipped surface.
    - Target: `docs/reference/three-layer-model.md` (or equivalent under `docs/reference/`) exists with three explicit sections: (a) 3-layer model narrative naming each layer and what it owns; (b) Routing Rules — a markdown table with columns `Verb | Belongs in (layer) | Compendium role | Out of scope` and rows for capture / clarify / organize / review (all 4 GTD verbs present); (c) Anti-features list explicitly excluding inbox, next-action execution, calendar, reminders, rapid transactional updates, high-churn waiting-for state, and Slack/ticket/event-stream ingest.
    - Acceptance: File exists; `grep` confirms the 4 GTD-verb rows in the routing table; `grep` confirms each anti-feature appears in the anti-features section; `docs/reference/index.md` lists the new file; the doc cites the BOUND-01 decision record by ID.
 
-3. **BOUND-03 — Surface consistency**: README, `docs/`, and `wiki/decisions/` consistently exclude "all-in-one PKM/task system" framing AND no new wiki page types or `wiki/` directory taxonomies are introduced.
+3. **BOUND-03 — Surface consistency**: README, `docs/`, and `wiki/decisions/` consistently exclude "all-in-one PKM/task system" framing (zero positive ownership claims) AND no new wiki page types or `wiki/` directory taxonomies are introduced. Note: the new BOUND-01 DR's "Alternatives Considered" section and the new BOUND-02 doc's Anti-features section MUST mention the excluded systems (task manager, calendar, reminders, inbox, etc.) in negative/exclusionary framing — those are required content, not contradictions.
    - Current: README.md does not contradict the boundary but does not mention it; no audit confirms `docs/` and `wiki/decisions/` are clean.
-   - Target: README.md gains a single `See: docs/reference/three-layer-model.md` pointer line under the existing "What this is" section, making the boundary discoverable from the entry point; an audit grep confirms zero occurrences of "all-in-one", "task manager", "task backend", "reminder", "calendar app" framings claiming compendium itself owns those concerns; zero new page types added to AGENTS.md §4 enum (still 6: entity, concept, source, comparison, overview, decision); zero new top-level subdirectories under `wiki/` beyond the existing 5 (entities, concepts, sources, comparisons, overviews) plus `decisions/` and `maintenance/`.
-   - Acceptance: README.md contains exactly one new pointer line referencing the BOUND-02 doc; `bin/check-neutrality.sh` and the audit grep confirm no contradictory framing in README.md, AGENTS.md, `docs/`, or `wiki/decisions/`; AGENTS.md §4 page-type enum unchanged; `find wiki -maxdepth 1 -type d` returns the same set as before this phase.
+   - Target: README.md gains a single contextual pointer sentence under the existing "What this is" section, making the boundary discoverable from the entry point; a **reviewed-match audit** over README.md, AGENTS.md, `docs/`, and `wiki/decisions/` enumerates every `grep` hit on the boundary patterns and confirms each match is negative/exclusionary framing (e.g., "compendium is NOT a task manager", "out of scope: calendar", or appears inside an "Alternatives Considered" section listing rejected framings) — zero matches asserting compendium IS such a system; zero new page types added to AGENTS.md §4 enum (still 6: entity, concept, source, comparison, overview, decision); zero new top-level subdirectories under `wiki/` beyond the existing set.
+   - Acceptance: README.md contains exactly one new contextual pointer sentence referencing the BOUND-02 doc; the reviewed-match audit (inline shell snippet captured in `12-VERIFICATION.md`) lists every match and the verdict for each (`negative-framing` or `positive-claim`); zero matches with `positive-claim` verdict; AGENTS.md §4 page-type enum unchanged; `find wiki -maxdepth 1 -type d` returns the same set as before this phase plus the unchanged existing `decisions/` and `maintenance/`.
 
 4. **REQUIREMENTS.md status sync**: BOUND-01, BOUND-02, BOUND-03 flip from `Pending` to `Complete` in REQUIREMENTS.md and the Phase 12 traceability rows reflect the verification artifact.
    - Current: BOUND-01/02/03 marked Pending; traceability table lists `BOUND-01..03 | Phase 12 | Pending`.
@@ -49,17 +49,19 @@ This phase converts the exploratory notes into the canonical shipped surface.
 
 6. **No scope expansion of schema/tooling**: This phase ships docs and a decision record only — no changes to `bin/`, no new schema fields, no new lint rules, no new page-type enums.
    - Current: The bin/, schema/, and AGENTS.md page-type enum are stable post-Phase 11.
-   - Target: Phase 12's diff touches only `wiki/decisions/dr-2026-05-DD-*.md`, `docs/reference/three-layer-model.md`, `docs/reference/index.md`, `README.md` (one pointer line), `.planning/REQUIREMENTS.md` (status flips), `.planning/phases/12-*/` (planning artifacts).
-   - Acceptance: `git diff --name-only origin/main...HEAD` for the phase-12 branch shows zero files under `bin/`, `schema/` (excluding any planning-artifact regeneration), or `AGENTS.md §4 page-type enum`; the AGENTS.md ↔ CLAUDE.md byte-equality hook continues to pass.
+   - Target: Phase 12's diff touches only `wiki/decisions/dr-2026-05-DD-*.md`, `docs/reference/three-layer-model.md`, `docs/reference/index.md`, `README.md` (one contextual pointer sentence), `wiki/index.md` (Decisions section adds the new DR per AGENTS.md §11.4 step 5), `wiki/log.md` (single reflect entry per AGENTS.md §11.4 step 6 / §12), `.planning/REQUIREMENTS.md` (status flips), `.planning/phases/12-*/` (planning artifacts).
+   - Acceptance: A captured phase-base SHA recorded in `12-VERIFICATION.md` (taken at SPEC commit time) anchors the diff; `git diff --name-only <phase_base>...HEAD` (or equivalent walk over phase-12 commits if no remote `origin/main` exists) shows zero files under `bin/`, `schema/`, or content edits to `AGENTS.md` / `CLAUDE.md`; the AGENTS.md ↔ CLAUDE.md byte-equality hook continues to pass.
 
 ## Boundaries
 
 **In scope:**
 - One new decision record in `wiki/decisions/` capturing the complementary-systems boundary (BOUND-01).
 - One new reference doc in `docs/reference/` with 3-layer model + routing table + anti-features section (BOUND-02).
-- One pointer line added to `README.md` under "What this is" pointing at the new reference doc.
-- One pointer line added to `docs/reference/index.md` listing the new reference doc.
-- Audit grep confirming README, AGENTS.md, `docs/`, and `wiki/decisions/` exclude "all-in-one PKM/task system" framing (BOUND-03).
+- One contextual pointer sentence added to `README.md` under "What this is" pointing at the new reference doc.
+- One bullet added to `docs/reference/index.md` listing the new reference doc.
+- One Decisions-section entry added to `wiki/index.md` for the new DR (per AGENTS.md §11.4 step 5).
+- One reflect entry appended to `wiki/log.md` for Phase 12 (per AGENTS.md §11.4 step 6 and §12).
+- Reviewed-match audit (inline shell snippet in `12-VERIFICATION.md`) confirming every grep hit on boundary patterns is negative/exclusionary framing — zero positive ownership claims (BOUND-03).
 - REQUIREMENTS.md status flips for BOUND-01/02/03.
 - VERIFICATION.md artifact for Phase 12.
 
@@ -87,17 +89,19 @@ This phase converts the exploratory notes into the canonical shipped surface.
 
 - [ ] `wiki/decisions/dr-2026-05-DD-complementary-systems-boundary.md` exists with `type: decision`, `trigger_type: schema-update`, `affected_pages: []`, and all 7 sections (TL;DR, Decision, Why, Alternatives Considered, Consequences, Affected Pages, Sources) populated with non-placeholder content.
 - [ ] `bin/lint.sh --category yaml,provenance` exits 0 against the new decision record.
-- [ ] `docs/reference/three-layer-model.md` (or equivalent path under `docs/reference/`) exists and contains: (a) a 3-layer model section naming task / working-memory / wiki-compiler layers, (b) a markdown routing table with columns `Verb | Belongs in | Compendium role | Out of scope` and rows for `capture`, `clarify`, `organize`, `review` (all 4 present), and (c) an anti-features list explicitly excluding inbox, next-action execution, calendar, reminders, rapid transactional updates, high-churn waiting-for state, and Slack/ticket/event-stream ingest.
+- [ ] `docs/reference/three-layer-model.md` exists and contains: (a) a 3-layer model section naming task / working-memory / wiki-compiler layers, (b) a markdown routing table with columns `Verb | Belongs in | Compendium role | Out of scope` and rows for `capture`, `clarify`, `organize`, `review` (all 4 present), and (c) an `## Anti-features` section containing each of the following as an explicit bullet: inbox UI / quick-capture interface, next-action execution, calendar, reminders, rapid transactional updates, high-churn waiting-for state, and Slack/ticket/event-stream ingest.
 - [ ] `docs/reference/index.md` lists the new reference doc.
-- [ ] `README.md` contains exactly one new line pointing at the new reference doc, placed under the existing "What this is" section.
-- [ ] An audit grep over README.md, AGENTS.md, `docs/`, and `wiki/decisions/` returns zero claims that compendium IS an all-in-one PKM/task system, task manager, reminder system, or calendar.
+- [ ] `README.md` contains exactly one new contextual pointer sentence referencing the BOUND-02 doc, placed under the existing "What this is" section.
+- [ ] `wiki/index.md` Decisions section lists the new DR with a one-line summary entry per AGENTS.md §12 index format.
+- [ ] `wiki/log.md` ends with a single new reflect entry for Phase 12 per AGENTS.md §11.4 step 6 / §12 log format.
+- [ ] **Reviewed-match audit (BOUND-03):** running the inline shell command captured in `12-VERIFICATION.md` against README.md + AGENTS.md + `docs/` + `wiki/decisions/` enumerates all matches; every match is annotated with verdict `negative-framing` (boundary, anti-feature, or alternative-considered context) or `positive-claim`. Phase passes iff zero matches carry the `positive-claim` verdict.
 - [ ] `find wiki -maxdepth 1 -type d` returns the same set after Phase 12 as before (no new top-level wiki directories).
 - [ ] AGENTS.md §4 page-type enum still lists exactly 6 types (entity, concept, source, comparison, overview, decision).
 - [ ] BOUND-01, BOUND-02, BOUND-03 marked `[x]` in `.planning/REQUIREMENTS.md`; traceability rows updated to `Complete`.
 - [ ] `bin/requirements-sync.sh --strict --phase 12` exits 0.
-- [ ] `.planning/phases/12-complementary-systems-boundary-gtd-alignment/12-VERIFICATION.md` exists with REQ-ID rows for BOUND-01/02/03 each carrying explicit file-path evidence.
-- [ ] AGENTS.md ↔ CLAUDE.md byte-equality pre-commit hook passes (no AGENTS.md edits expected).
-- [ ] `git diff --name-only origin/main...HEAD` for phase-12 contains zero files under `bin/` or `schema/brownfield/migrations/` (i.e., zero tooling changes).
+- [ ] `.planning/phases/12-complementary-systems-boundary-gtd-alignment/12-VERIFICATION.md` exists with REQ-ID rows for BOUND-01/02/03 each carrying explicit file-path evidence, plus the captured phase-base SHA used for the diff acceptance check.
+- [ ] AGENTS.md ↔ CLAUDE.md byte-equality pre-commit hook passes (no AGENTS.md content edits expected).
+- [ ] Diff over phase-12 commits (anchored on the captured phase-base SHA in `12-VERIFICATION.md`) contains zero files under `bin/` or `schema/`, and zero content changes to `AGENTS.md` / `CLAUDE.md`.
 
 ## Ambiguity Report
 
@@ -121,8 +125,21 @@ Status: ✓ = met minimum, ⚠ = below minimum (planner treats as assumption)
 | 1     | Boundary Keeper          | README posture — edit or audit-only?                      | Audit + single pointer line under existing "What this is" section (max discoverability, min surface change)     |
 | 1     | Failure Analyst          | How to make routing rules pass/fail?                      | Markdown table with columns `Verb \| Belongs in \| Compendium role \| Out of scope`; all 4 GTD verbs required   |
 
+## Review-Driven Amendments
+
+After CONTEXT.md was captured, three external AI reviewers flagged consistent issues. SPEC was amended (2026-05-01, post-CONTEXT) to address them. See `12-CONTEXT.md` § "Review-Driven Amendments" for the full list. SPEC-level changes:
+
+- **Requirement 3 (BOUND-03):** Replaced "zero matches" audit with **reviewed-match audit** — every grep hit gets verdict `negative-framing` or `positive-claim`; PASS iff zero `positive-claim` hits. Required content (DR's "Alternatives Considered" + ref doc's "Anti-features") explicitly excluded from being treated as contradictions.
+- **Requirement 6 (diff scope):** Diff anchor changed from `origin/main...HEAD` to a captured phase-base SHA recorded in `12-VERIFICATION.md` (repo branching_strategy is `none`). Allowed-files list explicitly extended to include `wiki/index.md` (Decisions section entry) and `wiki/log.md` (single reflect entry) per AGENTS.md §11.4 step 5/6 / §12.
+- **In-scope list:** Added `wiki/index.md` Decisions entry + `wiki/log.md` reflect entry as required deliverables.
+- **README pointer:** Explicit "contextual pointer sentence" wording (was "See: line"). Acceptance criterion updated.
+- **Anti-features acceptance:** AC for BOUND-02 strengthened to require each excluded item as an explicit bullet inside a `## Anti-features` section (not just a global grep hit anywhere).
+- **bin/check-neutrality.sh:** Removed from BOUND-03 acceptance evidence (it scans for creator-specific terms, not framing patterns).
+- **Ambiguity:** Re-scored after amendments — Goal Clarity 0.94, Boundary Clarity 0.93, Constraint Clarity 0.88, Acceptance Criteria 0.92. Ambiguity = 1.0 − (0.35×0.94 + 0.25×0.93 + 0.20×0.88 + 0.20×0.92) = **0.082**. Gate stays met.
+
 ---
 
 *Phase: 12-complementary-systems-boundary-gtd-alignment*
 *Spec created: 2026-05-01*
-*Next step: /gsd-discuss-phase 12 — implementation decisions (exact filenames, exact pointer line wording, exact routing table contents, exact anti-features list)*
+*Spec amended: 2026-05-01 (review-driven)*
+*Next step: /gsd-plan-phase 12 — research + plan against the amended SPEC + CONTEXT.*
