@@ -144,6 +144,100 @@ EOF
     rm -rf "$tmp"
 }
 
+# --- Test 8: --require-complete fails when in-scope REQ-IDs are Pending ---
+t8_require_complete_fails_on_pending() {
+    local tmp out rc
+    tmp=$(mktemp -d)
+    # Existing fixture has TMPL-01, TMPL-03, NEUT-01, DEBT-03, FOO-01 as Pending
+    cp "$FIXTURES/REQUIREMENTS.md" "$tmp/REQUIREMENTS.md"
+    cp "$FIXTURES/07-VERIFICATION.md" "$tmp/07-VERIFICATION.md"
+    out=$(bash "$SCRIPT" --root "$tmp" --require-complete 2>/dev/null); rc=$?
+    if [ "$rc" -ne 2 ]; then _fail t8_require_complete_fails_on_pending "expected exit 2, got $rc"; rm -rf "$tmp"; return; fi
+    if ! echo "$out" | grep -q 'require-complete'; then
+        _fail t8_require_complete_fails_on_pending "missing require-complete summary line"; rm -rf "$tmp"; return
+    fi
+    if ! echo "$out" | grep -q 'in-scope REQ-IDs are NOT Complete'; then
+        _fail t8_require_complete_fails_on_pending "missing 'NOT Complete' summary"; rm -rf "$tmp"; return
+    fi
+    _pass t8_require_complete_fails_on_pending
+    rm -rf "$tmp"
+}
+
+# --- Test 9: --require-complete passes when all in-scope REQ-IDs are Complete ---
+t9_require_complete_passes_when_all_complete() {
+    local tmp out rc
+    tmp=$(mktemp -d)
+    cat > "$tmp/REQUIREMENTS.md" <<'EOF'
+# Fixture REQUIREMENTS
+
+## Traceability
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| TMPL-01 | Phase 7 | Complete |
+| TMPL-02 | Phase 7 | Complete |
+| NEUT-01 | Phase 7 | Complete |
+EOF
+    out=$(bash "$SCRIPT" --root "$tmp" --require-complete 2>/dev/null); rc=$?
+    if [ "$rc" -ne 0 ]; then _fail t9_require_complete_passes_when_all_complete "expected exit 0, got $rc"; rm -rf "$tmp"; return; fi
+    if ! echo "$out" | grep -q 'all 3 in-scope REQ-IDs are Complete'; then
+        _fail t9_require_complete_passes_when_all_complete "missing 'all 3 ... Complete' summary"; rm -rf "$tmp"; return
+    fi
+    _pass t9_require_complete_passes_when_all_complete
+    rm -rf "$tmp"
+}
+
+# --- Test 10: --require-complete composes with --phase ---
+t10_require_complete_phase_scoped() {
+    local tmp rc
+    tmp=$(mktemp -d)
+    cat > "$tmp/REQUIREMENTS.md" <<'EOF'
+# Fixture REQUIREMENTS
+
+## Traceability
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| TMPL-01 | Phase 7 | Complete |
+| TMPL-02 | Phase 7 | Complete |
+| FOO-01  | Phase 8 | Pending |
+EOF
+    # Phase 7 (all Complete) -> exit 0
+    bash "$SCRIPT" --root "$tmp" --require-complete --phase 7 >/dev/null 2>&1; rc=$?
+    if [ "$rc" -ne 0 ]; then _fail t10_require_complete_phase_scoped "Phase 7 expected exit 0, got $rc"; rm -rf "$tmp"; return; fi
+    # Phase 8 (Pending) -> exit 2
+    bash "$SCRIPT" --root "$tmp" --require-complete --phase 8 >/dev/null 2>&1; rc=$?
+    if [ "$rc" -ne 2 ]; then _fail t10_require_complete_phase_scoped "Phase 8 expected exit 2, got $rc"; rm -rf "$tmp"; return; fi
+    # Without --require-complete, Phase 8 Pending exits 0 (advisory)
+    bash "$SCRIPT" --root "$tmp" --phase 8 >/dev/null 2>&1; rc=$?
+    if [ "$rc" -ne 0 ]; then _fail t10_require_complete_phase_scoped "Phase 8 advisory expected exit 0, got $rc"; rm -rf "$tmp"; return; fi
+    _pass t10_require_complete_phase_scoped
+    rm -rf "$tmp"
+}
+
+# --- Test 11: --strict default unchanged (drift-only, completion ignored) ---
+t11_strict_does_not_check_completion() {
+    local tmp rc
+    tmp=$(mktemp -d)
+    # All Pending in REQUIREMENTS.md and VERIFICATION.md -> 0 drift, but incomplete
+    cat > "$tmp/REQUIREMENTS.md" <<'EOF'
+# Fixture REQUIREMENTS
+
+## Traceability
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| TMPL-01 | Phase 7 | Pending |
+EOF
+    cat > "$tmp/07-VERIFICATION.md" <<'EOF'
+# Phase 7 VERIFICATION
+- TMPL-01: Pending
+EOF
+    bash "$SCRIPT" --root "$tmp" --strict >/dev/null 2>&1; rc=$?
+    if [ "$rc" -ne 0 ]; then _fail t11_strict_does_not_check_completion "--strict alone with Pending+no-drift expected exit 0, got $rc"; rm -rf "$tmp"; return; fi
+    bash "$SCRIPT" --root "$tmp" --require-complete >/dev/null 2>&1; rc=$?
+    if [ "$rc" -ne 2 ]; then _fail t11_strict_does_not_check_completion "--require-complete alone with Pending expected exit 2, got $rc"; rm -rf "$tmp"; return; fi
+    _pass t11_strict_does_not_check_completion
+    rm -rf "$tmp"
+}
+
 # Execute tests
 if [ ! -x "$SCRIPT" ] && [ ! -f "$SCRIPT" ]; then
     echo "FAIL setup: bin/requirements-sync.sh not found at $SCRIPT"
@@ -157,6 +251,10 @@ t4_json_format
 t5_phase_filter
 t6_missing_verification
 t7_decimal_phase_filter
+t8_require_complete_fails_on_pending
+t9_require_complete_passes_when_all_complete
+t10_require_complete_phase_scoped
+t11_strict_does_not_check_completion
 
 TOTAL=$((PASS + FAIL))
 echo ""

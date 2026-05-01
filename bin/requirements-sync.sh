@@ -18,21 +18,32 @@ Options:
   --help, -h              Show this help message
   --format <text|json>    Output format (default: text)
   --strict                Exit 2 on any drift row (default: advisory, exit 0)
+  --require-complete      Exit 2 when any in-scope REQ-ID has status != Complete
+                          in REQUIREMENTS.md. Closure-gate primitive: --strict
+                          checks consistency (REQUIREMENTS.md vs VERIFICATION.md);
+                          --require-complete checks completion. The two are
+                          orthogonal and can be combined. Composes with --phase
+                          for phase-scope closure; without --phase the check
+                          spans every REQ-ID in REQUIREMENTS.md.
   --phase N               Restrict to REQ-IDs mapped to Phase N in REQUIREMENTS.md
   --root DIR              Override default root (.planning/); REQUIREMENTS.md is
                           read from <root>/REQUIREMENTS.md and VERIFICATION.md
                           files are discovered via find -maxdepth 3.
 
 Exit codes:
-  0   Success (advisory mode, or strict with no drift)
+  0   Success (advisory mode, or strict with no drift, or require-complete with
+      every in-scope REQ-ID Complete)
   1   Script failure (missing files, bad flags, python error)
-  2   Strict mode found drift rows
+  2   Strict mode found drift rows, OR require-complete found incomplete rows
+      (combined when both flags are passed)
 
 Examples:
   bash bin/requirements-sync.sh
   bash bin/requirements-sync.sh --phase 7 --strict
   bash bin/requirements-sync.sh --format json | jq '.[] | select(.drift)'
   bash bin/requirements-sync.sh --root tests/phase-07/fixtures/requirements-sync
+  bash bin/requirements-sync.sh --require-complete           # milestone closure
+  bash bin/requirements-sync.sh --phase 12.1 --require-complete  # phase closure
 EOF
 }
 
@@ -42,6 +53,7 @@ EOF
 
 FORMAT="text"
 STRICT=0
+REQUIRE_COMPLETE=0
 PHASE_FILTER=""
 ROOT=".planning"
 
@@ -52,6 +64,7 @@ while [ "$#" -gt 0 ]; do
             if [ "$#" -lt 2 ]; then echo "ERROR: --format requires a value" >&2; exit 1; fi
             FORMAT="$2"; shift 2 ;;
         --strict) STRICT=1; shift ;;
+        --require-complete) REQUIRE_COMPLETE=1; shift ;;
         --phase)
             if [ "$#" -lt 2 ]; then echo "ERROR: --phase requires a value" >&2; exit 1; fi
             PHASE_FILTER="$2"; shift 2 ;;
@@ -85,14 +98,17 @@ VERIF_LIST=$(find "$ROOT" -maxdepth 3 -name '*VERIFICATION.md' -type f 2>/dev/nu
 # ---------------------------------------------------------------------------
 
 SENTINEL=$(mktemp)
-trap 'rm -f "$SENTINEL"' EXIT
+INCOMPLETE_SENTINEL=$(mktemp)
+trap 'rm -f "$SENTINEL" "$INCOMPLETE_SENTINEL"' EXIT
 
 REQ_FILE="$REQ_FILE" \
 VERIF_LIST="$VERIF_LIST" \
 FORMAT="$FORMAT" \
 STRICT="$STRICT" \
+REQUIRE_COMPLETE="$REQUIRE_COMPLETE" \
 PHASE_FILTER="$PHASE_FILTER" \
 SENTINEL="$SENTINEL" \
+INCOMPLETE_SENTINEL="$INCOMPLETE_SENTINEL" \
 python3 - <<'PY'
 import json, os, re, sys
 
@@ -100,8 +116,10 @@ req_file = os.environ["REQ_FILE"]
 verif_list = [p for p in os.environ["VERIF_LIST"].split("\n") if p.strip()]
 fmt = os.environ["FORMAT"]
 strict = os.environ["STRICT"] == "1"
+require_complete = os.environ.get("REQUIRE_COMPLETE", "0") == "1"
 phase_filter = os.environ.get("PHASE_FILTER", "")
 sentinel = os.environ["SENTINEL"]
+incomplete_sentinel = os.environ["INCOMPLETE_SENTINEL"]
 
 # --- Parse REQUIREMENTS.md traceability table ---
 # Rows: | REQ-ID | Phase N | Status |
@@ -195,6 +213,14 @@ for rid, phase, req_status in requirements:
         "phase": phase,
     })
 
+# --- Completion check (--require-complete) ---
+# A row is "incomplete" iff its REQUIREMENTS.md status is not "Complete".
+# This is independent of drift: a row can be drift-free (REQ.md == VERIF.md)
+# and still be incomplete (both Pending). The completion check operates on
+# the in-scope findings list, so --phase composes naturally.
+incomplete_rows = [row for row in findings if row["requirements_md"] != "Complete"]
+incomplete_count = len(incomplete_rows)
+
 # --- Emit output ---
 if fmt == "json":
     print(json.dumps(findings, indent=2))
@@ -208,12 +234,24 @@ else:
         print(f"| {row['req_id']:<9} | {row['requirements_md']:<15} | {row['verification_md']:<15} | {drift_cell:<5} | {row['note']} |")
     print("")
     print(f"# {drift_count} drift row(s) of {len(findings)} total.")
+    if require_complete:
+        scope = f"phase {phase_filter}" if phase_filter else "milestone"
+        if incomplete_count == 0:
+            print(f"# require-complete ({scope}): all {len(findings)} in-scope REQ-IDs are Complete.")
+        else:
+            print(f"# require-complete ({scope}): {incomplete_count} of {len(findings)} in-scope REQ-IDs are NOT Complete:")
+            for row in incomplete_rows:
+                print(f"#   - {row['req_id']} (Phase {row['phase']}): {row['requirements_md']}")
 
 print(f"Drift rows: {drift_count} / {len(findings)}", file=sys.stderr)
+if require_complete:
+    print(f"Incomplete rows: {incomplete_count} / {len(findings)}", file=sys.stderr)
 
-# Write drift count to sentinel file for bash to consume.
+# Write drift + incomplete counts to sentinel files for bash to consume.
 with open(sentinel, "w") as f:
     f.write(str(drift_count))
+with open(incomplete_sentinel, "w") as f:
+    f.write(str(incomplete_count))
 PY
 
 PY_RC=$?
@@ -223,8 +261,12 @@ if [ "$PY_RC" -ne 0 ]; then
 fi
 
 DRIFT_COUNT=$(cat "$SENTINEL" 2>/dev/null || echo 0)
+INCOMPLETE_COUNT=$(cat "$INCOMPLETE_SENTINEL" 2>/dev/null || echo 0)
 
 if [ "$STRICT" -eq 1 ] && [ "$DRIFT_COUNT" -gt 0 ]; then
+    exit 2
+fi
+if [ "$REQUIRE_COMPLETE" -eq 1 ] && [ "$INCOMPLETE_COUNT" -gt 0 ]; then
     exit 2
 fi
 exit 0
