@@ -273,7 +273,7 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-None yet.
+- [2026-05-01] Reorder roadmap phases 12–13 and fix cross-cutting issues (area: planning) — `.planning/todos/pending/2026-05-01-reorder-roadmap-phases-12-13.md`
 
 ### Roadmap Evolution
 
