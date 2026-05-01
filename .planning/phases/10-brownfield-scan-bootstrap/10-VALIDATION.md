@@ -131,3 +131,24 @@ The three deferred-warning items from `10-REVIEW.md` (WR-01 orphan-raw-sources w
 | Requirements covered | 11/11 (BRWN-01..10 + BRWN-21) |
 
 **Auditor:** none spawned — no gaps detected. State B reconstruction relied on cross-referencing per-task PLAN names against the test-file → REQ-ID map already documented in `10-VERIFICATION.md`. Aggregator re-run during this validation pass confirmed `PHASE 10 TESTS: 32/32`.
+
+---
+
+## Validation Audit 2026-05-01
+
+| Metric | Count |
+|--------|-------|
+| Gaps found | 0 |
+| Resolved | 0 |
+| Escalated | 0 |
+| Tests existing | 32 |
+| Requirements covered | 11/11 (BRWN-01..10 + BRWN-21) |
+
+**Findings:**
+
+- Re-confirmation pass triggered by `/gsd-validate-phase 10` after the v1.1 milestone audit reported 10's Nyquist status as `MISSING` — that classification was based on a pre-reconstruction filesystem snapshot; the VALIDATION.md was reconstructed (State B) on 2026-04-30 and is now current.
+- `PYTHONPATH=$HOME/.local/lib/python3/dist-packages bash tests/phase-10/run.sh` re-run on 2026-05-01: `PHASE 10 TESTS: 32/32`, exit 0.
+- All 32 test files still present under `tests/phase-10/`; 7 fixtures intact; `lib.sh` + `run.sh` unchanged.
+- No new requirements introduced; no remediation needed.
+
+**Phase 10 remains Nyquist-compliant. Milestone-audit Nyquist status table for 10 should now read COMPLIANT.**
