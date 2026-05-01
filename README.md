@@ -10,6 +10,8 @@ Deterministic CLI helpers manage the file and workflow scaffolding. An LLM codin
 
 Unlike search-over-notes or chat-on-top-of-PDFs, the result is a persistent artifact. Cross-references are already there. Syntheses accumulate. The vault gets more useful as you ingest more material and ask better questions.
 
+Compendium is the durable wiki-memory layer of a multi-system stack — it complements a task / GTD backend rather than substituting for one. See [docs/reference/three-layer-model.md](docs/reference/three-layer-model.md) for the boundary and routing rules.
+
 ## Who this is for
 
 Technical Obsidian users who are comfortable with bash, git, and working with an LLM coding agent such as Claude Code or Codex. If you want a compounding knowledge base instead of a chat-on-top-of-PDFs workflow, this repo is for you.
