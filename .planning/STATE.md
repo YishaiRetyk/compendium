@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Shareability
-status: Milestone complete
-stopped_at: Completed 11-05-PLAN.md (Phase 11 close)
-last_updated: "2026-04-20T22:11:33.348Z"
+status: In progress
+stopped_at: Phase 11 complete; reorder 2026-05-01 expanded v1.1 to 12 phases (added 12, 12.1, 12.2, 13, 13.1, 13.2); next is Phase 12
+last_updated: "2026-05-01T00:00:00.000Z"
 progress:
-  total_phases: 6
+  total_phases: 12
   completed_phases: 6
   total_plans: 29
   completed_plans: 29
-  percent: 100
+  percent: 50
 ---
 
 # Project State
@@ -20,11 +20,11 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-15)
 
 **Core value:** The wiki is a persistent, compounding artifact -- cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested.
-**Current focus:** Phase 11 — brownfield-suggest-verify
+**Current focus:** Phase 12 — Complementary Systems Boundary + GTD Alignment
 
 ## Current Position
 
-Phase: 11
+Phase: 12
 Plan: Not started
 
 ## Performance Metrics
@@ -111,7 +111,7 @@ Recent decisions affecting current work:
 - [v1.1 Roadmap] Contradiction stays warning-only in CI per CI-03 reconciliation; `local_only` privacy guard scoped to public paths only per CI-07.
 - [v1.1 Roadmap] No single-command brownfield chain-runner in v1.1 (deferred to v1.2 BRWNAPPLY-01); v1.1 migration scripts are user-invoked per-class.
 - [v1.1 Roadmap] Zero claim-level schema expansion for imported content — page-level `bootstrap_stage` carries the lineage (BRWN-07, BRWN-15).
-- [v1.1 Roadmap] Phase 12 is a v1.0-debt verification gate (Obsidian render, Codex agent-parity, write-back scenario), not cosmetic polish.
+- [v1.1 Roadmap] Phase 12 is Complementary Systems Boundary + GTD Alignment (decision record + reference doc defining compendium as durable wiki memory inside a multi-system agent stack); v1.0-debt verification (Obsidian render, Codex agent-parity, write-back scenario) moved to Phase 13.1 in the 2026-05-01 reorder.
 - Roadmap: 6 phases derived from 95 v1 requirements (standard granularity)
 - Roadmap: CLI helpers distributed across phases 3-5 where their functionality is most relevant
 - Roadmap: Epistemic status placed in Phase 2 (with templates) per research advice that it's foundational to trustworthiness
@@ -273,7 +273,7 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-- [planning] Fix planning artifact consistency after phase 12–13 reorder (.planning/todos/pending/2026-05-01-fix-planning-artifact-consistency-post-reorder.md)
+None.
 
 ### Roadmap Evolution
 

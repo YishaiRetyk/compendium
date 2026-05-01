@@ -212,7 +212,7 @@ Explicitly excluded from v1.1. Documented to prevent scope creep.
 | NEUT-05 | Phase 7 | Complete |
 | NEUT-06 | Phase 7 | Complete |
 | NEUT-07 | Phase 7 | Complete |
-| NEUT-08 | Phase 12.1 | Promoted from backlog 999.2 (2026-05-01) — infrastructure shipped in Phase 7, curation moved to active v1.1 |
+| NEUT-08 | Phase 12.1 | Pending |
 | DEBT-03 | Phase 7 | Complete |
 | WZRD-01 | Phase 8 | Complete |
 | WZRD-02 | Phase 8 | Complete |
@@ -299,4 +299,4 @@ Explicitly excluded from v1.1. Documented to prevent scope creep.
 
 ---
 *Requirements defined: 2026-04-15 — v1.1 Shareability milestone*
-*Roadmap traceability updated: 2026-04-24 — 10 active v1.1 phases (7–13.1)*
+*Roadmap traceability updated: 2026-05-01 — 11 active v1.1 phases (7–13.2)*

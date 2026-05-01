@@ -173,7 +173,7 @@ Plans:
   2. `bin/check-neutrality.sh` exits 0 on the live tree post-merge (no false positives on legitimately neutral text).
   3. A neutrality-leak fixture (introducing a denylisted term into a public path) fails the gate as expected, proving the new entries are wired correctly.
   4. NEUT-08 flips from `Deferred (partial)` to `Complete` in REQUIREMENTS.md and the Phase 7 → Phase 12.1 reassignment is reflected in the phase-mapping table.
-  5. `bin/requirements-sync.sh --strict` shows zero NEUT-08 drift.
+  5. A Phase 12.1 verification artifact records NEUT-08 as `Complete` (rationale, kept-term count, and fixture evidence), and `bin/requirements-sync.sh --strict --phase 12.1` reports zero drift against the post-curation traceability state.
 **Non-goals**:
 - No expansion of `bin/check-neutrality.sh` semantics (infrastructure already shipped in Phase 7)
 - No new categories beyond what the candidate file surfaces
@@ -226,7 +226,7 @@ Plans:
 **Goal**: All `/docs/reference/` material is filled out against the now-stable v1.1 feature surface, every deferred v1.0 verification (Obsidian render, multi-agent parity, write-back scenario) is executed end-to-end, and a minimal shipped Obsidian starter -- page-type templates derived from the schema templates plus a reference doc -- closes the day-1 page-creation ergonomics gap without prescribing review workflows.
 
 **Scope note**: Phase 13.1's Obsidian scope is intentionally minimal: verify renderability and ship page-creation ergonomics only. Review dashboards, GTD-specific views, hotkey bundles, and workflow-specific Dataview surfaces remain deferred until observed practice justifies them (see backlog Phase 999.6).
-**Depends on**: Phases 7–13 (all feature surfaces stable and documented).
+**Depends on**: Phases 7–13 (all feature surfaces stable).
 **Requirements**: DEBT-01, DEBT-02, DEBT-04, OBSID-01, OBSID-02, OBSID-03
 **Success Criteria** (what must be TRUE):
   1. User opens the generated wiki (both fresh-starter and post-bootstrap fixtures) in Obsidian and confirms that wikilinks resolve, Dataview queries render with expected row counts against `examples/dataview-fixtures/`, and graph view is not contaminated by `examples/` — closing v1.0's deferred Phase 4 verification.
@@ -344,6 +344,27 @@ Plans:
 - No premature dashboards marketed as canonical
 - No GTD-specific filesystem/schema expansion without separate justification
 
+**Requirements:** TBD
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (promote with /gsd-review-backlog when ready)
+
+### Phase 999.7: requirements-sync Strict-Mode Completion Check (BACKLOG)
+
+**Goal:** [Captured for future planning] Extend `bin/requirements-sync.sh --strict` so it fails when active requirements are still `Pending` at phase/milestone closure, not just when REQUIREMENTS.md and VERIFICATION.md drift.
+**Origin:** Surfaced 2026-05-01 while reconciling Phase 12.1 (NEUT-08 promotion). Current strict mode passes trivially for any active-but-unstarted phase: `requirements-sync --phase 12.1 --strict` reports "0 drift / NEUT-08 Pending / not found / ok" and exits 0. This means closure gates that lean only on `requirements-sync --strict` cannot detect incomplete work — they can only detect *inconsistent* work. Phase 12.1's success criterion now requires a verification artifact in addition to the drift check; longer term the script itself should encode a closure-mode check.
+**Trigger to promote:**
+- Multiple phases approaching closure want a single mechanical "all required REQ-IDs Complete" gate, OR
+- The Phase 13.2 closure-verification gate authoring exposes the same gap and benefits from a shared primitive.
+**Scope when promoted:**
+- New flag (e.g., `--require-complete` or `--mode closure`) that fails when any in-scope REQ-ID has `Pending` status in REQUIREMENTS.md
+- Composes with `--phase N` for phase-scope closure and `--milestone X` (if added) for milestone-scope closure
+- Preserves backward compatibility: default `--strict` semantics (drift-only) unchanged
+**Non-goals:**
+- No automatic status flipping
+- No replacement of human-authored verification artifacts
+- No coupling to a specific milestone's closure script
 **Requirements:** TBD
 **Plans:** 0 plans
 
