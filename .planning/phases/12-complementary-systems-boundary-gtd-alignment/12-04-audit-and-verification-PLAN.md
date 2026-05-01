@@ -27,6 +27,7 @@ must_haves:
     - "git diff over phase-12 commits (anchored on the captured phase-base SHA) shows zero files under bin/ or schema/, and zero content edits to AGENTS.md / CLAUDE.md."
     - "find wiki -maxdepth 1 -type d returns the same set as before Phase 12 (no new top-level wiki directories)."
     - "AGENTS.md §4 page-type enum still lists exactly 6 types (entity, concept, source, comparison, overview, decision)."
+    - "Implementation honors locked CONTEXT.md decisions D-12 (Core 6 grep patterns + bounded `(replaces|replacement for) (a |an |your )?(task|gtd|todo|reminder|calendar|inbox)` regex), D-13 (audit scope is exactly `README.md AGENTS.md docs/ wiki/decisions/`, excluding `.planning/`, `examples/`, and other `wiki/` subtrees), D-14 (reviewed-match audit procedure: capture every grep hit with `path:line:text`, annotate verdict `negative-framing` or `positive-claim`, PASS iff zero `positive-claim` rows; audit lives as inline shell snippet in 12-VERIFICATION.md, NOT as a versioned `bin/check-boundary.sh`)."
   artifacts:
     - path: .planning/phases/12-complementary-systems-boundary-gtd-alignment/12-VERIFICATION.md
       provides: "Phase 12 verification artifact — REQ-ID rows + audit table + phase-base SHA"

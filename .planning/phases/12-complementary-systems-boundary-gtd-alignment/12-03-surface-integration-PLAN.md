@@ -23,6 +23,7 @@ must_haves:
     - "docs/reference/index.md gains a single bullet entry listing the new three-layer-model.md."
     - "wiki/index.md Decisions section gains a single bullet for dr-2026-05-01-complementary-systems-boundary."
     - "wiki/log.md gains one new reflect entry (newest at bottom, append-only) recording the Phase 12 boundary work."
+    - "Implementation honors locked CONTEXT.md decisions D-09 (README pointer placed at end of 'What this is' section, after the existing 'Unlike search-over-notes...' paragraph), D-10 (locked README sentence wording: 'Compendium is the durable wiki-memory layer of a multi-system stack — it complements a task / GTD backend rather than substituting for one. See [docs/reference/three-layer-model.md](docs/reference/three-layer-model.md) for the boundary and routing rules.'), D-11 (single-bullet docs/reference/index.md entry: '- [three-layer-model.md](three-layer-model.md) — The 3-layer model and complementary-systems boundary.')."
   artifacts:
     - path: README.md
       provides: "Single contextual pointer sentence at end of 'What this is' section"

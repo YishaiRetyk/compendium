@@ -162,9 +162,14 @@ Plans:
 - No canonical review dashboards
 **Plans:** 4 plans
 Plans:
+**Wave 1**
 - [ ] 12-01-decision-record-PLAN.md — BOUND-01 decision record at wiki/decisions/dr-2026-05-01-complementary-systems-boundary.md (type: decision, trigger_type: schema-update, affected_pages: [], 7 required sections per AGENTS.md §4.6)
 - [ ] 12-02-reference-doc-PLAN.md — BOUND-02 reference doc at docs/reference/three-layer-model.md (3-layer model + 4-verb routing table + anti-features section)
+
+**Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 12-03-surface-integration-PLAN.md — README pointer (D-10 locked wording) + docs/reference/index.md bullet + wiki/index.md Decisions entry + wiki/log.md reflect entry
+
+**Wave 3** *(blocked on Wave 2 completion)*
 - [ ] 12-04-audit-and-verification-PLAN.md — Capture phase-base SHA, run reviewed-match audit grep (D-12 patterns over D-13 scope), write 12-VERIFICATION.md, flip REQUIREMENTS.md BOUND-01/02/03 status, run bin/requirements-sync.sh --strict --phase 12
 
 ### Phase 12.1: NEUT-08 Personal-Term Denylist Curation (PROMOTED FROM 999.2)

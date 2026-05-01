@@ -18,6 +18,7 @@ must_haves:
     - "The decision record's Why section explicitly contrasts compendium ownership (durable synthesis, heavy-write/cheap-read) vs complementary-system ownership (executable commitments / reminders / calendars / transactional state)."
     - "The Alternatives Considered section names and rejects (a) all-in-one PKM/task system framing, (b) deferring boundary statement to v2, (c) embedding boundary inline in README only."
     - "bin/lint.sh --category yaml,provenance exits 0 when run against the new decision record."
+    - "Implementation honors locked CONTEXT.md decisions D-15 (DR filename `dr-2026-05-01-complementary-systems-boundary.md`), D-16 (`trigger_type: schema-update` + `affected_pages: []`), D-17 (Sources cites the three .planning/notes/2026-04-24-*.md notes + REQUIREMENTS.md BOUND-01/02/03 + ROADMAP Phase 12 entry; body links new ref doc by relative path), D-18 (Alternatives Considered names and rejects all-in-one PKM/task framing, deferring to v2, README-only embedding)."
   artifacts:
     - path: wiki/decisions/dr-2026-05-01-complementary-systems-boundary.md
       provides: "BOUND-01 decision record (trigger_type schema-update, affected_pages [], 7 required sections per AGENTS.md §4.6)"

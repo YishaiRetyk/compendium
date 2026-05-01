@@ -18,6 +18,7 @@ must_haves:
     - "The doc contains a routing table with 4 columns (Verb | Belongs in | Compendium role | Out of scope) and 4 rows for capture / clarify / organize / review (in that order)."
     - "The doc contains an `## Anti-features` section with explicit bullets for inbox UI / quick-capture interface, next-action execution, calendar, reminders, rapid transactional updates, high-churn waiting-for state, Slack/ticket/event-stream ingest."
     - "The doc cites the BOUND-01 decision record by ID (dr-2026-05-01-complementary-systems-boundary)."
+    - "Implementation honors locked CONTEXT.md decisions D-01 (filename `docs/reference/three-layer-model.md`), D-02 (section order Model → Routing → Anti-features), D-03 (1-paragraph TL;DR-style opening framing), D-04 (4-column routing table with verbs capture/clarify/organize/review in that order), D-05 (Belongs-in mapping: capture/clarify → working-memory, organize → task layer, review → all three layers), D-06 (Compendium role cells use concrete actions per verb without erasing the durable-knowledge contribution), D-07 (Out-of-scope cells use per-verb specific entries, not a shared pointer), D-08 (1-line caption above the routing table explaining the 4-column reading order)."
   artifacts:
     - path: docs/reference/three-layer-model.md
       provides: "BOUND-02 reference doc — 3-layer model + routing rules + anti-features"
