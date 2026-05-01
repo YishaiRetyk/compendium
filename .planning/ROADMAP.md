@@ -29,6 +29,7 @@
 - [ ] **Phase 12: Docs Finalization + Obsidian Starter** — `/docs/reference/` fill-out, Obsidian render check, Codex agent-parity, write-back scenario re-run, minimal Obsidian starter (templates + reference doc only; no prescribed workflows).
 - [ ] **Phase 12.1: Complementary Systems Boundary + GTD Alignment** — Decision record + reference doc defining compendium as durable wiki memory inside a multi-system agent stack; routes capture/clarify/organize/review without expanding schema or directory taxonomies.
 - [ ] **Phase 12.2: Local Wiki Write Gate** — Pre-commit gate over staged `wiki/{entities,concepts,overviews,comparisons}/` changes reusing `bin/lint.sh --strict` semantics where possible; blocks zero-provenance new synthesized pages before they land locally.
+- [ ] **Phase 12.3: NEUT-08 Personal-Term Denylist Curation** — Hand-curate a vetted subset of `.planning/backlog-neutrality-denylist-candidate.txt` (861 lines) into `.neutrality-denylist.txt`, closing the only outstanding partial v1.1 requirement before the closure gate. Promoted from backlog 999.2.
 - [ ] **Phase 13: Claim Faithfulness Audit** — `bin/audit-claims.sh` samples high-risk claims (inferred/tentative/stale/high-fanout) and emits structured verdicts (supports / weak / contradicts / insufficient) against the cited source passage; review-only, privacy-respecting, no auto-fix.
 - [ ] **Phase 13.1: v1.1 Closure Verification Gate** — Final requirements-sync, Obsidian render, agent-parity, write-back, docs consistency, and scope-leak checks after all v1.1 work is complete.
 
@@ -196,6 +197,24 @@ Plans:
 - No full-vault lint on every commit
 **Plans**: TBD
 
+### Phase 12.3: NEUT-08 Personal-Term Denylist Curation (PROMOTED FROM 999.2)
+
+**Goal**: Hand-curate the personal-domain term set deferred from Phase 7 and merge a vetted subset into `.neutrality-denylist.txt`, closing the only outstanding partial v1.1 requirement before the closure gate.
+**Depends on**: Phase 7 (`bin/check-neutrality.sh` infrastructure, `.neutrality-denylist.txt` file, `.planning/backlog-neutrality-denylist-candidate.txt` 861-line `--suggest-denylist` output).
+**Why this phase exists**: NEUT-08 was deferred at the end of Phase 7 per user decision "approved — minimal" (infrastructure shipped; entries deferred). Phase 13.1 closure criterion #1 (`bin/requirements-sync.sh --strict` shows zero drift) cannot pass while NEUT-08 is `Deferred (partial)`. This phase resolves that drift by completing the curation.
+**Requirements**: NEUT-08
+**Success Criteria** (what must be TRUE):
+  1. A human-vetted subset of `.planning/backlog-neutrality-denylist-candidate.txt` is merged into `.neutrality-denylist.txt`, with each kept term annotated by category (personal vault, prior project, ambient project name, etc.).
+  2. `bin/check-neutrality.sh` exits 0 on the live tree post-merge (no false positives on legitimately neutral text).
+  3. A neutrality-leak fixture (introducing a denylisted term into a public path) fails the gate as expected, proving the new entries are wired correctly.
+  4. NEUT-08 flips from `Deferred (partial)` to `Complete` in REQUIREMENTS.md and the Phase 7 → Phase 12.3 reassignment is reflected in the phase-mapping table.
+  5. `bin/requirements-sync.sh --strict` shows zero NEUT-08 drift.
+**Non-goals**:
+- No expansion of `bin/check-neutrality.sh` semantics (infrastructure already shipped in Phase 7)
+- No new categories beyond what the candidate file surfaces
+- No retroactive lint of historical commits
+**Plans**: TBD
+
 ### Phase 13: Claim Faithfulness Audit
 
 **Goal**: Add a source-grounded audit workflow that checks whether wiki claims faithfully reflect the cited source passage, not just whether `[prov:]` markers exist.
@@ -242,15 +261,13 @@ Plans:
 **Supersedes:** promoted backlog → v1.1 Phases 10–11
 **Original goal:** Workflow to scan an existing Obsidian vault with non-conforming pages and bring them into compliance: schema inference, bulk frontmatter injection, provenance bootstrapping, index auto-generation, template application, and conformance linting with auto-fix.
 
-### Phase 999.2: NEUT-08 Personal-Term Denylist Curation (BACKLOG)
+### Phase 999.2: NEUT-08 Personal-Term Denylist Curation (PROMOTED — see Phase 12.3)
 
-**Goal:** [Captured for future planning] Hand-review `.planning/backlog-neutrality-denylist-candidate.txt` (861 lines of deterministic `bin/check-neutrality.sh --suggest-denylist` output) and merge a curated personal-domain term set into `.neutrality-denylist.txt`. Ships today with Kahneman category only (10 lines); infrastructure (gate + suggest + candidate) is complete. Remaining work is human curation, not engineering.
+**Status:** Promoted 2026-05-01 to active v1.1 as **Phase 12.3** so the only outstanding partial v1.1 requirement (NEUT-08) clears before the Phase 13.1 closure gate. This entry is retained for historical traceability only; do not plan new work against it.
+
+**Promoted to:** Phase 12.3 (NEUT-08 Personal-Term Denylist Curation)
+**Original goal:** Hand-review `.planning/backlog-neutrality-denylist-candidate.txt` (861 lines of deterministic `bin/check-neutrality.sh --suggest-denylist` output) and merge a curated personal-domain term set into `.neutrality-denylist.txt`. Ships today with Kahneman category only (10 lines); infrastructure (gate + suggest + candidate) is complete. Remaining work is human curation, not engineering.
 **Origin:** Phase 7 scope-deferred per user (reaffirmed 2026-04-16 during human-UAT walkthrough). Tracked in REQUIREMENTS.md as NEUT-08 "Deferred (partial)"; evidence in `.planning/phases/07-neutral-template-foundation/07-VERIFICATION.md` `human_verification_deferred` block.
-**Requirements:** TBD
-**Plans:** 0 plans
-
-Plans:
-- [ ] TBD (promote with /gsd-review-backlog when ready)
 
 ### Phase 999.3: Template Placeholder System for Published Surfaces (BACKLOG)
 
@@ -360,5 +377,6 @@ The following are intentionally deferred until real usage demands them, captured
 | 12. Docs Finalization + Obsidian Starter | v1.1 | 0/0 | Not started | - |
 | 12.1. Complementary Systems Boundary + GTD Alignment | v1.1 | 0/0 | Not started | - |
 | 12.2. Local Wiki Write Gate | v1.1 | 0/0 | Not started | - |
+| 12.3. NEUT-08 Personal-Term Denylist Curation | v1.1 | 0/0 | Not started | - |
 | 13. Claim Faithfulness Audit | v1.1 | 0/0 | Not started | - |
 | 13.1. v1.1 Closure Verification Gate | v1.1 | 0/0 | Not started | - |
