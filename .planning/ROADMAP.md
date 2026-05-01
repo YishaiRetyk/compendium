@@ -409,7 +409,7 @@ The following are intentionally deferred until real usage demands them, captured
 | 9. Collaborative PR Workflow + CI Lint Gate | v1.1 | 6/6 | Complete | 2026-04-16 |
 | 10. Brownfield Scan + Bootstrap | v1.1 | 6/6 | Complete    | 2026-04-18 |
 | 11. Brownfield Suggest + Verify | v1.1 | 5/5 | Complete    | 2026-04-20 |
-| 12. Complementary Systems Boundary + GTD Alignment | v1.1 | 4/4 | Complete   | 2026-05-01 |
+| 12. Complementary Systems Boundary + GTD Alignment | v1.1 | 4/4 | Complete    | 2026-05-01 |
 | 12.1. NEUT-08 Personal-Term Denylist Curation | v1.1 | 0/0 | Not started | - |
 | 12.2. Local Wiki Write Gate | v1.1 | 0/0 | Not started | - |
 | 13. Claim Faithfulness Audit | v1.1 | 0/0 | Not started | - |
