@@ -33,7 +33,7 @@ Numbering continues from v1.0. New REQ-ID prefixes: `TMPL`, `NEUT`, `WZRD`, `MAN
 - [x] **NEUT-05**: `examples/kahneman/README.md` explains why the cluster is preserved and how to use it as a reference
 - [x] **NEUT-06**: CI neutrality gate: grep-based check that **public control-plane surfaces** (`AGENTS.md`, `CLAUDE.md`, `README.md`, `PRIVACY.md`, `/docs/**`, `.github/**`, `wiki/**`, `bin/**`) contain zero Kahneman-specific strings; `examples/kahneman/**` is explicitly excluded from the check as the permitted home for Kahneman content (runs on every PR) (pitfall C-1)
 - [x] **NEUT-07**: Decision record `dr-YYYY-MM-DD-kahneman-to-examples.md` committed (SUPERSEDE-class structural reorg per §11.4)
-- [ ] **NEUT-08** *(promoted to Phase 12.3)*: CI personal-content denylist check covering domain terms from the creator's private vault, runs on PR diff restricted to public control-plane paths (excludes `examples/kahneman/**`) (pitfall C-1 mitigation). **Status:** Infrastructure shipped in Phase 7 (bin/check-neutrality.sh supports denylist gating on public paths); personal-term denylist curation promoted from backlog 999.2 to active **Phase 12.3** on 2026-05-01 to clear before the Phase 13.1 closure gate. Candidate material at `.planning/backlog-neutrality-denylist-candidate.txt` (861-line deterministic --suggest-denylist output).
+- [ ] **NEUT-08** *(promoted to Phase 12.1)*: CI personal-content denylist check covering domain terms from the creator's private vault, runs on PR diff restricted to public control-plane paths (excludes `examples/kahneman/**`) (pitfall C-1 mitigation). **Status:** Infrastructure shipped in Phase 7 (bin/check-neutrality.sh supports denylist gating on public paths); personal-term denylist curation promoted from backlog 999.2 to active **Phase 12.1** on 2026-05-01 to clear before the Phase 13.2 closure gate. Candidate material at `.planning/backlog-neutrality-denylist-candidate.txt` (861-line deterministic --suggest-denylist output).
 
 ### Guided Setup Wizard (WZRD)
 
@@ -142,7 +142,7 @@ Numbering continues from v1.0. New REQ-ID prefixes: `TMPL`, `NEUT`, `WZRD`, `MAN
 ### v1.1 Closure Gate (CLOSE)
 
 - [ ] **CLOSE-01**: `bin/requirements-sync.sh --strict` shows zero drift between `REQUIREMENTS.md` and phase verification artifacts across all v1.1 phases before milestone closure.
-- [ ] **CLOSE-02**: Obsidian render, non-Claude agent-parity, and genuine write-back scenarios are re-run or explicitly audited after Phases 12.1, 12.2, and 13 land.
+- [ ] **CLOSE-02**: Obsidian render, non-Claude agent-parity, and genuine write-back scenarios are re-run or explicitly audited after Phases 12, 12.1, 12.2, 13, and 13.1 land.
 - [ ] **CLOSE-03**: README, docs, decision records, and roadmap consistently describe the final v1.1 feature surface, complementary-system boundary, and explicitly deferred work.
 - [ ] **CLOSE-04**: A final scope-leak check confirms no task engine, reminder/calendar layer, high-frequency event ingest, premature scaling tier, or canonical GTD dashboard has entered v1.1.
 
@@ -212,7 +212,7 @@ Explicitly excluded from v1.1. Documented to prevent scope creep.
 | NEUT-05 | Phase 7 | Complete |
 | NEUT-06 | Phase 7 | Complete |
 | NEUT-07 | Phase 7 | Complete |
-| NEUT-08 | Phase 12.3 | Promoted from backlog 999.2 (2026-05-01) — infrastructure shipped in Phase 7, curation moved to active v1.1 |
+| NEUT-08 | Phase 12.1 | Promoted from backlog 999.2 (2026-05-01) — infrastructure shipped in Phase 7, curation moved to active v1.1 |
 | DEBT-03 | Phase 7 | Complete |
 | WZRD-01 | Phase 8 | Complete |
 | WZRD-02 | Phase 8 | Complete |
@@ -270,15 +270,15 @@ Explicitly excluded from v1.1. Documented to prevent scope creep.
 | BRWN-19 | Phase 11 | Complete |
 | BRWN-20 | Phase 11 | Complete |
 | BRWN-22 | Phase 11 | Complete |
-| DEBT-01 | Phase 12 | Pending |
-| DEBT-02 | Phase 12 | Pending |
-| DEBT-04 | Phase 12 | Pending |
-| OBSID-01 | Phase 12 | Pending |
-| OBSID-02 | Phase 12 | Pending |
-| OBSID-03 | Phase 12 | Pending |
-| BOUND-01 | Phase 12.1 | Pending |
-| BOUND-02 | Phase 12.1 | Pending |
-| BOUND-03 | Phase 12.1 | Pending |
+| BOUND-01 | Phase 12 | Pending |
+| BOUND-02 | Phase 12 | Pending |
+| BOUND-03 | Phase 12 | Pending |
+| DEBT-01 | Phase 13.1 | Pending |
+| DEBT-02 | Phase 13.1 | Pending |
+| DEBT-04 | Phase 13.1 | Pending |
+| OBSID-01 | Phase 13.1 | Pending |
+| OBSID-02 | Phase 13.1 | Pending |
+| OBSID-03 | Phase 13.1 | Pending |
 | WGATE-01 | Phase 12.2 | Pending |
 | WGATE-02 | Phase 12.2 | Pending |
 | WGATE-03 | Phase 12.2 | Pending |
@@ -287,14 +287,14 @@ Explicitly excluded from v1.1. Documented to prevent scope creep.
 | FAITH-02 | Phase 13 | Pending |
 | FAITH-03 | Phase 13 | Pending |
 | FAITH-04 | Phase 13 | Pending |
-| CLOSE-01 | Phase 13.1 | Pending |
-| CLOSE-02 | Phase 13.1 | Pending |
-| CLOSE-03 | Phase 13.1 | Pending |
-| CLOSE-04 | Phase 13.1 | Pending |
+| CLOSE-01 | Phase 13.2 | Pending |
+| CLOSE-02 | Phase 13.2 | Pending |
+| CLOSE-03 | Phase 13.2 | Pending |
+| CLOSE-04 | Phase 13.2 | Pending |
 
 **Coverage:**
 - v1.1 requirements: 97 total (TMPL: 11, NEUT: 8, WZRD: 11, MANUAL: 6, COLAB: 8, CI: 9, BRWN: 22, DEBT: 4, OBSID: 3, BOUND: 3, WGATE: 4, FAITH: 4, CLOSE: 4)
-- Mapped to phases: 97 (Phase 7: 20, Phase 8: 17, Phase 9: 17, Phase 10: 11, Phase 11: 11, Phase 12: 6, Phase 12.1: 3, Phase 12.2: 4, Phase 13: 4, Phase 13.1: 4)
+- Mapped to phases: 97 (Phase 7: 19, Phase 8: 17, Phase 9: 17, Phase 10: 11, Phase 11: 11, Phase 12: 3, Phase 12.1: 1, Phase 12.2: 4, Phase 13: 4, Phase 13.1: 6, Phase 13.2: 4)
 - Unmapped: 0
 
 ---
