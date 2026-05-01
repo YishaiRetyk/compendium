@@ -26,7 +26,7 @@
 - [x] **Phase 9: Collaborative PR Workflow + CI Lint Gate** — Git-based PR workflow, `log.md` contributor field, `bin/lint.sh --ci --format json` severity policy, privacy-leak guard. (6/6 plans complete 2026-04-16)
 - [x] **Phase 10: Brownfield Scan + Bootstrap** — `bin/brownfield.sh scan|bootstrap` with `bootstrap_stage` sentinel, ruamel.yaml round-trip, byte-exact fixture tests. (completed 2026-04-17)
 - [x] **Phase 11: Brownfield Suggest + Verify** — Four staged migration script classes, `verify` wrapper over lint. (completed 2026-04-20)
-- [ ] **Phase 12: Complementary Systems Boundary + GTD Alignment** — Decision record + reference doc defining compendium as durable wiki memory inside a multi-system agent stack; routes capture/clarify/organize/review without expanding schema or directory taxonomies.
+- [x] **Phase 12: Complementary Systems Boundary + GTD Alignment** — Decision record + reference doc defining compendium as durable wiki memory inside a multi-system agent stack; routes capture/clarify/organize/review without expanding schema or directory taxonomies. (completed 2026-05-01)
 - [ ] **Phase 12.1: NEUT-08 Personal-Term Denylist Curation** — Hand-curate a vetted subset of `.planning/backlog-neutrality-denylist-candidate.txt` (861 lines) into `.neutrality-denylist.txt`, closing the only outstanding partial v1.1 requirement before the closure gate. Promoted from backlog 999.2.
 - [ ] **Phase 12.2: Local Wiki Write Gate** — Pre-commit gate over staged `wiki/{entities,concepts,overviews,comparisons}/` changes reusing `bin/lint.sh --strict` semantics where possible; blocks zero-provenance new synthesized pages before they land locally.
 - [ ] **Phase 13: Claim Faithfulness Audit** — `bin/audit-claims.sh` samples high-risk claims (inferred/tentative/stale/high-fanout) and emits structured verdicts (supports / weak / contradicts / insufficient) against the cited source passage; review-only, privacy-respecting, no auto-fix.
@@ -160,7 +160,7 @@ Plans:
 - No Slack/ticket/event ingest pipeline
 - No GTD-specific filesystem expansion
 - No canonical review dashboards
-**Plans:** 3/4 plans executed
+**Plans:** 4/4 plans complete
 Plans:
 **Wave 1**
 - [x] 12-01-decision-record-PLAN.md — BOUND-01 decision record at wiki/decisions/dr-2026-05-01-complementary-systems-boundary.md (type: decision, trigger_type: schema-update, affected_pages: [], 7 required sections per AGENTS.md §4.6)
@@ -170,7 +170,7 @@ Plans:
 - [x] 12-03-surface-integration-PLAN.md — README pointer (D-10 locked wording) + docs/reference/index.md bullet + wiki/index.md Decisions entry + wiki/log.md reflect entry
 
 **Wave 3** *(blocked on Wave 2 completion)*
-- [ ] 12-04-audit-and-verification-PLAN.md — Capture phase-base SHA, run reviewed-match audit grep (D-12 patterns over D-13 scope), write 12-VERIFICATION.md, flip REQUIREMENTS.md BOUND-01/02/03 status, run bin/requirements-sync.sh --strict --phase 12
+- [x] 12-04-audit-and-verification-PLAN.md — Capture phase-base SHA, run reviewed-match audit grep (D-12 patterns over D-13 scope), write 12-VERIFICATION.md, flip REQUIREMENTS.md BOUND-01/02/03 status, run bin/requirements-sync.sh --strict --phase 12
 
 ### Phase 12.1: NEUT-08 Personal-Term Denylist Curation (PROMOTED FROM 999.2)
 
@@ -409,7 +409,7 @@ The following are intentionally deferred until real usage demands them, captured
 | 9. Collaborative PR Workflow + CI Lint Gate | v1.1 | 6/6 | Complete | 2026-04-16 |
 | 10. Brownfield Scan + Bootstrap | v1.1 | 6/6 | Complete    | 2026-04-18 |
 | 11. Brownfield Suggest + Verify | v1.1 | 5/5 | Complete    | 2026-04-20 |
-| 12. Complementary Systems Boundary + GTD Alignment | v1.1 | 3/4 | In Progress|  |
+| 12. Complementary Systems Boundary + GTD Alignment | v1.1 | 4/4 | Complete   | 2026-05-01 |
 | 12.1. NEUT-08 Personal-Term Denylist Curation | v1.1 | 0/0 | Not started | - |
 | 12.2. Local Wiki Write Gate | v1.1 | 0/0 | Not started | - |
 | 13. Claim Faithfulness Audit | v1.1 | 0/0 | Not started | - |
