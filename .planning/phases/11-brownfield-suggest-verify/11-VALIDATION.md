@@ -159,3 +159,24 @@ already passed 2026-04-30 commit d39f75c — 3 manual scenarios + 0 issues)
 | Resolved | 1 (added `test_docs_rollback_git_reset_recipe.sh`) |
 | Escalated to manual-only | 0 |
 | Final test count | 48 GREEN |
+
+---
+
+## Validation Audit 2026-05-01
+
+| Metric | Count |
+|--------|-------|
+| Gaps found | 0 |
+| Resolved | 0 |
+| Escalated | 0 |
+| Tests existing | 48 |
+| Requirements covered | 11/11 (BRWN-11..20, 22) |
+
+**Findings:**
+
+- Re-confirmation pass triggered by `/gsd-validate-phase 11` after the v1.1 milestone audit reported 11's Nyquist status as `MISSING` — that classification was based on a pre-reconstruction filesystem snapshot; the VALIDATION.md was reconstructed (State B) on 2026-04-30 and is now current.
+- `PYTHONPATH=$HOME/.local/lib/python3/dist-packages bash tests/phase-11/run.sh` re-run on 2026-05-01: `PHASE 11 TESTS: 48/48`, exit 0.
+- Gap-fill test added during 2026-04-30 reconstruction (`test_docs_rollback_git_reset_recipe.sh`, BRWN-19 recipe-content assertion) still present and green.
+- All 11 declared requirements (BRWN-11..20, BRWN-22) remain COVERED. BRWN-21 covered by Phase 10.
+
+**Phase 11 remains Nyquist-compliant. Milestone-audit Nyquist status table for 11 should now read COMPLIANT.**
