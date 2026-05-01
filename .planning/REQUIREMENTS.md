@@ -121,9 +121,9 @@ Numbering continues from v1.0. New REQ-ID prefixes: `TMPL`, `NEUT`, `WZRD`, `MAN
 
 ### Complementary Systems Boundary (BOUND)
 
-- [ ] **BOUND-01**: A decision record states that compendium owns durable, provenance-backed synthesis and reflective wiki memory, while complementary systems own executable commitments, reminders, calendars, transactional state, and high-churn operational events.
-- [ ] **BOUND-02**: A reference doc explains the 3-layer model: task layer, working-memory layer, and wiki-compiler layer.
-- [ ] **BOUND-03**: README, docs, and decision records consistently exclude "all-in-one PKM/task system" framing and do not add new wiki page types or `wiki/` directory taxonomies for GTD.
+- [x] **BOUND-01**: A decision record states that compendium owns durable, provenance-backed synthesis and reflective wiki memory, while complementary systems own executable commitments, reminders, calendars, transactional state, and high-churn operational events.
+- [x] **BOUND-02**: A reference doc explains the 3-layer model: task layer, working-memory layer, and wiki-compiler layer.
+- [x] **BOUND-03**: README, docs, and decision records consistently exclude "all-in-one PKM/task system" framing and do not add new wiki page types or `wiki/` directory taxonomies for GTD.
 
 ### Local Wiki Write Gate (WGATE)
 
@@ -270,9 +270,9 @@ Explicitly excluded from v1.1. Documented to prevent scope creep.
 | BRWN-19 | Phase 11 | Complete |
 | BRWN-20 | Phase 11 | Complete |
 | BRWN-22 | Phase 11 | Complete |
-| BOUND-01 | Phase 12 | Pending |
-| BOUND-02 | Phase 12 | Pending |
-| BOUND-03 | Phase 12 | Pending |
+| BOUND-01 | Phase 12 | Complete |
+| BOUND-02 | Phase 12 | Complete |
+| BOUND-03 | Phase 12 | Complete |
 | DEBT-01 | Phase 13.1 | Pending |
 | DEBT-02 | Phase 13.1 | Pending |
 | DEBT-04 | Phase 13.1 | Pending |
