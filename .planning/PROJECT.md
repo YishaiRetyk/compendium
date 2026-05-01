@@ -59,6 +59,9 @@ The wiki is a persistent, compounding artifact — cross-references are already 
 - [x] `bin/brownfield.sh review-typing` — EOF-safe deterministic page-typing review surface (TTY small-batch + AI-handoff large-batch) — Validated in Phase 11: brownfield-suggest-verify
 - [x] `bin/brownfield.sh verify` (+ `--promote`) — read-only lint wrapper with 5-gate `bootstrapped → verified` promotion — Validated in Phase 11: brownfield-suggest-verify
 - [x] Four canonical migration scripts — 01 page-typing + 02 provenance-bootstrap (apply-class), 03 cross-link-inference + 04 privacy-review (advisory-class) — Validated in Phase 11: brownfield-suggest-verify
+- [x] Complementary-systems boundary decision record — compendium owns durable wiki memory; task / calendar / reminder / inbox layers belong to complementary systems (BOUND-01) — Validated in Phase 12: complementary-systems-boundary-gtd-alignment
+- [x] Three-layer reference doc — task / working-memory / wiki-compiler split with capture/clarify/organize/review routing rules and explicit anti-features (BOUND-02) — Validated in Phase 12: complementary-systems-boundary-gtd-alignment
+- [x] Reviewed-match boundary audit — README + AGENTS.md + docs/ + wiki/decisions/ verified to contain zero "all-in-one PKM/task" framing (BOUND-03) — Validated in Phase 12: complementary-systems-boundary-gtd-alignment
 
 ### Active (v1.1 focus areas — formal REQ-IDs in REQUIREMENTS.md)
 
@@ -127,4 +130,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-20 — Phase 11 (Brownfield Suggest-Verify) complete: `suggest` + `review-typing` + `verify` + `verify --promote` subcommands + four canonical migration scripts (01 page-typing & 02 provenance-bootstrap apply-class, 03 cross-link-inference & 04 privacy-review advisory-class) + AGENTS.md §11.5 schema section + Tier-1 DR documenting apply-vs-advisory architecture. 47/47 Phase 11 tests GREEN; BRWN-16 hard-lock (no LLM/network calls) enforced at runtime.*
+*Last updated: 2026-05-01 — Phase 12 (Complementary Systems Boundary + GTD Alignment) complete: `wiki/decisions/dr-2026-05-01-complementary-systems-boundary.md` (BOUND-01) + `docs/reference/three-layer-model.md` (BOUND-02) + reviewed-match audit over README/AGENTS.md/docs/wiki/decisions (BOUND-03) — 6/6 grep hits all `negative-framing`, zero `positive-claim`. SPEC-anchored phase-base SHA `ef3afec`; zero `bin/`/`schema/` content drift; AGENTS.md §4 page-type enum unchanged (still 6); `bin/requirements-sync.sh --strict --phase 12` exits 0.*
