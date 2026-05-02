@@ -19,6 +19,7 @@ aliases:
   - Lint Report
 has_contradictions: false
 knowledge_domain: ""
+neutrality_exempt: true  # Lint reports enumerate drift findings by file path; legitimately naming `kahneman` and `personal-decision-journal` (lines 38-39) is unavoidable when summarizing what the lint detected. Scanner skips this file (check-neutrality.sh).
 ---
 
 # Lint Report
