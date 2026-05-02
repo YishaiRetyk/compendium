@@ -188,7 +188,12 @@ Plans:
 - No expansion of `bin/check-neutrality.sh` semantics (infrastructure already shipped in Phase 7)
 - No new categories beyond what the candidate file surfaces
 - No retroactive lint of historical commits
-**Plans**: TBD
+**Plans:** 4 plans
+Plans:
+- [ ] 12.1-01-PLAN.md — Wave 1: tests/phase-12.1/ test scaffold (run.sh aggregator + Any-NEUT-08-term contract test per CONTEXT.md D-05/D-06)
+- [ ] 12.1-02-PLAN.md — Wave 1: wiki/maintenance/lint-report.md frontmatter neutrality_exempt: true fix (mirrors 3 in-repo precedents); captures pre/post check-neutrality.sh exit-code evidence per D-10
+- [ ] 12.1-03-PLAN.md — Wave 2: calibration script (Python, seed=42) + interactive user pass + Claude extrapolation draft + user review + append unified `# Category:` header to .neutrality-denylist.txt per D-07
+- [ ] 12.1-04-PLAN.md — Wave 3: REQUIREMENTS.md NEUT-08 status flip + 12.1-VERIFICATION.md (Phase 7 mirror per D-09 + D-10 evidence) + bin/requirements-sync.sh --strict + --require-complete exit-0 evidence
 
 ### Phase 12.2: Local Wiki Write Gate
 
@@ -410,7 +415,7 @@ The following are intentionally deferred until real usage demands them, captured
 | 10. Brownfield Scan + Bootstrap | v1.1 | 6/6 | Complete    | 2026-04-18 |
 | 11. Brownfield Suggest + Verify | v1.1 | 5/5 | Complete    | 2026-04-20 |
 | 12. Complementary Systems Boundary + GTD Alignment | v1.1 | 4/4 | Complete    | 2026-05-01 |
-| 12.1. NEUT-08 Personal-Term Denylist Curation | v1.1 | 0/0 | Not started | - |
+| 12.1. NEUT-08 Personal-Term Denylist Curation | v1.1 | 0/4 | Planned     | - |
 | 12.2. Local Wiki Write Gate | v1.1 | 0/0 | Not started | - |
 | 13. Claim Faithfulness Audit | v1.1 | 0/0 | Not started | - |
 | 13.1. Docs Finalization + Obsidian Starter | v1.1 | 0/0 | Not started | - |
