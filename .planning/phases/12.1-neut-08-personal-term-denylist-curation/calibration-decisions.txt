@@ -1,0 +1,22 @@
+# Phase 12.1 calibration decisions (seed=42, n=20)
+# Format: <decision>\t<term>\t<source-cluster>
+skip	date	.planning/notes/2026-04-09-agents-md-size-risk.md
+skip	anchoring	git:wiki/overviews/personal-decision-patterns.md
+skip	surface	git:wiki/overviews/personal-decision-patterns.md
+skip	follows	git:wiki/overviews/personal-decision-patterns.md
+skip	fails	git:wiki/overviews/personal-decision-patterns.md
+skip	ended	git:wiki/overviews/personal-decision-patterns.md
+skip	conversation	git:wiki/overviews/personal-decision-patterns.md
+skip	sunk-cost	git:wiki/overviews/personal-decision-patterns.md
+skip	carefully	git:wiki/overviews/personal-decision-patterns.md
+skip	signature	git:wiki/overviews/personal-decision-patterns.md
+skip	prior	git:wiki/overviews/personal-decision-patterns.md
+skip	catching	git:wiki/sources/src-2026-04-10-personal-decision-journal.md
+skip	roughly	git:wiki/sources/src-2026-04-10-personal-decision-journal.md
+skip	observation	git:wiki/sources/src-2026-04-10-personal-decision-journal.md
+skip	app	git:wiki/sources/src-2026-04-10-personal-decision-journal.md
+skip	anything	git:wiki/sources/src-2026-04-10-personal-decision-journal.md
+skip	choices	git:wiki/sources/src-2026-04-10-personal-decision-journal.md
+skip	experiential	git:wiki/sources/src-2026-04-10-personal-decision-journal.md
+skip	fail	git:wiki/sources/src-2026-04-10-personal-decision-journal.md
+skip	productivity	git:wiki/sources/src-2026-04-10-personal-decision-journal.md
