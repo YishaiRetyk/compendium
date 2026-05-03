@@ -28,7 +28,7 @@
 - [x] **Phase 11: Brownfield Suggest + Verify** — Four staged migration script classes, `verify` wrapper over lint. (completed 2026-04-20)
 - [x] **Phase 12: Complementary Systems Boundary + GTD Alignment** — Decision record + reference doc defining compendium as durable wiki memory inside a multi-system agent stack; routes capture/clarify/organize/review without expanding schema or directory taxonomies. (completed 2026-05-01)
 - [x] **Phase 12.1: NEUT-08 Personal-Term Denylist Curation** — Hand-curate a vetted subset of `.planning/backlog-neutrality-denylist-candidate.txt` (861 lines) into `.neutrality-denylist.txt`, closing the only outstanding partial v1.1 requirement before the closure gate. Promoted from backlog 999.2. (4/4 plans complete 2026-05-03; N=7 defense-in-depth curation merged; gate + sync exit 0; first v1.1 partial-requirement closure)
-- [ ] **Phase 12.2: Local Wiki Write Gate** — Pre-commit gate over staged `wiki/{entities,concepts,overviews,comparisons}/` changes reusing `bin/lint.sh --strict` semantics where possible; blocks zero-provenance new synthesized pages before they land locally.
+- [x] **Phase 12.2: Local Wiki Write Gate** — Pre-commit gate over staged `wiki/{entities,concepts,overviews,comparisons}/` changes reusing `bin/lint.sh --strict` semantics where possible; blocks zero-provenance new synthesized pages before they land locally. (5/5 plans complete 2026-05-04; WGATE-01..04 → Complete; verifier PASS 7/7 SC + 4/4 REQ; tests 11/11)
 - [ ] **Phase 13: Claim Faithfulness Audit** — `bin/audit-claims.sh` samples high-risk claims (inferred/tentative/stale/high-fanout) and emits structured verdicts (supports / weak / contradicts / insufficient) against the cited source passage; review-only, privacy-respecting, no auto-fix.
 - [ ] **Phase 13.1: Docs Finalization + Obsidian Starter** — `/docs/reference/` fill-out, Obsidian render check, Codex agent-parity, write-back scenario re-run, minimal Obsidian starter (templates + reference doc only; no prescribed workflows).
 - [ ] **Phase 13.2: v1.1 Closure Verification Gate** — Final requirements-sync, Obsidian render, agent-parity, write-back, docs consistency, and scope-leak checks after all v1.1 work is complete.
@@ -423,7 +423,7 @@ The following are intentionally deferred until real usage demands them, captured
 | 11. Brownfield Suggest + Verify | v1.1 | 5/5 | Complete    | 2026-04-20 |
 | 12. Complementary Systems Boundary + GTD Alignment | v1.1 | 4/4 | Complete    | 2026-05-01 |
 | 12.1. NEUT-08 Personal-Term Denylist Curation | v1.1 | 0/4 | Planned     | - |
-| 12.2. Local Wiki Write Gate | v1.1 | 4/5 | In Progress|  |
+| 12.2. Local Wiki Write Gate | v1.1 | 5/5 | Complete    | 2026-05-04 |
 | 13. Claim Faithfulness Audit | v1.1 | 0/0 | Not started | - |
 | 13.1. Docs Finalization + Obsidian Starter | v1.1 | 0/0 | Not started | - |
 | 13.2. v1.1 Closure Verification Gate | v1.1 | 0/0 | Not started | - |
