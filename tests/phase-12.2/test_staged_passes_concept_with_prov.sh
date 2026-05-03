@@ -33,6 +33,40 @@ knowledge_domain: ""
 
 Foo concept body with provenance [prov:src-2026-04-15-x#sec:intro|direct|2026-05-04] backing the claim.
 EOF
+
+# Source page is added in a prior commit so the existing provenance-ref check
+# (which resolves source_id against wiki/sources/) finds the referenced source.
+# This is independent of the --staged new-page-provenance check under test.
+write_page "$REPO" "wiki/sources/src-2026-04-15-x.md" <<'EOF'
+---
+id: src-2026-04-15-x
+title: "X (test source)"
+type: source
+status: active
+summary: "Test source page for provenance-resolution."
+created_at: 2026-04-15
+updated_at: 2026-04-15
+sources: []
+epistemic_status: sourced
+tags: []
+domains: []
+supersedes:
+superseded_by:
+privacy: cloud_safe
+aliases: []
+has_contradictions: false
+knowledge_domain: ""
+path: sources/2026/2026-04/2026-04-15-x.md
+content_hash: "sha256:fixture"
+ingested_at: 2026-04-15
+source_type: paper
+compilation_status: compiled
+---
+
+Test source.
+EOF
+(cd "$REPO" && git add wiki/sources/src-2026-04-15-x.md && \
+    git -c commit.gpgsign=false commit -q -m "add source page (committed before staged page)")
 (cd "$REPO" && git add wiki/concepts/foo.md)
 
 set +e

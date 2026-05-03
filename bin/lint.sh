@@ -549,6 +549,44 @@ def strict_new_pages(base_ref='origin/main'):
     return paths
 
 
+def staged_new_pages():
+    """WGATE-02 / D-02: return list of git-diff status-A .md paths under
+       wiki/{entities,concepts,overviews,comparisons}/*.md, scoped to the
+       STAGED INDEX (not origin/main...HEAD).
+
+       Diff source: `git diff --cached --name-only --diff-filter=A`.
+       --diff-filter=A returns ONLY added paths, so the returned list is
+       direct (no status column to parse).
+
+       Files are read from the working tree, not from staged blobs (D-03).
+       Pre-commit hooks fire after `git add`, so working-tree content
+       matches the index for the typical add-then-commit flow.
+    """
+    try:
+        result = subprocess.run(
+            ['git', 'diff', '--cached', '--name-only', '--diff-filter=A'],
+            cwd=REPO_ROOT, check=True, capture_output=True, text=True,
+        )
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return []
+    paths = []
+    for line in result.stdout.splitlines():
+        path = line.strip()
+        if not path or not path.endswith('.md'):
+            continue
+        # D-15 (2): examples/ anywhere in the tree -> path-prefix exemption.
+        if path.startswith('examples/') or '/examples/' in path:
+            continue
+        # D-15 (1): only the four PROVENANCE_REQUIRED_TYPES dirs reach the
+        # frontmatter check. wiki/sources/, wiki/decisions/, anything outside
+        # wiki/ are skipped at this layer.
+        for t in ('entities', 'concepts', 'overviews', 'comparisons'):
+            if path.startswith(f'wiki/{t}/'):
+                paths.append(path)
+                break
+    return paths
+
+
 def collect_dr_affected_pages(wiki_root):
     """D-08 helper: union of affected_pages lists across ALL type: decision
        pages in the wiki. Built wiki-wide because decisions already merged are
@@ -652,6 +690,10 @@ def _strict_check_fallback(wiki_root):
 
 def strict_check(wiki_root):
     """Run --strict checks.
+       - Staged-mode (D-02 / WGATE-02): when STAGED_MODE is set, ONLY check
+         new-page provenance against the staged index. Origin-independent.
+         Returns immediately -- does not run the DR-match block or
+         has_origin_main() fallback.
        - DR-match (D-08, PR-diff-scoped): fail on [epistemic:: inferred|tentative]
          claims ADDED by this PR unless matched by a wiki decision record's
          affected_pages, or exempted by an adjacent lint:expect-* marker.
@@ -663,6 +705,58 @@ def strict_check(wiki_root):
     """
     if not STRICT_MODE:
         return
+
+    # WGATE-02 / D-02 / D-19: Staged-mode dispatch. MUST run BEFORE
+    # has_origin_main() -- staged-mode is origin-independent (uses
+    # `git diff --cached`, which works on any repo with a HEAD commit).
+    # Without this early branch, the has_origin_main() early-return below
+    # would route bare `git init -b main` fixtures into _strict_check_fallback,
+    # which explicitly skips the new-page check (line ~634 comment). The gate
+    # would silently no-op on fresh clones / local-only repos -- the canonical
+    # Phase 12.2 target environment per CONTEXT.md trunk-based-dev framing.
+    # Per D-04, staged-mode runs D-10 ONLY (no D-08 DR-match). The early
+    # `return` after the loop ensures strict_added_epistemic_claims() is
+    # never reached when STAGED_MODE is active.
+    if STAGED_MODE:
+        new_pages = staged_new_pages()
+        for path in new_pages:
+            abs_path = path if os.path.isabs(path) else os.path.join(REPO_ROOT, path)
+            if not os.path.exists(abs_path):
+                # File was staged then deleted/moved between diff-list and read.
+                # Treat as non-blocking (T-12.2-02-03 race-condition handling).
+                continue
+            try:
+                text = open(abs_path, encoding='utf-8').read()
+            except OSError:
+                continue
+            fm = parse_fm_from_text(text)
+            if not fm:
+                continue
+            # D-15 (3) type:source / D-15 (4) type:decision: exempt by type.
+            # The PROVENANCE_REQUIRED_TYPES check below mechanically filters
+            # these out (source and decision are NOT in PROVENANCE_REQUIRED_TYPES).
+            t = fm.get('type', '')
+            if t not in PROVENANCE_REQUIRED_TYPES:
+                continue
+            # D-15 (5) example:true: brownfield/example pages are exempt.
+            if fm.get('example') is True:
+                continue
+            # D-15 (6) bootstrap_stage:bootstrapped: brownfield in-flight pages
+            # are exempt. bootstrap_stage:verified is NOT exempt (D-12) -- those
+            # pages have been promoted through verify --promote and are
+            # first-class wiki content from the gate's perspective.
+            if fm.get('bootstrap_stage') == 'bootstrapped':
+                continue
+            if not PROVENANCE_PRESENCE_RE.search(text):
+                # D-08 (failure UX): emit the actionable-paths message in
+                # staged-mode. PR-mode uses the original concise message
+                # (preserved verbatim -- Phase-09 tests may grep against it).
+                add_finding('error', 'provenance', path,
+                            f"new {t} page has zero [prov:...] markers "
+                            f"(D-10; add [prov:source_id#locator] markers, "
+                            f"set type:source/decision in frontmatter, or "
+                            f"`git commit --no-verify` to bypass)")
+        return  # Staged-mode is independent of PR-mode flow -- exit before has_origin_main.
 
     # Local-mode fallback: if origin/main is absent, warn and fall back to wiki-wide scan.
     # CI always has origin/main (fetch-depth: 0); local dev may not.

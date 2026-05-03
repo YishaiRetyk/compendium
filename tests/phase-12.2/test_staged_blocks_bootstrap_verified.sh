@@ -33,7 +33,7 @@ bootstrap_stage: verified
 bootstrap_date: 2026-05-04
 ---
 
-Verified-stage concept body with no [prov:] markers; NOT exempt — gate must fire.
+Verified-stage concept body with no provenance markers; NOT exempt -- gate must fire.
 EOF
 (cd "$REPO" && git add wiki/concepts/foo.md)
 
