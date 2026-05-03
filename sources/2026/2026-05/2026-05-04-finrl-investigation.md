@@ -27,3 +27,34 @@ Fundamentals exist as a single example, not a shipped FA module.
 ## sec:other
 
 Volatility and turbulence indices: `add_vix`, `add_turbulence`. OHLCV ingestion supports 14+ providers (Yahoo, Alpaca, Binance, CCXT, WRDS, EODHD, Sinopac, etc.). No sentiment/news/embedding features in the core repo; those live in sibling repositories such as FinRL-Meta and FinGPT.
+
+## sec:data-sources
+
+FinRL fetches data live at runtime from external market-data APIs — no OHLCV bundle ships in the repo. Data-provider modules under `finrl/meta/data_processors/` (raw OHLCV fetchers, all unified by `finrl/meta/data_processor.py`):
+
+- `processor_yahoofinance.py` — Yahoo via `yfinance`, OHLCV daily/intraday
+- `processor_alpaca.py` — Alpaca US stocks/ETFs OHLCV (1-min)
+- `processor_wrds.py` — WRDS intraday trades / TAQ
+- `processor_ccxt.py` — CCXT crypto OHLCV
+- `processor_eodhd.py` — EOD Historical Data US OHLCV
+- `processor_joinquant.py` / `processor_tushare` (in `preprocessor/`) — CN securities OHLCV
+- `processor_quantconnect.py`, `processor_sinopac.py` — QuantConnect / Taiwan OHLCV
+
+Lighter downloaders under `finrl/meta/preprocessor/`: `yahoodownloader.py`, `tusharedownloader.py`, `shioajidownloader.py`, `ibkrdownloader.py`. `preprocessors.py` adds technical indicators (MACD, RSI, Bollinger via `stockstats`), VIX, and turbulence — not raw fetch.
+
+All paths are OHLCV + derived technicals. The only fundamentals path is a remote CSV (`dow_30_fundamental_wrds.csv`) pulled by `fundamental_stock_trading.py`. Typical flow: `examples/FinRL_StockTrading_2026_1_data.py` → `YahooDownloader.fetch_data()` → `FeatureEngineer.preprocess_data()` at `finrl/applications/stock_trading/stock_trading.py:43-54`.
+
+## sec:training-paradigm
+
+RL agents are trained from scratch with random initialization. Every standard pipeline calls `agent.get_model(name)` to instantiate a fresh SB3 / ElegantRL / RLlib model, then `agent.train_model(...)`. No checkpoint is loaded into training.
+
+- `finrl/agents/stablebaselines3/models.py:108-123` — `get_model` returns `MODELS[model_name](policy="MlpPolicy", env=self.env, ...)`, a brand-new SB3 instance.
+- `train.py:78-91` (SB3 branch) and `train.py:48-57` (ElegantRL) follow the same pattern.
+- `PPO.load` / `*.load` calls appear only in `examples/FinRL_StockTrading_2026_3_Backtest.py`, `Stock_NeurIPS2018_3_Backtest.ipynb`, and `finrl/meta/paper_trading/alpaca.py` — inference and deployment, never training.
+- `grep set_parameters` returns zero hits across the repo.
+
+Shipped checkpoints are demo *outputs*, not training inputs: `finrl/applications/cryptocurrency_trading/actor.pth` and `finrl/applications/high_frequency_trading/actor.pth` (plus `recorder.npy`). They are loaded only by the Alpaca paper-trading deployment script, not by any training pipeline.
+
+Algorithms: A2C, DDPG, PPO, TD3, SAC. Three backends selectable via `drl_lib`: Stable-Baselines3 (`finrl/agents/stablebaselines3/models.py`, `MODELS = {a2c, ddpg, td3, sac, ppo}`), ElegantRL (`finrl/agents/elegantrl/models.py`), RLlib (`finrl/agents/rllib/models.py`). All three listed in `requirements.txt`.
+
+Transfer learning and curriculum learning are absent from the standard RL pipeline. The only related surface is `finrl/applications/imitation_learning/` (Stock_Selection / Weight_Initialization / Imitation_Sandbox notebooks) — an opt-in imitation-then-RL research workflow that is not invoked by `train.py` or any stock_trading example.

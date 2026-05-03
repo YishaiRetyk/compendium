@@ -30,7 +30,7 @@ example: false
 
 ## TL;DR
 
-FinRL is the deep-reinforcement-learning trading framework in this comparison. Technical indicators are first-class engineered features fed into the RL state via a default `INDICATORS` list (MACD, Bollinger upper/lower, RSI-30, CCI-30, DX-30, 30/60-day SMAs) plus VIX and turbulence indices, all backed by `stockstats`. Fundamentals exist as a single application example consuming a static Compustat/WRDS CSV — there is no shipped FA module.
+FinRL is the deep-reinforcement-learning trading framework in this comparison. Technical indicators are first-class engineered features fed into the RL state via a default `INDICATORS` list (MACD, Bollinger upper/lower, RSI-30, CCI-30, DX-30, 30/60-day SMAs) plus VIX and turbulence indices, all backed by `stockstats`. Fundamentals exist as a single application example consuming a static Compustat/WRDS CSV — there is no shipped FA module. Training data is fetched live from 14+ external market-data APIs (no bundled OHLCV); RL agents train from scratch with random initialization on A2C/DDPG/PPO/TD3/SAC across three swappable backends (Stable-Baselines3, ElegantRL, RLlib).
 
 ## Key Facts
 
@@ -40,6 +40,9 @@ FinRL is the deep-reinforcement-learning trading framework in this comparison. T
 - Fundamentals are present as a single example only: `finrl/applications/stock_trading/fundamental_stock_trading.py` consumes a Compustat/WRDS-derived static CSV and computes ratios in-line (OPM, NPM, ROA, ROE, EPS, BPS, DPS, current ratio, quick ratio); no fundamentals module, `add_fundamental_indicator` method, or DCF/comparables logic is shipped [prov:src-2026-05-04-finrl-investigation#sec:fundamental-analysis|direct|2026-05-04] [epistemic:: sourced]
 - Its strengths are statistically trainable policies, reproducible experiments, backtest framing, and usefulness for reinforcement-learning research [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|direct|2026-05-04] [epistemic:: sourced]
 - Its weaknesses are an older coupled architecture, not being the recommended production path, reinforcement-learning overfitting and data-leakage risks, and less natural-language explainability than LLM agents [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|direct|2026-05-04] [epistemic:: sourced]
+- Training data is fetched live from external market-data APIs at runtime via per-provider processors under `finrl/meta/data_processors/` (Yahoo via `yfinance`, Alpaca, WRDS/TAQ, CCXT, EODHD, JoinQuant/Tushare, QuantConnect, Sinopac, IBKR); no OHLCV bundle ships with the repo [prov:src-2026-05-04-finrl-investigation#sec:data-sources|direct|2026-05-04] [epistemic:: sourced]
+- RL agents are trained from scratch with random initialization, not fine-tuned: `agent.get_model(name)` at `finrl/agents/stablebaselines3/models.py:108-123` returns a brand-new SB3 instance; `*.load` calls appear only in backtest and paper-trading inference scripts, never in training [prov:src-2026-05-04-finrl-investigation#sec:training-paradigm|direct|2026-05-04] [epistemic:: sourced]
+- Supported algorithms are A2C, DDPG, PPO, TD3, SAC across three swappable backends (Stable-Baselines3, ElegantRL, RLlib) selectable via `drl_lib`; transfer learning and curriculum learning are absent from the standard pipeline [prov:src-2026-05-04-finrl-investigation#sec:training-paradigm|direct|2026-05-04] [epistemic:: sourced]
 
 ## Detail
 
@@ -54,6 +57,16 @@ The training pipeline in `finrl/train.py` and `finrl/meta/paper_trading/common.p
 The `fundamental_stock_trading.py` example is the only fundamentals usage in the repository. `processor_eodhd.py` references EODHD's `/fundamentals/` endpoint, but only to fetch index *components* (ticker lists), not financial statements. Other applications (cryptocurrency, portfolio allocation, high-frequency, default `stock_trading`) use only TA features. Sentiment, news, and embedding features are absent from the core repo and live in sibling repositories such as FinRL-Meta and FinGPT [prov:src-2026-05-04-finrl-investigation#sec:fundamental-analysis|direct|2026-05-04] [prov:src-2026-05-04-finrl-investigation#sec:other|direct|2026-05-04] [epistemic:: sourced]
 
 OHLCV ingestion supports 14+ providers (Yahoo, Alpaca, Binance, CCXT, WRDS, EODHD, Sinopac, etc.) [prov:src-2026-05-04-finrl-investigation#sec:other|direct|2026-05-04] [epistemic:: sourced]
+
+### Training data sources (2026-05-04)
+
+Data-provider modules under `finrl/meta/data_processors/` are unified by `finrl/meta/data_processor.py`: `processor_yahoofinance.py` (Yahoo via `yfinance`, OHLCV daily/intraday), `processor_alpaca.py` (Alpaca US stocks/ETFs OHLCV at 1-min), `processor_wrds.py` (WRDS intraday trades/TAQ), `processor_ccxt.py` (CCXT crypto OHLCV), `processor_eodhd.py` (EOD Historical Data US OHLCV), `processor_joinquant.py` and `processor_tushare` (CN securities OHLCV), `processor_quantconnect.py` and `processor_sinopac.py` (QuantConnect / Taiwan OHLCV). Lighter downloaders under `finrl/meta/preprocessor/` include `yahoodownloader.py`, `tusharedownloader.py`, `shioajidownloader.py`, and `ibkrdownloader.py`. All paths return OHLCV plus derived technicals; the only fundamentals path is a remote CSV (`dow_30_fundamental_wrds.csv`) pulled by `fundamental_stock_trading.py`. Typical flow: `examples/FinRL_StockTrading_2026_1_data.py` → `YahooDownloader.fetch_data()` → `FeatureEngineer.preprocess_data()` at `finrl/applications/stock_trading/stock_trading.py:43-54` [prov:src-2026-05-04-finrl-investigation#sec:data-sources|direct|2026-05-04] [epistemic:: sourced]
+
+### Training paradigm (2026-05-04)
+
+RL agents are trained from scratch with random initialization on each environment. The standard pipeline calls `agent.get_model(name)` at `finrl/agents/stablebaselines3/models.py:108-123` — which returns `MODELS[model_name](policy="MlpPolicy", env=self.env, ...)`, a brand-new SB3 instance — and then `agent.train_model(...)`. `train.py:78-91` (SB3 branch) and `train.py:48-57` (ElegantRL) follow the same pattern. `PPO.load` and `*.load` calls appear only in `examples/FinRL_StockTrading_2026_3_Backtest.py`, `Stock_NeurIPS2018_3_Backtest.ipynb`, and `finrl/meta/paper_trading/alpaca.py` — inference and deployment, never training. A repository-wide grep for `set_parameters` returns zero hits [prov:src-2026-05-04-finrl-investigation#sec:training-paradigm|direct|2026-05-04] [epistemic:: sourced]
+
+The `actor.pth` files shipped at `finrl/applications/cryptocurrency_trading/actor.pth` and `finrl/applications/high_frequency_trading/actor.pth` are demo outputs of prior ElegantRL training runs — they are loaded only by the Alpaca paper-trading deployment script, not by any training pipeline. The only adjacent surface is `finrl/applications/imitation_learning/` (Stock_Selection / Weight_Initialization / Imitation_Sandbox notebooks), an opt-in imitation-then-RL research workflow that is not invoked by `train.py` or any stock_trading example [prov:src-2026-05-04-finrl-investigation#sec:training-paradigm|direct|2026-05-04] [epistemic:: sourced]
 
 ## Related Pages
 

@@ -76,3 +76,10 @@ notes: superseded "financial reasoning must be built on top" claim on OpenBB (TA
 findings: 20 total (0 errors, 17 warnings, 3 info)
 auto_fixes: 0 applied
 report: wiki/maintenance/lint-report.md
+
+## [2026-05-04] query | FinRL training data sources and training-from-scratch paradigm
+
+answer: FinRL fetches data live at runtime from 14+ external market-data APIs via per-provider processors under finrl/meta/data_processors/; no bundled OHLCV. RL agents train from scratch with random initialization (no fine-tuning) on A2C/DDPG/PPO/TD3/SAC across three swappable backends (SB3, ElegantRL, RLlib). PPO.load only appears in inference scripts; shipped actor.pth files are demo outputs, not training inputs. Transfer/curriculum learning absent from standard pipeline.
+write_back: WRITE-BACK: extended src-2026-05-04-finrl-investigation with sec:data-sources and sec:training-paradigm sections; updated finrl entity TL;DR + Key Facts + Detail
+delta_compiled: src-2026-05-04-finrl-investigation (re-compiled after extension; content_hash updated to sha256:490c12bb...)
+pages_affected: finrl, src-2026-05-04-finrl-investigation
