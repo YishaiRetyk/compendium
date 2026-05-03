@@ -33,7 +33,7 @@ Numbering continues from v1.0. New REQ-ID prefixes: `TMPL`, `NEUT`, `WZRD`, `MAN
 - [x] **NEUT-05**: `examples/kahneman/README.md` explains why the cluster is preserved and how to use it as a reference
 - [x] **NEUT-06**: CI neutrality gate: grep-based check that **public control-plane surfaces** (`AGENTS.md`, `CLAUDE.md`, `README.md`, `PRIVACY.md`, `/docs/**`, `.github/**`, `wiki/**`, `bin/**`) contain zero Kahneman-specific strings; `examples/kahneman/**` is explicitly excluded from the check as the permitted home for Kahneman content (runs on every PR) (pitfall C-1)
 - [x] **NEUT-07**: Decision record `dr-YYYY-MM-DD-kahneman-to-examples.md` committed (SUPERSEDE-class structural reorg per §11.4)
-- [ ] **NEUT-08** *(promoted to Phase 12.1)*: CI personal-content denylist check covering domain terms from the creator's private vault, runs on PR diff restricted to public control-plane paths (excludes `examples/kahneman/**`) (pitfall C-1 mitigation). **Status:** Infrastructure shipped in Phase 7 (bin/check-neutrality.sh supports denylist gating on public paths); personal-term denylist curation promoted from backlog 999.2 to active **Phase 12.1** on 2026-05-01 to clear before the Phase 13.2 closure gate. Candidate material at `.planning/backlog-neutrality-denylist-candidate.txt` (861-line deterministic --suggest-denylist output).
+- [x] **NEUT-08** *(completed in Phase 12.1)*: CI personal-content denylist check covering domain terms from the creator's private vault, runs on PR diff restricted to public control-plane paths (excludes `examples/kahneman/**`) (pitfall C-1 mitigation). **Status:** Complete (Phase 12.1) — 7 personal-vault terms curated from `.planning/backlog-neutrality-denylist-candidate.txt` (855 candidate lines) and merged into `.neutrality-denylist.txt` under the unified `# Category: Personal-vault terms expanded curation (NEUT-08, 2026-05-02)` header. Live-tree gate exit 0 verified; contract test at `tests/phase-12.1/`. See `.planning/phases/12.1-neut-08-personal-term-denylist-curation/12.1-VERIFICATION.md`.
 
 ### Guided Setup Wizard (WZRD)
 
@@ -212,7 +212,7 @@ Explicitly excluded from v1.1. Documented to prevent scope creep.
 | NEUT-05 | Phase 7 | Complete |
 | NEUT-06 | Phase 7 | Complete |
 | NEUT-07 | Phase 7 | Complete |
-| NEUT-08 | Phase 12.1 | Pending |
+| NEUT-08 | Phase 12.1 | Complete |
 | DEBT-03 | Phase 7 | Complete |
 | WZRD-01 | Phase 8 | Complete |
 | WZRD-02 | Phase 8 | Complete |
