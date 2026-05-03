@@ -1,0 +1,12 @@
+=== bash bin/check-neutrality.sh ===
+exit: 0
+
+=== bash tests/phase-12.1/run.sh ===
+--- Running test_neut08_live_denylist_contract.sh ---
+anchor term: pre-committing
+PASS positive: gate fires on 'pre-committing'
+PASS negative-control: gate clean after removal
+test_neut08_live_denylist_contract: 2 pass / 0 fail
+--- PASS test_neut08_live_denylist_contract.sh ---
+
+PHASE 12.1 TESTS: 1/1
