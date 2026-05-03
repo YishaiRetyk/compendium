@@ -127,10 +127,10 @@ Numbering continues from v1.0. New REQ-ID prefixes: `TMPL`, `NEUT`, `WZRD`, `MAN
 
 ### Local Wiki Write Gate (WGATE)
 
-- [ ] **WGATE-01**: The local commit path runs a deterministic pre-commit gate against staged wiki changes before commit completes.
+- [x] **WGATE-01**: The local commit path runs a deterministic pre-commit gate against staged wiki changes before commit completes.
 - [ ] **WGATE-02**: New staged pages under `wiki/{entities,concepts,overviews,comparisons}/` fail the gate when they contain zero `[prov:...]` markers.
 - [ ] **WGATE-03**: The gate is staged-index aware and composes with existing `bin/lint.sh --strict` policy where possible without relying blindly on PR-mode `origin/main...HEAD` behavior.
-- [ ] **WGATE-04**: Exemptions match the schema/tooling contract: `type: source`, `type: decision`, `examples/`, and brownfield transitional cases are not falsely blocked, and the existing `AGENTS.md` / `CLAUDE.md` sync hook remains intact.
+- [x] **WGATE-04**: Exemptions match the schema/tooling contract: `type: source`, `type: decision`, `examples/`, and brownfield transitional cases are not falsely blocked, and the existing `AGENTS.md` / `CLAUDE.md` sync hook remains intact.
 
 ### Claim Faithfulness Audit (FAITH)
 
@@ -279,10 +279,10 @@ Explicitly excluded from v1.1. Documented to prevent scope creep.
 | OBSID-01 | Phase 13.1 | Pending |
 | OBSID-02 | Phase 13.1 | Pending |
 | OBSID-03 | Phase 13.1 | Pending |
-| WGATE-01 | Phase 12.2 | Pending |
+| WGATE-01 | Phase 12.2 | Complete |
 | WGATE-02 | Phase 12.2 | Pending |
 | WGATE-03 | Phase 12.2 | Pending |
-| WGATE-04 | Phase 12.2 | Pending |
+| WGATE-04 | Phase 12.2 | Complete |
 | FAITH-01 | Phase 13 | Pending |
 | FAITH-02 | Phase 13 | Pending |
 | FAITH-03 | Phase 13 | Pending |

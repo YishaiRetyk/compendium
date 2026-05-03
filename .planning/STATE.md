@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Shareability
 status: Phase 12.2 planned (5 plans, 4 waves) — ready to execute
-stopped_at: Phase 12.2 plans verified by gsd-plan-checker after 1 revision iteration
-last_updated: "2026-05-04T01:50:00.000Z"
+stopped_at: Phase 12.2 planned (5 plans, 4 waves; plan-checker passed iteration 2)
+last_updated: "2026-05-03T23:37:57.733Z"
 progress:
   total_phases: 19
   completed_phases: 8
   total_plans: 42
-  completed_plans: 37
-  percent: 88
+  completed_plans: 41
+  percent: 98
 ---
 
 # Project State
@@ -96,6 +96,7 @@ Phase 12.1 closure: 4/4 plans complete; NEUT-08 flipped to Complete in REQUIREME
 | Phase 11-brownfield-suggest-verify P03 | 35min | 3 tasks | 6 files |
 | Phase 11-brownfield-suggest-verify P04 | 70min | 2 tasks | 7 files |
 | Phase 11-brownfield-suggest-verify P05 | 40min | 2 tasks | 13 files |
+| Phase 12.2 P04 | 25min | 4 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -272,6 +273,8 @@ Recent decisions affecting current work:
 - [Phase 11-brownfield-suggest-verify]: [Phase 11-05] Tier-1 DR with trigger_type: schema-update + affected_pages: [] for infrastructure-only records (inaugural-record precedent from dr-2026-04-14-phase6-decision-type)
 - [Phase 11-brownfield-suggest-verify]: [Phase 11-05] canonical-AGENTS.md regenerated via Phase 8-01 wizard render routine with pinned WIZARD_GENERATED_AT + WIZARD_TEMPLATE_SHA; test_canonical_agents_byte_equality.sh Rule 1 fix re-uses Phase 8 wizard-render shape per 11-01 plan fallback
 - [Phase 11-brownfield-suggest-verify]: [Phase 11-05] Single comprehensive Tier-1 DR over 11 micro-DRs for review-feedback items 1-11 — they are implementation details of the apply-vs-advisory + review-manifest + lifecycle-gate architecture, not independent architectural choices
+- [Phase ?]: Phase 12.2-04: schema/AGENTS.template.md got the FULL Phase 9 + 12.2 §11.3 CI mode block (closes pre-existing Phase 9 mirror gap)
+- [Phase ?]: Phase 12.2-04: pre-existing AGENTS↔CLAUDE drift from b1c3691 fixed first (Plan 02 deferred-items.md) before §11.3 amendment
 
 ### Pending Todos
 
@@ -300,6 +303,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-05-04T01:50:00.000Z
+Last session: 2026-05-03T23:37:32.207Z
 Stopped at: Phase 12.2 planned (5 plans, 4 waves; plan-checker passed iteration 2)
-Resume file: .planning/phases/12.2-local-wiki-write-gate/12.2-01-PLAN.md
+Resume file: None
