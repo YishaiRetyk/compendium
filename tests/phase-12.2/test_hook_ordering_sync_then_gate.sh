@@ -28,6 +28,40 @@ git clone -q "$REPO_ROOT" "$TMP"
 (cd "$TMP" && git config user.email "fixture@example.com" && \
     git config user.name "Fixture")
 
+# Setup: pre-commit a source page so stage (e)'s [prov:] reference resolves
+# under the regular `--category provenance` broken-ref check. This is fixture
+# setup, not under test, so --no-verify is appropriate.
+write_page "$TMP" "wiki/sources/src-2026-04-15-x.md" <<'EOF'
+---
+id: src-2026-04-15-x
+title: "X (test source)"
+type: source
+status: active
+summary: "Test source page for provenance-resolution."
+created_at: 2026-04-15
+updated_at: 2026-04-15
+sources: []
+epistemic_status: sourced
+tags: []
+domains: []
+supersedes:
+superseded_by:
+privacy: cloud_safe
+aliases: []
+has_contradictions: false
+knowledge_domain: ""
+path: sources/2026/2026-04/2026-04-15-x.md
+content_hash: "sha256:fixture"
+ingested_at: 2026-04-15
+source_type: paper
+compilation_status: compiled
+---
+
+Test source.
+EOF
+(cd "$TMP" && git add wiki/sources/src-2026-04-15-x.md && \
+    git -c commit.gpgsign=false commit --no-verify -q -m "fixture: add source page")
+
 # Stage (a): introduce CLAUDE.md drift by deleting a line.
 # (Using sed -i in-place; the hook's sync-claude --check should catch this.)
 if [ -f "$TMP/CLAUDE.md" ]; then
@@ -56,7 +90,7 @@ has_contradictions: false
 knowledge_domain: ""
 ---
 
-Hook-ordering test body without [prov:] markers.
+Hook-ordering test body without provenance markers.
 EOF
 (cd "$TMP" && git add CLAUDE.md wiki/concepts/foo.md 2>/dev/null || git add wiki/concepts/foo.md)
 
@@ -101,6 +135,7 @@ if ! grep -qi "prov" /tmp/wgate-out.$$ /tmp/wgate-err.$$; then
 fi
 
 # Stage (e): fix the page by adding a [prov:] marker; commit must succeed.
+# (Source page src-2026-04-15-x was pre-committed in fixture setup above.)
 write_page "$TMP" "wiki/concepts/foo.md" <<'EOF'
 ---
 id: foo
