@@ -1035,6 +1035,60 @@ Auto-fix (mechanical, deterministic, reversible): updating stale claim markers p
 
 Report-only (no auto-fix): contradictions, knowledge gaps, orphan pages, missing cross-references, page restructuring, any fix requiring judgment.
 
+#### CI mode (Phase 9)
+
+> **Source of truth for Phase 9 / Phase 12.2 CI + local-gate contracts.** This section is the authoritative specification for: (a) the severity-remap dispatch table, (b) the `--format json` output schema, (c) the escape-hatch marker contract, (d) the `--require-version` semantics, and (e) the `--staged` local-write-gate contract (Phase 12.2). Other docs (`docs/reference/ci.md`, `CONTRIBUTING.md`, `.github/workflows/lint.yml` comments) MUST link here rather than restating the policy. Drift between this section and the shipped code is a regression.
+
+`bin/lint.sh` supports a CI operating profile via several independent, orthogonal flags:
+
+| Flag | Effect |
+|------|--------|
+| `--format json` | Emit JSON array `[{severity, category, path, line?, message}]` to stdout; do NOT write `lint-report.md`. |
+| `--ci` | Apply severity-remap dispatch table: `yaml`/`orphan`/`crossref`/`provenance` -> `error`; `stale`/`gap`/`contradiction`/`contradiction-sync`/`drift`/`contributor` -> `warning`; `autofix`/`skip-count` -> `info`. Default-skip `drift-external` category. Exit 1 iff any post-remap finding has severity `error`. |
+| `--skip-category <cat>` | Exclude one category. Repeatable. Inverse of `--category`. |
+| `--strict` | Quality ratchet: fail on (a) new `[epistemic:: inferred]` / `[epistemic:: tentative]` claims without a matching decision record whose `affected_pages` frontmatter contains the page ID; (b) new (git-diff status `A`) pages of type `entity`/`concept`/`overview`/`comparison` with zero `[prov:` markers. Source pages and decision records are exempt by design. |
+| `--staged` | Phase 12.2 local-write-gate scope swap. With `--strict`, replaces the diff source from `git diff origin/main...HEAD` to `git diff --cached --name-only --diff-filter=A` and applies D-10 (new-page provenance) ONLY — D-08 (DR-match) stays CI-only. Files are read from the working tree, not from staged blobs. No-op without `--strict`. Used by `.githooks/pre-commit`. See "Staged-mode rules" below. |
+| `--require-version X.Y.Z` | Minimum-version pin. Fails if `LINT_VERSION < X.Y.Z`. Semver tuple comparison, not string. |
+| `--version` | Print `LINT_VERSION` and exit 0. |
+| `--count-skips` | Enumerate every `<!-- lint:expect-* -->` escape-hatch marker. Emits one `info`/`skip-count` finding per marker (human-review aid). |
+
+**Escape-hatch marker syntax (`--strict` exemption):**
+
+```
+<!-- lint:expect-inferred id=<page-id> reason="<one line>" -->
+<!-- lint:expect-tentative id=<page-id> reason="<one line>" -->
+```
+
+Placement rules (strict):
+
+1. Marker MUST appear on the line IMMEDIATELY above the claim line -- no blank line between.
+2. `id` MUST match the containing page's frontmatter `id` field.
+3. `reason` is required and non-empty.
+4. Exempted claims are emitted as severity `info`, category `skip-count` (visible in PR annotations as `::notice`, non-blocking).
+
+**CI workflow reference:** `.github/workflows/lint.yml` invokes three jobs in parallel -- `lint`, `privacy-leak`, `strict` -- each a required check in branch protection. See `docs/reference/ci.md`.
+
+**Staged-mode rules (`--staged`, Phase 12.2):**
+
+`bin/lint.sh --staged` is the local-write-gate scope swap. The `.githooks/pre-commit` hook invokes `bash bin/lint.sh --strict --staged --category provenance` after the AGENTS.md ↔ CLAUDE.md sync check. Rules:
+
+1. **Requires `--strict`.** `--staged` is a no-op without `--strict` (no provenance enforcement; standard categories run as usual). The pre-commit hook always passes both flags together.
+2. **Diff source:** `git diff --cached --name-only --diff-filter=A` (status-A entries in the staged index). Files are read from the WORKING TREE, not from staged blobs — pre-commit hooks fire after `git add`, so working-tree content matches the index for the typical add-then-commit flow. If you `git add foo.md && echo extra >> foo.md && git commit`, the gate sees the dirty version (which already contains the staged content); known caveat, not a bug.
+3. **Scope:** D-10 (new-page provenance) ONLY. Pages staged as status-A under `wiki/{entities,concepts,overviews,comparisons}/` must contain at least one `[prov:` marker. D-08 (DR-match for added inferred/tentative claims) stays CI-only — not enforced at commit time.
+4. **Exemption ordering** (first match wins):
+   1. Path NOT under `wiki/{entities,concepts,overviews,comparisons}/` — not gated.
+   2. Path under `examples/` anywhere in the tree — not gated (path-prefix exemption, mirrors `EXCLUDE_DIRS` for full-lint).
+   3. Frontmatter `type: source` — not gated (source pages are themselves the provenance anchors).
+   4. Frontmatter `type: decision` — not gated (decision records are the gating mechanism, can't gate on themselves).
+   5. Frontmatter `example: true` — not gated (reference content, anywhere in the tree).
+   6. Frontmatter `bootstrap_stage: bootstrapped` — not gated (brownfield in-flight; provenance-bootstrap migration `02-provenance-bootstrap.sh` adds markers later).
+5. **`bootstrap_stage: verified` is NOT exempt.** Pages promoted through the brownfield 5-gate `verify --promote` flow are first-class wiki content from the gate's perspective — they must carry `[prov:]` markers like any other entity / concept / overview / comparison page.
+6. **Exit policy:** reuses `--strict`'s contract — exit 1 iff any post-remap error-severity finding exists. `provenance` already maps to `error` in the severity remap.
+7. **Bypass:** `git commit --no-verify` only. No `WGATE_SKIP=1` env var. No per-page `wgate_exempt: true` frontmatter (would create a permanent bypass surface defeating the gate's purpose). Per AGENTS.md §3, `--no-verify` is the operator's escape hatch — use rarely, document the reason in the commit message when used.
+8. **Hook activation:** `bash bin/install-hooks.sh` once per clone. The hook composes the existing AGENTS.md ↔ CLAUDE.md sync check (runs first; can re-stage CLAUDE.md) with the new write-gate (runs second; read-only over the staged index).
+
+**Failure UX:** when the gate blocks, `bin/lint.sh` prints per-page `error/provenance/<path>: new <type> page has zero [prov:...] markers (D-10; ...)` lines, and the hook appends a single trailing footer line listing the three actionable paths (add `[prov:source_id#locator]` markers, set `type: source` / `type: decision` in frontmatter if it's not a synthesized page, or `git commit --no-verify` to bypass).
+
 **Steps:**
 
 1. Read `wiki/index.md` for full page inventory. Build resolution map: for each wiki page, collect filename, id, title, and aliases (case-insensitive matching).
