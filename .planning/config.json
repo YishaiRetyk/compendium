@@ -33,7 +33,7 @@
     "research_before_questions": true,
     "discuss_mode": "discuss",
     "skip_discuss": false,
-    "_auto_chain_active": false,
+    "_auto_chain_active": true,
     "plan_review_convergence": true
   },
   "intel": {

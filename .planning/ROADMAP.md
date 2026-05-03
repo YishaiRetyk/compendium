@@ -214,7 +214,14 @@ Plans:
 - No cloud API use
 - No auto-rewrite of pages
 - No full-vault lint on every commit
-**Plans**: TBD
+**Plans**: 5 plans
+Plans:
+- [ ] 12.2-01-PLAN.md — Wave 0: tests/phase-12.2/ test harness (run.sh + lib.sh + 11 test_*.sh covering 10 D-20 scenarios + D-05 contract)
+- [ ] 12.2-02-PLAN.md — Wave 1: bin/lint.sh --staged orthogonal flag + staged_new_pages() + STRICT_MODE dispatch + D-15 exemption ordering + LINT_VERSION 1.2.0
+- [ ] 12.2-03-PLAN.md — Wave 1: .githooks/pre-commit composition (sync-claude preserved; write-gate appended per D-07; D-08 footer line)
+- [ ] 12.2-04-PLAN.md — Wave 2: AGENTS.md §11.3 amendment (--staged row + Staged-mode rules subsection) + schema/AGENTS.template.md byte-equal mirror + docs/reference/ci.md "Local pre-commit write gate" section + CONTRIBUTING.md install reminder
+- [ ] 12.2-05-PLAN.md — Wave 3: 12.2-VERIFICATION.md (Phase 12.1 mirror format) + REQUIREMENTS.md WGATE-01..04 status flip + bin/requirements-sync.sh --strict + --require-complete --phase 12.2 exit-0 evidence
+
 
 ### Phase 13: Claim Faithfulness Audit
 
@@ -416,7 +423,7 @@ The following are intentionally deferred until real usage demands them, captured
 | 11. Brownfield Suggest + Verify | v1.1 | 5/5 | Complete    | 2026-04-20 |
 | 12. Complementary Systems Boundary + GTD Alignment | v1.1 | 4/4 | Complete    | 2026-05-01 |
 | 12.1. NEUT-08 Personal-Term Denylist Curation | v1.1 | 0/4 | Planned     | - |
-| 12.2. Local Wiki Write Gate | v1.1 | 0/0 | Not started | - |
+| 12.2. Local Wiki Write Gate | v1.1 | 0/5 | Planned     | - |
 | 13. Claim Faithfulness Audit | v1.1 | 0/0 | Not started | - |
 | 13.1. Docs Finalization + Obsidian Starter | v1.1 | 0/0 | Not started | - |
 | 13.2. v1.1 Closure Verification Gate | v1.1 | 0/0 | Not started | - |
