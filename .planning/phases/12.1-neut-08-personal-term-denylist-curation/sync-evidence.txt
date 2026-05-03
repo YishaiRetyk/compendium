@@ -1,0 +1,26 @@
+=== bash bin/requirements-sync.sh --strict --phase 12.1 ===
+Drift rows: 0 / 1
+Advisory mode — active-phase drift expected. Pass --strict at milestone close.
+
+| REQ-ID    | REQUIREMENTS.md | VERIFICATION.md | Drift | Note |
+|-----------|-----------------|-----------------|-------|------|
+| NEUT-08   | Complete        | Complete        | ok    | OK |
+
+# 0 drift row(s) of 1 total.
+exit: 0
+
+=== bash bin/requirements-sync.sh --require-complete --phase 12.1 ===
+Drift rows: 0 / 1
+Incomplete rows: 0 / 1
+Advisory mode — active-phase drift expected. Pass --strict at milestone close.
+
+| REQ-ID    | REQUIREMENTS.md | VERIFICATION.md | Drift | Note |
+|-----------|-----------------|-----------------|-------|------|
+| NEUT-08   | Complete        | Complete        | ok    | OK |
+
+# 0 drift row(s) of 1 total.
+# require-complete (phase 12.1): all 1 in-scope REQ-IDs are Complete.
+exit: 0
+
+=== git diff 6a2bf5cb2be83079b3d81a05e5d66c6a7e21e950..HEAD -- bin/check-neutrality.sh ===
+diff-line-count: 0
