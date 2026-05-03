@@ -115,6 +115,40 @@ All three jobs are required status checks in branch protection on `main`.
 
 **`fetch-depth: 0`:** The `strict` job's checkout step uses full history so `git diff --name-status origin/main...HEAD` resolves correctly. Other jobs use shallow clones.
 
+## Local pre-commit write gate (Phase 12.2)
+
+> **Source of truth:** The authoritative specification lives in [AGENTS.md §11.3 "CI mode"](../../AGENTS.md). This page reproduces the install + bypass commands for ergonomic reference — the rules themselves (exemption ordering, exit codes, scope) must stay in sync with §11.3. If you find a discrepancy, §11.3 wins and this page is the bug.
+
+`bin/lint.sh --staged` is a local-only scope swap that gates new synthesized wiki pages over the **staged index** (not `origin/main...HEAD`), so structurally invalid writes are caught BEFORE they land in local history. The CI `--strict` job remains the merge-time ratchet; this is the pre-commit-time complement.
+
+**What it fails on:**
+
+- A page staged as git-diff status `A` under `wiki/{entities,concepts,overviews,comparisons}/` with zero `[prov:...]` markers in the body. This is D-10 (new-page provenance) ONLY — D-08 (DR-match for added inferred/tentative claims) is enforced by the CI `strict` job, not the local gate.
+
+**What it does not fail on:** see the AGENTS.md §11.3 "Staged-mode rules" subsection for the full exemption ordering. Summary: pages outside the four required-types directories, anything under `examples/`, `type: source` or `type: decision` pages, `example: true`, and `bootstrap_stage: bootstrapped` are exempt; `bootstrap_stage: verified` is NOT exempt.
+
+**How to install:**
+
+```sh
+bash bin/install-hooks.sh
+```
+
+Activates `core.hooksPath=.githooks`, which composes the existing AGENTS.md ↔ CLAUDE.md sync check with the new write-gate.
+
+**How to bypass (rarely):**
+
+```sh
+git commit --no-verify
+```
+
+Per AGENTS.md §3, `--no-verify` is the only operator escape; document the reason in the commit message when used. There is no `WGATE_SKIP=1` env var and no per-page `wgate_exempt: true` frontmatter — those would create permanent bypass surfaces and are explicitly rejected.
+
+**How to fix a blocked commit:**
+
+1. Add `[prov:source_id#locator]` markers to the page body. This is the primary fix.
+2. If the page is a source summary or decision record (not a synthesized page), set `type: source` or `type: decision` in frontmatter — it should not have been gated; review the page type.
+3. As a last resort, `git commit --no-verify` to bypass and follow up with provenance markers in the next commit.
+
 ## Escape-hatch markers
 
 Intentional `[inferred]` or `[tentative]` claims that do not yet have a matching decision record can carry an HTML-comment marker:

@@ -23,6 +23,10 @@ Three required checks run on every PR (branch protection rule):
 
 See [docs/reference/ci.md](docs/reference/ci.md) for the full severity policy, JSON schema, multi-provider equivalents, escape-hatch markers, and `--require-version` pinning.
 
+### Local pre-commit gate
+
+Run `bash bin/install-hooks.sh` once per clone to activate the AGENTS.md ↔ CLAUDE.md sync check and the local wiki write-gate (Phase 12.2). The gate blocks new staged pages under `wiki/{entities,concepts,overviews,comparisons}/` that contain zero `[prov:]` markers; bypass with `git commit --no-verify` (rare, document the reason in the commit message). See [docs/reference/ci.md](docs/reference/ci.md) and [AGENTS.md §11.3](AGENTS.md) for the full contract (exemption ordering, exit codes, --staged-requires-strict).
+
 ## Attribution
 
 **Git commit authorship is the source of truth** (COLAB-05). The `Author:` field on your commit is the canonical record of who produced the change. Squash-merging erases authorship granularity — we recommend merge commits for ingest PRs (documented, not enforced).
