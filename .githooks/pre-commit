@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Pre-commit hook: enforce AGENTS.md <-> CLAUDE.md byte-equality (D-03).
+# Pre-commit hook: enforce AGENTS.md <-> CLAUDE.md byte-equality (D-03)
+# AND run the local wiki write-gate over staged changes (Phase 12.2).
 set -euo pipefail
 
 if ! bash bin/sync-claude.sh --check 2>/dev/null; then
@@ -7,5 +8,15 @@ if ! bash bin/sync-claude.sh --check 2>/dev/null; then
     bash bin/sync-claude.sh
     git add CLAUDE.md
     echo "CLAUDE.md resynced and re-staged. Re-run commit." >&2
+    exit 1
+fi
+
+# Phase 12.2 / WGATE-01..04: local wiki write-gate over staged changes.
+# Reuses bin/lint.sh --strict policy via the additive --staged flag.
+# See AGENTS.md §11.3 for the normative contract (exemption ordering,
+# bypass, exit codes). Bypass via `git commit --no-verify` when needed.
+if ! bash bin/lint.sh --strict --staged --category provenance >&2; then
+    echo "" >&2
+    echo "Write-gate failed. Add [prov:source_id#locator] markers to the page, set type: source / type: decision in frontmatter if it's not a synthesized page, or run \`git commit --no-verify\` to bypass." >&2
     exit 1
 fi
