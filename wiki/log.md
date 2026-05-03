@@ -5,7 +5,7 @@ type: overview
 status: active
 summary: "Append-only operations log."
 created_at: 2026-04-15
-updated_at: 2026-04-15
+updated_at: 2026-05-04
 sources: []
 epistemic_status: sourced
 tags:
@@ -60,5 +60,19 @@ report: wiki/maintenance/lint-report.md
 ## [2026-05-01] lint | wiki health check
 
 findings: 5 total (0 errors, 5 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki/maintenance/lint-report.md
+
+## [2026-05-04] query | TA/FA capabilities of financial-AI repos (with delta ingestion of 6 investigation sources)
+
+answer: mapped 6 repos along technical-analysis and fundamental-analysis dimensions via direct GitHub repository inspection — TradingAgents and OpenBB ship both TA and FA; Dexter and Anthropic Financial Services are FA-only; FinRL is TA-first with a partial fundamentals example; Financial-Models-Numerical-Methods is neither.
+write_back: WRITE-BACK: corrections to wiki claims contradicted by ground truth + 6 new investigation sources ingested via append-then-synthesize per §10 Pass 3
+delta_compiled: src-2026-05-04-openbb-investigation, src-2026-05-04-finrl-investigation, src-2026-05-04-tradingagents-investigation, src-2026-05-04-fmnm-investigation, src-2026-05-04-dexter-investigation, src-2026-05-04-anthropic-financial-services-investigation
+pages_affected: openbb, dexter, finrl, tradingagents, anthropic-financial-services, financial-models-numerical-methods, financial-ai-repository-tradeoffs, financial-ai-repository-landscape, index
+notes: superseded "financial reasoning must be built on top" claim on OpenBB (TA + FA endpoints ship natively); superseded "mostly instructions and configuration" weakness on Anthropic Financial Services (Python validators, Excel templates, populated SKILL.md prompts ship). Both stale-marked with supersession pointers; original claims preserved per provenance trail rule. Index synced with existing wiki content at the same time.
+
+## [2026-05-04] lint | wiki health check
+
+findings: 20 total (0 errors, 17 warnings, 3 info)
 auto_fixes: 0 applied
 report: wiki/maintenance/lint-report.md
