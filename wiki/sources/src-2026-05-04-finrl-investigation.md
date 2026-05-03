@@ -25,11 +25,11 @@ knowledge_domain: software
 example: false
 path: sources/2026/2026-05/2026-05-04-finrl-investigation.md
 url: "https://github.com/AI4Finance-Foundation/FinRL"
-content_hash: "sha256:490c12bb87fa57a8bd3ae0a752efc091ef5677cab399c201e2b132c4527127e7"
+content_hash: "sha256:bde68e632187f318c24d120fa4bc7c49621187e65ad9a7abc0f33f703b40c78e"
 ingested_at: 2026-05-04
 source_type: article
 compilation_status: compiled
-compiled_against_hash: "sha256:490c12bb87fa57a8bd3ae0a752efc091ef5677cab399c201e2b132c4527127e7"
+compiled_against_hash: "sha256:bde68e632187f318c24d120fa4bc7c49621187e65ad9a7abc0f33f703b40c78e"
 compiled_targets:
   - finrl
   - financial-ai-repository-tradeoffs
@@ -49,6 +49,8 @@ FinRL feeds a default TA-indicator list (MACD, Bollinger upper/lower, RSI-30, CC
 - Training data is fetched live from 14+ external market-data APIs at runtime via per-provider processors under `finrl/meta/data_processors/`; no OHLCV bundle ships in the repo [prov:src-2026-05-04-finrl-investigation#sec:data-sources|direct|2026-05-04] [epistemic:: sourced]
 - RL agents are trained from scratch with random initialization: `agent.get_model(name)` at `finrl/agents/stablebaselines3/models.py:108-123` returns a brand-new SB3 instance; `PPO.load` and `*.load` appear only in inference and paper-trading scripts, never in training [prov:src-2026-05-04-finrl-investigation#sec:training-paradigm|direct|2026-05-04] [epistemic:: sourced]
 - Algorithms supported: A2C, DDPG, PPO, TD3, SAC across three swappable backends (Stable-Baselines3, ElegantRL, RLlib); transfer/curriculum learning are absent from the standard pipeline (the imitation-learning workflow is opt-in research code) [prov:src-2026-05-04-finrl-investigation#sec:training-paradigm|direct|2026-05-04] [epistemic:: sourced]
+- The repository states no hardware requirements (Python ≥3.7 only); training runs CPU-only out of the box because SB3 defaults to `device="auto"` and the example notebooks/scripts never request CUDA; a GPU is recommended but not required, and only meaningfully helps the ElegantRL backend and long SB3 runs at the `1e6`-step default [prov:src-2026-05-04-finrl-investigation#sec:hardware-requirements|direct|2026-05-04] [epistemic:: sourced]
+- No `SubprocVecEnv` or `n_envs` parameter is exposed (single-process `DummyVecEnv` only); the 1M-step TD3 replay buffer is the largest memory line item at default hyperparameters (on the order of hundreds of MB) [prov:src-2026-05-04-finrl-investigation#sec:hardware-requirements|direct|2026-05-04] [epistemic:: sourced]
 
 ## Extracted Claims
 
@@ -56,6 +58,7 @@ FinRL feeds a default TA-indicator list (MACD, Bollinger upper/lower, RSI-30, CC
 - "`finrl/applications/stock_trading/fundamental_stock_trading.py` consumes a Compustat/WRDS-derived static CSV and computes ratios in-line: OPM, NPM, ROA, ROE, EPS, BPS, DPS, current ratio, quick ratio" [prov:src-2026-05-04-finrl-investigation#sec:fundamental-analysis|direct|2026-05-04]
 - "`get_model` returns `MODELS[model_name](policy=\"MlpPolicy\", env=self.env, ...)`, a brand-new SB3 instance" [prov:src-2026-05-04-finrl-investigation#sec:training-paradigm|direct|2026-05-04]
 - "`PPO.load` / `*.load` calls appear only in `examples/FinRL_StockTrading_2026_3_Backtest.py`, `Stock_NeurIPS2018_3_Backtest.ipynb`, and `finrl/meta/paper_trading/alpaca.py` — inference and deployment, never training" [prov:src-2026-05-04-finrl-investigation#sec:training-paradigm|direct|2026-05-04]
+- "Training runs CPU-only out of the box. A GPU is recommended but not required, and only meaningfully helps the ElegantRL backend and long SB3 runs at the `1e6`-step default" [prov:src-2026-05-04-finrl-investigation#sec:hardware-requirements|direct|2026-05-04]
 
 ## Notes
 

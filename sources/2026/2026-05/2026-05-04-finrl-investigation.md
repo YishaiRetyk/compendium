@@ -58,3 +58,18 @@ Shipped checkpoints are demo *outputs*, not training inputs: `finrl/applications
 Algorithms: A2C, DDPG, PPO, TD3, SAC. Three backends selectable via `drl_lib`: Stable-Baselines3 (`finrl/agents/stablebaselines3/models.py`, `MODELS = {a2c, ddpg, td3, sac, ppo}`), ElegantRL (`finrl/agents/elegantrl/models.py`), RLlib (`finrl/agents/rllib/models.py`). All three listed in `requirements.txt`.
 
 Transfer learning and curriculum learning are absent from the standard RL pipeline. The only related surface is `finrl/applications/imitation_learning/` (Stock_Selection / Weight_Initialization / Imitation_Sandbox notebooks) — an opt-in imitation-then-RL research workflow that is not invoked by `train.py` or any stock_trading example.
+
+## sec:hardware-requirements
+
+The repository has no stated hardware requirements. The README only specifies Python ≥3.7 (`setup.py:50`) and OS support for macOS, Ubuntu, Windows 10 (`README.md:275`). There is no GPU/CPU/RAM section, no training-time commentary, no memory commentary, and no Colab badge. The `examples/` directory contains no `*Colab*.ipynb` files.
+
+Implicit hardware requirements are visible in the code:
+
+- `requirements.txt` pulls `stable-baselines3[extra]`, `elegantrl`, and `ray[default]`/`ray[tune]`. There is no `tensorflow` and no explicit CUDA pin. `gputil` (a GPU-monitoring library) is included, indicating that authors expect a GPU is sometimes present but do not require one.
+- SB3 path: `finrl/agents/stablebaselines3/models.py:125-133` constructs models without passing a `device=` argument, so SB3's default `device="auto"` applies — CUDA is used if available, otherwise CPU. The training loop calls `model.learn(total_timesteps=total_timesteps, ...)` at `models.py:139-150`.
+- ElegantRL path: `finrl/agents/elegantrl/models.py` imports `torch` and constructs `Config(...)` without setting `gpu_id` or `learner_gpus` in `get_model`, so ElegantRL's own `Config` defaults apply. The only hardcoded `gpu_id = 0` (`models.py:58`) appears inside `DRL_prediction`, which is evaluation, not training.
+- Vectorization is single-process `DummyVecEnv` (`finrl/agents/stablebaselines3/models.py:18, 358, 431, 579`); there is no `SubprocVecEnv` and no `n_envs` parameter exposed.
+
+Compute scale at default hyperparameters: `examples/FinRL_StockTrading_2026_2_train.py` trains all five agents at `total_timesteps=20000`. `finrl/train.py:91` defaults to `total_timesteps=1e6` for SB3 and `break_step=1e6` for ElegantRL (`train.py:49`). Replay-buffer sizes in `finrl/config.py:41-49` are TD3 `buffer_size=1000000`, DDPG `50000`, SAC `100000`. ElegantRL config (`config.py:50-58`) sets `batch_size=2048` and `net_dimension=512`. Single-env `DummyVecEnv` keeps RAM low; the 1M-step TD3 replay buffer is the largest memory line item (on the order of hundreds of MB).
+
+Bottom line: training runs CPU-only out of the box. A GPU is recommended but not required, and only meaningfully helps the ElegantRL backend (PyTorch-native, larger networks at `net_dimension=512`) and long SB3 runs at the `1e6`-step default. RLlib via Ray scales horizontally on CPU cores. No backend hard-requires a GPU.
