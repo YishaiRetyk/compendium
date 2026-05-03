@@ -10,7 +10,7 @@ set -euo pipefail
 # Lint rule-set semver per CI-08 / D-26. Bump MAJOR on breaking changes
 # (removed category, changed severity semantics). MINOR on non-breaking
 # additions. PATCH on bug fixes. --require-version X.Y.Z is a minimum check.
-LINT_VERSION="1.1.0"
+LINT_VERSION="1.2.0"
 
 usage() {
     cat <<'EOF'
@@ -61,6 +61,15 @@ Options:
                              marker across the wiki. Emits one info/skip-count
                              finding per marker + stderr grand total. Intended
                              for human review, not automated enforcement.
+  --staged                   WGATE local-mode: scope --strict's new-page
+                             provenance check (D-10) to staged additions
+                             only (`git diff --cached --name-only
+                             --diff-filter=A` instead of
+                             `origin/main...HEAD`). REQUIRES --strict;
+                             no-op otherwise. Reads files from the working
+                             tree (not from staged blobs) -- assumes the
+                             typical git-add-then-commit flow. Used by
+                             .githooks/pre-commit per AGENTS.md section 11.3.
 
 Arguments:
   [wiki-directory]    Path to wiki directory (default: wiki/)
@@ -91,6 +100,7 @@ CI_MODE=0
 SKIP_CATEGORIES=""   # colon-separated list
 STRICT_MODE=0
 COUNT_SKIPS=0
+STAGED_MODE=0
 
 while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -159,6 +169,10 @@ while [ "$#" -gt 0 ]; do
             ;;
         --count-skips)
             COUNT_SKIPS=1
+            shift
+            ;;
+        --staged)
+            STAGED_MODE=1
             shift
             ;;
         -*)
@@ -247,6 +261,7 @@ export LINT_CI_MODE="$CI_MODE"
 export LINT_SKIP_CATEGORIES="$SKIP_CATEGORIES"
 export LINT_STRICT_MODE="$STRICT_MODE"
 export LINT_COUNT_SKIPS="$COUNT_SKIPS"
+export LINT_STAGED_MODE="$STAGED_MODE"
 export LINT_REPO_ROOT="${LINT_REPO_ROOT:-$PWD}"
 
 python3 << 'PYEOF'
@@ -272,6 +287,7 @@ SKIP_CATEGORIES = set(filter(None, os.environ.get('LINT_SKIP_CATEGORIES', '').sp
 # --- Phase 9 Plan 03 primitives (D-07..D-11, D-22) ---
 STRICT_MODE = os.environ.get('LINT_STRICT_MODE', '0') == '1'
 COUNT_SKIPS_MODE = os.environ.get('LINT_COUNT_SKIPS', '0') == '1'
+STAGED_MODE = os.environ.get('LINT_STAGED_MODE', '0') == '1'
 REPO_ROOT = os.environ.get('LINT_REPO_ROOT', os.getcwd())
 
 import subprocess
