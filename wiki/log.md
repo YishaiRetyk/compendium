@@ -113,3 +113,10 @@ report: wiki/maintenance/lint-report.md
 findings: 28 total (0 errors, 25 warnings, 3 info)
 auto_fixes: 0 applied
 report: wiki/maintenance/lint-report.md
+
+## [2026-05-04] query | FinRL hardware requirements for training
+
+answer: Repository states no hardware requirements (Python ≥3.7 + macOS/Ubuntu/Windows 10 only); no GPU/CPU/RAM section, no Colab badge. Training runs CPU-only out of the box: SB3 path uses default device="auto" (CUDA if available, else CPU); ElegantRL path doesn't set gpu_id/learner_gpus in get_model; vectorization is single-process DummyVecEnv. Default hyperparameters modest (20k steps in examples; 1M in finrl/train.py defaults). Largest memory item is TD3's 1M-step replay buffer (~hundreds of MB). GPU recommended but not required — meaningfully helps only ElegantRL backend and long 1M-step SB3 runs.
+write_back: WRITE-BACK: extended src-2026-05-04-finrl-investigation with sec:hardware-requirements; updated finrl entity Key Facts + Detail
+delta_compiled: src-2026-05-04-finrl-investigation (re-compiled after extension; content_hash updated to sha256:bde68e63...)
+pages_affected: finrl, src-2026-05-04-finrl-investigation
