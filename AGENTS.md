@@ -127,6 +127,7 @@ Red links (wikilinks to non-existent pages) are allowed and intentional. They si
 - DO NOT create multiple commits for a single logical operation. One ingest = one commit, even if it touches 15 files.
 - DO NOT send `local_only` content to cloud LLM APIs under any circumstances.
 - DO NOT link to the same page more than once in a single page body. Link on first mention only.
+- DO NOT use real slugs, page IDs, or terms drawn from the user's private wiki content (under `examples/`, archived sources, or any `privacy: local_only` page) when authoring or editing **template-public files**: `AGENTS.md`, `CLAUDE.md`, `README.md`, `PRIVACY.md`, `docs/`, `.github/`, `wiki/` scaffolding (`index.md`, `log.md`, `maintenance/`), and `bin/`. Use abstract placeholders instead — `<concept-slug>`, `<source-id>`, `<page-title>`, `<entity-name>`, `<YYYY-MM-DD-slug>`, `<term>`. The `bin/check-neutrality.sh` denylist gate is a backstop, not the primary defense; prevent leaks at write-time. This rule applies to examples in schema docs, illustrative snippets, sample commands, test fixtures shipped to public paths, and any narrative that would benefit from a "concrete example" — pick a placeholder, not a real vault term.
 
 ## 4. Page Types and Templates
 
