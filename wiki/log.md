@@ -83,3 +83,33 @@ answer: FinRL fetches data live at runtime from 14+ external market-data APIs vi
 write_back: WRITE-BACK: extended src-2026-05-04-finrl-investigation with sec:data-sources and sec:training-paradigm sections; updated finrl entity TL;DR + Key Facts + Detail
 delta_compiled: src-2026-05-04-finrl-investigation (re-compiled after extension; content_hash updated to sha256:490c12bb...)
 pages_affected: finrl, src-2026-05-04-finrl-investigation
+
+## [2026-05-04] ingest | Hack — "Is this the only skill left?" (YouTube transcript)
+
+source: src-2026-05-03-is-this-the-only-skill-left
+classification: transcript (YouTube monologue, ~22 min)
+result: created source summary plus 4 concept pages (systems-thinking, comprehension-debt, programming-as-theory-building, jagged-frontier) and 2 entity pages (peter-naur, hack-agentive-stack)
+pages_affected: src-2026-05-03-is-this-the-only-skill-left, systems-thinking, comprehension-debt, programming-as-theory-building, jagged-frontier, peter-naur, hack-agentive-stack
+reason: foundational ingest seeding the AI-assisted-development domain; argues systems thinking is the durable skill in AI-coding and grounds the frame in Naur 1985.
+notes: validity assessment in source Notes section flags two unverified empirical claims — "Hosini and Liftinger" study (speaker hedges names) and the IBM/Salesforce/Indeed industry-trend numbers — as tentative. Naur 1985 reference is accurate; jagged-frontier attribution is partially correct (Dell'Acqua et al., 2023, HBS).
+
+## [2026-05-04] ingest | Hack — "Three artifacts that changed how I build with AI" (YouTube transcript)
+
+source: src-2026-05-04-three-artifacts-build-with-ai
+classification: transcript (YouTube monologue, ~15 min); explicitly references the prior video as "the previous video"
+result: created source summary, 1 overview page (domain-driven-design), 3 concept pages (ubiquitous-language, bounded-context, documented-contract), 1 entity page (eric-evans); UPDATE on systems-thinking (added DDD as operational successor + second source), comprehension-debt (added second source), hack-agentive-stack (added second source + Clark/editorial detail)
+pages_affected: src-2026-05-04-three-artifacts-build-with-ai, domain-driven-design, ubiquitous-language, bounded-context, documented-contract, eric-evans, systems-thinking, comprehension-debt, hack-agentive-stack
+reason: companion ingest to 2026-05-03 video; argues DDD reduced to three artifacts is the practical method for paying down comprehension debt in AI-assisted workflows.
+notes: validity assessment in source Notes section flags Hack's three-artifact reduction as a deliberate pedagogical simplification of Evans' larger DDD vocabulary (aggregates, value objects, anti-corruption layers, context maps absent). Evans 2003 attribution is accurate. "Documented contracts" is closest to Evans' Context Map / Published Language but is non-canonical phrasing.
+
+## [2026-05-04] lint | wiki health check
+
+findings: 0 total (0 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki/maintenance/lint-report.md
+
+## [2026-05-04] lint | wiki health check
+
+findings: 28 total (0 errors, 25 warnings, 3 info)
+auto_fixes: 0 applied
+report: wiki/maintenance/lint-report.md

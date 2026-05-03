@@ -23,6 +23,9 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 
 ## Entities
 
+- [[Hack (Agentive Stack)]] — Product engineer turned founder; YouTube creator publishing on AI-assisted software engineering practices (sourced, 2026-05-04)
+- [[Eric Evans]] — Author of *Domain-Driven Design* (2003) (mixed, 2026-05-04)
+- [[Peter Naur]] — Danish computer scientist; author of *Programming as Theory Building* (1985) (mixed, 2026-05-04)
 - [[OpenBB]] — Open-source financial data platform with native TA and FA router modules (sourced, 2026-05-04)
 - [[Dexter]] — Autonomous financial research agent specialized for fundamentals and DCF valuation (sourced, 2026-05-04)
 - [[FinRL]] — Deep reinforcement-learning trading framework with TA features as RL state inputs (sourced, 2026-05-04)
@@ -30,8 +33,20 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[Anthropic Financial Services]] — Claude Code plugin marketplace for professional FA workflows (sourced, 2026-05-04)
 - [[Financial-Models-Numerical-Methods]] — Educational quantitative finance notebook collection covering derivatives pricing and stochastic processes (sourced, 2026-05-04)
 
+## Concepts
+
+- [[Systems Thinking]] — The day-one skill for AI-assisted software development: reasoning about how parts of a system affect each other (sourced, 2026-05-04)
+- [[Comprehension Debt]] — Cumulative cost of shipping AI-generated code the team doesn't understand; aliased to "cognitive debt" (sourced, 2026-05-04)
+- [[Programming as Theory Building]] — Peter Naur's 1985 paper: the program is the theory in the head, the code is its shadow (mixed, 2026-05-04)
+- [[Jagged Frontier]] — AI capability shape: sharp in some places, dull in others, sometimes within a single session (mixed, 2026-05-04)
+- [[Ubiquitous Language]] — DDD artifact: project glossary functioning as a contract between humans, code, and AI (sourced, 2026-05-04)
+- [[Bounded Context]] — DDD artifact: a distinct area of a system with its own rules and stable term meanings (sourced, 2026-05-04)
+- [[Documented Contract]] — DDD artifact: written-down handshake between bounded contexts (sourced, 2026-05-04)
+
 ## Sources
 
+- [[Is this the only skill left?]] — Hack (Agentive Stack), 2026-05-03 — YouTube transcript on systems thinking as the durable skill in AI-assisted development (sourced, 2026-05-04)
+- [[Three artifacts that changed how I build with AI]] — Hack (Agentive Stack), 2026-05-04 — YouTube transcript on DDD reduced to three artifacts for AI-coding workflows (sourced, 2026-05-04)
 - [[Financial AI and Quant Finance Repository Comparison Report]] — Comparison report mapping six finance-related open-source repositories (sourced, 2026-05-04)
 - [[OpenBB Repository Investigation Snapshot]] — Direct repository inspection capturing OpenBB's TA, FA, and other extension surface (sourced, 2026-05-04)
 - [[FinRL Repository Investigation Snapshot]] — Direct repository inspection capturing FinRL's TA-indicator-as-RL-state pipeline (sourced, 2026-05-04)
@@ -46,6 +61,7 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 
 ## Overviews
 
+- [[Domain-Driven Design]] — 2003 methodology by Eric Evans, re-discovered for AI-assisted development as a remedy for context loss between AI sessions (mixed, 2026-05-04)
 - [[Financial AI Repository Landscape]] — Synthesis of six finance-related repositories as a layered ecosystem (mixed, 2026-05-04)
 
 ## Decisions
