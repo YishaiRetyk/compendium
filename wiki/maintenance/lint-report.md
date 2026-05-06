@@ -5,7 +5,7 @@ type: overview
 status: active
 summary: "Wiki health-check findings from most recent lint run."
 created_at: 2026-04-30
-updated_at: 2026-05-04
+updated_at: 2026-05-06
 sources: []
 epistemic_status: sourced
 tags:
@@ -23,18 +23,22 @@ knowledge_domain: ""
 
 # Lint Report
 
-**Last run:** 2026-05-04
-**Total findings:** 28
+**Last run:** 2026-05-06
+**Total findings:** 32
 **Auto-fixes applied:** 0
 
 ## Errors (0)
 
 (none)
 
-## Warnings (25)
+## Warnings (29)
 
 ### Contradiction
+- **wiki/concepts/progressive-disclosure.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-06-anthropic-agent-skills-best-practices and src-2026-05-06-anthropic-agent-skills-overview (agent review needed)
 - **wiki/entities/anthropic-financial-services.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-04-anthropic-financial-services-investigation and src-2026-05-04-financial-ai-repo-comparison-report (agent review needed)
+- **wiki/entities/anthropic.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-06-anthropic-agent-skills-best-practices and src-2026-05-06-anthropic-agent-skills-overview (agent review needed)
+- **wiki/entities/anthropic.md** | Potential contradiction candidate in section "Detail": claims from src-2026-05-06-anthropic-agent-skills-best-practices and src-2026-05-06-anthropic-agent-skills-overview (agent review needed)
+- **wiki/entities/claude-api.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-06-anthropic-agent-skills-overview and src-2026-05-06-anthropic-agent-skills-quickstart (agent review needed)
 - **wiki/entities/dexter.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-04-dexter-investigation and src-2026-05-04-financial-ai-repo-comparison-report (agent review needed)
 - **wiki/entities/financial-models-numerical-methods.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-04-financial-ai-repo-comparison-report and src-2026-05-04-fmnm-investigation (agent review needed)
 - **wiki/entities/finrl.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-04-financial-ai-repo-comparison-report and src-2026-05-04-finrl-investigation (agent review needed)

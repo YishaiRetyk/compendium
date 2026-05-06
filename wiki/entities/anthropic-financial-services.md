@@ -5,7 +5,7 @@ type: entity
 status: active
 summary: "Claude Code plugin marketplace for professional finance workflows. Ships populated SKILL.md prompts for DCF, comps, 3-statement, LBO, merger model, initiating coverage, earnings analysis, and tear-sheet — alongside Python validators, Excel templates, and an Office add-in bootstrap."
 created_at: 2026-05-04
-updated_at: 2026-05-04
+updated_at: 2026-05-06
 sources:
   - src-2026-05-04-financial-ai-repo-comparison-report
   - src-2026-05-04-anthropic-financial-services-investigation
@@ -65,6 +65,9 @@ A repo-wide grep for TA indicator names returns only false positives ("version",
 - [[Dexter]]
 - [[TradingAgents]]
 - [[OpenBB]]
+- [[Anthropic]]
+- [[Claude Code]]
+- [[Agent Skills]]
 
 ## Sources
 

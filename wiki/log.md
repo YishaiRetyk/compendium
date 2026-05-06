@@ -5,7 +5,7 @@ type: overview
 status: active
 summary: "Append-only operations log."
 created_at: 2026-04-15
-updated_at: 2026-05-04
+updated_at: 2026-05-06
 sources: []
 epistemic_status: sourced
 tags:
@@ -120,3 +120,31 @@ answer: Repository states no hardware requirements (Python ≥3.7 + macOS/Ubuntu
 write_back: WRITE-BACK: extended src-2026-05-04-finrl-investigation with sec:hardware-requirements; updated finrl entity Key Facts + Detail
 delta_compiled: src-2026-05-04-finrl-investigation (re-compiled after extension; content_hash updated to sha256:bde68e63...)
 pages_affected: finrl, src-2026-05-04-finrl-investigation
+
+## [2026-05-04] lint | wiki health check
+
+findings: 0 total (0 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki/maintenance/lint-report.md
+
+## [2026-05-06] ingest | Anthropic Agent Skills — overview, quickstart, best-practices (3 platform docs)
+
+sources: src-2026-05-06-anthropic-agent-skills-overview, src-2026-05-06-anthropic-agent-skills-quickstart, src-2026-05-06-anthropic-agent-skills-best-practices
+classification: 3 articles (Anthropic platform documentation, captured 2026-05-06 from platform.claude.com/docs/en/agents-and-tools/agent-skills/)
+result: created 3 source summaries; 1 overview page (agent-skills); 1 concept page (progressive-disclosure); 3 entity pages (anthropic, claude-code, claude-api); UPDATE on anthropic-financial-services (Related Pages cross-link to new entities/overview, updated_at bumped — no new claims since the docs don't say new things specifically about anthropics/financial-services-plugins).
+write_back: WRITE-BACK — new sources establish the canonical model for Skills, the Skills-vs-prompts distinction, and the surface-specific runtime/sharing rules; not present in wiki before this ingest.
+delta_compiled: src-2026-05-06-anthropic-agent-skills-overview, src-2026-05-06-anthropic-agent-skills-quickstart, src-2026-05-06-anthropic-agent-skills-best-practices (all flipped pending → compiled with compiled_against_hash + compiled_targets populated per §5 invariants).
+pages_affected: agent-skills, progressive-disclosure, anthropic, claude-code, claude-api, anthropic-financial-services, src-2026-05-06-anthropic-agent-skills-overview, src-2026-05-06-anthropic-agent-skills-quickstart, src-2026-05-06-anthropic-agent-skills-best-practices, index
+notes: foundational ingest seeding the AI-agents domain. All three sources are publicly fetched Anthropic platform docs → privacy: cloud_safe. Single-author repo, contributor field omitted per §11.1 step 9a. Adjacent existing entity [[Anthropic Financial Services]] (a Claude Code plugin marketplace) is now properly cross-linked to its umbrella concepts. The wiki page [[Agent Skills]] is structurally an overview because it synthesizes across three sources and ties together a sub-concept ([[Progressive Disclosure]]) with three surface entities ([[Anthropic]], [[Claude Code]], [[Claude API]]) — same pattern as [[Domain-Driven Design]]. No contradictions detected vs. prior wiki content.
+
+## [2026-05-06] lint | wiki health check
+
+findings: 33 total (0 errors, 29 warnings, 4 info)
+auto_fixes: 0 applied
+report: wiki/maintenance/lint-report.md
+
+## [2026-05-06] lint | wiki health check
+
+findings: 32 total (0 errors, 29 warnings, 3 info)
+auto_fixes: 0 applied
+report: wiki/maintenance/lint-report.md
