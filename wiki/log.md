@@ -148,3 +148,19 @@ report: wiki/maintenance/lint-report.md
 findings: 32 total (0 errors, 29 warnings, 3 info)
 auto_fixes: 0 applied
 report: wiki/maintenance/lint-report.md
+
+## [2026-05-06] ingest | Anthropic claude-cookbooks Skills notebooks 01 + 03
+
+sources: src-2026-05-06-anthropic-claude-cookbook-skills-introduction, src-2026-05-06-anthropic-claude-cookbook-skills-custom-development
+classification: 2 articles (Jupyter notebook tutorials from github.com/anthropics/claude-cookbooks @ d28edf17, rendered to source.md from notebook.ipynb in bundle dirs alongside the original notebooks)
+result: created 2 source summaries; UPDATEd 3 existing wiki pages via append-then-synthesize (§10 Pass 3): agent-skills, progressive-disclosure, claude-api. No new entity/concept pages — these notebooks operationalize existing wiki entities/concepts with concrete SDK code rather than introducing new abstractions.
+write_back: WRITE-BACK — new sources add (a) the SDK invocation pattern (client.beta.messages.create + betas= parameter, anthropic>=0.71.0), (b) the custom-Skill lifecycle (skills.create + files_from_dir, versions.create/list/delete, display_title workspace-uniqueness), (c) the type:"custom" container discriminator and skill composition pattern, (d) the "all top-level .md files load at L2" refinement to the Progressive Disclosure model, (e) the "98% savings is initial-context-only" disambiguation, and (f) observed generation times (Excel/PPT ~1-2 min, PDF ~40-60s) and container-reuse via container.id.
+delta_compiled: src-2026-05-06-anthropic-claude-cookbook-skills-introduction → [agent-skills, progressive-disclosure, claude-api]; src-2026-05-06-anthropic-claude-cookbook-skills-custom-development → [agent-skills, progressive-disclosure, claude-api]. Both flipped pending → compiled.
+pages_affected: agent-skills, progressive-disclosure, claude-api, src-2026-05-06-anthropic-claude-cookbook-skills-introduction, src-2026-05-06-anthropic-claude-cookbook-skills-custom-development, index
+notes: privacy: cloud_safe (public Anthropic cookbook). Source files stored as bundle dirs (sources/2026/2026-05/2026-05-06-<slug>/) containing both source.md (markdown rendering of cells) and notebook.ipynb (the original) — schema §2 bundle pattern, with content_hash computed against source.md per the established compilation-tracking semantics. Single-author repo, contributor field omitted per §11.1 step 9a. No contradictions vs. prior wiki content; the cookbook claims extend rather than supersede the platform-doc claims.
+
+## [2026-05-06] lint | wiki health check
+
+findings: 45 total (0 errors, 42 warnings, 3 info)
+auto_fixes: 0 applied
+report: wiki/maintenance/lint-report.md

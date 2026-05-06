@@ -10,6 +10,8 @@ sources:
   - src-2026-05-06-anthropic-agent-skills-overview
   - src-2026-05-06-anthropic-agent-skills-quickstart
   - src-2026-05-06-anthropic-agent-skills-best-practices
+  - src-2026-05-06-anthropic-claude-cookbook-skills-introduction
+  - src-2026-05-06-anthropic-claude-cookbook-skills-custom-development
 epistemic_status: sourced
 tags:
   - agent-skills
@@ -51,6 +53,13 @@ Agent Skills are filesystem-based capability packages: a directory containing a 
 - Match degrees of freedom to task: high freedom (text-based instructions) when multiple approaches work, medium freedom (parameterized scripts) when a preferred pattern exists, low freedom (specific scripts with no/few flags) when consistency is critical or operations are fragile — analogy: open field vs narrow bridge with cliffs [prov:src-2026-05-06-anthropic-agent-skills-best-practices#sec:set-appropriate-degrees-of-freedom|direct|2026-05-06] [epistemic:: sourced]
 - Agent Skills are NOT covered by Anthropic's Zero Data Retention; data is retained per Anthropic's standard data retention policy [prov:src-2026-05-06-anthropic-agent-skills-overview#sec:data-retention|direct|2026-05-06] [epistemic:: sourced]
 - Security guidance: Skills should only come from trusted sources because malicious Skills can direct Claude to invoke tools or execute code outside their stated purpose, with risks including data exfiltration and unauthorized system access; treat Skills like installing software [prov:src-2026-05-06-anthropic-agent-skills-overview#sec:security-considerations|direct|2026-05-06] [epistemic:: sourced]
+- Python SDK invocation pattern: `client.beta.messages.create(...)` (NOT `client.messages.create(...)`); beta features go in the `betas=[...]` parameter (NOT `extra_headers`); minimum SDK version `anthropic >= 0.71.0` [prov:src-2026-05-06-anthropic-claude-cookbook-skills-introduction#sec:how-skills-work-with-code-execution|direct|2026-05-06] [epistemic:: sourced]
+- Custom-Skill upload via `client.beta.skills.create(display_title=..., files=files_from_dir(skill_path))` (helper imported from `anthropic.lib`); `display_title` is workspace-unique and a duplicate raises `cannot reuse an existing display_title` [prov:src-2026-05-06-anthropic-claude-cookbook-skills-custom-development#sec:api-workflow|direct|2026-05-06] [epistemic:: sourced]
+- Skill composition is supported at the API surface: a single `container.skills` array may mix `type: "custom"` and `type: "anthropic"` entries (e.g., a custom brand-guidelines Skill stacked with the pre-built `pptx` Skill in one request) [prov:src-2026-05-06-anthropic-claude-cookbook-skills-custom-development#sec:brand-guidelines|direct|2026-05-06] [epistemic:: sourced]
+- Custom-Skill versioning lifecycle: `client.beta.skills.versions.create() / .list() / .delete()`, plus `client.beta.skills.delete()` for the Skill envelope itself; deletion of a Skill requires deleting all its versions first [prov:src-2026-05-06-anthropic-claude-cookbook-skills-custom-development#sec:creating-new-versions|direct|2026-05-06] [epistemic:: sourced]
+- All `.md` files in a Skill's top-level directory load at Level 2 (not just `SKILL.md`/`REFERENCE.md`); the ~5k-token budget recommendation thus applies to the *sum* of top-level markdown [prov:src-2026-05-06-anthropic-claude-cookbook-skills-custom-development#sec:additional-documentation-files|direct|2026-05-06] [epistemic:: sourced]
+- Observed end-to-end generation times via the API: Excel ~1-2 minutes, PowerPoint ~1-2 minutes, PDF ~40-60 seconds — concrete planning numbers for sync timeouts and UI loading states [prov:src-2026-05-06-anthropic-claude-cookbook-skills-introduction#sec:expected-generation-times|direct|2026-05-06] [epistemic:: sourced]
+- Container reuse via `container.id` (passing the id from a previous response into subsequent requests) is the API-level token-optimization pattern that lets Skills stay loaded across calls without re-paying L2 [prov:src-2026-05-06-anthropic-claude-cookbook-skills-introduction#sec:token-optimization-tips|direct|2026-05-06] [epistemic:: sourced]
 
 ## Detail
 
@@ -102,6 +111,33 @@ The authoring guide ([[Anthropic Agent Skills Best Practices]]) is opinionated. 
 
 [[Anthropic Financial Services]] is a concrete production-scale Skills deployment: it's a Claude Code plugin marketplace shipping populated SKILL.md prompts (DCF, comps, 3-statement, LBO, merger model, initiating coverage, earnings analysis, model update, tear-sheet) alongside Python validators (e.g., `validate_dcf.py`), Excel templates (e.g., `examples/LBO_Model.xlsx`), and Office-JS integration via `claude-in-office`. It implements the bundle-everything-the-Skill-needs pattern from the authoring guide and uses the [[Claude Code]] surface (with Plugins distribution) rather than the API.
 
+### SDK invocation and Skills API operations
+
+The platform docs describe Skills abstractly via request shapes and beta headers; the cookbooks pin the exact SDK calls. The minimum Python SDK version is `anthropic >= 0.71.0`. A Skills request goes through `client.beta.messages.create(...)` — the non-beta `client.messages.create(...)` does NOT accept `container` and raises `TypeError`. Beta features are activated via the `betas=[...]` parameter on the call (not via `extra_headers` as in older Anthropic beta features); a Skills call needs all three of `code-execution-2025-08-25`, `files-api-2025-04-14`, and `skills-2025-10-02` [prov:src-2026-05-06-anthropic-claude-cookbook-skills-introduction#sec:how-skills-work-with-code-execution|direct|2026-05-06] [epistemic:: sourced]
+
+Custom Skills are uploaded via `client.beta.skills.create(display_title=..., files=files_from_dir(skill_path))`, where `files_from_dir` is the helper from `anthropic.lib` that walks a directory into the API's expected file payload. The returned object exposes `id` (used as `skill_id` in subsequent calls), `display_title`, `latest_version`, and `created_at`. New versions go through `client.beta.skills.versions.create(skill_id, files=files_from_dir(...))`. Listing is `client.beta.skills.list(source="anthropic"|"custom")` and `client.beta.skills.versions.list(skill_id=...)`. Deletion is staged: per-version via `versions.delete(skill_id, version)`, then envelope via `skills.delete(skill_id)` once all versions are gone [prov:src-2026-05-06-anthropic-claude-cookbook-skills-custom-development#sec:api-workflow|direct|2026-05-06] [epistemic:: sourced]
+
+`display_title` is workspace-unique. A duplicate `create()` call returns an error containing `cannot reuse an existing display_title` — operationally important for team workflows because two engineers can't independently upload Skills with the same label. Forces explicit collaboration around naming rather than allowing silent shadowing [prov:src-2026-05-06-anthropic-claude-cookbook-skills-custom-development#sec:financial-ratio-calculator|direct|2026-05-06] [epistemic:: sourced]
+
+### Composition
+
+A single `container.skills` array may mix custom and Anthropic Skills:
+
+```python
+container={"skills": [
+    {"type": "custom",    "skill_id": brand_skill_id, "version": "latest"},
+    {"type": "anthropic", "skill_id": "pptx",          "version": "latest"},
+]}
+```
+
+This is the API-surface confirmation that Skills are designed to stack, not just substitute. The cookbook's three custom-Skill examples — Financial Ratio Analyzer, Corporate Brand Guidelines, Financial Modeling Suite — illustrate distinct composition patterns: a calculation skill consumed alone, an organizational-standards skill stacked atop a generic generator (`pptx`), and a multi-file modeling skill stacked atop `xlsx` for DCF + sensitivity output [prov:src-2026-05-06-anthropic-claude-cookbook-skills-custom-development#sec:brand-guidelines|direct|2026-05-06] [epistemic:: sourced]
+
+### Operational planning (timeouts, lifetimes)
+
+End-to-end generation against pre-built Skills via the API is not instantaneous. Observed times: Excel ~1-2 minutes (with charts and formatting), PowerPoint ~1-2 minutes (simple 2-slide presentations with charts), PDF ~40-60 seconds (simple documents). Plan client timeouts and UI loading states accordingly [prov:src-2026-05-06-anthropic-claude-cookbook-skills-introduction#sec:expected-generation-times|direct|2026-05-06] [epistemic:: sourced]
+
+Generated files have a "limited lifetime" on Anthropic's servers — download them immediately after creation rather than later [prov:src-2026-05-06-anthropic-claude-cookbook-skills-introduction#sec:troubleshooting-file-download|direct|2026-05-06] [epistemic:: sourced]. For repeated calls, pass `container.id` from a previous response into subsequent requests to keep Skills loaded across calls and avoid re-paying L2 [prov:src-2026-05-06-anthropic-claude-cookbook-skills-introduction#sec:token-optimization-tips|direct|2026-05-06] [epistemic:: sourced]
+
 ## Related Pages
 
 - [[Anthropic]]
@@ -115,3 +151,5 @@ The authoring guide ([[Anthropic Agent Skills Best Practices]]) is opinionated. 
 - [[src-2026-05-06-anthropic-agent-skills-overview]]: "Anthropic Agent Skills Overview" (2026-05-06)
 - [[src-2026-05-06-anthropic-agent-skills-quickstart]]: "Anthropic Agent Skills Quickstart" (2026-05-06)
 - [[src-2026-05-06-anthropic-agent-skills-best-practices]]: "Anthropic Agent Skills Best Practices" (2026-05-06)
+- [[src-2026-05-06-anthropic-claude-cookbook-skills-introduction]]: "Introduction to Claude Skills (claude-cookbooks notebook 01)" (2026-05-06)
+- [[src-2026-05-06-anthropic-claude-cookbook-skills-custom-development]]: "Building Custom Skills for Claude (claude-cookbooks notebook 03)" (2026-05-06)

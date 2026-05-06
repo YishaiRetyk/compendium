@@ -61,6 +61,8 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[Anthropic Agent Skills Overview]] — Anthropic's docs page introducing Agent Skills as filesystem-based directories with three-level progressive disclosure across Claude API, Claude Code, and Claude.ai (sourced, 2026-05-06)
 - [[Anthropic Agent Skills Quickstart]] — Anthropic's API tutorial for invoking pre-built Agent Skills via the Messages API container parameter and downloading generated files via the Files API (sourced, 2026-05-06)
 - [[Anthropic Agent Skills Best Practices]] — Anthropic's authoring guide for SKILL.md: under 500 lines, third-person descriptions, references one level deep, evals before docs, Claude-A-writes-for-Claude-B iteration loop (sourced, 2026-05-06)
+- [[Introduction to Claude Skills (claude-cookbooks notebook 01)]] — Anthropic claude-cookbooks notebook with concrete SDK call shape (client.beta.messages.create + betas= parameter), required SDK version (anthropic>=0.71.0), and observed generation times (sourced, 2026-05-06)
+- [[Building Custom Skills for Claude (claude-cookbooks notebook 03)]] — Anthropic claude-cookbooks notebook on custom-Skill upload (skills.create + files_from_dir), display_title workspace-uniqueness, type:'custom' container discriminator, versioning lifecycle, and skill composition (sourced, 2026-05-06)
 
 ## Comparisons
 

@@ -9,6 +9,8 @@ updated_at: 2026-05-06
 sources:
   - src-2026-05-06-anthropic-agent-skills-overview
   - src-2026-05-06-anthropic-agent-skills-best-practices
+  - src-2026-05-06-anthropic-claude-cookbook-skills-introduction
+  - src-2026-05-06-anthropic-claude-cookbook-skills-custom-development
 epistemic_status: sourced
 tags:
   - progressive-disclosure
@@ -45,6 +47,9 @@ Progressive disclosure is the loading discipline Anthropic uses to let many Agen
 - Anthropic recommends keeping reference files one level deep from SKILL.md; deeper nesting causes Claude to use `head -100` previews and miss content past the read window [prov:src-2026-05-06-anthropic-agent-skills-best-practices#sec:avoid-deeply-nested-references|direct|2026-05-06] [epistemic:: sourced]
 - For reference files longer than 100 lines, including a table of contents at the top ensures Claude sees the full scope of available information even when previewing partially [prov:src-2026-05-06-anthropic-agent-skills-best-practices#sec:structure-longer-reference-files-with-table-of-contents|direct|2026-05-06] [epistemic:: sourced]
 - Three documented progressive-disclosure patterns: high-level guide with references (SKILL.md + FORMS.md/REFERENCE.md/EXAMPLES.md), domain-specific organization (per-domain reference files), and conditional details (basic content inline, advanced via links) [prov:src-2026-05-06-anthropic-agent-skills-best-practices#sec:progressive-disclosure-patterns|direct|2026-05-06] [epistemic:: sourced]
+- Level 2 loads ALL `.md` files in the Skill's top-level directory — not just `SKILL.md` and `REFERENCE.md` — so multi-file documentation (`REFERENCE.md`, `EXAMPLES.md`, `TROUBLESHOOTING.md`, `CHANGELOG.md`, etc.) is a first-class organization pattern; the ~5k token budget recommendation applies to the *sum* of top-level markdown, not just SKILL.md [prov:src-2026-05-06-anthropic-claude-cookbook-skills-custom-development#sec:additional-documentation-files|direct|2026-05-06] [epistemic:: sourced]
+- The "98% savings" framing for Skills tokens applies to the *initial context only* — Level 1 metadata is essentially free; once Level 2 fires for a given request, the full ~5k tokens of instructions load and are paid for that request [prov:src-2026-05-06-anthropic-claude-cookbook-skills-introduction#sec:token-usage-optimization|direct|2026-05-06] [epistemic:: sourced]
+- Container reuse via `container.id` (passing the id from a previous response into subsequent requests) is the API-level token-optimization pattern that lets Skills stay loaded across calls without re-paying L2 [prov:src-2026-05-06-anthropic-claude-cookbook-skills-introduction#sec:token-optimization-tips|direct|2026-05-06] [epistemic:: sourced]
 
 ## Detail
 
@@ -62,6 +67,27 @@ Three concrete patterns operationalize the discipline at SKILL.md scale [prov:sr
 
 The same disciplined load pattern shows up in [[Agent Skills]] usage at the [[Claude API]] surface — listing Skills via `GET /v1/skills?source=anthropic` returns only metadata, not bodies — and in this wiki's own navigation rule: scan `## TL;DR` and `## Key Facts` first, drill into `## Detail` only when the shallow material is insufficient.
 
+### Level 2 includes all top-level markdown, not just SKILL.md
+
+The cookbook's custom-Skills documentation makes a refinement that's easy to miss in the platform-doc framing: Level 2 loads ALL `.md` files in the Skill's top-level directory, not just `SKILL.md` (and not even just `SKILL.md` + `REFERENCE.md` as one might infer from the example bundles). A Skill organized as [prov:src-2026-05-06-anthropic-claude-cookbook-skills-custom-development#sec:additional-documentation-files|direct|2026-05-06] [epistemic:: sourced]:
+
+```
+skill_name/
+├── SKILL.md           # required entry point
+├── REFERENCE.md       # optional: API reference
+├── EXAMPLES.md        # optional: usage examples
+├── TROUBLESHOOTING.md # optional: common issues
+└── CHANGELOG.md       # optional: version history
+```
+
+… loads ALL of those `.md` files at L2. So the ~5k token budget recommendation effectively applies to the *sum* of top-level markdown, not just the SKILL.md body in isolation. Subdirectory markdown (`scripts/foo.md`, `resources/notes.md`) is L3 — pulled in only when explicitly referenced.
+
+### "98% savings" disambiguation
+
+The cookbook's token math frames Skills as offering "98% savings" vs manual prompt-engineered instructions. This is true *for the initial context* — Level 1 metadata is ~100 tokens per Skill rather than the ~5,000-10,000 tokens of an inline instruction prompt. But once Level 2 fires for a given request, the full ~5k tokens load and are paid for that request [prov:src-2026-05-06-anthropic-claude-cookbook-skills-introduction#sec:token-usage-optimization|direct|2026-05-06] [epistemic:: sourced]. The value of progressive disclosure is therefore in *amortization across many requests*: 100 Skills installed cost ~10k tokens of metadata permanently, but only the few that actually fire on a given request pay the L2 cost on that request.
+
+The API-level lever for amortizing further is container reuse — pass `container.id` from a previous response into subsequent requests so Skills stay loaded across calls in the same container, avoiding re-paying L2 for already-resident Skills [prov:src-2026-05-06-anthropic-claude-cookbook-skills-introduction#sec:token-optimization-tips|direct|2026-05-06] [epistemic:: sourced]
+
 ## Related Pages
 
 - [[Agent Skills]]
@@ -73,3 +99,5 @@ The same disciplined load pattern shows up in [[Agent Skills]] usage at the [[Cl
 
 - [[src-2026-05-06-anthropic-agent-skills-overview]]: "Anthropic Agent Skills Overview" (2026-05-06)
 - [[src-2026-05-06-anthropic-agent-skills-best-practices]]: "Anthropic Agent Skills Best Practices" (2026-05-06)
+- [[src-2026-05-06-anthropic-claude-cookbook-skills-introduction]]: "Introduction to Claude Skills (claude-cookbooks notebook 01)" (2026-05-06)
+- [[src-2026-05-06-anthropic-claude-cookbook-skills-custom-development]]: "Building Custom Skills for Claude (claude-cookbooks notebook 03)" (2026-05-06)
