@@ -69,6 +69,6 @@ Anthropic's existing Claude Code plugin marketplace [[Anthropic Financial Servic
 
 ## Sources
 
-- [[src-2026-05-06-anthropic-agent-skills-overview]]: "Anthropic Agent Skills Overview" (2026-05-06)
-- [[src-2026-05-06-anthropic-agent-skills-quickstart]]: "Anthropic Agent Skills Quickstart" (2026-05-06)
-- [[src-2026-05-06-anthropic-agent-skills-best-practices]]: "Anthropic Agent Skills Best Practices" (2026-05-06)
+- [[Anthropic Agent Skills Overview]] — Anthropic platform docs, 2026-05-06
+- [[Anthropic Agent Skills Quickstart]] — Anthropic platform docs, 2026-05-06
+- [[Anthropic Agent Skills Best Practices]] — Anthropic platform docs, 2026-05-06

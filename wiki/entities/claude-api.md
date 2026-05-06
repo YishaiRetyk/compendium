@@ -105,7 +105,7 @@ A single `container.skills` array may carry both `type: "custom"` and `type: "an
 
 ## Sources
 
-- [[src-2026-05-06-anthropic-agent-skills-overview]]: "Anthropic Agent Skills Overview" (2026-05-06)
-- [[src-2026-05-06-anthropic-agent-skills-quickstart]]: "Anthropic Agent Skills Quickstart" (2026-05-06)
-- [[src-2026-05-06-anthropic-claude-cookbook-skills-introduction]]: "Introduction to Claude Skills (claude-cookbooks notebook 01)" (2026-05-06)
-- [[src-2026-05-06-anthropic-claude-cookbook-skills-custom-development]]: "Building Custom Skills for Claude (claude-cookbooks notebook 03)" (2026-05-06)
+- [[Anthropic Agent Skills Overview]] — Anthropic platform docs, 2026-05-06
+- [[Anthropic Agent Skills Quickstart]] — Anthropic platform docs, 2026-05-06
+- [[Introduction to Claude Skills (claude-cookbooks notebook 01)]] — Anthropic claude-cookbooks, 2026-05-06
+- [[Building Custom Skills for Claude (claude-cookbooks notebook 03)]] — Anthropic claude-cookbooks, 2026-05-06

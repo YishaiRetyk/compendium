@@ -64,5 +64,5 @@ The existing [[Anthropic Financial Services]] plugin marketplace is a production
 
 ## Sources
 
-- [[src-2026-05-06-anthropic-agent-skills-overview]]: "Anthropic Agent Skills Overview" (2026-05-06)
-- [[src-2026-05-06-anthropic-agent-skills-best-practices]]: "Anthropic Agent Skills Best Practices" (2026-05-06)
+- [[Anthropic Agent Skills Overview]] — Anthropic platform docs, 2026-05-06
+- [[Anthropic Agent Skills Best Practices]] — Anthropic platform docs, 2026-05-06
