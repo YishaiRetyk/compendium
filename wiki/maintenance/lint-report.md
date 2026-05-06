@@ -24,12 +24,14 @@ knowledge_domain: ""
 # Lint Report
 
 **Last run:** 2026-05-06
-**Total findings:** 45
+**Total findings:** 51
 **Auto-fixes applied:** 0
 
-## Errors (0)
+## Errors (1)
 
-(none)
+### Yaml
+- **wiki/Peter Naur.md** | No YAML frontmatter found
+
 
 ## Warnings (42)
 
@@ -82,9 +84,14 @@ knowledge_domain: ""
 - **sources/2026/2026-04/2026-04-10-personal-decision-journal/source.md** | Raw source has no wiki source summary page
 
 
-## Info (3)
+## Info (8)
 
 ### Drift
+- **wiki/.obsidian/app.json** | EXTERNAL: Non-markdown file in wiki/ (may cause Obsidian issues)
+- **wiki/.obsidian/appearance.json** | EXTERNAL: Non-markdown file in wiki/ (may cause Obsidian issues)
+- **wiki/.obsidian/core-plugins.json** | EXTERNAL: Non-markdown file in wiki/ (may cause Obsidian issues)
+- **wiki/.obsidian/graph.json** | EXTERNAL: Non-markdown file in wiki/ (may cause Obsidian issues)
+- **wiki/.obsidian/workspace.json** | EXTERNAL: Non-markdown file in wiki/ (may cause Obsidian issues)
 - **wiki/comparisons/Untitled** | EXTERNAL: Non-markdown file in wiki/ (may cause Obsidian issues)
 
 ### Gap

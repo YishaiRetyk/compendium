@@ -170,3 +170,9 @@ report: wiki/maintenance/lint-report.md
 findings: 45 total (0 errors, 42 warnings, 3 info)
 auto_fixes: 0 applied
 report: wiki/maintenance/lint-report.md
+
+## [2026-05-06] lint | wiki health check
+
+findings: 51 total (1 errors, 42 warnings, 8 info)
+auto_fixes: 0 applied
+report: wiki/maintenance/lint-report.md
