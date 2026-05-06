@@ -204,3 +204,35 @@ report: wiki/maintenance/lint-report.md
 findings: 55 total (0 errors, 48 warnings, 7 info)
 auto_fixes: 0 applied
 report: wiki/maintenance/lint-report.md
+
+## [2026-05-06] query | Ralph loop creator skill spec
+
+answer: reviewed the Agent Skills cluster, Ralph cluster, adjacent AI-coding skills pages, and raw Ralph bundle templates to specify a custom skill that scaffolds Ralph loop artifacts without launching autonomous execution.
+write_back: WRITE-BACK: trigger met -> CREATE ralph-loop-creator-skill as a reusable synthesis artifact.
+delta_compiled: none; all relevant source summaries were already compiled.
+pages_affected: ralph-loop-creator-skill, index, log
+notes: The spec combines the Skill authoring/progressive-disclosure constraints with Ralph's files contract, backpressure model, sandbox warning, and systems-thinking/DDD context-preservation guidance. It treats the skill as a scaffold generator rather than an autonomous loop runner.
+
+## [2026-05-06] lint | wiki health check
+
+findings: 72 total (1 errors, 64 warnings, 7 info)
+auto_fixes: 0 applied
+report: wiki/maintenance/lint-report.md
+
+## [2026-05-06] lint | wiki health check
+
+findings: 56 total (1 errors, 48 warnings, 7 info)
+auto_fixes: 0 applied
+report: wiki/maintenance/lint-report.md
+
+## [2026-05-06] lint | wiki health check
+
+findings: 55 total (0 errors, 48 warnings, 7 info)
+auto_fixes: 0 applied
+report: wiki/maintenance/lint-report.md
+
+## [2026-05-07] lint | wiki health check
+
+findings: 55 total (0 errors, 48 warnings, 7 info)
+auto_fixes: 0 applied
+report: wiki/maintenance/lint-report.md

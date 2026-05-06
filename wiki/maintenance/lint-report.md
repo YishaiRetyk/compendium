@@ -5,7 +5,7 @@ type: overview
 status: active
 summary: "Wiki health-check findings from most recent lint run."
 created_at: 2026-04-30
-updated_at: 2026-05-06
+updated_at: 2026-05-07
 sources: []
 epistemic_status: sourced
 tags:
@@ -23,7 +23,7 @@ knowledge_domain: ""
 
 # Lint Report
 
-**Last run:** 2026-05-06
+**Last run:** 2026-05-07
 **Total findings:** 55
 **Auto-fixes applied:** 0
 
