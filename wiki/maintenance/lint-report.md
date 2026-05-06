@@ -24,14 +24,12 @@ knowledge_domain: ""
 # Lint Report
 
 **Last run:** 2026-05-06
-**Total findings:** 51
+**Total findings:** 49
 **Auto-fixes applied:** 0
 
-## Errors (1)
+## Errors (0)
 
-### Yaml
-- **wiki/Peter Naur.md** | No YAML frontmatter found
-
+(none)
 
 ## Warnings (42)
 
@@ -84,7 +82,7 @@ knowledge_domain: ""
 - **sources/2026/2026-04/2026-04-10-personal-decision-journal/source.md** | Raw source has no wiki source summary page
 
 
-## Info (8)
+## Info (7)
 
 ### Drift
 - **wiki/.obsidian/app.json** | EXTERNAL: Non-markdown file in wiki/ (may cause Obsidian issues)
@@ -92,7 +90,6 @@ knowledge_domain: ""
 - **wiki/.obsidian/core-plugins.json** | EXTERNAL: Non-markdown file in wiki/ (may cause Obsidian issues)
 - **wiki/.obsidian/graph.json** | EXTERNAL: Non-markdown file in wiki/ (may cause Obsidian issues)
 - **wiki/.obsidian/workspace.json** | EXTERNAL: Non-markdown file in wiki/ (may cause Obsidian issues)
-- **wiki/comparisons/Untitled** | EXTERNAL: Non-markdown file in wiki/ (may cause Obsidian issues)
 
 ### Gap
 - **maturity** | Sparse coverage check skipped: wiki needs 5+ domains with 3+ having 2+ sources (currently 2 domains, 1 meet threshold)
