@@ -44,4 +44,5 @@ aliases: []
 ## Sources
 
 <!-- Human-readable source list with wikilinks to source summary pages.
-     Format: - [[src-YYYY-MM-DD-slug]]: "Title" (date) -->
+     Use [[Exact Page Title]] per AGENTS.md §8 rule 1 (NOT [[src-YYYY-MM-DD-slug]]).
+     Format: - [[Page Title]] — author/source, date -->
