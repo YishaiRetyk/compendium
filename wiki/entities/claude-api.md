@@ -25,6 +25,7 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
+  - Claude API
   - Anthropic API
   - Claude HTTP API
 has_contradictions: false

@@ -25,6 +25,7 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
+  - Progressive Disclosure
   - Three-Level Loading
   - Three-Level Skill Loading
   - Skills Progressive Disclosure

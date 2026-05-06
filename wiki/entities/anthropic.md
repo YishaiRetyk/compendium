@@ -24,6 +24,7 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
+  - Anthropic
   - Anthropic PBC
 has_contradictions: false
 knowledge_domain: software

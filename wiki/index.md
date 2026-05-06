@@ -5,7 +5,7 @@ type: overview
 status: active
 summary: "Skeleton index — ingested content will appear here organized by knowledge domain."
 created_at: 2026-04-15
-updated_at: 2026-05-06
+updated_at: 2026-05-06T22:30:00
 sources: []
 epistemic_status: sourced
 tags:
@@ -35,6 +35,7 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[Anthropic]] — AI safety company that builds Claude; ships the Claude API, Claude Code, and Claude.ai plus pre-built and Custom Agent Skills (sourced, 2026-05-06)
 - [[Claude Code]] — Anthropic's CLI for Claude (terminal, desktop, web, IDE); custom-only Agent Skills mounted at ~/.claude/skills/ or .claude/skills/ (sourced, 2026-05-06)
 - [[Claude API]] — Anthropic's HTTP API surface; pre-built and custom Agent Skills via container.skills + code_execution_20250825 tool with three required betas (sourced, 2026-05-06)
+- [[Geoffrey Huntley]] — Software engineer who originated the "Ralph" autonomous-coding-loop technique (sourced, 2026-05-06)
 
 ## Concepts
 
@@ -46,6 +47,8 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[Bounded Context]] — DDD artifact: a distinct area of a system with its own rules and stable term meanings (sourced, 2026-05-04)
 - [[Documented Contract]] — DDD artifact: written-down handshake between bounded contexts (sourced, 2026-05-04)
 - [[Progressive Disclosure]] — Three-level loading pattern in Anthropic Agent Skills: metadata always, instructions when triggered, resources as needed (sourced, 2026-05-06)
+- [[Ralph (Autonomous Coding Loop)]] — Geoffrey Huntley's minimal autonomous-coding pattern: bash `while` loop + fixed PROMPT.md + IMPLEMENTATION_PLAN.md on disk as cross-iteration shared state (sourced, 2026-05-06)
+- [[Backpressure]] — Downstream rejection signals (tests, typechecks, lints, builds, LLM-as-judge) that block invalid agent output before commit (sourced, 2026-05-06)
 
 ## Sources
 
@@ -63,6 +66,7 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[Anthropic Agent Skills Best Practices]] — Anthropic's authoring guide for SKILL.md: under 500 lines, third-person descriptions, references one level deep, evals before docs, Claude-A-writes-for-Claude-B iteration loop (sourced, 2026-05-06)
 - [[Introduction to Claude Skills (claude-cookbooks notebook 01)]] — Anthropic claude-cookbooks notebook with concrete SDK call shape (client.beta.messages.create + betas= parameter), required SDK version (anthropic>=0.71.0), and observed generation times (sourced, 2026-05-06)
 - [[Building Custom Skills for Claude (claude-cookbooks notebook 03)]] — Anthropic claude-cookbooks notebook on custom-Skill upload (skills.create + files_from_dir), display_title workspace-uniqueness, type:'custom' container discriminator, versioning lifecycle, and skill composition (sourced, 2026-05-06)
+- [[The Ralph Playbook (Clayton Farr's how-to-ralph-wiggum)]] — Clayton Farr, 2026-05-06 — Long-form synthesis of Geoffrey Huntley's Ralph autonomous-coding-loop technique: 3 phases / 2 prompts / 1 loop, with five proposed enhancements (sourced, 2026-05-06)
 
 ## Comparisons
 

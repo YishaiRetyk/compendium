@@ -9,6 +9,7 @@ updated_at: 2026-05-06
 sources:
   - src-2026-05-06-anthropic-agent-skills-overview
   - src-2026-05-06-anthropic-agent-skills-best-practices
+  - src-2026-05-06-ralph-playbook
 epistemic_status: sourced
 tags:
   - claude-code
@@ -23,6 +24,7 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
+  - Claude Code
   - claude-code
   - Claude Code CLI
 has_contradictions: false
@@ -42,6 +44,8 @@ Claude Code is Anthropic's developer-facing Claude — distributed as a CLI, des
 - Skills in Claude Code can also be shared via Claude Code Plugins, which is the supported distribution mechanism beyond per-user/per-project file copying [prov:src-2026-05-06-anthropic-agent-skills-overview#sec:sharing-scope|direct|2026-05-06] [epistemic:: sourced]
 - Skills running in Claude Code have full network access — the same network access as any other program on the user's computer — and can install local packages, though global package installation is discouraged to avoid interfering with the user's environment [prov:src-2026-05-06-anthropic-agent-skills-overview#sec:runtime-environment-constraints|direct|2026-05-06] [epistemic:: sourced]
 - Anthropic bundles its open-source Claude API skill (up-to-date API reference + SDK documentation for 8 programming languages) with Claude Code [prov:src-2026-05-06-anthropic-agent-skills-overview#sec:open-source-skills|direct|2026-05-06] [epistemic:: sourced]
+- Claude Code is the reference CLI for the [[Ralph (Autonomous Coding Loop)]] pattern; the canonical autonomous invocation is `claude -p --dangerously-skip-permissions --output-format=stream-json --model opus --verbose`, fed by a bash `while` loop reading a fixed `PROMPT.md` from stdin [prov:src-2026-05-06-ralph-playbook#sec:loop-mechanics|direct|2026-05-06] [epistemic:: sourced]
+- Running with `--dangerously-skip-permissions` bypasses Claude Code's permission system entirely, so a sandbox (Docker, E2B, Fly Sprites) is the only remaining security boundary for autonomous loops on this CLI [prov:src-2026-05-06-ralph-playbook#sec:key-principles|direct|2026-05-06] [epistemic:: sourced]
 
 ## Detail
 
@@ -53,6 +57,8 @@ Because Claude Code's runtime is the user's actual machine, Skills here can do t
 
 The existing [[Anthropic Financial Services]] plugin marketplace is a production-scale example of Claude Code Plugins distributing Skills: each plugin packages Skills (DCF, LBO, merger-model, etc.) plus supporting Python validators and Excel templates, mounted into Claude Code via Plugin distribution rather than per-user file copy.
 
+Claude Code is also the reference CLI for [[Geoffrey Huntley]]'s autonomous-coding pattern: a bash `while :; do cat PROMPT.md | claude -p --dangerously-skip-permissions --output-format=stream-json --model opus --verbose ; done` loop, with an `IMPLEMENTATION_PLAN.md` file on disk acting as cross-iteration shared state. The same loop pattern works with other CLI agents (`amp`, `codex`, `opencode`), but Opus + Claude Code is the documented baseline. The `-p` (headless) and `--output-format=stream-json` flags are what make Claude Code suitable as a non-interactive bash-loop component; `--dangerously-skip-permissions` is what makes the loop autonomous, at the explicit cost of relocating the security boundary from Claude Code's permission prompts to the surrounding sandbox.
+
 ## Related Pages
 
 - [[Anthropic]]
@@ -61,8 +67,12 @@ The existing [[Anthropic Financial Services]] plugin marketplace is a production
 - [[Claude API]]
 - [[Anthropic Financial Services]]
 - [[Hack (Agentive Stack)]]
+- [[Ralph (Autonomous Coding Loop)]]
+- [[Geoffrey Huntley]]
+- [[Backpressure]]
 
 ## Sources
 
 - [[Anthropic Agent Skills Overview]] — Anthropic platform docs, 2026-05-06
 - [[Anthropic Agent Skills Best Practices]] — Anthropic platform docs, 2026-05-06
+- [[The Ralph Playbook (Clayton Farr's how-to-ralph-wiggum)]] — Clayton Farr's synthesis, 2026-05-06

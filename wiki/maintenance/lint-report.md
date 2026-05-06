@@ -24,14 +24,14 @@ knowledge_domain: ""
 # Lint Report
 
 **Last run:** 2026-05-06
-**Total findings:** 49
+**Total findings:** 55
 **Auto-fixes applied:** 0
 
 ## Errors (0)
 
 (none)
 
-## Warnings (42)
+## Warnings (48)
 
 ### Contradiction
 - **wiki/concepts/progressive-disclosure.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-06-anthropic-agent-skills-best-practices and src-2026-05-06-anthropic-agent-skills-overview (agent review needed)
@@ -49,6 +49,7 @@ knowledge_domain: ""
 - **wiki/entities/claude-api.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-06-anthropic-agent-skills-quickstart and src-2026-05-06-anthropic-claude-cookbook-skills-custom-development (agent review needed)
 - **wiki/entities/claude-api.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-06-anthropic-agent-skills-quickstart and src-2026-05-06-anthropic-claude-cookbook-skills-introduction (agent review needed)
 - **wiki/entities/claude-api.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-06-anthropic-claude-cookbook-skills-custom-development and src-2026-05-06-anthropic-claude-cookbook-skills-introduction (agent review needed)
+- **wiki/entities/claude-code.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-06-anthropic-agent-skills-overview and src-2026-05-06-ralph-playbook (agent review needed)
 - **wiki/entities/dexter.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-04-dexter-investigation and src-2026-05-04-financial-ai-repo-comparison-report (agent review needed)
 - **wiki/entities/financial-models-numerical-methods.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-04-financial-ai-repo-comparison-report and src-2026-05-04-fmnm-investigation (agent review needed)
 - **wiki/entities/finrl.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-04-financial-ai-repo-comparison-report and src-2026-05-04-finrl-investigation (agent review needed)
@@ -80,6 +81,11 @@ knowledge_domain: ""
 - **sources/2026/2026-04/2026-04-09-thinking-fast-and-slow-part1/source.md** | Raw source has no wiki source summary page
 - **sources/2026/2026-04/2026-04-10-kahneman-prospect-theory/source.md** | Raw source has no wiki source summary page
 - **sources/2026/2026-04/2026-04-10-personal-decision-journal/source.md** | Raw source has no wiki source summary page
+- **sources/2026/2026-05/2026-05-06-ralph-playbook/AGENTS.md** | Raw source has no wiki source summary page
+- **sources/2026/2026-05/2026-05-06-ralph-playbook/IMPLEMENTATION_PLAN.md** | Raw source has no wiki source summary page
+- **sources/2026/2026-05/2026-05-06-ralph-playbook/PROMPT_build.md** | Raw source has no wiki source summary page
+- **sources/2026/2026-05/2026-05-06-ralph-playbook/PROMPT_plan.md** | Raw source has no wiki source summary page
+- **sources/2026/2026-05/2026-05-06-ralph-playbook/references/sandbox-environments.md** | Raw source has no wiki source summary page
 
 
 ## Info (7)

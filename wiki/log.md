@@ -182,3 +182,25 @@ report: wiki/maintenance/lint-report.md
 findings: 49 total (0 errors, 42 warnings, 7 info)
 auto_fixes: 0 applied
 report: wiki/maintenance/lint-report.md
+
+## [2026-05-06] ingest | The Ralph Playbook (Clayton Farr's how-to-ralph-wiggum)
+
+source: src-2026-05-06-ralph-playbook
+classification: 1 article (long-form playbook README from github.com/ghuntley/how-to-ralph-wiggum @ 88d488a, authored by Clayton Farr <contact@claytonfarr.com>, synthesizing Geoffrey Huntley's Ralph technique). Bundled with supporting files: AGENTS.md/IMPLEMENTATION_PLAN.md/PROMPT_build.md/PROMPT_plan.md/loop.sh templates plus references/sandbox-environments.md and figures.
+result: created source summary at wiki/sources/src-2026-05-06-ralph-playbook.md. Created 1 new entity (geoffrey-huntley) and 2 new concepts (ralph-loop, backpressure) — Ralph and Huntley are net-new to the wiki. UPDATEd wiki/entities/claude-code.md via append-then-synthesize (§10 Pass 3) to add the canonical Ralph CLI invocation pattern (`claude -p --dangerously-skip-permissions --output-format=stream-json --model opus --verbose`) and the `--dangerously-skip-permissions` security caveat (sandbox is the only remaining boundary).
+write_back: WRITE-BACK — new sources add (a) the Ralph autonomous-coding-loop pattern as a discoverable concept, (b) Geoffrey Huntley as the originating entity, (c) "backpressure" as a generalizable agentic-loop concept worth its own page (tests/typechecks/lints/builds + LLM-as-judge), (d) the canonical Claude Code autonomous-mode CLI flag set, and (e) the JTBD → topics-of-concern → specs cardinality and "one sentence without 'and'" topic-scope test as durable framing for downstream ingests.
+delta_compiled: src-2026-05-06-ralph-playbook → [geoffrey-huntley, ralph-loop, backpressure, claude-code]. Compilation flipped pending → compiled with all 4 targets recorded.
+pages_affected: src-2026-05-06-ralph-playbook, geoffrey-huntley, ralph-loop, backpressure, claude-code, index
+notes: privacy: cloud_safe (public GitHub repo, no PII). Source bundle stored at sources/2026/2026-05/2026-05-06-ralph-playbook/ containing source.md (rendered from README.md, content_hash sha256:55980d42…), the prompt/loop/agents templates, and the references/ subdir; the redundant 138 KB index.html (rendered README) was excluded. Single-author repo, contributor field omitted per §11.1 step 9a. Clayton Farr is the playbook author but not yet a recurring wiki figure — surfaced in source Notes/Source Metadata, no entity page yet (revisit if future sources cite him). No contradictions vs prior wiki content; the playbook adds new framing rather than challenging existing claims. The lint flagged one contradiction-candidate on claude-code.md (Key Facts now draws from skills-overview + ralph-playbook) — reviewed and confirmed complementary, not contradictory.
+
+## [2026-05-06] lint | wiki health check
+
+findings: 56 total (1 errors, 48 warnings, 7 info)
+auto_fixes: 0 applied
+report: wiki/maintenance/lint-report.md
+
+## [2026-05-06] lint | wiki health check
+
+findings: 55 total (0 errors, 48 warnings, 7 info)
+auto_fixes: 0 applied
+report: wiki/maintenance/lint-report.md

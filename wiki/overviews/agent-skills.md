@@ -27,6 +27,7 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
+  - Agent Skills
   - Anthropic Agent Skills
   - Agent Skill
   - Skill (Anthropic)
