@@ -24,6 +24,7 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
+  - The Ralph Playbook (Clayton Farr's how-to-ralph-wiggum)
   - The Ralph Playbook
   - how-to-ralph-wiggum
   - ralph-playbook

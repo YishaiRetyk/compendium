@@ -21,6 +21,7 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
+  - Geoffrey Huntley
   - ghuntley
   - GeoffreyHuntley
   - Geoff Huntley

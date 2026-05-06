@@ -22,6 +22,7 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
+  - Backpressure
   - agentic backpressure
   - loop backpressure
 has_contradictions: false

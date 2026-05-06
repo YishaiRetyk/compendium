@@ -23,6 +23,7 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
+  - Ralph (Autonomous Coding Loop)
   - Ralph
   - The Ralph Loop
   - Ralph Wiggum
