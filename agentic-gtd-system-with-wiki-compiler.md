@@ -342,6 +342,17 @@ This project is a strong fit for a personal assistant’s **durable memory**, bu
 - **working-memory layer** for recent context
 - **wiki compiler** for durable structured memory
 
+### Automatic vs. curated durable memory
+
+There is a competing class of durable-memory layer worth naming explicitly, because it occupies the same slot in an agent stack: **automatic agent-memory systems** (e.g. Neo4j's `neo4j-agent-memory`/NAMS, which underpins `create-context-graph`). These accrue memory *automatically* — every conversation turn is run through entity extraction and the knowledge graph grows silently, agent-maintained and machine-queried.
+
+The wiki compiler is the **inverse**: memory is *curated* — the human sources, the LLM compiles with provenance, contradiction flags, and decision records, and the artifact stays human-legible markdown. The tradeoff is fundamental, not incidental:
+
+- **Automatic memory optimizes recall throughput** — zero capture friction, scales to every utterance, but the store is machine-shaped, unaudited, and not meant to be read end-to-end.
+- **Curated memory optimizes fidelity and auditability** — every claim is provenance-backed and human-reviewable, contradictions are surfaced rather than silently merged, but capture is deliberate and heavier.
+
+For a personal agent, these are complementary, not competing: an automatic layer can serve as part of the **working-memory layer** (cheap, high-churn, ephemeral recall), while the wiki compiler remains the **durable** layer where things are promoted only when they're worth keeping faithfully. Conflating them — letting an automatic extractor write directly into the curated wiki — would erode exactly the fidelity that makes the durable layer worth having.
+
 ---
 
 ## Business Documents, Orders, and Invoices
