@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Shareability
-status: Phase 12.2 complete — 5/5 plans, verifier PASS, ready for next phase
-stopped_at: Phase 12.2 complete (WGATE-01..04 → Complete; verifier 7/7 SC; tests 11/11)
-last_updated: "2026-05-04T02:30:00.000Z"
+status: Phase 13 context gathered — ready for planning
+stopped_at: Phase 13 context gathered (16 decisions D-01..D-16; CONTEXT.md committed)
+last_updated: "2026-05-31T00:00:00.000Z"
 progress:
   total_phases: 19
   completed_phases: 9
@@ -20,11 +20,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-15)
 
 **Core value:** The wiki is a persistent, compounding artifact -- cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested.
-**Current focus:** Phase 12.2 — local-wiki-write-gate
+**Current focus:** Phase 13 — claim-faithfulness-audit
 
 ## Current Position
 
-Phase: 12.2 context gathered. Next: `/gsd-plan-phase 12.2` to produce PLAN.md.
+Phase: 13 context gathered. Next: `/gsd-plan-phase 13` to produce PLAN.md.
+
+Phase 12.2 closure: 5/5 plans complete; WGATE-01..04 → Complete; verifier PASS 7/7 SC; tests 11/11.
+
+Phase 13 context: 16 decisions captured in `13-CONTEXT.md` (resolves the 5 open questions from `13-DESIGN-NOTES.md`). Verifier = contract-only (agent-in-the-loop default + documented `--verifier` hook, no bundled script); fail-closed `local_only` egress (`skipped-privacy` default, explicit local opt-in); page-marker convention shipped in v1 (optional `<!-- page: N -->` + `insufficient-locator` fallback, document-now/helper-later); sample-20 priority-ranked union; on-demand + reflect-tier cadence; human-approved `contradicts`→marker handoff. LOCKED carry-forwards: raw-source-at-`path:`, no auto-fix, no default CI gate, no SQLite, no full-vault default, zero new claim vocabulary.
 
 Phase 12.1 closure: 4/4 plans complete; NEUT-08 flipped to Complete in REQUIREMENTS.md (line 36 + matrix line 215); 12.1-VERIFICATION.md authored with verbatim D-10 evidence; bin/requirements-sync.sh --strict --phase 12.1 and --require-complete --phase 12.1 both exit 0; bin/check-neutrality.sh source unchanged across the entire phase. N=7 defense-in-depth curation: pre-committing, physical flinch, pre-mortem, pre-mortems, decision fatigue, decision-fatigue, meta-observation. First v1.1 partial-requirement closure.
 
@@ -303,6 +307,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-05-03T23:37:32.207Z
-Stopped at: Phase 12.2 planned (5 plans, 4 waves; plan-checker passed iteration 2)
-Resume file: None
+Last session: 2026-05-31
+Stopped at: Phase 13 context gathered (discuss-phase complete; 16 decisions)
+Resume file: .planning/phases/13-claim-faithfulness-audit/13-CONTEXT.md
