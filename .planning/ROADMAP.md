@@ -29,7 +29,7 @@
 - [x] **Phase 12: Complementary Systems Boundary + GTD Alignment** — Decision record + reference doc defining compendium as durable wiki memory inside a multi-system agent stack; routes capture/clarify/organize/review without expanding schema or directory taxonomies. (completed 2026-05-01)
 - [x] **Phase 12.1: NEUT-08 Personal-Term Denylist Curation** — Hand-curate a vetted subset of `.planning/backlog-neutrality-denylist-candidate.txt` (861 lines) into `.neutrality-denylist.txt`, closing the only outstanding partial v1.1 requirement before the closure gate. Promoted from backlog 999.2. (4/4 plans complete 2026-05-03; N=7 defense-in-depth curation merged; gate + sync exit 0; first v1.1 partial-requirement closure)
 - [x] **Phase 12.2: Local Wiki Write Gate** — Pre-commit gate over staged `wiki/{entities,concepts,overviews,comparisons}/` changes reusing `bin/lint.sh --strict` semantics where possible; blocks zero-provenance new synthesized pages before they land locally. (5/5 plans complete 2026-05-04; WGATE-01..04 → Complete; verifier PASS 7/7 SC + 4/4 REQ; tests 11/11)
-- [ ] **Phase 13: Claim Faithfulness Audit** — `bin/audit-claims.sh` samples high-risk claims (inferred/tentative/stale/high-fanout) and emits structured verdicts (supports / weak / contradicts / insufficient) against the cited source passage; review-only, privacy-respecting, no auto-fix.
+- [x] **Phase 13: Claim Faithfulness Audit** — `bin/audit-claims.sh` samples high-risk claims (inferred/tentative/stale/high-fanout) and emits structured verdicts (supports / weak / contradicts / insufficient) against the cited source passage; review-only, privacy-respecting, no auto-fix. (5/5 plans complete 2026-06-01; FAITH-01..04 → Complete; verifier PASS 6/6 SC + 4/4 REQ; tests 33/33; code review 0 critical/0 high)
 - [ ] **Phase 13.1: Docs Finalization + Obsidian Starter** — `/docs/reference/` fill-out, Obsidian render check, Codex agent-parity, write-back scenario re-run, minimal Obsidian starter (templates + reference doc only; no prescribed workflows).
 - [ ] **Phase 13.2: v1.1 Closure Verification Gate** — Final requirements-sync, Obsidian render, agent-parity, write-back, docs consistency, and scope-leak checks after all v1.1 work is complete.
 
@@ -242,11 +242,11 @@ Plans:
 - No SQLite requirement
 - No full-vault audit by default
 **Plans**: 5 plans
-- [ ] 13-01-PLAN.md — Wave 0: tests/phase-13/ harness (run.sh + lib.sh + fake/recording verifiers + self-contained fixture contract)
-- [ ] 13-02-PLAN.md — Wave 1: bin/audit-claims.sh deterministic core (FAITH-01 selectors + FAITH-02 locator→passage resolver + 9-key finding emitter + report/checkpoint)
-- [ ] 13-03-PLAN.md — Wave 2: bin/lib/privacy_resolve.py §13 fail-closed resolver + verdict/verifier dispatch (FAITH-04 chokepoint + FAITH-02 judgment half; primary threat model)
-- [ ] 13-04-PLAN.md — Wave 1: AGENTS.md §6 `<!-- page: N -->` convention + Audit workflow docs (CLAUDE.md + schema/AGENTS.template.md mirror)
-- [ ] 13-05-PLAN.md — Wave 3: 13-VERIFICATION.md (12.2 mirror format) + REQUIREMENTS.md FAITH-01..04 flip + requirements-sync --strict/--require-complete exit-0
+- [x] 13-01-PLAN.md — Wave 0: tests/phase-13/ harness (run.sh + lib.sh + fake/recording verifiers + self-contained fixture contract)
+- [x] 13-02-PLAN.md — Wave 1: bin/audit-claims.sh deterministic core (FAITH-01 selectors + FAITH-02 locator→passage resolver + 9-key finding emitter + report/checkpoint)
+- [x] 13-03-PLAN.md — Wave 2: bin/lib/privacy_resolve.py §13 fail-closed resolver + verdict/verifier dispatch (FAITH-04 chokepoint + FAITH-02 judgment half; primary threat model)
+- [x] 13-04-PLAN.md — Wave 1: AGENTS.md §6 `<!-- page: N -->` convention + Audit workflow docs (CLAUDE.md + schema/AGENTS.template.md mirror)
+- [x] 13-05-PLAN.md — Wave 3: 13-VERIFICATION.md (12.2 mirror format) + REQUIREMENTS.md FAITH-01..04 flip + requirements-sync --strict/--require-complete exit-0
 
 ### Phase 13.1: Docs Finalization + Obsidian Starter
 

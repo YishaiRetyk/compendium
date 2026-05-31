@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Shareability
-status: Ready to execute
-stopped_at: Phase 13 context gathered (discuss-phase complete; 16 decisions)
-last_updated: "2026-05-31T19:33:24.075Z"
+status: Phase 13 complete
+stopped_at: Phase 13 complete (5/5 plans; verifier PASS 6/6 SC + 4/4 REQ; tests 33/33)
+last_updated: "2026-06-01T00:00:00.000Z"
 progress:
   total_phases: 19
-  completed_phases: 9
+  completed_phases: 10
   total_plans: 47
-  completed_plans: 42
-  percent: 89
+  completed_plans: 47
+  percent: 100
 ---
 
 # Project State
@@ -20,11 +20,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-15)
 
 **Core value:** The wiki is a persistent, compounding artifact -- cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested.
-**Current focus:** Phase 13 — claim-faithfulness-audit
+**Current focus:** Phase 13.1 — Docs Finalization + Obsidian Starter (next)
 
 ## Current Position
 
-Phase: 13 context gathered. Next: `/gsd-plan-phase 13` to produce PLAN.md.
+Phase: 13 complete. Next: `/gsd-discuss-phase 13.1` (or `/gsd-plan-phase 13.1`).
+
+Phase 13 closure: 5/5 plans complete; FAITH-01..04 → Complete in REQUIREMENTS.md (bullets + traceability matrix); 13-VERIFICATION.md (plan-authored, 12.2 mirror) + 13-VERIFIER-REPORT.md (independent, PASS 6/6 SC + 4/4 REQ); tests 33/33; `bin/requirements-sync.sh --strict --phase 13` and `--require-complete --phase 13` both exit 0; code review 0 critical / 0 high (3 medium / 4 low, advisory — top item MD-01: `--format json` does not apply the `--emit-worklist` HIGH-C metadata redaction; passage text NOT leaked). Shipped: `bin/audit-claims.sh` (selectors → raw-source locator resolver → 9-key findings → privacy chokepoint → stdin-only `shlex.split` verifier dispatch), `bin/lib/privacy_resolve.py` (§13 fail-closed + strictest-wins effective-claim privacy), AGENTS/CLAUDE §6 `<!-- page: N -->` + Audit review-only workflow. Generated audit-report.md / audit-state.md stamped `privacy: local_only`.
 
 Phase 12.2 closure: 5/5 plans complete; WGATE-01..04 → Complete; verifier PASS 7/7 SC; tests 11/11.
 
