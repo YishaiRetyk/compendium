@@ -29,6 +29,8 @@ The LLM Wiki Compiler is a personal knowledge management system with three layer
 
 Workflows for each operation are defined in Section 11 of this document.
 
+These four operations are the wiki's mutation vocabulary. Layered on top is the **Audit** -- a review-only diagnostic workflow (`bin/audit-claims.sh`, Section 11.7) that checks whether sampled claims semantically follow from the source passage they cite. The Audit never mutates a wiki page; like Lint, it is a workflow, not one of the four mutation operations, so the four-operation framing is preserved.
+
 ## 2. Directory Structure
 
 ```
@@ -1400,6 +1402,34 @@ full lifecycle walkthrough.
 ### 11.6 Release Workflow (Orphan-Branch Publish)
 
 Template releases use an orphan-branch workflow that publishes a neutralized snapshot of the repo without the creator's personal `wiki/` content. See `docs/reference/release.md` for the full runbook.
+
+### 11.7 Audit Workflow
+
+The Audit is a **review-only** diagnostic workflow. It is NOT a fifth top-level operation -- the four-operation framing (Ingest / Query / Lint / Reflect) is preserved (Section 1). The Audit is layered on top, analogous to how Lint is a workflow rather than one of the four mutation operations. It adds no wiki page type.
+
+```
+Trigger:  Operator runs bin/audit-claims.sh on-demand; OR a non-binding
+          "audit recommended" note surfaces during a lint run.
+Inputs:   wiki/ pages with [prov:] claims + the raw sources at their path:.
+Outputs:  wiki/maintenance/audit-report.md (+ lint-compatible JSON), advanced
+          wiki/maintenance/audit-state.md checkpoint. NO wiki page is mutated.
+Commit:   N/A by default (the audit writes only control-plane artifacts; the
+          operator commits the report if they wish to track it).
+```
+
+**What it is.** `bin/audit-claims.sh` is a source-grounded, review-only audit. It samples high-risk claims, resolves each `[prov:source_id#locator]` to the cited passage in the **raw** source file at the source page's `path:` (never the source summary's `## Extracted Claims` -- that would be circular), and emits a verdict per claim: `supports` / `weak` / `contradicts` / `insufficient`, plus the operational verdicts `insufficient-locator` (no passage extractable -- e.g. a `#p` locator against an unmarked source per the Section 6 page-marker convention), `skipped-privacy` (withheld for privacy), and `skipped-nontext` (`#img`). Findings extend Lint's `{severity, category, path, message}` tuple with `verdict`, `line`, `source_id`, `locator`, and `rationale`, and are written to `wiki/maintenance/audit-report.md` (the pattern-twin of `lint-report.md`), grouped by verdict. The audit NEVER mutates a wiki page, never gates by default (no `error` severity -- `contradicts` maps to `warning`, the rest to `info`), and runs on-demand.
+
+**Cadence.** The primary path is operator-invoked (`bin/audit-claims.sh`). Additionally, the Lint workflow MAY emit a non-binding `audit recommended: <reason>` note (the Section 11.4 Tier-2 recommendation pattern) when high-risk-claim counts cross a threshold -- Lint already computes the stale / epistemic / orphan signals, so it is the cheapest host. This note is **informational only**: it does not run the audit, and the audit is never a CI gate in v1.
+
+**Privacy (the load-bearing FAITH-04 contract).** The audit resolves each claim's **effective claim privacy** via the Section 13 precedence -- the STRICTEST of {claim-page privacy, source-summary privacy, raw-source privacy, enclosing-directory signal, fail-closed `local_only` default}. This is NOT "source privacy" alone: the worklist payload carries the wiki page's own claim text, so a `privacy: local_only` page citing a `cloud_safe` source must still be withheld. Effective-`local_only` claims are withheld (their claim text AND the resolved passage) from BOTH the verifier subprocess AND the `--emit-worklist` stdout -- the partition gates every passage-bearing egress surface, not just the subprocess. Withheld claims emit a `skipped-privacy` verdict; on a primarily-local vault, a high `skipped-privacy` count is acceptable, expected UX (it satisfies FAITH-04 without forcing a local-model dependency), not a failure to pad around.
+
+On the cloud-facing `--emit-worklist` stdout, a withheld claim's `skipped-privacy` metadata (`source_id` / `path` / `locator`) is redacted to a bare aggregate count; full per-record detail is written only to the `privacy: local_only` `audit-report.md`. This keeps even the existence-metadata of local-only claims off the cloud-facing surface.
+
+**Verifier-locality model.** Every `--verifier <cmd>` is treated as cloud / egress **by default**. The audit NEVER infers a verifier's locality from its command -- locality is an operator assertion via a flag, never a guess. A `local_only` passage is admitted to a verifier ONLY via an explicit `--allow-local` flag (with `--local-verifier <cmd>` documented as sugar for `--verifier <cmd> --allow-local`). The script enforces this mechanically; the docs must never describe a weaker "local verifier auto-detected" behavior.
+
+**The contradicts → marker handoff (D-10).** The audit stays strictly report-only. A human or agent MAY, as a SEPARATE explicit operation, add an `[epistemic:: tentative]` or a `[contradiction:source_a#locator vs source_b#locator]` marker (Section 6) to a claim with a confirmed `contradicts` verdict, then sync `has_contradictions` per the Lint mechanics (Section 11.3). This is **never automatic** -- the audit produces a finding; a subsequent human-approved decision promotes it to a marker.
+
+**Checkpoint.** `wiki/maintenance/audit-state.md` (frontmatter `last_audit_commit`, `last_audit_at`, `last_sample_size`) mirrors `reflect-state.md`. It is control-plane (not listed in `wiki/index.md`) and advances even on a no-finding run.
 
 ## 12. Index and Log
 
