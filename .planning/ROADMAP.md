@@ -241,7 +241,12 @@ Plans:
 - No required CI blocking gate in the first shipped version
 - No SQLite requirement
 - No full-vault audit by default
-**Plans**: TBD
+**Plans**: 5 plans
+- [ ] 13-01-PLAN.md — Wave 0: tests/phase-13/ harness (run.sh + lib.sh + fake/recording verifiers + self-contained fixture contract)
+- [ ] 13-02-PLAN.md — Wave 1: bin/audit-claims.sh deterministic core (FAITH-01 selectors + FAITH-02 locator→passage resolver + 9-key finding emitter + report/checkpoint)
+- [ ] 13-03-PLAN.md — Wave 2: bin/lib/privacy_resolve.py §13 fail-closed resolver + verdict/verifier dispatch (FAITH-04 chokepoint + FAITH-02 judgment half; primary threat model)
+- [ ] 13-04-PLAN.md — Wave 1: AGENTS.md §6 `<!-- page: N -->` convention + Audit workflow docs (CLAUDE.md + schema/AGENTS.template.md mirror)
+- [ ] 13-05-PLAN.md — Wave 3: 13-VERIFICATION.md (12.2 mirror format) + REQUIREMENTS.md FAITH-01..04 flip + requirements-sync --strict/--require-complete exit-0
 
 ### Phase 13.1: Docs Finalization + Obsidian Starter
 
