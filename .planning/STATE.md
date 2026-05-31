@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Shareability
-status: Phase 13 complete
-stopped_at: Phase 13 complete (5/5 plans; verifier PASS 6/6 SC + 4/4 REQ; tests 33/33)
+status: Phase 13.1 context gathered
+stopped_at: Phase 13.1 context gathered (12 decisions in 13.1-CONTEXT.md; ready for planning)
 last_updated: "2026-06-01T00:00:00.000Z"
 progress:
   total_phases: 19
@@ -20,11 +20,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-15)
 
 **Core value:** The wiki is a persistent, compounding artifact -- cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested.
-**Current focus:** Phase 13.1 — Docs Finalization + Obsidian Starter (next)
+**Current focus:** Phase 13.1 — Docs Finalization + Obsidian Starter (context gathered; ready to plan)
 
 ## Current Position
 
-Phase: 13 complete. Next: `/gsd-discuss-phase 13.1` (or `/gsd-plan-phase 13.1`).
+Phase: 13.1 context gathered. Next: `/clear` then `/gsd-plan-phase 13.1`.
+
+Phase 13.1 context: 12 decisions in `13.1-CONTEXT.md` (4 areas). Obsidian starter = Templates-core tokens ({{date}}/{{title}}), `schema/obsidian/` templates + reference doc only, NO `.obsidian/` config mutation. Dataview verification = build `examples/dataview-fixtures/` (example: true + documented expected counts); one fixture covers fresh-starter + post-bootstrap via embedded `bootstrap_stage` pages — KNOWN TENSION: `.obsidianignore` excludes examples/ from indexing (Dataview would return 0; researcher to reconcile). Manual verification split: Claude runs DEBT-04 write-back + BOTH sides of DEBT-02 (Claude ingest + `codex exec`, CLI 0.135.0 confirmed) against `examples/kahneman/` golden, tolerance = structural equivalence; USER does only DEBT-01 Obsidian render (prepared-and-await, phase NOT blocked on GUI; 13.2 confirms). Docs: fully author 3 stubs (schema-tour/privacy-model/examples) + new `agent-parity.md`, accuracy-pass substantial docs, reconcile index; merge-conflict stays in CONTRIBUTING.md, dataview-fixtures folds into examples.md. NEUTRALITY (CLAUDE.md §3) binds all docs/templates — placeholders only, kahneman is the sole sanctioned concrete example.
 
 Phase 13 closure: 5/5 plans complete; FAITH-01..04 → Complete in REQUIREMENTS.md (bullets + traceability matrix); 13-VERIFICATION.md (plan-authored, 12.2 mirror) + 13-VERIFIER-REPORT.md (independent, PASS 6/6 SC + 4/4 REQ); tests 33/33; `bin/requirements-sync.sh --strict --phase 13` and `--require-complete --phase 13` both exit 0; code review 0 critical / 0 high (3 medium / 4 low, advisory — top item MD-01: `--format json` does not apply the `--emit-worklist` HIGH-C metadata redaction; passage text NOT leaked). Shipped: `bin/audit-claims.sh` (selectors → raw-source locator resolver → 9-key findings → privacy chokepoint → stdin-only `shlex.split` verifier dispatch), `bin/lib/privacy_resolve.py` (§13 fail-closed + strictest-wins effective-claim privacy), AGENTS/CLAUDE §6 `<!-- page: N -->` + Audit review-only workflow. Generated audit-report.md / audit-state.md stamped `privacy: local_only`.
 
