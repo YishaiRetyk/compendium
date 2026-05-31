@@ -10,7 +10,7 @@ set -euo pipefail
 # Lint rule-set semver per CI-08 / D-26. Bump MAJOR on breaking changes
 # (removed category, changed severity semantics). MINOR on non-breaking
 # additions. PATCH on bug fixes. --require-version X.Y.Z is a minimum check.
-LINT_VERSION="1.2.0"
+LINT_VERSION="1.3.0"
 
 usage() {
     cat <<'EOF'
@@ -1746,6 +1746,59 @@ if should_run('drift') or should_run('all'):
                 rel = os.path.relpath(fpath)
                 add_finding('info', 'drift', rel,
                             'EXTERNAL: Non-markdown file in wiki/ (may cause Obsidian issues)')
+
+    # --- DRFT-04: Orphaned operation artifacts (log <-> git drift) ---
+    # An operation (query/ingest) that finishes its file edits but skips its
+    # commit leaves log.md asserting `pages_affected` the wiki does not contain
+    # as committed files. The next operation's commit then flushes the shared
+    # append-only log.md while the orphaned page/index edits dangle untracked.
+    # This check reads the COMMITTED log.md (git show HEAD:) so that an in-flight
+    # operation -- whose fresh log entry is itself still uncommitted alongside
+    # its page -- is NOT flagged; only entries already in HEAD are audited.
+    # Scope: the machine-parseable `pages_affected:` field (query-workflow
+    # format, AGENTS.md §11.2). See AGENTS.md §11.3 step 11 (DRFT-04).
+    print("  Check 10f: Orphaned operation artifacts (DRFT-04)...", file=sys.stderr)
+    _drft04_skip_ids = {'index', 'log', 'lint-report', 'reflect-state', 'none', ''}
+    try:
+        wiki_rel = os.path.relpath(os.path.abspath(wiki_dir.rstrip('/')), REPO_ROOT)
+        committed_log = subprocess.run(
+            ['git', 'show', f'HEAD:{wiki_rel}/log.md'],
+            cwd=REPO_ROOT, check=True, capture_output=True, text=True,
+        ).stdout
+        tracked = subprocess.run(
+            ['git', 'ls-files', wiki_rel],
+            cwd=REPO_ROOT, check=True, capture_output=True, text=True,
+        ).stdout
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        committed_log = ''
+        tracked = ''
+    if committed_log:
+        # Resolve referenced IDs against the actual `id` frontmatter of
+        # git-tracked pages (NOT filename stems): a page whose id != filename
+        # is itself a yaml-check error, and must not also produce a spurious
+        # orphan finding here.
+        tracked_paths = {
+            os.path.normpath(p) for p in tracked.splitlines() if p.endswith('.md')
+        }
+        tracked_ids = set()
+        for page_path, page_fm, _b, _e in all_pages:
+            if not page_fm:
+                continue
+            pid = page_fm.get('id', '')
+            rel = os.path.relpath(os.path.abspath(page_path), REPO_ROOT)
+            if pid and os.path.normpath(rel) in tracked_paths:
+                tracked_ids.add(pid)
+        log_rel = os.path.relpath(os.path.join(wiki_dir, 'log.md'))
+        for m in re.finditer(r'^pages_affected:\s*(.+)$', committed_log, re.MULTILINE):
+            for pid in (x.strip() for x in m.group(1).split(',')):
+                if pid in _drft04_skip_ids:
+                    continue
+                if pid not in tracked_ids:
+                    add_finding('warning', 'drift', log_rel,
+                                f"log.md records pages_affected '{pid}' but no "
+                                f"git-tracked wiki page exists for it (orphaned "
+                                f"operation artifact -- prior operation skipped "
+                                f"its commit; commit the page or fix the log entry)")
 
 # ---------------------------------------------------------------------------
 # Check: brownfield (BRWN-09) — 30-day staleness + summary counts
