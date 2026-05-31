@@ -57,6 +57,7 @@ id: cloudclaim
 title: "CloudClaim"
 type: concept
 status: active
+privacy: cloud_safe
 ---
 Cloud claim [prov:src-cloud#sec:introduction|direct|2026-04-15]
 EOF

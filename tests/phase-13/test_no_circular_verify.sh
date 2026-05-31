@@ -44,6 +44,7 @@ id: cv
 title: "CV"
 type: concept
 status: active
+privacy: cloud_safe
 ---
 A claim [prov:src-cv#sec:introduction|direct|2026-04-15]
 EOF

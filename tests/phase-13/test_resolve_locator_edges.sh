@@ -50,6 +50,7 @@ id: edgea
 title: "EdgeA"
 type: concept
 status: active
+privacy: cloud_safe
 ---
 Slug tolerant [prov:src-ed#sec:self-attention|direct|2026-04-15]
 EOF
@@ -61,6 +62,7 @@ id: edgeb
 title: "EdgeB"
 type: concept
 status: active
+privacy: cloud_safe
 ---
 No such section [prov:src-ed#sec:nonexistent|direct|2026-04-15]
 EOF
@@ -72,6 +74,7 @@ id: edgec
 title: "EdgeC"
 type: concept
 status: active
+privacy: cloud_safe
 ---
 Malformed [prov:src-ed#bogus99|direct|2026-04-15]
 EOF
@@ -83,6 +86,7 @@ id: edged
 title: "EdgeD"
 type: concept
 status: active
+privacy: cloud_safe
 ---
 Unknown source [prov:src-nope#sec:self-attention|direct|2026-04-15]
 EOF
@@ -94,6 +98,7 @@ id: edgee
 title: "EdgeE"
 type: concept
 status: active
+privacy: cloud_safe
 ---
 Tail page [prov:src-ed#p3|direct|2026-04-15]
 EOF
@@ -107,6 +112,7 @@ id: edgef
 title: "EdgeF"
 type: concept
 status: active
+privacy: cloud_safe
 ---
 Code para [prov:src-ed#para3|direct|2026-04-15]
 EOF
@@ -118,6 +124,7 @@ id: edgeg
 title: "EdgeG"
 type: concept
 status: active
+privacy: cloud_safe
 ---
 Two markers [prov:src-ed#sec:self-attention|direct|2026-04-15] and [prov:src-ed#para1|direct|2026-04-15]
 EOF

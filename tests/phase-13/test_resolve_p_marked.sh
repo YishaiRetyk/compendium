@@ -38,6 +38,7 @@ id: pmpage
 title: "PMpage"
 type: concept
 status: active
+privacy: cloud_safe
 ---
 A claim [prov:src-pm#p8|direct|2026-04-15]
 EOF

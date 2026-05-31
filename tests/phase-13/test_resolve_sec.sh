@@ -37,6 +37,7 @@ id: p
 title: "P"
 type: concept
 status: active
+privacy: cloud_safe
 ---
 A claim [prov:src-s#sec:introduction|direct|2026-04-15]
 EOF

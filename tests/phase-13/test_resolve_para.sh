@@ -35,6 +35,7 @@ id: pp
 title: "PP"
 type: concept
 status: active
+privacy: cloud_safe
 ---
 A claim [prov:src-pa#para2|direct|2026-04-15]
 EOF

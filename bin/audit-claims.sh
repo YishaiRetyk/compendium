@@ -10,22 +10,28 @@
 # heredoc) and COPIES lint's embedded primitives verbatim (lint's python is a
 # monolithic heredoc, NOT an importable module -- 13-RESEARCH.md Assumption A1).
 #
-# SCOPE (Plan 13-02): this is the DETERMINISTIC CORE. The verdict/verifier
-# dispatch and the full §13 privacy chokepoint are Plan 03. Here:
-#   - resolved (non-skipped) claims carry the declared-enum verdict `insufficient`
-#     with rationale "verifier not run" (NOT an out-of-enum placeholder token).
-#     Plan 03 overwrites this with the real dispatched verdict.
-#   - --emit-worklist ships an INTERIM frontmatter-only privacy guard: a local_only
-#     (or privacy-absent -> fail-closed local_only) passage is withheld absent
-#     --allow-local, substituting a {verdict:"skipped-privacy"} record. Plan 03
-#     upgrades the check to the full three-level §13 resolver without relaxing this.
-#   - NO network, NO subprocess egress (verdict dispatch lands in Plan 03).
+# SCOPE (Plan 13-03 -- verdict/verifier dispatch + the full §13 chokepoint):
+#   - The SINGLE privacy chokepoint gates on the EFFECTIVE claim privacy
+#     (resolve_effective_claim_privacy in bin/lib/privacy_resolve.py = strictest
+#     of {claim-page, source-summary, raw-source, enclosing-dir, fail-closed
+#     default}), NOT source privacy alone (REVIEW HIGH-A). It is the one partition
+#     point upstream of BOTH the verdict dispatch AND --emit-worklist.
+#   - local_only-effective claims are WITHHELD (-> skipped-privacy) unless
+#     --allow-local; their per-record metadata is REDACTED to a bare aggregate
+#     count on cloud-facing --emit-worklist stdout (REVIEW HIGH-C). Full detail
+#     goes only to the privacy: local_only audit-report.md.
+#   - The verdict step (--verifier <cmd>) is THE sole egress: payload on STDIN
+#     ONLY via shlex.split(cmd) + shell=False; stdout parsed defensively (no eval).
+#     With no --verifier, --emit-worklist ships the partitioned worklist (agent-
+#     in-the-loop default, D-01) and resolved claims carry the declared-enum
+#     `insufficient` placeholder with rationale "verifier not run".
 #
-# Verifier-locality contract (REVIEW HIGH-1): every --verifier is treated as
-# cloud/egress by DEFAULT. There is NO flag and NO heuristic that marks a verifier
-# "local" implicitly. The ONLY way a local_only passage enters a passage-bearing
-# output is an explicit --allow-local. --local-verifier <cmd> is pure sugar for
-# `--verifier <cmd> --allow-local`.
+# Verifier-locality contract (REVIEW HIGH-1): every verifier command is treated
+# as cloud/egress by DEFAULT. There is NO flag and NO heuristic that inspects the
+# command string to mark it trusted. The ONLY admission of a local_only passage
+# into a passage-bearing output is the explicit AUDIT_ALLOW_LOCAL flag (set by
+# --allow-local). The --local-verifier <cmd> flag is pure sugar that sets both
+# the verifier command AND AUDIT_ALLOW_LOCAL.
 
 set -euo pipefail
 
@@ -53,7 +59,7 @@ Options:
                          dispatch lands in Plan 03.
   --allow-local          Opt-in: admit local_only passages to passage-bearing
                          output. Required for any local-only egress.
-  --local-verifier <cmd> Sugar for: --verifier <cmd> --allow-local.
+  --local-verifier <cmd> Sugar: same as that command plus the allow opt-in flag.
   --version              Print AUDIT_VERSION and exit.
   --help, -h             Show this help.
 EOF
@@ -97,16 +103,23 @@ while [ "$#" -gt 0 ]; do
             APPLY_VERDICTS="$2"; shift 2 ;;
         --verifier)
             if [ "$#" -lt 2 ]; then echo "ERROR: --verifier requires a value" >&2; exit 1; fi
-            # Every --verifier is CLOUD/egress by default; never infer locality.
+            # Every verifier command is CLOUD/egress by default; admission is the
+            # AUDIT_ALLOW_LOCAL flag, never inferred from the command string.
             AUDIT_VERIFIER="$2"; shift 2 ;;
         --allow-local) AUDIT_ALLOW_LOCAL="1"; shift ;;
         --local-verifier)
             if [ "$#" -lt 2 ]; then echo "ERROR: --local-verifier requires a value" >&2; exit 1; fi
-            # Sugar: --local-verifier <cmd> = --verifier <cmd> --allow-local.
+            # Sugar that sets the verifier command AND the AUDIT_ALLOW_LOCAL flag.
             AUDIT_VERIFIER="$2"; AUDIT_ALLOW_LOCAL="1"; shift 2 ;;
         *) echo "ERROR: unknown option: $1" >&2; usage >&2; exit 1 ;;
     esac
 done
+
+# --- bin/lib import dir (robust path resolution; mirrors the brownfield
+#     breadcrumb pattern so the script works when invoked via absolute path
+#     from an unrelated cwd). schema/brownfield/migrations/01-page-typing.sh
+#     is the precedent for a .sh heredoc importing a bin/lib python module. ---
+export AUDIT_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/lib" && pwd)"
 
 # --- bash -> python handoff (prefer check-privacy.sh's exit-propagation wrapper). ---
 export AUDIT_SINCE="$SINCE"
@@ -121,8 +134,12 @@ export AUDIT_REPO_ROOT="${AUDIT_REPO_ROOT:-$PWD}"
 
 set +e
 python3 - <<'PYEOF'
-import os, re, sys, json, subprocess
+import os, re, sys, json, shlex, subprocess
 from datetime import date
+
+# §13 privacy resolvers (bin/lib/privacy_resolve.py -- pure, egress-free).
+sys.path.insert(0, os.environ['AUDIT_LIB_DIR'])
+from privacy_resolve import resolve_source_privacy, resolve_effective_claim_privacy
 
 # --- COPIED FROM bin/lint.sh (LINT_VERSION=1.3.0) ---
 # These symbols are byte-copies from bin/lint.sh's monolithic python heredoc
@@ -182,6 +199,25 @@ def parse_frontmatter(filepath):
         return None, content, f'YAML parse error: {e}'
 
 
+def parse_frontmatter_str(content):
+    """Like parse_frontmatter but over an in-memory string (the raw source text
+    already read by read_raw_source). Returns (fm|None, body, error). fm is None
+    when the text has no leading --- fence (no new file open -> no new egress)."""
+    if not content.startswith('---'):
+        return None, content, None
+    try:
+        end = content.index('---', 3)
+        fm = yaml.safe_load(content[3:end])
+        body = content[end+3:]
+        if not isinstance(fm, dict):
+            fm = None
+        return fm, body, None
+    except ValueError:
+        return None, content, 'Unterminated frontmatter (missing closing ---)'
+    except yaml.YAMLError as e:
+        return None, content, f'YAML parse error: {e}'
+
+
 # ----------------------------------------------------------------------------
 # Page walk + source registry build (COPIED from lint.sh page walk classifier).
 # ----------------------------------------------------------------------------
@@ -215,16 +251,17 @@ for sp, sfm, sbody in source_pages:
 
 
 # ----------------------------------------------------------------------------
-# Privacy: INTERIM frontmatter-only guard (REVIEW HIGH-2 / D-02).
-# Plan 03 replaces this with the full three-level §13 precedence resolver.
-# Fail-closed: privacy absent -> local_only.
+# Privacy chokepoint (REVIEW HIGH-A / HIGH-1 / HIGH-2 / HIGH-C, D-02).
+# The full §13 three-level precedence + the strictest-wins effective-claim
+# resolver live in bin/lib/privacy_resolve.py (imported above as
+# resolve_source_privacy / resolve_effective_claim_privacy). The audit partition
+# gates on resolve_effective_claim_privacy -- the strictest of {claim-page
+# privacy, source-summary privacy, raw-source privacy, enclosing-dir, default}
+# -- NOT source privacy alone. There is exactly ONE partition point upstream of
+# BOTH the verdict dispatch AND --emit-worklist; local_only-effective claims are
+# WITHHELD (-> skipped-privacy) unless AUDIT_ALLOW_LOCAL=1. Verifier locality is
+# a FLAG (AUDIT_ALLOW_LOCAL), never inferred from the verifier command string.
 # ----------------------------------------------------------------------------
-def source_privacy(sfm):
-    fm_priv = (sfm or {}).get('privacy')
-    if fm_priv == 'cloud_safe':
-        return 'cloud_safe'
-    # local_only, missing, or any unknown value -> fail-closed local_only.
-    return 'local_only'
 
 
 # ----------------------------------------------------------------------------
@@ -607,7 +644,14 @@ def severity_for(verdict):
 
 
 findings = []
-worklist = []
+worklist = []                 # the SINGLE partitioned worklist (cloud_safe-effective
+                              # entries only, unless --allow-local). BOTH the verdict
+                              # dispatch and --emit-worklist consume THIS object.
+redacted_skip_count = 0       # REVIEW HIGH-C: count of withheld local_only-effective
+                              # claims whose per-record metadata is redacted on stdout.
+
+VALID_VERDICTS = ('supports', 'weak', 'contradicts', 'insufficient',
+                  'insufficient-locator', 'skipped-privacy', 'skipped-nontext')
 
 
 def add_finding(verdict, rel, line, sid, loc, message):
@@ -622,6 +666,44 @@ def add_finding(verdict, rel, line, sid, loc, message):
         'message': message,
         'rationale': message,
     })
+
+
+# ----------------------------------------------------------------------------
+# Verifier dispatch (THE sole egress, D-01). Invoked per worklist entry via
+# shlex.split(cmd) + shell=False (REVIEW MEDIUM): a command WITH args parses,
+# and NO shell ever runs. The payload {claim,passage,support_type} is passed on
+# STDIN ONLY via input= -- NEVER interpolated into argv (command-injection
+# mitigation, T-13-09). stdout is parsed DEFENSIVELY: a JSONDecodeError or a
+# missing/out-of-enum `verdict` yields an `insufficient` finding, never a crash,
+# never eval (T-13-10).
+# ----------------------------------------------------------------------------
+def run_verifier(verifier_cmd, claim_text, passage, support_type):
+    """Return (verdict, rationale). Defensive: malformed -> ('insufficient', ...)."""
+    payload = json.dumps({
+        'claim': claim_text,
+        'passage': passage,
+        'support_type': support_type,
+    })
+    try:
+        proc = subprocess.run(
+            shlex.split(verifier_cmd),
+            input=payload, text=True, capture_output=True, shell=False,
+            cwd=REPO_ROOT,
+        )
+    except (OSError, ValueError) as exc:
+        return 'insufficient', f'verifier could not be invoked: {exc}'
+    out = proc.stdout or ''
+    try:
+        parsed = json.loads(out)
+    except (json.JSONDecodeError, ValueError):
+        return 'insufficient', 'verifier returned unparseable output'
+    if not isinstance(parsed, dict) or 'verdict' not in parsed:
+        return 'insufficient', 'verifier returned unparseable output'
+    verdict = parsed.get('verdict')
+    if verdict not in VALID_VERDICTS:
+        return 'insufficient', f'verifier returned out-of-enum verdict: {verdict!r}'
+    rationale = parsed.get('rationale') or ''
+    return verdict, rationale
 
 
 # no-silent-caps log line (D-09) -- emitted as an info finding.
@@ -654,28 +736,53 @@ for rank, (rel, line, sid, loc, line_text, fm), hits in capped:
                     f'no passage extractable for {sid}{loc}')
         continue
 
-    # Resolved. Determine source privacy (interim frontmatter-only guard).
+    # --- THE single privacy chokepoint (REVIEW HIGH-A): gate on EFFECTIVE claim
+    #     privacy = strictest of {claim-page, source-summary, raw-source, dir,
+    #     default}, NOT source privacy alone. Parse the RAW source's frontmatter
+    #     (already-open file; no new egress) and fold it in. ---
     sfm = source_registry.get(sid)
-    priv = source_privacy(sfm)
-    if priv == 'local_only' and not ALLOW_LOCAL:
-        # WITHHOLD passage from any passage-bearing output (worklist).
+    raw_source_fm, _, _ = parse_frontmatter_str(raw_text)
+    effective_priv = resolve_effective_claim_privacy(
+        fm, rel, sfm, raw_source_fm, (sfm or {}).get('path', ''))
+
+    # Locality is the AUDIT_ALLOW_LOCAL flag, never inferred from the command
+    # string. local_only-effective claims are admitted ONLY when --allow-local
+    # (or the --local-verifier sugar) set the flag.
+    if effective_priv == 'local_only' and not ALLOW_LOCAL:
+        # WITHHOLD claim text AND passage from the partitioned worklist (the one
+        # gate for BOTH egress surfaces). REVIEW HIGH-C: also redact the per-claim
+        # metadata (source_id/path/line/locator/rationale -- private slugs,
+        # T-13-21) from cloud-facing stdout. The full per-record detail lands ONLY
+        # in the privacy: local_only audit-report.md via add_finding below.
         add_finding('skipped-privacy', rel, line, sid, loc,
-                    f'local_only source {sid} withheld (no --allow-local)')
-        # worklist gets a passage-free skipped-privacy record
-        worklist.append({
-            'verdict': 'skipped-privacy',
-            'path': rel, 'line': line, 'source_id': sid, 'locator': loc,
-        })
+                    f'local_only-effective claim withheld (no --allow-local)')
+        redacted_skip_count += 1
         continue
 
-    # Passage admitted. Worklist carries the passage (egress surface).
+    # Admitted (cloud_safe-effective, OR local_only with --allow-local). The
+    # worklist carries the passage + claim text (the egress surface). `privacy`
+    # is the EFFECTIVE claim privacy (strictest-wins), not source-summary privacy.
+    # support_type is the third [prov:] field when present (PROV_RE group 3).
+    support_type = ''
+    mprov = PROV_RE.search(line_text)
+    if mprov and mprov.group(3):
+        support_type = mprov.group(3)
     worklist.append({
         'path': rel, 'line': line, 'source_id': sid, 'locator': loc,
         'claim': line_text.strip(), 'passage': passage,
+        'support_type': support_type, 'privacy': effective_priv,
     })
-    # Deterministic-core verdict stub: declared-enum `insufficient`, NOT an
-    # out-of-enum placeholder token. Plan 03 overwrites this.
-    add_finding('insufficient', rel, line, sid, loc, 'verifier not run')
+
+    if VERIFIER:
+        # THE sole egress: dispatch the (already-partitioned) claim to the verifier.
+        verdict, rationale = run_verifier(VERIFIER, line_text.strip(), passage, support_type)
+        add_finding(verdict, rel, line, sid, loc,
+                    rationale or f'verifier verdict: {verdict}')
+    else:
+        # Agent-in-the-loop default (D-01): no --verifier -> the worklist IS the
+        # output. The deterministic core emits no real verdict; carry the
+        # declared-enum `insufficient` placeholder so the finding stays in-enum.
+        add_finding('insufficient', rel, line, sid, loc, 'verifier not run')
 
 
 # ----------------------------------------------------------------------------
@@ -689,15 +796,23 @@ if APPLY_VERDICTS:
         verdicts = []
     vmap = {}
     for v in (verdicts or []):
+        if not isinstance(v, dict):
+            continue
+        # REVIEW MEDIUM (T-13-20): validate strictly. Reject records whose verdict
+        # is outside the declared enum; key ONLY on (path,line,source_id,locator);
+        # IGNORE any `passage`/`claim` keys (never re-import passage/claim text
+        # from an external verdict file).
+        vv = v.get('verdict')
+        if vv not in VALID_VERDICTS:
+            continue
         k = (v.get('path'), v.get('line'), v.get('source_id'), v.get('locator'))
         vmap[k] = v
     for f in findings:
         k = (f['path'], f['line'], f['source_id'], f['locator'])
         if k in vmap:
             vv = vmap[k]
-            if vv.get('verdict'):
-                f['verdict'] = vv['verdict']
-                f['severity'] = severity_for(vv['verdict'])
+            f['verdict'] = vv['verdict']
+            f['severity'] = severity_for(vv['verdict'])
             if vv.get('rationale'):
                 f['message'] = vv['rationale']
                 f['rationale'] = vv['rationale']
@@ -836,9 +951,22 @@ knowledge_domain: ""
 
 
 if EMIT_WORKLIST:
-    # Worklist is a passage-bearing EGRESS surface. The interim privacy guard
-    # above already withheld local_only passages absent --allow-local.
-    sys.stdout.write(json.dumps(worklist, indent=2) + '\n')
+    # Worklist is a passage-bearing EGRESS surface. The SINGLE chokepoint above
+    # already withheld local_only-effective claims (text AND passage) absent
+    # --allow-local. REVIEW HIGH-C: emit the cloud-facing stdout as the admitted
+    # entries PLUS a single aggregate REDACTED record for the withheld claims --
+    # carrying ONLY a bare count, NO per-record source_id/path/line/locator/
+    # rationale (private slugs, T-13-21). Full per-record detail lands ONLY in
+    # the privacy: local_only audit-report.md (write_report below). cloud_safe
+    # worklist entries are emitted in full and are unaffected.
+    emitted = list(worklist)
+    if redacted_skip_count > 0:
+        emitted.append({
+            'verdict': 'skipped-privacy',
+            'redacted': True,
+            'count': redacted_skip_count,
+        })
+    sys.stdout.write(json.dumps(emitted, indent=2) + '\n')
     # Still advance the checkpoint + report so the run is auditable.
     write_report()
     write_checkpoint()
