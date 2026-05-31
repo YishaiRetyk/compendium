@@ -134,10 +134,10 @@ Numbering continues from v1.0. New REQ-ID prefixes: `TMPL`, `NEUT`, `WZRD`, `MAN
 
 ### Claim Faithfulness Audit (FAITH)
 
-- [ ] **FAITH-01**: `bin/audit-claims.sh` samples recently modified claims plus high-risk claims (`[epistemic:: inferred]`, `[epistemic:: tentative]`, stale-source claims, and high-fanout page claims).
-- [ ] **FAITH-02**: The audit resolves each sampled claim's `[prov:source_id#locator]` marker to the cited source passage and evaluates whether the passage supports, weakly supports, contradicts, or does not establish the claim.
-- [ ] **FAITH-03**: Audit output is structured and review-only by default, including page path, line number, source ID, locator, verdict, and rationale; no automatic wiki rewrites occur.
-- [ ] **FAITH-04**: `privacy: local_only` claims are never sent to cloud APIs; the audit uses a local verifier or emits an explicit skipped/privacy finding.
+- [x] **FAITH-01**: `bin/audit-claims.sh` samples recently modified claims plus high-risk claims (`[epistemic:: inferred]`, `[epistemic:: tentative]`, stale-source claims, and high-fanout page claims). **Status:** Complete (Phase 13). See `.planning/phases/13-claim-faithfulness-audit/13-VERIFICATION.md`.
+- [x] **FAITH-02**: The audit resolves each sampled claim's `[prov:source_id#locator]` marker to the cited source passage and evaluates whether the passage supports, weakly supports, contradicts, or does not establish the claim. **Status:** Complete (Phase 13). See `.planning/phases/13-claim-faithfulness-audit/13-VERIFICATION.md`.
+- [x] **FAITH-03**: Audit output is structured and review-only by default, including page path, line number, source ID, locator, verdict, and rationale; no automatic wiki rewrites occur. **Status:** Complete (Phase 13). See `.planning/phases/13-claim-faithfulness-audit/13-VERIFICATION.md`.
+- [x] **FAITH-04**: `privacy: local_only` claims are never sent to cloud APIs; the audit uses a local verifier or emits an explicit skipped/privacy finding. **Status:** Complete (Phase 13). See `.planning/phases/13-claim-faithfulness-audit/13-VERIFICATION.md`.
 
 ### v1.1 Closure Gate (CLOSE)
 
@@ -283,10 +283,10 @@ Explicitly excluded from v1.1. Documented to prevent scope creep.
 | WGATE-02 | Phase 12.2 | Complete |
 | WGATE-03 | Phase 12.2 | Complete |
 | WGATE-04 | Phase 12.2 | Complete |
-| FAITH-01 | Phase 13 | Pending |
-| FAITH-02 | Phase 13 | Pending |
-| FAITH-03 | Phase 13 | Pending |
-| FAITH-04 | Phase 13 | Pending |
+| FAITH-01 | Phase 13 | Complete |
+| FAITH-02 | Phase 13 | Complete |
+| FAITH-03 | Phase 13 | Complete |
+| FAITH-04 | Phase 13 | Complete |
 | CLOSE-01 | Phase 13.2 | Pending |
 | CLOSE-02 | Phase 13.2 | Pending |
 | CLOSE-03 | Phase 13.2 | Pending |
