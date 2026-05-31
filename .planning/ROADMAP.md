@@ -262,7 +262,18 @@ Plans:
   4. Every `/docs/reference/` file (`schema-tour.md`, `brownfield.md`, `privacy-model.md`, `ci.md`, `examples.md`, plus `agent-parity.md` and any Dataview/merge-conflict reference) is filled out with accurate descriptions of the shipped v1.1 features.
   5. Phase 13.1 verification notes document the Obsidian render, agent-parity, and write-back results so the Phase 13.2 closure gate can re-run or audit them.
   6. A minimal Obsidian starter ships for day-1 use: page-type templates derived from the schema templates plus a reference doc explaining how to use them. This starter improves page creation ergonomics without introducing canonical dashboards, hotkey bundles, or workflow prescriptions.
-**Plans**: TBD
+**Plans**: 5 plans
+
+**Wave 1** *(parallel — no file overlap)*
+- [ ] 13.1-01-PLAN.md — Obsidian starter: 6 token-ized schema/obsidian/ templates (no drift) + docs/reference/obsidian-starter.md (OBSID-01/02/03)
+- [ ] 13.1-02-PLAN.md — examples/dataview-fixtures/ (8-12 example:true pages, >=2 bootstrap_stage) + per-query expected-count matrix (DEBT-01 prep)
+- [ ] 13.1-03-PLAN.md — Verification execution: DEBT-02 Codex parity ingest + DEBT-04 live write-back + 13.1-VERIFICATION.md with DEBT-01 render checklist (DEBT-01/02/04)
+
+**Wave 2** *(blocked on Wave 1: consumes fixture matrix + parity findings)*
+- [ ] 13.1-04-PLAN.md — Author 3 stubs (schema-tour/privacy-model/examples) + new agent-parity.md; examples.md folds in fixture counts + corrects .obsidianignore claim (SC4 / DEBT-02)
+
+**Wave 3** *(blocked on Wave 2: runs after all reference files exist)*
+- [ ] 13.1-05-PLAN.md — Accuracy-pass 5 substantial docs (edit-on-drift) + reconcile docs/reference/index.md (5 additions) + verify CONTRIBUTING merge-conflict recipes (SC4)
 
 ### Phase 13.2: v1.1 Closure Verification Gate
 
