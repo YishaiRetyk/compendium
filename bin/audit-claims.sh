@@ -13,7 +13,7 @@
 # SCOPE (Plan 13-02): this is the DETERMINISTIC CORE. The verdict/verifier
 # dispatch and the full §13 privacy chokepoint are Plan 03. Here:
 #   - resolved (non-skipped) claims carry the declared-enum verdict `insufficient`
-#     with rationale "verifier not run" (NOT an out-of-enum pending-verifier token).
+#     with rationale "verifier not run" (NOT an out-of-enum placeholder token).
 #     Plan 03 overwrites this with the real dispatched verdict.
 #   - --emit-worklist ships an INTERIM frontmatter-only privacy guard: a local_only
 #     (or privacy-absent -> fail-closed local_only) passage is withheld absent
@@ -674,7 +674,7 @@ for rank, (rel, line, sid, loc, line_text, fm), hits in capped:
         'claim': line_text.strip(), 'passage': passage,
     })
     # Deterministic-core verdict stub: declared-enum `insufficient`, NOT an
-    # out-of-enum pending-verifier token. Plan 03 overwrites this.
+    # out-of-enum placeholder token. Plan 03 overwrites this.
     add_finding('insufficient', rel, line, sid, loc, 'verifier not run')
 
 
