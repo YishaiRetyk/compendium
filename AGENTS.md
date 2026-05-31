@@ -417,6 +417,29 @@ Every factual claim in wiki pages SHOULD have an inline provenance marker linkin
 | Timestamp | `#t<start>-<end>` | `#t00:12:10-00:12:48` | Audio/video transcripts |
 | Image | `#img<number>` | `#img2` | Figures, diagrams |
 
+### Page-marker convention
+
+Markdown-native raw sources lose the page boundaries a PDF carries, so a `#p<n>` locator has nothing to bound against. The OPTIONAL `<!-- page: N -->` HTML-comment marker, hand-inserted in the raw source at each page break, makes `#p` resolvable where authors opt in. It is Obsidian-invisible (an HTML comment does not render in reading view), grep-able, and requires NO change to the `[prov:]` grammar -- `#p` already exists in the Locator Types table above.
+
+**Marker syntax:** insert `<!-- page: N -->` on its own line in the raw source file (the file at the source page's `path:`) at each page boundary, where `N` is the page number that begins below the marker:
+
+```markdown
+<!-- page: 7 -->
+...the text of page 7...
+
+<!-- page: 8 -->
+...the text of page 8...
+
+<!-- page: 9 -->
+...the text of page 9...
+```
+
+**Slice semantics:** `#p8` resolves from the `<!-- page: 8 -->` marker to the line before `<!-- page: 9 -->`; `#p12-14` spans the `<!-- page: 12 -->` marker to the `<!-- page: 15 -->` marker (exclusive upper bound -- the slice ends just before the `page: 15` marker, so the range covers pages 12, 13, and 14). The lower marker is inclusive, the next-page marker is exclusive.
+
+**Optional, with a documented fallback:** markers are never required. When present, `#p` resolves to a bounded passage; when absent, a `#p` locator degrades to the audit's first-class `insufficient-locator` verdict (NOT an error). This is additive -- it imposes nothing on existing sources, and unmarked paginated sources are not errors (D-06). The fallback nudges authors toward `#sec:`/`#para` locators for markdown-native sources that have no real pages.
+
+**Document-now / helper-later (D-07):** the curator hand-marks sources today; any auto-insertion helper (e.g. PDF-to-markdown page-break detection at ingest) is deferred to a later version. The audit consumes the markers read-only; ingest gains zero new logic from this convention.
+
 ### Support Types
 
 | Type | Meaning |
