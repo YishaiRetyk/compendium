@@ -265,7 +265,7 @@ Plans:
 **Plans**: 5 plans
 
 **Wave 1** *(parallel — no file overlap)*
-- [ ] 13.1-01-PLAN.md — Obsidian starter: 6 token-ized schema/obsidian/ templates (no drift) + docs/reference/obsidian-starter.md (OBSID-01/02/03)
+- [x] 13.1-01-PLAN.md — Obsidian starter: 6 token-ized schema/obsidian/ templates (no drift) + docs/reference/obsidian-starter.md (OBSID-01/02/03)
 - [ ] 13.1-02-PLAN.md — examples/dataview-fixtures/ (8-12 example:true pages, >=2 bootstrap_stage) + per-query expected-count matrix (DEBT-01 prep)
 - [ ] 13.1-03-PLAN.md — Verification execution: DEBT-02 Codex parity ingest + DEBT-04 live write-back + 13.1-VERIFICATION.md with DEBT-01 render checklist (DEBT-01/02/04)
 

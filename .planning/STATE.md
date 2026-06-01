@@ -4,7 +4,7 @@ milestone: v1.1
 milestone_name: Shareability
 status: Ready to execute
 stopped_at: Phase 13 context gathered (discuss-phase complete; 16 decisions)
-last_updated: "2026-05-31T23:01:40.021Z"
+last_updated: "2026-06-01T11:59:45.025Z"
 progress:
   total_phases: 19
   completed_phases: 10
@@ -20,11 +20,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-15)
 
 **Core value:** The wiki is a persistent, compounding artifact -- cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested.
-**Current focus:** Phase 13.1 — Docs Finalization + Obsidian Starter (context gathered; ready to plan)
+**Current focus:** Phase 13.1 — Docs Finalization + Obsidian Starter (executing; plan 01/05 complete)
 
 ## Current Position
 
-Phase: 13.1 context gathered. Next: `/clear` then `/gsd-plan-phase 13.1`.
+Phase: 13.1 executing. Plan 01/05 complete (Obsidian starter). Next Wave-1 plans: 13.1-02 (dataview-fixtures), 13.1-03 (verification execution).
+
+Plan 13.1-01 complete (2026-06-01): six token-ized `schema/obsidian/{entity,concept,overview,comparison,source-summary,decision}.md` templates (Templates-core `{{title}}`/`{{date:YYYY-MM-DD}}`; zero drift vs `schema/templates/` via full-file reverse-substitution diff; decision.md asymmetry preserved) + `docs/reference/obsidian-starter.md` (OBSID-02; Setup-once, auto-fill-vs-typed, OBSID-03 scope). PRE-FLIGHT: cleared the pre-existing `check-neutrality.sh` exit-2 by adding `neutrality_exempt: true` to generated `wiki/maintenance/lint-report.md` (drift findings preserved) — every downstream plan's neutrality gate is now meaningful. OBSID-01/02/03 → complete. Commits 2bc2258, 8dd8940, bc03f95. SUMMARY self-check PASSED. NOTE: `obsidian-starter.md` index.md registration is owned by Plan 05, not this plan.
 
 Phase 13.1 context: 12 decisions in `13.1-CONTEXT.md` (4 areas). Obsidian starter = Templates-core tokens ({{date}}/{{title}}), `schema/obsidian/` templates + reference doc only, NO `.obsidian/` config mutation. Dataview verification = build `examples/dataview-fixtures/` (example: true + documented expected counts); one fixture covers fresh-starter + post-bootstrap via embedded `bootstrap_stage` pages — KNOWN TENSION: `.obsidianignore` excludes examples/ from indexing (Dataview would return 0; researcher to reconcile). Manual verification split: Claude runs DEBT-04 write-back + BOTH sides of DEBT-02 (Claude ingest + `codex exec`, CLI 0.135.0 confirmed) against `examples/kahneman/` golden, tolerance = structural equivalence; USER does only DEBT-01 Obsidian render (prepared-and-await, phase NOT blocked on GUI; 13.2 confirms). Docs: fully author 3 stubs (schema-tour/privacy-model/examples) + new `agent-parity.md`, accuracy-pass substantial docs, reconcile index; merge-conflict stays in CONTRIBUTING.md, dataview-fixtures folds into examples.md. NEUTRALITY (CLAUDE.md §3) binds all docs/templates — placeholders only, kahneman is the sole sanctioned concrete example.
 
