@@ -9,8 +9,8 @@ progress:
   total_phases: 19
   completed_phases: 10
   total_plans: 52
-  completed_plans: 48
-  percent: 92
+  completed_plans: 49
+  percent: 94
 ---
 
 # Project State
@@ -20,11 +20,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-15)
 
 **Core value:** The wiki is a persistent, compounding artifact -- cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested.
-**Current focus:** Phase 13.1 — Docs Finalization + Obsidian Starter (executing; plans 01-03/05 complete)
+**Current focus:** Phase 13.1 — Docs Finalization + Obsidian Starter (executing; plans 01-04 complete, 05 pending)
 
 ## Current Position
 
-Phase: 13.1 executing. Plans 01-03/05 complete (Obsidian starter + dataview-fixtures + DEBT-01/02/04 verification). Next Wave-2 plan: 13.1-04 (docs finalization: stubs + agent-parity.md + examples.md).
+Phase: 13.1 executing. Plans 01-04 complete (Obsidian starter + dataview-fixtures + DEBT-01/02/04 verification + docs finalization). Next plan: 13.1-05 (accuracy-pass substantial docs + index.md reconciliation, incl. registering agent-parity.md).
+
+Plan 13.1-04 complete (2026-06-01): authored the three never-populated `docs/reference/` stubs (schema-tour, privacy-model, examples) + created new `agent-parity.md` (DEBT-02 deliverable). schema-tour.md = full §5 frontmatter + §6 provenance/claim-syntax walkthrough (page-type section orders, validation checklist, `[prov:]` grammar + locator table, `<!-- page: N -->` convention, `[epistemic::]`, decay model). privacy-model.md = §13 tiers/precedence + 7-row decision table VERBATIM + strictest-wins inheritance + `bin/check-privacy.sh` CI gate. examples.md = examples/ usage + `example: true` lint-skip + CORRECTED `.obsidianignore` (release-manifest/graph-hygiene convention, NOT Obsidian-native; real mechanism = Excluded files/`userIgnoreFilters`) + five fixture-scoped Dataview blocks with expected counts (3/2/2/2/5) + grep-vs-Dataview divergence notes; active-entities count re-derived LIVE (=3) and asserted equal. agent-parity.md = structural-equivalence rubric (page-set/types/prov-IDs/locator-targets/frontmatter; prose free) + golden inventory (1 entity, 3 concepts, 1 comparison, 1 overview, 2 sources; single-source vs prospect-theory SUBSET) + codex=cloud-egress + fail-closed seed guard + `codex exec` re-run + `pagetypes()`/`provtargets()` helpers + diff table with Codex column rendered `pending — deferred to 13.2` (blocked-on-runtime, NEVER fabricated; mirrors 13.1-VERIFICATION.md). Neutrality: path-only kahneman refs, only bare token = `prospect-theory` slug; `bash bin/check-neutrality.sh` exit 0. One deviation (Rule 3): added spaced "structural equivalence" to agent-parity TL;DR to satisfy `grep -qi`. Commits eb7b419, 8060c7d, 39e47fb. SUMMARY self-check PASSED. NOTE: index.md registration of agent-parity.md is owned by Plan 05.
 
 Plan 13.1-03 complete (2026-06-01): DEBT-01/02/04 verification execution → `13.1-VERIFICATION.md` (Phase 13 mirror). DEBT-02 agent-parity: fail-closed seed guard (CLAUDE.md §13) ran exit-0 over both scratch trees BEFORE codex egress (single mandatory egress defense; local_only personal-decision-journal never seeded); Claude-side scratch ingest of the prospect-theory source produced 4 pages whose prov-locator-target set EXACTLY matches the golden prospect-theory SUBSET (6 `#sec:` targets); lint 0/0/0 on explicit scratch path; scratch torn down by absolute path (trap + explicit rm; repo clean). Codex side BLOCKED-ON-RUNTIME: codex exec hung on stdin without `</dev/null` (fixed on retry), then bubblewrap sandbox "needs user namespaces" pathology → degenerate sed-exec loop, 0 wiki pages after ~23min → recorded honestly (NOT faked) per SAFETY-GUARD; Phase 13.2 re-runs the Codex column (not on Wave 2 critical path — Plan 04 consumes the Claude-vs-golden-subset diff). DEBT-04 genuine write-back: UPDATE `wiki/concepts/progressive-disclosure.md` citing src-2026-05-06-ralph-playbook + src-2026-05-06-anthropic-agent-skills-overview (≥2 distinct cloud_safe source_ids), validate-op UPDATE PASS (5/5), new today-dated WRITE-BACK log line (7→8), append-then-synthesize, privacy inheritance honored, lint clean, single query() commit 267d2c8. DEBT-01: render checklist + "awaiting user render" capture slot shipped (SC1 graph sub-check reframed to "isolable sub-graph"; D-09 prepared-and-await; Phase 13.2 SC2 closes). DEBT-02/04 → Complete in REQUIREMENTS.md (bullets + matrix); DEBT-01 → Pending (awaiting render). check-neutrality.sh exit 0; targeted neutrality clean (no journal body). Commits 267d2c8 (write-back), b1ba23b (VERIFICATION.md). SUMMARY self-check PASSED.
 
@@ -46,7 +48,7 @@ Phase 12.1 closure: 4/4 plans complete; NEUT-08 flipped to Complete in REQUIREME
 
 **Velocity:**
 
-- Total plans completed: 23
+- Total plans completed: 24
 - Average duration: -
 - Total execution time: 0 hours
 

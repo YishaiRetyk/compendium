@@ -270,7 +270,7 @@ Plans:
 - [x] 13.1-03-PLAN.md — Verification execution: DEBT-02 Codex parity ingest (Claude side + diff matrix; Codex blocked-on-runtime, 13.2 re-runs) + DEBT-04 live write-back + 13.1-VERIFICATION.md with DEBT-01 render checklist (DEBT-02/04 Complete; DEBT-01 awaiting render)
 
 **Wave 2** *(blocked on Wave 1: consumes fixture matrix + parity findings)*
-- [ ] 13.1-04-PLAN.md — Author 3 stubs (schema-tour/privacy-model/examples) + new agent-parity.md; examples.md folds in fixture counts + corrects .obsidianignore claim (SC4 / DEBT-02)
+- [x] 13.1-04-PLAN.md — Author 3 stubs (schema-tour/privacy-model/examples) + new agent-parity.md; examples.md folds in fixture counts + corrects .obsidianignore claim (SC4 / DEBT-02)
 
 **Wave 3** *(blocked on Wave 2: runs after all reference files exist)*
 - [ ] 13.1-05-PLAN.md — Accuracy-pass 5 substantial docs (edit-on-drift) + reconcile docs/reference/index.md (5 additions) + verify CONTRIBUTING merge-conflict recipes (SC4)
@@ -447,5 +447,5 @@ The following are intentionally deferred until real usage demands them, captured
 | 12.1. NEUT-08 Personal-Term Denylist Curation | v1.1 | 4/4 | Complete    | 2026-05-03 |
 | 12.2. Local Wiki Write Gate | v1.1 | 5/5 | Complete    | 2026-05-04 |
 | 13. Claim Faithfulness Audit | v1.1 | 0/0 | Not started | - |
-| 13.1. Docs Finalization + Obsidian Starter | v1.1 | 0/0 | Not started | - |
+| 13.1. Docs Finalization + Obsidian Starter | v1.1 | 4/5 | In progress | 2026-06-01 |
 | 13.2. v1.1 Closure Verification Gate | v1.1 | 0/0 | Not started | - |
