@@ -1,9 +1,12 @@
-# .obsidianignore — STARTER DEFAULT.
-# This file hides examples/ from the Obsidian graph view + content indexing
-# so the bundled Kahneman reference cluster does not pollute your personal
-# vault's graph. It is shipped as a sensible default for new template users.
+# .obsidianignore — release-manifest + graph-hygiene CONVENTION.
+# IMPORTANT: Obsidian does NOT read this file. It is not an Obsidian feature
+# and does not hide anything from the Obsidian graph view or content indexing.
+# It is a convention consumed by bin/release.sh and the docs to mark the
+# bundled reference cluster (examples/) as graph-hygiene-excluded content.
+# examples/ IS indexed by Dataview by default.
 #
-# Safe to delete: if you want examples/ visible in your Obsidian graph
-# (e.g., to study the reference cluster as part of your own knowledge base),
-# delete this file or remove the `examples/` line below.
+# To actually exclude examples/ from your own Obsidian vault, use
+# Settings → Files & Links → Excluded files (writes app.json userIgnoreFilters).
+# (If you run the Dataview fixtures, do NOT exclude examples/ — they must stay
+# indexed for the fixture queries to resolve.)
 examples/

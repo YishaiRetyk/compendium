@@ -32,7 +32,7 @@ bash bin/ingest.sh <path-to-source>
 
 ## 4. Open in Obsidian
 
-Open the repo as an Obsidian vault. Your compiled wiki lives under `wiki/`. The `examples/kahneman/` cluster (hidden from Obsidian by default via `.obsidianignore`) is a reference example you can browse for shape.
+Open the repo as an Obsidian vault. Your compiled wiki lives under `wiki/`. The `examples/kahneman/` cluster is a reference example you can browse for shape — note that `.obsidianignore` is a release-manifest + graph-hygiene convention (consumed by `bin/release.sh` and docs), NOT an Obsidian-enforced exclusion; Obsidian does not read it, so `examples/` is indexed by Dataview by default. To hide it from your own vault, use Settings → Files & Links → Excluded files.
 
 ## Reference material
 

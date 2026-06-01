@@ -1,6 +1,6 @@
 # Brownfield Workflow
 
-Mechanical onboarding of an existing Obsidian vault into the LLM Wiki Compiler schema. `bin/brownfield.sh` ships two complete subcommands — `scan` (dry-run inventory) and `bootstrap` (idempotent mechanical transforms) — plus two stubs (`suggest`, `verify`) that ship in Phase 11.
+Mechanical onboarding of an existing Obsidian vault into the LLM Wiki Compiler schema. `bin/brownfield.sh` ships five subcommands — `scan` (dry-run inventory), `bootstrap` (idempotent mechanical transforms), `suggest` (generate migration scripts + candidate data files), `review-typing` (resolve pending page-typing clusters), and `verify` (read-only lint gate, with `--promote` flipping `bootstrap_stage`). See AGENTS.md §11.5 for the authoritative five-subcommand contract.
 
 > **Decision boundary:** Skip on parse failure or unsafe structure; merge on parseable metadata; warn whenever preserved values may not satisfy the schema.
 
@@ -84,7 +84,7 @@ Bootstrap NEVER blindly overwrites existing frontmatter. Each sentinel field is 
 
 **Class A — safe-additive:** `tags`, `aliases`, `sources`, `status`. Bootstrap preserves existing values; injects sentinel defaults only where a key is absent. Collisions are logged to `.brownfield/REPORT.md` under `## Preserved collision`.
 
-**Class B — schema-authoritative:** `type`, `epistemic_status`, `knowledge_domain`, `privacy`, `bootstrap_stage`. Bootstrap preserves existing values and **never overwrites**. If the existing value is missing, malformed, or noncanonical, it is logged to `.brownfield/REPORT.md` under `## Preserved schema-authoritative field` with a warning — semantic correction is `suggest` / `lint`'s job in Phase 11, not bootstrap's.
+**Class B — schema-authoritative:** `type`, `epistemic_status`, `knowledge_domain`, `privacy`, `bootstrap_stage`. Bootstrap preserves existing values and **never overwrites**. If the existing value is missing, malformed, or noncanonical, it is logged to `.brownfield/REPORT.md` under `## Preserved schema-authoritative field` with a warning — semantic correction is `suggest` / `lint`'s job, not bootstrap's.
 
 **Class C — structural hard failure:** Unparseable YAML, non-mapping frontmatter, detectable duplicate YAML keys. Bootstrap skips the page and records the skip in `.brownfield/SKIPPED.md` with the parse error and a one-line suggestion.
 
@@ -92,7 +92,7 @@ Bootstrap NEVER blindly overwrites existing frontmatter. Each sentinel field is 
 
 After `--apply`, the `.brownfield/` directory contains:
 
-- `REPORT.md` — four sections: (a) bootstrapped-successfully, (b) bootstrapped-with-preserved-collisions, (c) bootstrapped-with-schema-warnings, (d) **"Needs human judgment"** — the scan tail, reused across both subcommands per D-04, which collects both (i) unclassifiable pages from `scan` mode AND (ii) orphan raw sources found during `bootstrap` (raw files under `sources/` with no corresponding `wiki/sources/*.md` summary page; handoff to Phase 11 `suggest/01-page-typing.sh`). The report MUST have exactly four sections — there is no separate "Needs summary" section; orphan raw sources are a form of unclassifiable-needs-user-judgment and belong in (d).
+- `REPORT.md` — four sections: (a) bootstrapped-successfully, (b) bootstrapped-with-preserved-collisions, (c) bootstrapped-with-schema-warnings, (d) **"Needs human judgment"** — the scan tail, reused across both subcommands per D-04, which collects both (i) unclassifiable pages from `scan` mode AND (ii) orphan raw sources found during `bootstrap` (raw files under `sources/` with no corresponding `wiki/sources/*.md` summary page; handoff to the `suggest` / `01-page-typing.sh` migration path). The report MUST have exactly four sections — there is no separate "Needs summary" section; orphan raw sources are a form of unclassifiable-needs-user-judgment and belong in (d).
 - `APPLIED.md` — append-only execution manifest: every touched file + timestamp + outcome. Each `--apply` run appends a new `## Run <timestamp>` block so you can audit bootstrap invocations over time.
 - `SKIPPED.md` — parse-failure + unsafe-structure files only (scoped narrowly per D-05 so reviewers can triage unparseable files independently from merge collisions).
 
@@ -135,23 +135,23 @@ Why this matters:
 
 - Bootstrap is safe to re-run on the same vault; it will never overwrite your existing `type`, `privacy`, `knowledge_domain`, `epistemic_status`, or `bootstrap_stage` values.
 - Bootstrap will NEVER:
-  - Choose a page type for you (semantic judgment — see Phase 11's `01-page-typing.sh`)
-  - Infer cross-links between pages (Phase 11's `03-cross-link-inference.sh`)
-  - Classify privacy (Phase 11's `04-privacy-classification.sh`)
-  - Bootstrap provenance markers onto existing claims (Phase 11's `02-provenance-bootstrap.sh`)
+  - Choose a page type for you (semantic judgment — handled by the `01-page-typing.sh` migration)
+  - Infer cross-links between pages (the `03-cross-link-inference.sh` advisory migration)
+  - Classify privacy (the `04-privacy-review.sh` advisory migration)
+  - Bootstrap provenance markers onto existing claims (the `02-provenance-bootstrap.sh` migration)
 - Bootstrap ONLY does mechanical work: YAML round-trip, sentinel injection, SHA hashing, skeleton creation.
 
 ## Interaction with lint and ingest
 
 ### `bin/lint.sh --ci` (BRWN-08 downgrade)
 
-After bootstrap, the vault will contain pages with `bootstrap_stage: bootstrapped` + empty `type`, missing `sources`, `epistemic_status: tentative`. These would normally be lint errors. `bin/lint.sh --ci` downgrades findings in the allowlist (`yaml`, `provenance`, `orphan`) from `error` to `info` when the page carries `bootstrap_stage: bootstrapped`. This lets CI gates pass on a fresh brownfield vault while the user works through Phase 11 migrations.
+After bootstrap, the vault will contain pages with `bootstrap_stage: bootstrapped` + empty `type`, missing `sources`, `epistemic_status: tentative`. These would normally be lint errors. `bin/lint.sh --ci` downgrades findings in the allowlist (`yaml`, `provenance`, `orphan`) from `error` to `info` when the page carries `bootstrap_stage: bootstrapped`. This lets CI gates pass on a fresh brownfield vault while the user works through the suggest/review-typing/verify migrations.
 
 **Scope note (I-1):** The BRWN-08 error→info downgrade fires in `--ci` mode ONLY (per the Phase 9 `CI_SEVERITY_REMAP` convention). Text-mode lint behavior (plain `bin/lint.sh` without `--ci`) is unchanged: the original severities are preserved. If you run `bin/lint.sh` locally after `bin/brownfield.sh bootstrap`, you will still see full-severity `yaml`/`provenance`/`orphan` findings on bootstrapped pages — this is expected. The downgrade is a CI-gate pragmatic, not a universal severity change. Use `--ci` locally if you want to mirror the CI severity view.
 
 ### `bin/lint.sh --category brownfield` (BRWN-09)
 
-A dedicated lint category reports the count of `bootstrapped` pages and warns on any page `bootstrapped` more than 30 days ago — prodding the user to complete Phase 11 migrations before too much time passes. The summary emits `info/brownfield` with `bootstrapped pages: X; stale (>30d): Y` whenever at least one bootstrapped page exists.
+A dedicated lint category reports the count of `bootstrapped` pages and warns on any page `bootstrapped` more than 30 days ago — prodding the user to complete the suggest/review-typing/verify migrations before too much time passes. The summary emits `info/brownfield` with `bootstrapped pages: X; stale (>30d): Y` whenever at least one bootstrapped page exists.
 
 ### `bin/ingest.sh` (BRWN-10 strip)
 
@@ -162,8 +162,8 @@ If a user ingests a source whose frontmatter carries `bootstrap_stage` or `boots
 | Value | Meaning |
 |-------|---------|
 | `raw` | Reserved for future import workflows that scan but don't yet bootstrap. |
-| `bootstrapped` | Written by `bin/brownfield.sh bootstrap`. Page has mechanical sentinel frontmatter; user should complete Phase 11 migrations to reach `verified`. |
-| `verified` | Page has been reviewed against Phase 11's suggest/verify workflow. Persists on imported pages as a page-level marker for "content predates the LLM ingest pipeline." |
+| `bootstrapped` | Written by `bin/brownfield.sh bootstrap`. Page has mechanical sentinel frontmatter; user should complete the suggest/review-typing/verify migrations to reach `verified`. |
+| `verified` | Page has passed the `verify --promote` 5-gate pass-list (the suggest/review-typing/verify workflow). Persists on imported pages as a page-level marker for "content predates the LLM ingest pipeline." |
 
 See AGENTS.md §5 for the authoritative field definition and the explicit contrast with claim-level provenance (PROV-01..05 are the authoritative provenance mechanism; `bootstrap_stage` tracks page-level migration state only).
 
@@ -330,8 +330,8 @@ Each migration script appends one block to `.brownfield/applied.log` per meaning
 
 ## Known limitations
 
-- **Scan classification is heuristic:** The 4-signal rule set (D-16) uses filename conventions, frontmatter, heading structure, and outbound link density. It cannot distinguish every page type correctly — `unknown` is the honest output when signals conflict or are absent. Phase 11's `01-page-typing.sh` adds inbound-link context for higher accuracy.
-- **Bootstrap does not infer provenance, privacy, or page type:** These are judgment calls that belong in Phase 11's suggest/verify workflow. Bootstrap only writes mechanical sentinel frontmatter.
+- **Scan classification is heuristic:** The 4-signal rule set (D-16) uses filename conventions, frontmatter, heading structure, and outbound link density. It cannot distinguish every page type correctly — `unknown` is the honest output when signals conflict or are absent. The `01-page-typing.sh` migration adds inbound-link context for higher accuracy.
+- **Bootstrap does not infer provenance, privacy, or page type:** These are judgment calls that belong in the suggest/review-typing/verify workflow. Bootstrap only writes mechanical sentinel frontmatter.
 - **Lint downgrade is CI-only:** The BRWN-08 error->info downgrade for bootstrapped pages fires in `bin/lint.sh --ci` mode only (I-1 scope). Local `bin/lint.sh` runs show full-severity findings on bootstrapped pages. Use `--ci` locally to mirror CI behavior.
 
 ## Fixture testing environment variables
@@ -350,7 +350,7 @@ Both variables accept `YYYY-MM-DD` strings only. `BROWNFIELD_FIXTURE_CREATED_AT`
 ## See also
 
 - [AGENTS.md §5](../../AGENTS.md) — `bootstrap_stage` + `bootstrap_date` field definitions
-- [AGENTS.md §11.5](../../AGENTS.md) — Brownfield Workflow (populated in Phase 11)
+- [AGENTS.md §11.5](../../AGENTS.md) — Brownfield Workflow (the authoritative five-subcommand contract)
 - [AGENTS.md §13](../../AGENTS.md) — Privacy fail-closed default (`privacy: local_only`)
 - [docs/quickstart.md](../quickstart.md) — Five-minute onboarding with ruamel.yaml prerequisite note
 - [REQUIREMENTS.md §BRWN](../../.planning/REQUIREMENTS.md) — Phase 10 + Phase 11 requirements
