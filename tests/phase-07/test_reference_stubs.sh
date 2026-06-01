@@ -16,10 +16,12 @@ done
 
 # Stubs still pending future-phase populate carry the exact
 # "Status: stub — populated in v1.1 Phase" marker. ci.md was populated in
-# Phase 9 Plan 06; brownfield.md was populated in Phase 10 Plan 05
-# (both drop from the stub list — Phase 08-04 precedent for relaxing prior-phase
-# tests when a successor plan populates the stub).
-STUB_FILES=(docs/reference/schema-tour.md docs/reference/privacy-model.md docs/reference/examples.md)
+# Phase 9 Plan 06; brownfield.md was populated in Phase 10 Plan 05; the final
+# three stubs (schema-tour.md, privacy-model.md, examples.md) were populated in
+# Phase 13.1 Plan 04 (all drop from the stub list — Phase 08-04 / 09-06
+# precedent for relaxing prior-phase tests when a successor plan populates the
+# stub). With every reference doc now authored, the stub list is empty.
+STUB_FILES=()
 STUBS_OK=0
 for f in "${STUB_FILES[@]}"; do
   if grep -q 'Status: stub — populated in v1.1 Phase' "$f"; then
@@ -28,7 +30,16 @@ for f in "${STUB_FILES[@]}"; do
     fail "$f missing 'Status: stub — populated in v1.1 Phase' marker"
   fi
 done
-if [ "$STUBS_OK" -eq "${#STUB_FILES[@]}" ]; then pass "all ${#STUB_FILES[@]} remaining reference stubs carry stub marker"; fi
+if [ "${#STUB_FILES[@]}" -eq 0 ]; then pass "no reference stubs remain — all reference docs authored"; fi
+
+# schema-tour.md / privacy-model.md / examples.md are NOT stubs (populated in Phase 13.1 Plan 04)
+for f in docs/reference/schema-tour.md docs/reference/privacy-model.md docs/reference/examples.md; do
+  if grep -q 'Status: stub' "$f"; then
+    fail "$f contains 'Status: stub' (Phase 13.1 Plan 04 populated this file; must no longer be a stub)"
+  else
+    pass "$f is not marked as a stub"
+  fi
+done
 
 # ci.md is NOT a stub (populated in Phase 9 Plan 06)
 if grep -q 'Status: stub' docs/reference/ci.md; then
