@@ -9,8 +9,8 @@ progress:
   total_phases: 19
   completed_phases: 10
   total_plans: 52
-  completed_plans: 49
-  percent: 94
+  completed_plans: 50
+  percent: 96
 ---
 
 # Project State
@@ -20,11 +20,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-15)
 
 **Core value:** The wiki is a persistent, compounding artifact -- cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested.
-**Current focus:** Phase 13.1 — Docs Finalization + Obsidian Starter (executing; plans 01-04 complete, 05 pending)
+**Current focus:** Phase 13.1 — Docs Finalization + Obsidian Starter (all 5 plans complete; ready for Phase 13.2 closure)
 
 ## Current Position
 
-Phase: 13.1 executing. Plans 01-04 complete (Obsidian starter + dataview-fixtures + DEBT-01/02/04 verification + docs finalization). Next plan: 13.1-05 (accuracy-pass substantial docs + index.md reconciliation, incl. registering agent-parity.md).
+Phase: 13.1 complete (5/5 plans). All docs-finalization + Obsidian-starter deliverables shipped. Next: Phase 13.2 closure (CLOSE-01..04 — re-run/audit 13.1's verification notes incl. the DEBT-01 Obsidian render and DEBT-02 Codex parity column).
+
+Plan 13.1-05 complete (2026-06-01): accuracy-passed the five substantial reference docs (edit-on-drift) + reconciled `docs/reference/index.md` + verified CONTRIBUTING.md merge-conflict recipes. Only `brownfield.md` had drift: line 3 rewritten to name all FIVE subcommands (scan/bootstrap/suggest/review-typing/verify) per §11.5 (dropped "two stubs ... ship in Phase 11"; never wrote "four" — T-13.1-12 trap avoided); wrong script name `04-privacy-classification.sh` → `04-privacy-review.sh`; ~14 stale "Phase 11" refs reworded to shipped tense (line 356 "Phase 10 + Phase 11 requirements" KEPT as accurate historical authorship); every `0[1-4]-*.sh` ref verified real. quickstart.md ~line 35 + `.obsidianignore` header: corrected the self-falsifying ".obsidianignore hides examples/ from Obsidian" claim (Obsidian does not read it; examples/ IS Dataview-indexed; real exclusion = Settings → Excluded files); .obsidianignore kept in release allowlist; bare `Kahneman` token removed from header (Rule 2 neutrality). ci.md/release.md/three-layer-model.md/dataview-queries.md = NO DRIFT (left byte-unchanged; severity table, allowlist, DR link, 5 queries all verified against source-of-truth). index.md now catalogs all 12 reference files anchored to link form (+5: dataview-queries, commit-examples, setup-prerequisites, agent-parity, obsidian-starter); CONTRIBUTING pointer strengthened (D-11: no merge-conflicts.md). CONTRIBUTING recipes VERIFIED: committed `.gitattributes` has no `merge=union` (opt-in claim true); index.md category-header structure confirms the union-collide warning. check-neutrality.sh + sync-claude.sh --check + full lint all exit 0. Commits ecb013d, 1929838. SUMMARY self-check PASSED.
 
 Plan 13.1-04 complete (2026-06-01): authored the three never-populated `docs/reference/` stubs (schema-tour, privacy-model, examples) + created new `agent-parity.md` (DEBT-02 deliverable). schema-tour.md = full §5 frontmatter + §6 provenance/claim-syntax walkthrough (page-type section orders, validation checklist, `[prov:]` grammar + locator table, `<!-- page: N -->` convention, `[epistemic::]`, decay model). privacy-model.md = §13 tiers/precedence + 7-row decision table VERBATIM + strictest-wins inheritance + `bin/check-privacy.sh` CI gate. examples.md = examples/ usage + `example: true` lint-skip + CORRECTED `.obsidianignore` (release-manifest/graph-hygiene convention, NOT Obsidian-native; real mechanism = Excluded files/`userIgnoreFilters`) + five fixture-scoped Dataview blocks with expected counts (3/2/2/2/5) + grep-vs-Dataview divergence notes; active-entities count re-derived LIVE (=3) and asserted equal. agent-parity.md = structural-equivalence rubric (page-set/types/prov-IDs/locator-targets/frontmatter; prose free) + golden inventory (1 entity, 3 concepts, 1 comparison, 1 overview, 2 sources; single-source vs prospect-theory SUBSET) + codex=cloud-egress + fail-closed seed guard + `codex exec` re-run + `pagetypes()`/`provtargets()` helpers + diff table with Codex column rendered `pending — deferred to 13.2` (blocked-on-runtime, NEVER fabricated; mirrors 13.1-VERIFICATION.md). Neutrality: path-only kahneman refs, only bare token = `prospect-theory` slug; `bash bin/check-neutrality.sh` exit 0. One deviation (Rule 3): added spaced "structural equivalence" to agent-parity TL;DR to satisfy `grep -qi`. Commits eb7b419, 8060c7d, 39e47fb. SUMMARY self-check PASSED. NOTE: index.md registration of agent-parity.md is owned by Plan 05.
 
@@ -319,6 +321,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-05-31
-Stopped at: Phase 13 context gathered (discuss-phase complete; 16 decisions)
-Resume file: .planning/phases/13-claim-faithfulness-audit/13-CONTEXT.md
+Last session: 2026-06-01
+Stopped at: Completed 13.1-05-PLAN.md (final plan of Phase 13.1)
+Resume file: None

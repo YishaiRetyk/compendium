@@ -30,7 +30,7 @@
 - [x] **Phase 12.1: NEUT-08 Personal-Term Denylist Curation** — Hand-curate a vetted subset of `.planning/backlog-neutrality-denylist-candidate.txt` (861 lines) into `.neutrality-denylist.txt`, closing the only outstanding partial v1.1 requirement before the closure gate. Promoted from backlog 999.2. (4/4 plans complete 2026-05-03; N=7 defense-in-depth curation merged; gate + sync exit 0; first v1.1 partial-requirement closure)
 - [x] **Phase 12.2: Local Wiki Write Gate** — Pre-commit gate over staged `wiki/{entities,concepts,overviews,comparisons}/` changes reusing `bin/lint.sh --strict` semantics where possible; blocks zero-provenance new synthesized pages before they land locally. (5/5 plans complete 2026-05-04; WGATE-01..04 → Complete; verifier PASS 7/7 SC + 4/4 REQ; tests 11/11)
 - [x] **Phase 13: Claim Faithfulness Audit** — `bin/audit-claims.sh` samples high-risk claims (inferred/tentative/stale/high-fanout) and emits structured verdicts (supports / weak / contradicts / insufficient) against the cited source passage; review-only, privacy-respecting, no auto-fix. (5/5 plans complete 2026-06-01; FAITH-01..04 → Complete; verifier PASS 6/6 SC + 4/4 REQ; tests 33/33; code review 0 critical/0 high)
-- [ ] **Phase 13.1: Docs Finalization + Obsidian Starter** — `/docs/reference/` fill-out, Obsidian render check, Codex agent-parity, write-back scenario re-run, minimal Obsidian starter (templates + reference doc only; no prescribed workflows).
+- [x] **Phase 13.1: Docs Finalization + Obsidian Starter** — `/docs/reference/` fill-out, Obsidian render check, Codex agent-parity, write-back scenario re-run, minimal Obsidian starter (templates + reference doc only; no prescribed workflows). (5/5 plans complete 2026-06-01; OBSID-01/02/03 + DEBT-02/04 → Complete; DEBT-01 Obsidian render awaiting-user-render + DEBT-02 Codex parity column blocked-on-runtime → deferred to Phase 13.2 closure per D-09)
 - [ ] **Phase 13.2: v1.1 Closure Verification Gate** — Final requirements-sync, Obsidian render, agent-parity, write-back, docs consistency, and scope-leak checks after all v1.1 work is complete.
 
 ## Phase Details
@@ -273,7 +273,7 @@ Plans:
 - [x] 13.1-04-PLAN.md — Author 3 stubs (schema-tour/privacy-model/examples) + new agent-parity.md; examples.md folds in fixture counts + corrects .obsidianignore claim (SC4 / DEBT-02)
 
 **Wave 3** *(blocked on Wave 2: runs after all reference files exist)*
-- [ ] 13.1-05-PLAN.md — Accuracy-pass 5 substantial docs (edit-on-drift) + reconcile docs/reference/index.md (5 additions) + verify CONTRIBUTING merge-conflict recipes (SC4)
+- [x] 13.1-05-PLAN.md — Accuracy-pass 5 substantial docs (edit-on-drift; only brownfield.md drifted — five subcommands + real script names) + reconcile docs/reference/index.md (5 additions, all 12 cataloged) + verify CONTRIBUTING merge-conflict recipes (SC4)
 
 ### Phase 13.2: v1.1 Closure Verification Gate
 
