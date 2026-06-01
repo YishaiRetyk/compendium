@@ -267,7 +267,7 @@ Plans:
 **Wave 1** *(parallel — no file overlap)*
 - [x] 13.1-01-PLAN.md — Obsidian starter: 6 token-ized schema/obsidian/ templates (no drift) + docs/reference/obsidian-starter.md (OBSID-01/02/03)
 - [x] 13.1-02-PLAN.md — examples/dataview-fixtures/ (8-12 example:true pages, >=2 bootstrap_stage) + per-query expected-count matrix (DEBT-01 prep)
-- [ ] 13.1-03-PLAN.md — Verification execution: DEBT-02 Codex parity ingest + DEBT-04 live write-back + 13.1-VERIFICATION.md with DEBT-01 render checklist (DEBT-01/02/04)
+- [x] 13.1-03-PLAN.md — Verification execution: DEBT-02 Codex parity ingest (Claude side + diff matrix; Codex blocked-on-runtime, 13.2 re-runs) + DEBT-04 live write-back + 13.1-VERIFICATION.md with DEBT-01 render checklist (DEBT-02/04 Complete; DEBT-01 awaiting render)
 
 **Wave 2** *(blocked on Wave 1: consumes fixture matrix + parity findings)*
 - [ ] 13.1-04-PLAN.md — Author 3 stubs (schema-tour/privacy-model/examples) + new agent-parity.md; examples.md folds in fixture counts + corrects .obsidianignore claim (SC4 / DEBT-02)
