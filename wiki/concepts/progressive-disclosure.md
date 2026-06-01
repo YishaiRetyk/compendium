@@ -5,12 +5,13 @@ type: concept
 status: active
 summary: "Three-level loading pattern at the heart of Anthropic Agent Skills. L1 metadata (~100 tokens/Skill) is always preloaded into the system prompt; L2 SKILL.md body (under 5k tokens) is read via bash when the Skill is triggered; L3 bundled files and scripts are accessed only as needed, with script source code never entering context."
 created_at: 2026-05-06
-updated_at: 2026-05-06
+updated_at: 2026-06-01
 sources:
   - src-2026-05-06-anthropic-agent-skills-overview
   - src-2026-05-06-anthropic-agent-skills-best-practices
   - src-2026-05-06-anthropic-claude-cookbook-skills-introduction
   - src-2026-05-06-anthropic-claude-cookbook-skills-custom-development
+  - src-2026-05-06-ralph-playbook
 epistemic_status: sourced
 tags:
   - progressive-disclosure
@@ -36,7 +37,7 @@ example: false
 
 ## TL;DR
 
-Progressive disclosure is the loading discipline Anthropic uses to let many Agent Skills coexist without paying full token cost upfront. Information loads in three levels: Level 1 metadata (the YAML `name` + `description`, always preloaded into the system prompt at ~100 tokens per Skill); Level 2 instructions (the SKILL.md body, read via bash when the Skill is triggered, kept under ~5k tokens); Level 3 resources (additional `.md` references, datasets, scripts — accessed only when explicitly referenced, with script source code executed via bash so it never enters context). The pattern lets a Skill bundle dozens of reference files, comprehensive API docs, or large datasets without context penalty until something is actually read.
+Progressive disclosure is the loading discipline Anthropic uses to let many Agent Skills coexist without paying full token cost upfront. Information loads in three levels: Level 1 metadata (the YAML `name` + `description`, always preloaded into the system prompt at ~100 tokens per Skill); Level 2 instructions (the SKILL.md body, read via bash when the Skill is triggered, kept under ~5k tokens); Level 3 resources (additional `.md` references, datasets, scripts — accessed only when explicitly referenced, with script source code executed via bash so it never enters context). The pattern lets a Skill bundle dozens of reference files, comprehensive API docs, or large datasets without context penalty until something is actually read. The same discipline is a general context-engineering principle, not a Skills-only mechanism: the [[Ralph Playbook]] applies it to autonomous coding loops by keeping its always-loaded `AGENTS.md` minimal and deferring status/detail to a separate on-demand file.
 
 ## Key Facts
 
@@ -51,6 +52,7 @@ Progressive disclosure is the loading discipline Anthropic uses to let many Agen
 - Level 2 loads ALL `.md` files in the Skill's top-level directory — not just `SKILL.md` and `REFERENCE.md` — so multi-file documentation (`REFERENCE.md`, `EXAMPLES.md`, `TROUBLESHOOTING.md`, `CHANGELOG.md`, etc.) is a first-class organization pattern; the ~5k token budget recommendation applies to the *sum* of top-level markdown, not just SKILL.md [prov:src-2026-05-06-anthropic-claude-cookbook-skills-custom-development#sec:additional-documentation-files|direct|2026-05-06] [epistemic:: sourced]
 - The "98% savings" framing for Skills tokens applies to the *initial context only* — Level 1 metadata is essentially free; once Level 2 fires for a given request, the full ~5k tokens of instructions load and are paid for that request [prov:src-2026-05-06-anthropic-claude-cookbook-skills-introduction#sec:token-usage-optimization|direct|2026-05-06] [epistemic:: sourced]
 - Container reuse via `container.id` (passing the id from a previous response into subsequent requests) is the API-level token-optimization pattern that lets Skills stay loaded across calls without re-paying L2 [prov:src-2026-05-06-anthropic-claude-cookbook-skills-introduction#sec:token-optimization-tips|direct|2026-05-06] [epistemic:: sourced]
+- The same disclosure discipline appears outside Agent Skills: the Ralph Playbook keeps its `AGENTS.md` loop file concise (~60 lines, operational-only) and pushes mutable status/progress into a separate `IMPLEMENTATION_PLAN.md`, so the always-loaded file stays small while detail is deferred to a file read only when needed — the same L1-stays-small / detail-loads-on-demand split that governs Skills' three levels [prov:src-2026-05-06-ralph-playbook#sec:files|direct|2026-06-01] [prov:src-2026-05-06-anthropic-agent-skills-overview#sec:how-skills-work|direct|2026-06-01] [epistemic:: inferred]
 
 ## Detail
 
@@ -89,6 +91,16 @@ The cookbook's token math frames Skills as offering "98% savings" vs manual prom
 
 The API-level lever for amortizing further is container reuse — pass `container.id` from a previous response into subsequent requests so Skills stay loaded across calls in the same container, avoiding re-paying L2 for already-resident Skills [prov:src-2026-05-06-anthropic-claude-cookbook-skills-introduction#sec:token-optimization-tips|direct|2026-05-06] [epistemic:: sourced]
 
+### Progressive disclosure as a shared design principle (Agent Skills and the Ralph loop)
+
+Progressive disclosure is not unique to Agent Skills; it is a general context-engineering discipline, and the Ralph Playbook is an independent instance of the same pattern applied to autonomous coding loops. Two structural choices in Ralph map directly onto the Skills three-level model:
+
+- **The always-loaded file is kept small, detail is deferred to on-demand files.** Ralph treats `AGENTS.md` as "the heart of the loop" — concise (~60 lines), operational only (how to build/run/validate), explicitly *not* a changelog or progress diary — while status, progress, and planning live in a separate `IMPLEMENTATION_PLAN.md` that is read only when an iteration needs it [prov:src-2026-05-06-ralph-playbook#sec:files|direct|2026-06-01] [epistemic:: sourced]. This is the same separation Skills draw between Level 1 metadata (always in the system prompt, kept tiny) and Levels 2–3 (loaded only when triggered) [prov:src-2026-05-06-anthropic-agent-skills-overview#sec:how-skills-work|direct|2026-06-01] [epistemic:: sourced]. In both systems the load-bearing rule is identical: bloating the always-resident layer pollutes every future unit of work, so detail must be pushed down to a layer that is paid for only on demand.
+
+- **Deterministic, budgeted up-front context loading.** Ralph's "context is everything" principle steers each iteration by loading a bounded, deterministic slice up front — the playbook's heuristic reserves roughly the "first ~5,000 tokens for specs" and targets a 40–60% context-utilization "smart zone" rather than filling the window [prov:src-2026-05-06-ralph-playbook#sec:key-principles|direct|2026-06-01] [epistemic:: sourced]. That ~5k budget for the steering layer is strikingly close to the Skills guidance that a triggered Level 2 body stay under ~5k tokens — both treat the context window as a public good and cap the eagerly-loaded layer at a similar order of magnitude.
+
+The connection is interpretive rather than a claim either source makes about the other: neither the Ralph playbook nor the Agent Skills docs reference each other [epistemic:: inferred]. What they share is the underlying principle — *defer loading anything not immediately needed, and keep the always-resident layer minimal* — which is why this wiki files both under progressive disclosure rather than treating them as unrelated token-optimization tricks.
+
 ## Related Pages
 
 - [[Agent Skills]]
@@ -102,3 +114,4 @@ The API-level lever for amortizing further is container reuse — pass `containe
 - [[Anthropic Agent Skills Best Practices]] — Anthropic platform docs, 2026-05-06
 - [[Introduction to Claude Skills (claude-cookbooks notebook 01)]] — Anthropic claude-cookbooks, 2026-05-06
 - [[Building Custom Skills for Claude (claude-cookbooks notebook 03)]] — Anthropic claude-cookbooks, 2026-05-06
+- [[The Ralph Playbook (Clayton Farr's how-to-ralph-wiggum)]] — Clayton Farr / Geoffrey Huntley, 2026-05-06

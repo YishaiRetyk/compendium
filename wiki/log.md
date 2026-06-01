@@ -236,3 +236,17 @@ report: wiki/maintenance/lint-report.md
 findings: 55 total (0 errors, 48 warnings, 7 info)
 auto_fixes: 0 applied
 report: wiki/maintenance/lint-report.md
+
+## [2026-06-01] query | How does progressive disclosure operate as a shared design principle across Anthropic Agent Skills and the Ralph autonomous-loop playbook?
+
+answer: Both systems apply the same context-engineering discipline — keep the always-loaded layer minimal and defer detail to on-demand reads. Agent Skills express it as the L1/L2/L3 three-level model; the Ralph loop expresses it by keeping AGENTS.md concise (~60 lines, operational-only) with status/progress deferred to IMPLEMENTATION_PLAN.md, plus a budgeted ~5k-token up-front spec load matching the L2 budget.
+write_back: WRITE-BACK: new connection between existing pages -> UPDATE progressive-disclosure
+delta_compiled: none (both source summaries already compiled)
+pages_affected: progressive-disclosure, log
+notes: Cross-source synthesis cites >=2 distinct source_ids (src-2026-05-06-ralph-playbook AND src-2026-05-06-anthropic-agent-skills-overview). The connection is interpretive (inferred) — neither source references the other; appended as a new Detail subsection per append-then-synthesize (CLAUDE.md Section 10 Pass 3) and surfaced in TL;DR + a new Key Fact. Privacy: both sources cloud_safe -> target stays cloud_safe.
+
+## [2026-06-01] lint | wiki health check
+
+findings: 0 total (0 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki/maintenance/lint-report.md

@@ -46,7 +46,7 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[Ubiquitous Language]] — DDD artifact: project glossary functioning as a contract between humans, code, and AI (sourced, 2026-05-04)
 - [[Bounded Context]] — DDD artifact: a distinct area of a system with its own rules and stable term meanings (sourced, 2026-05-04)
 - [[Documented Contract]] — DDD artifact: written-down handshake between bounded contexts (sourced, 2026-05-04)
-- [[Progressive Disclosure]] — Three-level loading pattern in Anthropic Agent Skills: metadata always, instructions when triggered, resources as needed (sourced, 2026-05-06)
+- [[Progressive Disclosure]] — Three-level loading pattern in Anthropic Agent Skills (metadata always, instructions when triggered, resources as needed); also a general context-engineering principle shared by the Ralph autonomous-loop playbook (sourced, 2026-06-01)
 - [[Ralph (Autonomous Coding Loop)]] — Geoffrey Huntley's minimal autonomous-coding pattern: bash `while` loop + fixed PROMPT.md + IMPLEMENTATION_PLAN.md on disk as cross-iteration shared state (sourced, 2026-05-06)
 - [[Backpressure]] — Downstream rejection signals (tests, typechecks, lints, builds, LLM-as-judge) that block invalid agent output before commit (sourced, 2026-05-06)
 
