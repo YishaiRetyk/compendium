@@ -9,8 +9,8 @@ progress:
   total_phases: 19
   completed_phases: 10
   total_plans: 52
-  completed_plans: 47
-  percent: 90
+  completed_plans: 48
+  percent: 92
 ---
 
 # Project State
@@ -24,7 +24,9 @@ See: .planning/PROJECT.md (updated 2026-04-15)
 
 ## Current Position
 
-Phase: 13.1 executing. Plan 01/05 complete (Obsidian starter). Next Wave-1 plans: 13.1-02 (dataview-fixtures), 13.1-03 (verification execution).
+Phase: 13.1 executing. Plans 01-02/05 complete (Obsidian starter + dataview-fixtures). Next Wave-1 plan: 13.1-03 (verification execution).
+
+Plan 13.1-02 complete (2026-06-01): `examples/dataview-fixtures/` — 10 `example: true` fixtures (4 entity / 2 concept / 2 source / 1 comparison / 1 overview) spanning statuses (8 active, 2 stale, 1 archived) and synthetic domains (alpha×5, beta×3, gamma×2). Positive-neutrality discipline: all ids `fixture-*`, synthetic alpha/beta/gamma + tag-x/y/z tokens (check-neutrality.sh PRUNES examples/, so the targeted denylist grep + positive markers are the real proof). domains/tags YAML block-lists; 2 pages carry `bootstrap_stage: bootstrapped` (entity-2, concept-1); both source fixtures carry the full source tail. Machine-consumable count matrix (Plan 04 consumes): active-entities=3, sources-by-domain-alpha=2, stale-pages=2, missing-privacy=2, pages-in-domain-alpha-active=5. Live wiki lint clean (yaml,orphan 0/0/0 — no regression); check-neutrality.sh exit 0. Commit 3eeb101. SUMMARY self-check PASSED. NOTE: examples.md documentation of the fixture counts + .obsidianignore correction is owned by Plan 04.
 
 Plan 13.1-01 complete (2026-06-01): six token-ized `schema/obsidian/{entity,concept,overview,comparison,source-summary,decision}.md` templates (Templates-core `{{title}}`/`{{date:YYYY-MM-DD}}`; zero drift vs `schema/templates/` via full-file reverse-substitution diff; decision.md asymmetry preserved) + `docs/reference/obsidian-starter.md` (OBSID-02; Setup-once, auto-fill-vs-typed, OBSID-03 scope). PRE-FLIGHT: cleared the pre-existing `check-neutrality.sh` exit-2 by adding `neutrality_exempt: true` to generated `wiki/maintenance/lint-report.md` (drift findings preserved) — every downstream plan's neutrality gate is now meaningful. OBSID-01/02/03 → complete. Commits 2bc2258, 8dd8940, bc03f95. SUMMARY self-check PASSED. NOTE: `obsidian-starter.md` index.md registration is owned by Plan 05, not this plan.
 
