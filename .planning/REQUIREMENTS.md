@@ -115,9 +115,9 @@ Numbering continues from v1.0. New REQ-ID prefixes: `TMPL`, `NEUT`, `WZRD`, `MAN
 
 ### Obsidian Starter (OBSID)
 
-- [ ] **OBSID-01**: `schema/obsidian/` ships page-type templates derived from the canonical schema templates, covering the supported wiki page types without introducing divergent field names or section order.
-- [ ] **OBSID-02**: A reference doc explains how to use the Obsidian starter for day-1 page creation ergonomics, including what is generated and what remains user-owned.
-- [ ] **OBSID-03**: The Obsidian starter does not ship canonical GTD dashboards, workflow-specific Dataview surfaces, hotkey bundles, custom CSS/theme files, or prescribed review workflows.
+- [x] **OBSID-01**: `schema/obsidian/` ships page-type templates derived from the canonical schema templates, covering the supported wiki page types without introducing divergent field names or section order. **Status:** Complete (Phase 13.1). Six drift-free `schema/obsidian/*.md` token templates (Plan 01); verified in `13.1-VERIFICATION.md` + `13.1-VERIFIER-REPORT.md`.
+- [x] **OBSID-02**: A reference doc explains how to use the Obsidian starter for day-1 page creation ergonomics, including what is generated and what remains user-owned. **Status:** Complete (Phase 13.1). `docs/reference/obsidian-starter.md` Setup-once + auto-fill-vs-user-typed table (Plan 01).
+- [x] **OBSID-03**: The Obsidian starter does not ship canonical GTD dashboards, workflow-specific Dataview surfaces, hotkey bundles, custom CSS/theme files, or prescribed review workflows. **Status:** Complete (Phase 13.1). Negative scope held at doc + artifact level (zero dashboards/dataviewjs/hotkeys/CSS).
 
 ### Complementary Systems Boundary (BOUND)
 
@@ -276,9 +276,9 @@ Explicitly excluded from v1.1. Documented to prevent scope creep.
 | DEBT-01 | Phase 13.1 | Pending (awaiting user render; Phase 13.2 audits) |
 | DEBT-02 | Phase 13.1 | Complete |
 | DEBT-04 | Phase 13.1 | Complete |
-| OBSID-01 | Phase 13.1 | Pending |
-| OBSID-02 | Phase 13.1 | Pending |
-| OBSID-03 | Phase 13.1 | Pending |
+| OBSID-01 | Phase 13.1 | Complete |
+| OBSID-02 | Phase 13.1 | Complete |
+| OBSID-03 | Phase 13.1 | Complete |
 | WGATE-01 | Phase 12.2 | Complete |
 | WGATE-02 | Phase 12.2 | Complete |
 | WGATE-03 | Phase 12.2 | Complete |
