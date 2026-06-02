@@ -250,3 +250,19 @@ notes: Cross-source synthesis cites >=2 distinct source_ids (src-2026-05-06-ralp
 findings: 0 total (0 errors, 0 warnings, 0 info)
 auto_fixes: 0 applied
 report: wiki/maintenance/lint-report.md
+
+## [2026-06-02] reflect | SC1 reframing decision record (examples/ isolable sub-graph)
+
+Created decision record [[dr-2026-06-02-sc1-examples-isolable-subgraph]] (`trigger_type: reframing`, `affected_pages: []`) formalizing the Phase 13.1 SC1 renegotiation: "graph not contaminated by examples/" → "examples/ forms a visually isolable sub-graph." Forced by Obsidian's single Excluded-files mechanism, which governs both Dataview indexing and graph membership — the fixtures must stay indexed for the DEBT-01 render-count verification, so they necessarily appear in the graph; isolability (a disconnected component) is the deliverable bar. Registered under Decisions in wiki/index.md. Authored as part of the Phase 13.2 v1.1 closure gate (Plan 13.2-03).
+
+## [2026-06-02] lint | wiki health check
+
+findings: 0 total (0 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki/maintenance/lint-report.md
+
+## [2026-06-02] lint | wiki health check
+
+findings: 0 total (0 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki/maintenance/lint-report.md

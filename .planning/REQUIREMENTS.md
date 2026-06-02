@@ -141,10 +141,10 @@ Numbering continues from v1.0. New REQ-ID prefixes: `TMPL`, `NEUT`, `WZRD`, `MAN
 
 ### v1.1 Closure Gate (CLOSE)
 
-- [ ] **CLOSE-01**: `bin/requirements-sync.sh --strict` shows zero drift between `REQUIREMENTS.md` and phase verification artifacts across all v1.1 phases before milestone closure.
-- [ ] **CLOSE-02**: Obsidian render, non-Claude agent-parity, and genuine write-back scenarios are re-run or explicitly audited after Phases 12, 12.1, 12.2, 13, and 13.1 land.
-- [ ] **CLOSE-03**: README, docs, decision records, and roadmap consistently describe the final v1.1 feature surface, complementary-system boundary, and explicitly deferred work.
-- [ ] **CLOSE-04**: A final scope-leak check confirms no task engine, reminder/calendar layer, high-frequency event ingest, premature scaling tier, or canonical GTD dashboard has entered v1.1.
+- [x] **CLOSE-01**: `bin/requirements-sync.sh --strict` shows zero drift between `REQUIREMENTS.md` and phase verification artifacts across all v1.1 phases before milestone closure. **Status:** Complete (Phase 13.2). See `.planning/phases/13.2-v1-1-closure-verification-gate/13.2-VERIFICATION.md`.
+- [x] **CLOSE-02**: Obsidian render, non-Claude agent-parity, and genuine write-back scenarios are re-run or explicitly audited after Phases 12, 12.1, 12.2, 13, and 13.1 land. **Status:** Complete (Phase 13.2). See `.planning/phases/13.2-v1-1-closure-verification-gate/13.2-VERIFICATION.md`.
+- [x] **CLOSE-03**: README, docs, decision records, and roadmap consistently describe the final v1.1 feature surface, complementary-system boundary, and explicitly deferred work. **Status:** Complete (Phase 13.2). See `.planning/phases/13.2-v1-1-closure-verification-gate/13.2-VERIFICATION.md`.
+- [x] **CLOSE-04**: A final scope-leak check confirms no task engine, reminder/calendar layer, high-frequency event ingest, premature scaling tier, or canonical GTD dashboard has entered v1.1. **Status:** Complete (Phase 13.2). See `.planning/phases/13.2-v1-1-closure-verification-gate/13.2-VERIFICATION.md`.
 
 ## v2 Requirements
 
@@ -287,10 +287,10 @@ Explicitly excluded from v1.1. Documented to prevent scope creep.
 | FAITH-02 | Phase 13 | Complete |
 | FAITH-03 | Phase 13 | Complete |
 | FAITH-04 | Phase 13 | Complete |
-| CLOSE-01 | Phase 13.2 | Pending |
-| CLOSE-02 | Phase 13.2 | Pending |
-| CLOSE-03 | Phase 13.2 | Pending |
-| CLOSE-04 | Phase 13.2 | Pending |
+| CLOSE-01 | Phase 13.2 | Complete |
+| CLOSE-02 | Phase 13.2 | Complete |
+| CLOSE-03 | Phase 13.2 | Complete |
+| CLOSE-04 | Phase 13.2 | Complete |
 
 **Coverage:**
 - v1.1 requirements: 97 total (TMPL: 11, NEUT: 8, WZRD: 11, MANUAL: 6, COLAB: 8, CI: 9, BRWN: 22, DEBT: 4, OBSID: 3, BOUND: 3, WGATE: 4, FAITH: 4, CLOSE: 4)
