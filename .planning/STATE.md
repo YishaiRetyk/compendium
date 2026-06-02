@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Shareability
-status: Phase 13.1 complete (verified)
-stopped_at: Phase 13.2 context gathered
-last_updated: "2026-06-01T15:39:02.599Z"
+status: Phase 13.2 planned (ready to execute)
+stopped_at: Phase 13.2 planned — 3 plans in 2 waves
+last_updated: "2026-06-02T08:46:22.150Z"
 progress:
   total_phases: 19
   completed_phases: 11
@@ -20,11 +20,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-15)
 
 **Core value:** The wiki is a persistent, compounding artifact -- cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested.
-**Current focus:** Phase 13.1 — Docs Finalization + Obsidian Starter (all 5 plans complete; ready for Phase 13.2 closure)
+**Current focus:** Phase 13.2 — v1.1 Closure Verification Gate (3 plans in 2 waves; ready to execute)
 
 ## Current Position
 
-Phase: 13.1 complete (5/5 plans). All docs-finalization + Obsidian-starter deliverables shipped. Next: Phase 13.2 closure (CLOSE-01..04 — re-run/audit 13.1's verification notes incl. the DEBT-01 Obsidian render and DEBT-02 Codex parity column).
+Phase: 13.2 PLANNED (3 plans, 2 waves) — ready to execute. The v1.1 end-of-line closure gate. Plan-checker PASSED (0 blockers; 3 warnings resolved in revision 1). Plans committed 7388323 (create) + 7613935 (checker fixes). Decomposition: **Wave 1** — 13.2-01 (CLOSE-02: user Obsidian render human checkpoint counts 3/2/2/2/5 + Codex column → blocked-on-host-runtime AppArmor + DEBT-04 audit; clears the sole DEBT-01 drift row) ‖ 13.2-02 (CLOSE-03 docs/README/DR/ROADMAP consistency + CLOSE-04 scope-leak, edit-on-drift, reusing check-neutrality/check-privacy, no new script). **Wave 2** — 13.2-03 (CLOSE-01: commit dangling 12.2-VERIFIER-REPORT.md [D-04a.1] + author SC1 reframing DR [D-04a.2] + requirements-sync --strict --require-complete zero-drift gate + flip CLOSE-01..04 Complete in bullets+matrix + paired 13.2-VERIFICATION.md/VERIFIER-REPORT.md + `/gsd-complete-milestone` as final task). Two human checkpoints (render, milestone-archive) are `autonomous: false`. Next: `/gsd-execute-phase 13.2`.
+
+Phase: 13.1 complete (5/5 plans). All docs-finalization + Obsidian-starter deliverables shipped. (Closure handled by Phase 13.2 — CLOSE-01..04 re-run/audit 13.1's verification notes incl. the DEBT-01 Obsidian render and DEBT-02 Codex parity column.)
 
 Plan 13.1-05 complete (2026-06-01): accuracy-passed the five substantial reference docs (edit-on-drift) + reconciled `docs/reference/index.md` + verified CONTRIBUTING.md merge-conflict recipes. Only `brownfield.md` had drift: line 3 rewritten to name all FIVE subcommands (scan/bootstrap/suggest/review-typing/verify) per §11.5 (dropped "two stubs ... ship in Phase 11"; never wrote "four" — T-13.1-12 trap avoided); wrong script name `04-privacy-classification.sh` → `04-privacy-review.sh`; ~14 stale "Phase 11" refs reworded to shipped tense (line 356 "Phase 10 + Phase 11 requirements" KEPT as accurate historical authorship); every `0[1-4]-*.sh` ref verified real. quickstart.md ~line 35 + `.obsidianignore` header: corrected the self-falsifying ".obsidianignore hides examples/ from Obsidian" claim (Obsidian does not read it; examples/ IS Dataview-indexed; real exclusion = Settings → Excluded files); .obsidianignore kept in release allowlist; bare `Kahneman` token removed from header (Rule 2 neutrality). ci.md/release.md/three-layer-model.md/dataview-queries.md = NO DRIFT (left byte-unchanged; severity table, allowlist, DR link, 5 queries all verified against source-of-truth). index.md now catalogs all 12 reference files anchored to link form (+5: dataview-queries, commit-examples, setup-prerequisites, agent-parity, obsidian-starter); CONTRIBUTING pointer strengthened (D-11: no merge-conflicts.md). CONTRIBUTING recipes VERIFIED: committed `.gitattributes` has no `merge=union` (opt-in claim true); index.md category-header structure confirms the union-collide warning. check-neutrality.sh + sync-claude.sh --check + full lint all exit 0. Commits ecb013d, 1929838. SUMMARY self-check PASSED.
 
