@@ -1617,6 +1617,156 @@ if should_run('gap'):
                             f'Consider: {question}')
 
 # ---------------------------------------------------------------------------
+# Check 9.5: Lexical near-duplicate page detection (a1, category: duplicate)
+# ---------------------------------------------------------------------------
+# Flags same-type page pairs whose titles/aliases are lexically near-identical
+# -- the weakest current relationship heuristic (nothing else detects
+# "Geoff Hinton" vs "Geoffrey Hinton" or "Attention Mechanism" vs
+# "Attention Mechanisms"). Report-only (severity warning): feeds the
+# human-confirmed MERGE operation (§9). NEVER auto-merges, never mutates.
+#
+# Candidate iff (same type) AND EITHER:
+#   - one page's title/alias contains the other's title/alias as a
+#     case-insensitive substring (contained string length > 5), OR
+#   - levenshtein(title_a, title_b) < 3 for titles longer than 5 chars.
+# Survivor = the page with MORE inbound wikilinks (tie -> lexicographically
+# first id is survivor, deterministic). One finding per pair.
+
+def _levenshtein(a, b):
+    """Pure-stdlib edit distance (no new imports). Two-row DP, O(len(a)*len(b))."""
+    if a == b:
+        return 0
+    if not a:
+        return len(b)
+    if not b:
+        return len(a)
+    prev = list(range(len(b) + 1))
+    for i, ca in enumerate(a, 1):
+        cur = [i]
+        for j, cb in enumerate(b, 1):
+            cost = 0 if ca == cb else 1
+            cur.append(min(
+                prev[j] + 1,        # deletion
+                cur[j - 1] + 1,     # insertion
+                prev[j - 1] + cost, # substitution
+            ))
+        prev = cur
+    return prev[-1]
+
+if should_run('duplicate'):
+    print("  Checking for near-duplicate pages...", file=sys.stderr)
+
+    # Build candidate page inventory (self-contained -- the orphan-block
+    # resolution_map / inbound_links are scoped to should_run('orphan')).
+    # Exclude: EXCLUDE_DIRS/examples (already filtered out of all_pages),
+    # example: true (already filtered), and archived/superseded pages.
+    dup_pages = []  # list of dicts: id, title, type, names (lowercased name set)
+    for fpath, fm, body, err in all_pages:
+        if fm is None:
+            continue
+        if fm.get('status') in ('archived', 'superseded'):
+            continue
+        pid = fm.get('id', '')
+        ptype = fm.get('type', '')
+        title = fm.get('title', '')
+        if not pid or not ptype or not title:
+            continue
+        # Names = title + aliases, lowercased, deduped.
+        names = {str(title).lower()}
+        for alias in (fm.get('aliases') or []):
+            if alias:
+                names.add(str(alias).lower())
+        dup_pages.append({
+            'id': pid,
+            'title': str(title),
+            'type': ptype,
+            'names': names,
+            'path': os.path.relpath(fpath),
+        })
+
+    # Build inbound-wikilink graph over the candidate pages (mirrors the
+    # orphan check's resolution + counting, scoped to dup_pages so it works
+    # even when should_run('orphan') is False).
+    dup_resolution = {}  # lowercase name -> set of page ids
+    dup_id_set = {p['id'] for p in dup_pages}
+    for p in dup_pages:
+        for nm in ({p['id'].lower()} | p['names']):
+            dup_resolution.setdefault(nm, set()).add(p['id'])
+
+    dup_inbound = {p['id']: set() for p in dup_pages}
+    # Count inbound links from ALL wiki pages (not just candidates), plus
+    # index.md/log.md, matching the orphan check's link-graph breadth.
+    for fpath, fm, body, err in all_pages:
+        if fm is None or body is None:
+            continue
+        linker_id = fm.get('id', '')
+        for target in WIKILINK_RE.findall(body):
+            for rid in dup_resolution.get(target.strip().lower(), set()):
+                if rid != linker_id:
+                    dup_inbound[rid].add(linker_id)
+    for special in ('index.md', 'log.md'):
+        spath = os.path.join(wiki_dir, special)
+        if os.path.exists(spath):
+            try:
+                scontent = open(spath, encoding='utf-8').read()
+            except OSError:
+                scontent = ''
+            for target in WIKILINK_RE.findall(scontent):
+                for rid in dup_resolution.get(target.strip().lower(), set()):
+                    dup_inbound[rid].add('__special__')
+
+    def _is_near_duplicate(names_a, names_b):
+        """True iff any cross name-pair satisfies the substring-containment or
+           Levenshtein<3 candidate predicate (both length-gated at >5)."""
+        for na in names_a:
+            for nb in names_b:
+                if na == nb:
+                    continue
+                # Substring containment: shorter inside longer, contained len > 5.
+                if na in nb and len(na) > 5:
+                    return True
+                if nb in na and len(nb) > 5:
+                    return True
+                # Levenshtein < 3, both strings longer than 5 chars.
+                if len(na) > 5 and len(nb) > 5 and _levenshtein(na, nb) < 3:
+                    return True
+        return False
+
+    # Group candidate pages by type, compare same-type unordered pairs once.
+    by_type = {}
+    for p in dup_pages:
+        by_type.setdefault(p['type'], []).append(p)
+
+    seen_pairs = set()
+    for t, group in by_type.items():
+        for i in range(len(group)):
+            for j in range(i + 1, len(group)):
+                pa, pb = group[i], group[j]
+                pair_key = tuple(sorted([pa['id'], pb['id']]))
+                if pair_key in seen_pairs:
+                    continue
+                if not _is_near_duplicate(pa['names'], pb['names']):
+                    continue
+                seen_pairs.add(pair_key)
+                # Survivor = more inbound links; tie -> lexicographically-first id.
+                n_a = len(dup_inbound.get(pa['id'], set()))
+                n_b = len(dup_inbound.get(pb['id'], set()))
+                if n_a > n_b:
+                    survivor, loser, n_survivor, n_loser = pa, pb, n_a, n_b
+                elif n_b > n_a:
+                    survivor, loser, n_survivor, n_loser = pb, pa, n_b, n_a
+                else:
+                    # tie: lexicographically-first id survives
+                    if pa['id'] <= pb['id']:
+                        survivor, loser, n_survivor, n_loser = pa, pb, n_a, n_b
+                    else:
+                        survivor, loser, n_survivor, n_loser = pb, pa, n_b, n_a
+                add_finding('warning', 'duplicate', loser['path'],
+                            f'possible duplicate of "{survivor["title"]}" '
+                            f'({survivor["id"]}); same type={t}; consider MERGE (§9). '
+                            f'Survivor by inbound-link count ({n_loser} vs {n_survivor}).')
+
+# ---------------------------------------------------------------------------
 # Check 10: Drift detection (DRFT-01, DRFT-02, DRFT-03, DRFT-04)
 # ---------------------------------------------------------------------------
 
