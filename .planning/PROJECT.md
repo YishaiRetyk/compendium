@@ -63,14 +63,20 @@ The wiki is a persistent, compounding artifact — cross-references are already 
 - [x] Three-layer reference doc — task / working-memory / wiki-compiler split with capture/clarify/organize/review routing rules and explicit anti-features (BOUND-02) — Validated in Phase 12: complementary-systems-boundary-gtd-alignment
 - [x] Reviewed-match boundary audit — README + AGENTS.md + docs/ + wiki/decisions/ verified to contain zero "all-in-one PKM/task" framing (BOUND-03) — Validated in Phase 12: complementary-systems-boundary-gtd-alignment
 
-### Active (v1.1 focus areas — formal REQ-IDs in REQUIREMENTS.md)
+### Validated (v1.1 Shareability — shipped 2026-06-02)
 
-- [ ] Template-based starter repo with four-track `/docs/` (quickstart, guided setup, manual setup, reference)
-- [ ] Kahneman cluster moved to `examples/`; starter vault neutral
-- [ ] `bin/brownfield.sh scan` — dry-run markdown report
-- [ ] `bin/brownfield.sh bootstrap` — mechanical-only auto (sentinel frontmatter, hashes, skeleton, YAML normalization)
-- [ ] Multi-agent validation (Codex or other) against v1.0 workflows
-- [ ] Obsidian render/Dataview verification (deferred from Phase 4)
+- ✓ Template-based starter repo with four-track `/docs/` (quickstart, guided setup, manual setup, reference) — v1.1 (Phase 7)
+- ✓ Kahneman cluster moved to `examples/`; starter vault neutral — v1.1 (Phase 7)
+- ✓ `bin/brownfield.sh scan` — dry-run markdown report — v1.1 (Phase 10)
+- ✓ `bin/brownfield.sh bootstrap` — mechanical-only auto (sentinel frontmatter, hashes, skeleton, YAML normalization) — v1.1 (Phase 10)
+- ✓ Multi-agent validation — Codex agent-parity audited (blocked-on-host-runtime per AppArmor; Claude-vs-golden EXACT structural match carries the verdict) — v1.1 (Phases 13.1/13.2)
+- ✓ Obsidian render/Dataview verification (deferred from v1.0 Phase 4) — v1.1 (Phase 13.2; live Dataview counts 3/2/2/2/5)
+
+Closure gate (Phase 13.2, CLOSE-01..04): `bin/requirements-sync.sh --strict --require-complete` exits 0 milestone-wide (0 drift of 97 requirements; all 97 Complete).
+
+### Active (next milestone — TBD)
+
+No active requirements yet for the next milestone. Define them with `/gsd-new-milestone`. Candidate backlog: ROADMAP.md Phases 999.3–999.6; v1.2-deferred items: Obsidian plugin distribution, one-command installer, hosted docs site, brownfield `--apply` mode.
 
 ### Out of Scope
 
@@ -130,6 +136,8 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
+*Last updated: 2026-06-02 after v1.1 Shareability milestone — SHIPPED + ARCHIVED. All 15 v1.1 phase directories (Phases 7–13.2, 52 plans) complete; 97/97 v1.1 requirements Complete with zero drift (`bin/requirements-sync.sh --strict --require-complete` exits 0). Phase 13.2 closure gate (CLOSE-01..04): Obsidian render re-run (Dataview 3/2/2/2/5), Codex agent-parity accepted blocked-on-host-runtime, write-back audited, docs consistency + scope-leak clean. Archived to `.planning/milestones/v1.1-*`; ROADMAP collapsed (Backlog preserved); `REQUIREMENTS.md` removed for a fresh next-milestone; git tag `v1.1`. Deferred: 1 post-v1.1 todo (a1 lexical-dedup lint), backlog 999.3–999.6, v1.2 items (Obsidian plugin, installer, hosted docs, brownfield `--apply`). Next: `/gsd-new-milestone`.*
+
 *Last updated: 2026-05-03 — Phase 12.1 (NEUT-08 Personal-Term Denylist Curation) complete: 7-term defense-in-depth expansion appended to `.neutrality-denylist.txt` under unified `# Category: Personal-vault terms expanded curation (NEUT-08, 2026-05-02)` header (kept set: pre-committing, physical flinch, pre-mortem, pre-mortems, decision fatigue, decision-fatigue, meta-observation). Rubric revised from "hyphenated identifier unique to vault" to include (a) spaced multi-word phrases coined in archived journal sources (precedent: existing denylist uses spaced forms `loss aversion`, `system 1`) and (b) popular cog-bias terms used heavily in vault that would betray vault provenance via LLM-mediated example-leak. NEUT-08 flipped to Complete in REQUIREMENTS.md (line 36 + matrix line 215); 12.1-VERIFICATION.md authored with verbatim D-10 evidence; `bin/requirements-sync.sh --strict --phase 12.1` and `--require-complete --phase 12.1` both exit 0; `bin/check-neutrality.sh` source unchanged across the entire phase. First v1.1 partial-requirement closure, clearing the path for Phase 13.2 v1.1 closure verification gate.*
 
 *Last updated: 2026-06-01 — Phase 13 (Claim Faithfulness Audit) complete: shipped `bin/audit-claims.sh` (FAITH-01 high-risk claim selectors → FAITH-02 raw-source locator→passage resolver → 9-key structured findings → FAITH-04 fail-closed privacy chokepoint → stdin-only `shlex.split` verifier dispatch with supports/weak/contradicts/insufficient verdicts) and `bin/lib/privacy_resolve.py` (§13 three-level fail-closed + strictest-wins effective-claim privacy). Review-only by default — no auto-fix, no CI gate, severity never `error`. AGENTS/CLAUDE §6 document the optional `<!-- page: N -->` page-marker convention and the Audit as a review-only workflow (four-operation framing preserved). FAITH-01..04 → Complete; verifier PASS 6/6 SC + 4/4 REQ; tests 33/33; `bin/requirements-sync.sh --strict/--require-complete --phase 13` both exit 0; code review 0 critical / 0 high (advisory MD-01: `--format json` omits the `--emit-worklist` HIGH-C metadata redaction — passage text not leaked). Remaining v1.1: Phase 13.1 (docs + Obsidian starter), Phase 13.2 (closure verification gate).*

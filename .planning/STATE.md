@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Shareability
-status: Phase 13.2 planned (ready to execute)
-stopped_at: Phase 13.2 planned — 3 plans in 2 waves
-last_updated: "2026-06-02T08:46:22.150Z"
+status: v1.1 Shareability SHIPPED + ARCHIVED 2026-06-02 — Phase 13.2 closure gate green (0 drift of 97, all 97 Complete); tagged v1.1
+stopped_at: v1.1 milestone archived; ready to start v1.2 via /gsd-new-milestone
+last_updated: "2026-06-02T11:03:44.632Z"
 progress:
   total_phases: 19
   completed_phases: 11
@@ -20,9 +20,31 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-15)
 
 **Core value:** The wiki is a persistent, compounding artifact -- cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested.
-**Current focus:** Phase 13.2 — v1.1 Closure Verification Gate (3 plans in 2 waves; ready to execute)
+**Current focus:** v1.1 Shareability SHIPPED + ARCHIVED 2026-06-02. Planning next milestone — start with `/gsd-new-milestone`.
+
+## Deferred Items
+
+Items acknowledged and deferred at the v1.1 milestone close (2026-06-02):
+
+| Category | Item | Status |
+|----------|------|--------|
+| quick_task (pending todo) | `a1-lexical-dedup-lint-category` — near-duplicate page detection (`duplicate` lint category) | Pending — `blocked_on: Phase 13.2` cleared; promote via `/gsd-quick` post-v1.1 |
+| backlog | Phases 999.3–999.6 (template placeholder system; v1.2 schema progressive-disclosure refactor; external source drift detection; observed GTD review patterns) | In `.planning/ROADMAP.md` Backlog |
+| v1.2-deferred | Obsidian plugin distribution; one-command installer; hosted docs site; brownfield `--apply` mode | Deferred to v1.2 per PROJECT.md |
+| tech-debt | Pre-existing (per superseded 2026-04-30 audit): 3 unsummarized Kahneman raw sources (DRFT-01); brownfield WR-*/IN-* nits; Phase 11 human-UAT visual items; lint `[[Page Title]]` red-link false-positives | Non-blocking |
 
 ## Current Position
+
+**v1.1 Shareability — SHIPPED + ARCHIVED 2026-06-02.** Phase 13.2 (v1.1 Closure Verification Gate) complete, 3/3 plans:
+- 13.2-02 (CLOSE-03/04): docs consistency NO-DRIFT across README/ROADMAP/three-layer-model/boundary DR; scope-leak audit 24 hits all ALLOWED, zero leak.
+- 13.2-01 (CLOSE-02): Obsidian render re-run PASS (Dataview 3/2/2/2/5, Obsidian 1.12.7 / Dataview 0.5.68); DEBT-01 → Complete (sole drift row cleared); Codex column → blocked-on-host-runtime (AppArmor); DEBT-04 audited.
+- 13.2-03 (CLOSE-01): committed dangling 12.2-VERIFIER-REPORT.md; authored SC1 reframing DR (dr-2026-06-02-sc1-examples-isolable-subgraph); CLOSE-01..04 → Complete; paired 13.2-VERIFICATION.md + 13.2-VERIFIER-REPORT.md; `requirements-sync --strict --require-complete` exits 0 milestone-wide (0 drift of 97, all 97 Complete).
+
+Milestone archived: `milestones/v1.1-ROADMAP.md`, `milestones/v1.1-REQUIREMENTS.md`, `milestones/v1.1-MILESTONE-AUDIT.md`; ROADMAP.md collapsed v1.1 to a shipped `<details>` (Backlog preserved); MILESTONES.md + PROJECT.md + RETROSPECTIVE.md updated; `REQUIREMENTS.md` removed (fresh for next milestone); git tag `v1.1`. Next: `/gsd-new-milestone`.
+
+## Archived Position History
+
+Phase: 13.2 PLANNED (3 plans, 2 waves) — ready to execute. The v1.1 end-of-line closure gate. Plan-checker PASSED (0 blockers; 3 warnings resolved in revision 1). Plans committed 7388323 (create) + 7613935 (checker fixes). Decomposition: **Wave 1** — 13.2-01 (CLOSE-02: user Obsidian render human checkpoint counts 3/2/2/2/5 + Codex column → blocked-on-host-runtime AppArmor + DEBT-04 audit; clears the sole DEBT-01 drift row) ‖ 13.2-02 (CLOSE-03 docs/README/DR/ROADMAP consistency + CLOSE-04 scope-leak, edit-on-drift, reusing check-neutrality/check-privacy, no new script). **Wave 2** — 13.2-03 (CLOSE-01: commit dangling 12.2-VERIFIER-REPORT.md [D-04a.1] + author SC1 reframing DR [D-04a.2] + requirements-sync --strict --require-complete zero-drift gate + flip CLOSE-01..04 Complete in bullets+matrix + paired 13.2-VERIFICATION.md/VERIFIER-REPORT.md + `/gsd-complete-milestone` as final task). Two human checkpoints (render, milestone-archive) are `autonomous: false`. Next: `/gsd-execute-phase 13.2`.
 
 Phase: 13.2 PLANNED (3 plans, 2 waves) — ready to execute. The v1.1 end-of-line closure gate. Plan-checker PASSED (0 blockers; 3 warnings resolved in revision 1). Plans committed 7388323 (create) + 7613935 (checker fixes). Decomposition: **Wave 1** — 13.2-01 (CLOSE-02: user Obsidian render human checkpoint counts 3/2/2/2/5 + Codex column → blocked-on-host-runtime AppArmor + DEBT-04 audit; clears the sole DEBT-01 drift row) ‖ 13.2-02 (CLOSE-03 docs/README/DR/ROADMAP consistency + CLOSE-04 scope-leak, edit-on-drift, reusing check-neutrality/check-privacy, no new script). **Wave 2** — 13.2-03 (CLOSE-01: commit dangling 12.2-VERIFIER-REPORT.md [D-04a.1] + author SC1 reframing DR [D-04a.2] + requirements-sync --strict --require-complete zero-drift gate + flip CLOSE-01..04 Complete in bullets+matrix + paired 13.2-VERIFICATION.md/VERIFIER-REPORT.md + `/gsd-complete-milestone` as final task). Two human checkpoints (render, milestone-archive) are `autonomous: false`. Next: `/gsd-execute-phase 13.2`.
 
@@ -298,7 +320,7 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-None.
+- `a1-lexical-dedup-lint-category` (2026-06-02) — near-duplicate page detection (`duplicate` lint category). `blocked_on: Phase 13.2` now cleared; promote via `/gsd-quick` in the next milestone. See `.planning/todos/pending/2026-06-02-a1-lexical-dedup-lint-category.md`.
 
 ### Roadmap Evolution
 

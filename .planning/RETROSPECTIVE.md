@@ -50,9 +50,60 @@ A full v1 starter kit for an LLM-maintained Obsidian wiki: agent-agnostic 1,178-
 
 ---
 
+## Milestone: v1.1 — Shareability
+
+**Shipped:** 2026-06-02
+**Phases:** 15 directories (Phases 7–13.2) | **Plans:** 52 | **Commits:** 382 | **Span:** 2026-04-15 → 2026-06-02 (~48 days)
+
+### What Was Built
+
+A shareable starter kit: neutral public template (Phase 7), two-track wizard/manual setup with byte-equality CI (Phase 8), collaborative PR workflow + three-job CI lint gate (Phase 9), brownfield vault onboarding scan/bootstrap/suggest/verify (Phases 10–11), the complementary-systems boundary + three-layer model (Phases 12, 12.1), a local pre-commit write gate (Phase 12.2), a claim-faithfulness audit (Phase 13), docs finalization + Obsidian starter (Phase 13.1), and a dedicated end-of-line closure verification gate (Phase 13.2).
+
+### What Worked
+
+- **Mechanical closure gate.** `bin/requirements-sync.sh --strict --require-complete` turned milestone closure into a single deterministic check (0 drift of 97, all 97 Complete) instead of a manual audit — built mid-milestone as backlog 999.7 precisely because the closure phase would need it.
+- **Edit-on-drift discipline.** The CLOSE-03/04 consistency pass found zero drift and zero scope leaks, leaving every file byte-unchanged — proof the canonical surface stayed coherent throughout, not patched at the end.
+- **Honest deferral over fake-green.** Codex agent-parity was blocked by a host AppArmor user-namespace restriction; it was recorded as blocked-on-host-runtime (with the Claude-vs-golden EXACT diff carrying the verdict) rather than fabricated as a pass.
+- **Separating two human checkpoints from autonomous work** let the closure phase run almost entirely unattended, pausing only for the GUI Obsidian render and the milestone-archive go-ahead.
+
+### What Was Inefficient
+
+- **Tooling drift.** The installed `gsd-tools.cjs` predates the `gsd-sdk query` interface the current workflows assume, so execute-phase and complete-milestone had to be driven manually. Faithful but slower; a tooling-version pin would remove the friction.
+- **Stale milestone audit.** The 2026-04-30 `v1.1-MILESTONE-AUDIT.md` (`gaps_found`) lingered as a scary-looking artifact until its own superseded-note clarified Phase 13.2 was the authoritative closure audit. A fresher re-audit before closure would have avoided the second-guess.
+- **CLOSE-02 over-claim risk.** The verifier report needed an explicit, guarded two-part framing (scenarios re-run *now* vs ledger-consistency, NOT a behavioral re-run) to avoid conflating documentation consistency with regression-testing — caught by cross-AI review, but only after a replan cycle.
+
+### Patterns Established
+
+- **Decimal closure phase (X.2) as a milestone end-of-line gate** — a dedicated phase whose only job is verify + reconcile + archive, distinct from the docs-finalization phase (13.1).
+- **Paired closure artifacts** — a plan-authored `VERIFICATION.md` plus an independent `VERIFIER-REPORT.md` that re-runs the gates, mirroring prior-phase format.
+- **STEP-0 hard gate on human input** — a human-reported render that can *fail* the milestone (divergent counts keep the drift row), not just be recorded.
+
+### Key Lessons
+
+- Build the mechanical gate the closure phase needs *before* the closure phase (999.7 → 13.2).
+- A superseded artifact must shout its supersession in its own frontmatter, or it will be misread as live state at the worst moment.
+- When a human checkpoint gates a milestone, give the operator a pre-filled, copy-paste-ready artifact (the scratch note) — it converts a vague "go render in Obsidian" into a 2-minute task.
+
+### Cost Observations
+
+- Model mix: predominantly Opus for orchestration + execution (this milestone's closure was driven inline rather than via subagents due to the tooling mismatch).
+- Notable: the closure phase was almost fully autonomous apart from two `autonomous: false` human checkpoints (Obsidian render, milestone archive).
+
+---
+
 ## Cross-Milestone Trends
 
 (To be populated as additional milestones ship.)
+
+### v1.0 → v1.1
+
+| Dimension | v1.0 MVP | v1.1 Shareability |
+|-----------|----------|-------------------|
+| Phases | 6 | 15 (incl. 4 decimal insertions) |
+| Plans | 24 | 52 |
+| Span | 9 days | ~48 days |
+| Focus | Build the compiler | Make it shareable + trustworthy + closable |
+| Closure | Manual audit | Mechanical `requirements-sync --require-complete` gate |
 
 ### Shipped Milestones
 
