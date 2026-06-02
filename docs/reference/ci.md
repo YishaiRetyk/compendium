@@ -29,6 +29,7 @@ All three jobs are required status checks in branch protection on `main`.
 | `contradiction` | warning | Source disagreement — scholarly expectation, not system failure (Phase 5 decision). |
 | `contradiction-sync` | warning | `has_contradictions` frontmatter out of sync with body markers. |
 | `drift` | warning | Cross-system drift (content-hash, index coverage). |
+| `duplicate` | warning | Same-type lexical near-duplicate pages — MERGE candidate, report-only (not in `--ci` error remap, stays non-blocking). |
 | `contributor` | warning | `contributor:: @handle` mismatch with git commit authors (non-blocking audit). |
 | `autofix` | info | Mechanical fix applied (e.g., stale marker updated). |
 | `skip-count` | info | Escape-hatch marker exempted a claim. |

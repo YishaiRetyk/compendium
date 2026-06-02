@@ -10,7 +10,7 @@ set -euo pipefail
 # Lint rule-set semver per CI-08 / D-26. Bump MAJOR on breaking changes
 # (removed category, changed severity semantics). MINOR on non-breaking
 # additions. PATCH on bug fixes. --require-version X.Y.Z is a minimum check.
-LINT_VERSION="1.3.0"
+LINT_VERSION="1.4.0"
 
 usage() {
     cat <<'EOF'
@@ -25,7 +25,8 @@ Options:
   --fix               Apply mechanical auto-fixes (stale markers)
   --category <cat>    Run only specified category:
                         orphan, crossref, stale, contradiction, gap,
-                        provenance, yaml, drift, contributor, brownfield
+                        provenance, yaml, drift, duplicate, contributor,
+                        brownfield
                       Default: all categories
   --version           Print lint rule-set semver (LINT_VERSION) and exit 0
   --require-version X.Y.Z
@@ -1906,7 +1907,7 @@ if should_run('drift') or should_run('all'):
     # operation -- whose fresh log entry is itself still uncommitted alongside
     # its page -- is NOT flagged; only entries already in HEAD are audited.
     # Scope: the machine-parseable `pages_affected:` field (query-workflow
-    # format, AGENTS.md §11.2). See AGENTS.md §11.3 step 11 (DRFT-04).
+    # format, AGENTS.md §11.2). See AGENTS.md §11.3 step 12 (DRFT-04).
     print("  Check 10f: Orphaned operation artifacts (DRFT-04)...", file=sys.stderr)
     _drft04_skip_ids = {'index', 'log', 'lint-report', 'reflect-state', 'none', ''}
     try:

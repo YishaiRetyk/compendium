@@ -1126,17 +1126,18 @@ Placement rules (strict):
 8. **`has_contradictions` sync:** Verify that `has_contradictions` frontmatter matches actual presence of `[contradiction:]` markers in the body. Auto-fix: set `true` if markers present, `false` if no markers present.
 9. **Knowledge gaps (red links):** Collect unresolved wikilinks. Flag when: appears on 2+ distinct pages, OR appears in TL;DR/Key Facts section of any page (per D-20). Severity: info. Report-only. Suggest investigative question per D-23.
 10. **Source coverage gaps:** Compare domain source counts. Flag domains with materially fewer sources than median. Only run when wiki has 5+ distinct knowledge_domain values with at least 3 having 2+ source pages (maturity guardrail per D-22). Use `knowledge_domain` consistently for both page classification and source counting. Severity: info. Report-only. Suggest investigative question per D-23.
-11. **Drift detection (category: `drift`):** Run cross-system drift checks. These detect misalignment between the wiki layer and its dependencies.
+11. **Near-duplicate pages (category: `duplicate`):** Flag same-`type` page pairs that are lexical near-duplicates -- candidate iff one page's title/alias contains the other's title/alias as a case-insensitive substring (contained length > 5), OR Levenshtein distance < 3 on titles longer than 5 chars. Survivor = the page with more inbound wikilinks (tie -> lexicographically-first id). One finding per pair. Severity: warning. Report-only -- feeds the human-confirmed MERGE operation (Section 9); never auto-merges. Excludes `EXCLUDE_DIRS`/`examples/`, `example: true`, and archived/superseded pages. Pure-stdlib (no embeddings) -- semantic dedup is a deferred Tier-4 extension.
+12. **Drift detection (category: `drift`):** Run cross-system drift checks. These detect misalignment between the wiki layer and its dependencies.
     - **Unrepresented sources (DRFT-01):** Walk `sources/` directory for `.md` files, check each has a corresponding wiki source summary page (matching the `path` field in source page frontmatter). Severity: warning.
     - **Missing source files (DRFT-02):** For each source summary page, verify the raw source file at the `path` frontmatter field exists on disk. Severity: error.
     - **Content-hash drift:** Recompute SHA-256 of the raw source file, compare against `content_hash` in source summary frontmatter. If mismatch: report finding (severity: warning). When `--fix` is passed, auto-fix `compilation_status` to `stale` on the affected source page. See Section 10 compilation status transitions.
     - **Index coverage:** Verify every wiki page (excluding index.md, log.md, and maintenance/ pages) has a wikilink entry in `wiki/index.md`. Severity: warning.
     - **Obsidian vault awareness (DRFT-03):** Verify `.obsidian/` directory exists (info if missing). Check for non-markdown files in `wiki/` subdirectories (severity: info).
-12. Compile findings into `wiki/maintenance/lint-report.md` organized by severity then category. Findings are grouped with category subsections (e.g., `### Drift` under `## Warnings`). Include total counts and per-category breakdowns.
-13. Append entry to `wiki/log.md`: `## [YYYY-MM-DD] lint | <scope>` with summary of findings counts and auto-fixes applied.
-14. Commit: `lint(<scope>): <one-line summary of findings and fixes>`
+13. Compile findings into `wiki/maintenance/lint-report.md` organized by severity then category. Findings are grouped with category subsections (e.g., `### Drift` under `## Warnings`). Include total counts and per-category breakdowns.
+14. Append entry to `wiki/log.md`: `## [YYYY-MM-DD] lint | <scope>` with summary of findings counts and auto-fixes applied.
+15. Commit: `lint(<scope>): <one-line summary of findings and fixes>`
 
-**Categories** (valid values for `--category` filter): `orphan`, `crossref`, `stale`, `contradiction`, `gap`, `provenance`, `yaml`, `drift`.
+**Categories** (valid values for `--category` filter): `orphan`, `crossref`, `stale`, `contradiction`, `gap`, `provenance`, `yaml`, `drift`, `duplicate`.
 
 **Abort conditions:**
 
