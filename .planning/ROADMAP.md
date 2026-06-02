@@ -290,7 +290,11 @@ Plans:
 - No new product features
 - No new schema expansion except fixes required by failed verification
 - No speculative GTD review pattern documentation
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 13.2-01-PLAN.md — CLOSE-02: re-run Obsidian render (human checkpoint) + resolve Codex parity column + audit write-back; flip DEBT-01 Complete (clears the sole drift row)
+- [ ] 13.2-02-PLAN.md — CLOSE-03 + CLOSE-04: docs/README/DR/ROADMAP consistency pass + scope-leak audit (edit-on-drift, no new script)
+- [ ] 13.2-03-PLAN.md — CLOSE-01: requirements-sync zero-drift + completeness gate; commit dangling 12.2-VERIFIER-REPORT.md; author SC1 reframing DR; paired closure artifacts; flip CLOSE-01..04 Complete; /gsd-complete-milestone
 
 ## Backlog
 
