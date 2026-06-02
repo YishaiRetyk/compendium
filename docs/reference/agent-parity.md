@@ -71,17 +71,17 @@ Diff the sorted outputs (`diff <(provtargets A) <(provtargets B)`). A clean diff
 
 ## Diff-presentation table
 
-Rows are the rubric dimensions; columns are the three comparisons; cells are `MATCH` / `DIFFERS (noted)` / `pending`. This template mirrors the recorded run — the Codex column is rendered `pending — deferred to 13.2 (Codex auth/runtime unavailable)` because the recorded Codex run was **blocked on a host runtime sandbox pathology (bubblewrap user-namespace creation), producing 0 wiki pages**. That is a runtime-environment failure on the host, NOT a parity failure — so it is recorded honestly as pending, never fabricated as a measured MATCH.
+Rows are the rubric dimensions; columns are the three comparisons; cells are `MATCH` / `DIFFERS (noted)` / `blocked-on-host-runtime`. This template mirrors the recorded run — the Codex column is rendered `blocked-on-host-runtime (AppArmor apparmor_restrict_unprivileged_userns=1)` because the recorded Codex run was **blocked on a host runtime sandbox pathology: the live AppArmor `apparmor_restrict_unprivileged_userns=1` restriction prevents Codex's bubblewrap sandbox from creating user namespaces, producing 0 wiki pages**. That is a host runtime-environment limitation, NOT a parity failure — so it is recorded honestly as blocked-on-host-runtime, never fabricated as a measured MATCH.
 
 | Dimension | Claude vs golden-subset | Codex vs golden-subset | Claude vs Codex |
 |-----------|-------------------------|------------------------|-----------------|
-| Page set (single-source-derivable core) | MATCH | pending — deferred to 13.2 (Codex runtime unavailable) | pending — Codex produced 0 pages |
-| Page types | MATCH (1 entity, 2 concepts, 1 source) | pending — deferred to 13.2 | pending |
-| Provenance source IDs | MATCH | pending — deferred to 13.2 | pending |
-| Provenance locator targets | **EXACT MATCH** (all 6 `#sec:` targets) | pending — deferred to 13.2 | pending |
-| Frontmatter valid | MATCH (`lint --category yaml,provenance` → 0/0/0) | pending — deferred to 13.2 | pending |
+| Page set (single-source-derivable core) | MATCH | blocked-on-host-runtime (AppArmor apparmor_restrict_unprivileged_userns=1) | blocked-on-host-runtime — Codex produced 0 pages |
+| Page types | MATCH (1 entity, 2 concepts, 1 source) | blocked-on-host-runtime (AppArmor apparmor_restrict_unprivileged_userns=1) | blocked-on-host-runtime |
+| Provenance source IDs | MATCH | blocked-on-host-runtime (AppArmor apparmor_restrict_unprivileged_userns=1) | blocked-on-host-runtime |
+| Provenance locator targets | **EXACT MATCH** (all 6 `#sec:` targets) | blocked-on-host-runtime (AppArmor apparmor_restrict_unprivileged_userns=1) | blocked-on-host-runtime |
+| Frontmatter valid | MATCH (`lint --category yaml,provenance` → 0/0/0) | blocked-on-host-runtime (AppArmor apparmor_restrict_unprivileged_userns=1) | blocked-on-host-runtime |
 
-**Recorded outcome (mirror of the phase verification record):** the Claude-side scratch ingest produced 4 pages (1 entity, 2 concepts, 1 source summary) whose provenance-locator-target set is an **exact match** of the golden prospect-theory subset (all 6 `#sec:` targets). The difference between the Claude scratch (4 pages) and the full golden subset (which additionally carries the 3 multi-source synthesis pages) is exactly those 3 pages, each citing a second source not seeded — structurally not reproducible from one source, as expected. The Codex column is blocked-on-runtime and is re-run/confirmed in Phase 13.2; prose variance between the Claude scratch and the golden was observed and, per the rubric, counted as expected rather than a failure.
+**Recorded outcome (mirror of the phase verification record):** the Claude-side scratch ingest produced 4 pages (1 entity, 2 concepts, 1 source summary) whose provenance-locator-target set is an **exact match** of the golden prospect-theory subset (all 6 `#sec:` targets). The difference between the Claude scratch (4 pages) and the full golden subset (which additionally carries the 3 multi-source synthesis pages) is exactly those 3 pages, each citing a second source not seeded — structurally not reproducible from one source, as expected. The Codex column is recorded as **blocked-on-host-runtime via the live AppArmor `apparmor_restrict_unprivileged_userns=1` user-namespace restriction** (Codex's bubblewrap sandbox cannot create user namespaces); the Claude-vs-golden-subset EXACT structural-diff carries the parity verdict, and NO Codex re-run was performed (per Phase 13.2 D-02 the runtime block is accepted, not remediated). Prose variance between the Claude scratch and the golden was observed and, per the rubric, counted as expected rather than a failure.
 
 ## Scratch teardown
 

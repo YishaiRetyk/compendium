@@ -108,7 +108,7 @@ Numbering continues from v1.0. New REQ-ID prefixes: `TMPL`, `NEUT`, `WZRD`, `MAN
 
 ### v1.0 Debt Closure (DEBT)
 
-- [ ] **DEBT-01**: Obsidian render verification — open generated wiki in Obsidian, confirm wikilinks resolve and Dataview queries render correctly (deferred from v1.0 Phase 4)
+- [x] **DEBT-01**: Obsidian render verification — open generated wiki in Obsidian, confirm wikilinks resolve and Dataview queries render correctly (deferred from v1.0 Phase 4) **Status:** Complete (Phase 13.2). See `.planning/phases/13.1-docs-finalization-obsidian-starter/13.1-VERIFICATION.md`.
 - [x] **DEBT-02**: Codex (or other non-Claude) agent-parity: run v1.0 ingest workflow end-to-end against Kahneman example cluster using a second agent; document diffs; set agent-parity tolerance **Status:** Complete (Phase 13.1). Claude-side scratch ingest + structural-equivalence diff (prov-targets EXACT-match the golden prospect-theory subset) + D-07 tolerance documented; Codex side blocked-on-runtime (bubblewrap sandbox) and re-run in Phase 13.2. See `.planning/phases/13.1-docs-finalization-obsidian-starter/13.1-VERIFICATION.md`.
 - [x] **DEBT-03**: `bin/requirements-sync.sh` mechanical check: compares `VERIFICATION.md` truths against `REQUIREMENTS.md` status checkboxes; flags drift (retrospective lesson)
 - [x] **DEBT-04**: Genuine write-back query scenario executed end-to-end (Phase 4 validation scenario that produced NO-WRITE-BACK in v1.0 re-run) **Status:** Complete (Phase 13.1). UPDATE `progressive-disclosure` with ≥2 distinct cloud_safe source_ids, validate-op PASS, new today-dated WRITE-BACK log line (commit 267d2c8). See `.planning/phases/13.1-docs-finalization-obsidian-starter/13.1-VERIFICATION.md`.
@@ -273,7 +273,7 @@ Explicitly excluded from v1.1. Documented to prevent scope creep.
 | BOUND-01 | Phase 12 | Complete |
 | BOUND-02 | Phase 12 | Complete |
 | BOUND-03 | Phase 12 | Complete |
-| DEBT-01 | Phase 13.1 | Pending (awaiting user render; Phase 13.2 audits) |
+| DEBT-01 | Phase 13.1 | Complete |
 | DEBT-02 | Phase 13.1 | Complete |
 | DEBT-04 | Phase 13.1 | Complete |
 | OBSID-01 | Phase 13.1 | Complete |
