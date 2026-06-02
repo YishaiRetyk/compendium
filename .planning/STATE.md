@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.1
-milestone_name: Shareability
-status: v1.1 Shareability SHIPPED + ARCHIVED 2026-06-02 — Phase 13.2 closure gate green (0 drift of 97, all 97 Complete); tagged v1.1
-stopped_at: v1.1 milestone archived; ready to start v1.2 via /gsd-new-milestone
+milestone: v1.1.1
+milestone_name: Graph Integrity
+status: planning
+stopped_at: v1.1.1 milestone defined (10 reqs, 3 phases) — ready to plan Phase 14
 last_updated: "2026-06-02T11:03:44.632Z"
 progress:
-  total_phases: 19
-  completed_phases: 11
-  total_plans: 52
-  completed_plans: 52
-  percent: 100
+  total_phases: 3
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -34,6 +34,15 @@ Items acknowledged and deferred at the v1.1 milestone close (2026-06-02):
 | tech-debt | Pre-existing (per superseded 2026-04-30 audit): 3 unsummarized Kahneman raw sources (DRFT-01); brownfield WR-*/IN-* nits; Phase 11 human-UAT visual items; lint `[[Page Title]]` red-link false-positives | Non-blocking |
 
 ## Current Position
+
+Phase: Not started — Phase 14 (Link-Resolution Convention + Decision Record)
+Plan: —
+Status: Planning — v1.1.1 Graph Integrity defined (LINK-01..10 across Phases 14–16)
+Last activity: 2026-06-02 — Milestone v1.1.1 started
+
+v1.1.1 fixes the Obsidian wikilink-resolution defect: Obsidian resolves `[[X]]` by filename + `aliases`, never `title`, so 31/49 wiki pages render as graph orphans (e.g. `domain-driven-design.md`, which has 11 inbound + 7 outbound links yet shows disconnected). **Phase 14** corrects CLAUDE.md §8 + adds the self-alias invariant (`title`, `id` ∈ `aliases`) + a decision record; **Phase 15** adds the `bin/lint.sh` `linkres` check (Obsidian-accurate resolution; distinguishes intentional knowledge-gap red links) + `--fix` + reconciles the masking `orphan` check; **Phase 16** backfills `wiki/` + `examples/` self-aliases, reconciles link-text variants (`[[Bounded Contexts]]`, `[[Hack (Agentive Stack)]]`), and human-verifies a connected graph. Sequenced before the v1.2 schema refactor (999.4). Next: `/gsd-plan-phase 14` (or `/gsd-discuss-phase 14`).
+
+## v1.1 Shareability — Archived 2026-06-02
 
 **v1.1 Shareability — SHIPPED + ARCHIVED 2026-06-02.** Phase 13.2 (v1.1 Closure Verification Gate) complete, 3/3 plans:
 - 13.2-02 (CLOSE-03/04): docs consistency NO-DRIFT across README/ROADMAP/three-layer-model/boundary DR; scope-leak audit 24 hits all ALLOWED, zero leak.

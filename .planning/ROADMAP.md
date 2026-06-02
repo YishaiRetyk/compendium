@@ -4,6 +4,7 @@
 
 - ✅ **v1.0 LLM Wiki Compiler MVP** — Phases 1–6 (shipped 2026-04-15) — [archive](milestones/v1.0-ROADMAP.md)
 - ✅ **v1.1 Shareability** — Phases 7–13.2 (shipped 2026-06-02) — [archive](milestones/v1.1-ROADMAP.md)
+- 🚧 **v1.1.1 Graph Integrity** — Phases 14–16 (started 2026-06-02)
 
 ## Phases
 
@@ -38,9 +39,54 @@ Full phase details: [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md)
 
 </details>
 
-### 📋 Next Milestone (planned)
+### 🚧 v1.1.1 Graph Integrity (Phases 14–16)
 
-- [ ] v1.2 — TBD. Start with `/gsd-new-milestone`. Candidate backlog: Phases 999.3–999.6 below.
+- [ ] **Phase 14: Link-Resolution Convention + Decision Record** — Correct CLAUDE.md §8 (Obsidian resolves by filename + aliases, not title) + self-alias invariant in §5 checklist + page templates; AGENTS.md byte-sync; decision record. (LINK-01..03)
+- [ ] **Phase 15: Lint Enforcement** — `bin/lint.sh` `linkres` check (unreachable titles + Obsidian-accurate unresolved links, distinguishing knowledge-gap red links) + `--fix` self-alias backfill + reconcile masking `orphan` check + tests. (LINK-04..06)
+- [ ] **Phase 16: Data Remediation** — backfill self-aliases across `wiki/` + `examples/`, reconcile link-text variants, verify `linkres` exits 0 and the Obsidian graph connects (human-verify). (LINK-07..10)
+
+> v1.2+ candidates remain in the Backlog below (Phases 999.3–999.6); the v1.2 schema progressive-disclosure refactor (999.4) is sequenced **after** this patch.
+
+## Phase Details
+
+### Phase 14: Link-Resolution Convention + Decision Record
+
+**Goal**: The schema tells agents the truth about Obsidian link resolution and mandates the self-alias invariant, so every newly created page connects in the graph by construction.
+**Depends on**: Nothing (first phase of v1.1.1).
+**Requirements**: LINK-01, LINK-02, LINK-03
+**Success Criteria** (what must be TRUE):
+  1. `CLAUDE.md` §8 states that Obsidian resolves `[[X]]` by filename + `aliases` (never `title`), and requires every page's `aliases` to include its `title` and `id` slug; the prior "resolves to the title value" claim is gone.
+  2. §5 frontmatter validation checklist includes a `title ∈ aliases` item; `schema/templates/*.md` and `schema/obsidian/*.md` ship the self-alias in their frontmatter.
+  3. `bash bin/sync-claude.sh --check` confirms `AGENTS.md` is byte-identical to `CLAUDE.md` after the edits.
+  4. A decision record (`trigger_type: schema-update`) is authored, registered, and logged, naming the adopted framing (self-alias) and the rejected alternatives (rename files, slug-form links).
+**Non-goals**: No lint code yet; no page data edits yet.
+**Plans**: TBD (set at plan time)
+
+### Phase 15: Lint Enforcement
+
+**Goal**: A mechanical, Obsidian-accurate check makes the self-alias invariant enforceable and auto-fixable, and stops the `orphan` check from masking unresolved links.
+**Depends on**: Phase 14 (the invariant it enforces).
+**Requirements**: LINK-04, LINK-05, LINK-06
+**Success Criteria** (what must be TRUE):
+  1. `bin/lint.sh --category linkres` flags every page whose `title ∉ {filename, aliases}` — and on the current tree reports the ~31 known-broken pages.
+  2. The check flags intra-wiki `[[link]]`s that do not resolve under Obsidian-accurate matching, while NOT flagging intentional knowledge-gap red links (per §3).
+  3. `bin/lint.sh --fix` backfills the self-alias idempotently (a second run makes no changes); the `orphan` check is reconciled so it no longer hides unresolved links.
+  4. New tests under `tests/` cover both detection and `--fix`, and the CI `strict` job stays green.
+**Non-goals**: No bulk data remediation yet (that is Phase 16); no renaming files.
+**Plans**: TBD (set at plan time)
+
+### Phase 16: Data Remediation
+
+**Goal**: The existing vault connects — all real pages carry self-aliases, link-text variants are reconciled, and the graph visibly connects in Obsidian.
+**Depends on**: Phase 14 (convention) and Phase 15 (`--fix` + check).
+**Requirements**: LINK-07, LINK-08, LINK-09, LINK-10
+**Success Criteria** (what must be TRUE):
+  1. `bash bin/lint.sh --category linkres` exits 0 over `wiki/` (every page reachable; no should-resolve link unresolved).
+  2. Link-text variants across `wiki/` (e.g. `[[Bounded Contexts]]`, `[[Hack (Agentive Stack)]]`) are reconciled so they resolve.
+  3. `examples/` pages (kahneman cluster + dataview-fixtures) carry self-aliases and resolve, respecting `example: true` / lint-skip conventions.
+  4. Human-verified: opening the vault at the repo root (`hideUnresolved` on) shows a connected graph; `domain-driven-design.md` and the previously-orphaned pages are no longer orphans.
+**Non-goals**: No near-duplicate page detection (deferred to the `a1-lexical-dedup` todo); no `.obsidian/` config shipped in the template.
+**Plans**: TBD (set at plan time)
 
 ## Backlog
 
@@ -199,3 +245,6 @@ The following are intentionally deferred until real usage demands them, captured
 | 13. Claim Faithfulness Audit | v1.1 | 5/5 | Complete | 2026-06-01 |
 | 13.1. Docs Finalization + Obsidian Starter | v1.1 | 5/5 | Complete | 2026-06-01 |
 | 13.2. v1.1 Closure Verification Gate | v1.1 | 3/3 | Complete | 2026-06-02 |
+| 14. Link-Resolution Convention + Decision Record | v1.1.1 | 0/? | Not started | - |
+| 15. Lint Enforcement | v1.1.1 | 0/? | Not started | - |
+| 16. Data Remediation | v1.1.1 | 0/? | Not started | - |

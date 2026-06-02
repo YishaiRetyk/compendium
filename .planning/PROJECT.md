@@ -8,23 +8,21 @@ A personal knowledge management system where LLM agents incrementally build and 
 
 The wiki is a persistent, compounding artifact — cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested. Knowledge accumulates rather than being re-derived.
 
-## Current Milestone: v1.1 Shareability
+## Current Milestone: v1.1.1 Graph Integrity
 
-**Goal:** Make the v1.0 starter kit usable by technically comfortable early adopters — a template-based starter repo with a two-track setup, git-based collaborative curation, and a safe path for onboarding existing Obsidian vaults.
+**Goal:** Make the wiki's Obsidian graph actually connect. The "Obsidian-first" premise is silently broken: Obsidian resolves `[[X]]` by **filename + `aliases`**, never by the `title` frontmatter — but pages are named by slug (`id == filename`) and linked by spaced `[[Title]]` that isn't in `aliases`, so 31 of 49 wiki pages render as graph orphans. Fix the defect at all three layers — correct the convention, enforce it mechanically, and remediate existing `wiki/` + `examples/` data — so the graph connects and stays connected as new pages are ingested.
 
-**Target features:**
+**Type:** Patch milestone (correctness fix to shipped v1.1). Sequenced **before** the v1.2 schema progressive-disclosure refactor (backlog 999.4), which it de-risks by correcting §8 in place first.
 
-- **Template-based starter repo on GitHub** — cloneable structure with in-repo `/docs/` organized into four explicit tracks (quickstart, guided setup, manual setup, reference), Kahneman cluster moved to `examples/`, empty vault by default.
-- **Two-track setup** — guided wizard (prompts for domain, privacy defaults, LLM agent, generates personalized `AGENTS.md`) *and* a manual hand-edit track for power users; each track has its own docs page.
-- **Git-based collaborative curation** — PR workflow where contributors fork, ingest on a branch, open PR; merge conflicts handled by git + lint gate. Attribution: git commit authorship is the source of truth; `log.md` ingest entries carry a contributor field as a convenience index.
-- **Brownfield vault onboarding** — `bin/brownfield.sh` with four subcommands: `scan` (dry-run markdown report), `bootstrap` (mechanical-only auto: sentinel frontmatter, SHA hashing, `index.md`/`log.md` skeleton, YAML normalization), `suggest` (writes `.brownfield/REPORT.md` plus `.brownfield/migrations/*.sh` — one idempotent staged shell script per transformation class, each printing what it changed), `verify` (runs existing lint after user-applied migrations). Strict mechanical/judgment boundary — page typing, provenance bootstrapping, cross-reference inference, and privacy classification stay in `suggest` only.
-- **Domain-agnostic defaults** — neutral starter content; `AGENTS.md` stripped of Kahneman-specific examples (kept in `examples/` for reference).
+**Target outcomes:**
 
-**Audience:** Technically comfortable early adopters first, with a guided setup path that reduces friction for less technical Obsidian users.
+- **Correct convention** — `CLAUDE.md` §8 states the real resolution rule (filename + aliases, not `title`) and mandates the self-alias invariant (every page's `aliases` includes its `title` and `id` slug); §5 checklist + page templates updated; `AGENTS.md` stays byte-identical; a decision record captures the reality.
+- **Mechanical enforcement** — a new `bin/lint.sh` Obsidian-accurate link-resolution check flags unreachable page titles and should-resolve-but-mismatched body links (distinct from intentional knowledge-gap red links), with `--fix` to auto-backfill the self-alias; the existing `orphan` check is reconciled so it no longer masks the problem.
+- **Data remediation** — all `wiki/` and `examples/` pages carry self-aliases; link-text variants (plural/parens/casing) reconciled; the resolution check exits 0 and the graph visibly connects in Obsidian.
 
-**Deferred to backlog:** Obsidian plugin distribution, one-command installer (`curl|bash`), hosted docs site, brownfield `--apply` mode for judgment-heavy operations (→ v1.2 after the dry-run path is battle-tested).
+**Audience:** Same as v1.1 — technically comfortable early adopters who browse the compiled vault in Obsidian. This makes the shipped "Obsidian-first" promise true.
 
-**v1.0 revisit flags threaded in:** Obsidian render/Dataview verification (deferred from Phase 4) and multi-agent validation (Codex, etc.) — folded into v1.1 verification gates.
+**Deferred to backlog:** Obsidian plugin distribution, one-command installer (`curl|bash`), hosted docs site, brownfield `--apply` mode, and the v1.2 schema progressive-disclosure refactor (999.4) — all sequenced after this patch.
 
 ## Requirements
 
@@ -74,9 +72,11 @@ The wiki is a persistent, compounding artifact — cross-references are already 
 
 Closure gate (Phase 13.2, CLOSE-01..04): `bin/requirements-sync.sh --strict --require-complete` exits 0 milestone-wide (0 drift of 97 requirements; all 97 Complete).
 
-### Active (next milestone — TBD)
+### Active (v1.1.1 Graph Integrity — formal REQ-IDs in REQUIREMENTS.md)
 
-No active requirements yet for the next milestone. Define them with `/gsd-new-milestone`. Candidate backlog: ROADMAP.md Phases 999.3–999.6; v1.2-deferred items: Obsidian plugin distribution, one-command installer, hosted docs site, brownfield `--apply` mode.
+- [ ] Obsidian-accurate link-resolution convention: §8 corrected + self-alias invariant (`title`, `id` ∈ `aliases`) (LINK-01..03)
+- [ ] `bin/lint.sh` resolution check (`linkres`) with `--fix`; reconcile masking `orphan` check (LINK-04..06)
+- [ ] Backfill `wiki/` + `examples/` self-aliases; reconcile link-text variants; graph connects in Obsidian (LINK-07..10)
 
 ### Out of Scope
 
@@ -136,6 +136,8 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
+*Last updated: 2026-06-02 — Milestone v1.1.1 Graph Integrity started. Patch milestone correcting the Obsidian wikilink-resolution defect (Obsidian resolves `[[X]]` by filename + `aliases`, not `title`; 31/49 wiki pages render as graph orphans). Three phases (14–16): convention + DR, lint enforcement (`linkres` + `--fix`), data remediation across `wiki/` + `examples/`. Sequenced before the v1.2 schema refactor (999.4). Requirements LINK-01..10.*
+
 *Last updated: 2026-06-02 after v1.1 Shareability milestone — SHIPPED + ARCHIVED. All 15 v1.1 phase directories (Phases 7–13.2, 52 plans) complete; 97/97 v1.1 requirements Complete with zero drift (`bin/requirements-sync.sh --strict --require-complete` exits 0). Phase 13.2 closure gate (CLOSE-01..04): Obsidian render re-run (Dataview 3/2/2/2/5), Codex agent-parity accepted blocked-on-host-runtime, write-back audited, docs consistency + scope-leak clean. Archived to `.planning/milestones/v1.1-*`; ROADMAP collapsed (Backlog preserved); `REQUIREMENTS.md` removed for a fresh next-milestone; git tag `v1.1`. Deferred: 1 post-v1.1 todo (a1 lexical-dedup lint), backlog 999.3–999.6, v1.2 items (Obsidian plugin, installer, hosted docs, brownfield `--apply`). Next: `/gsd-new-milestone`.*
 
 *Last updated: 2026-05-03 — Phase 12.1 (NEUT-08 Personal-Term Denylist Curation) complete: 7-term defense-in-depth expansion appended to `.neutrality-denylist.txt` under unified `# Category: Personal-vault terms expanded curation (NEUT-08, 2026-05-02)` header (kept set: pre-committing, physical flinch, pre-mortem, pre-mortems, decision fatigue, decision-fatigue, meta-observation). Rubric revised from "hyphenated identifier unique to vault" to include (a) spaced multi-word phrases coined in archived journal sources (precedent: existing denylist uses spaced forms `loss aversion`, `system 1`) and (b) popular cog-bias terms used heavily in vault that would betray vault provenance via LLM-mediated example-leak. NEUT-08 flipped to Complete in REQUIREMENTS.md (line 36 + matrix line 215); 12.1-VERIFICATION.md authored with verbatim D-10 evidence; `bin/requirements-sync.sh --strict --phase 12.1` and `--require-complete --phase 12.1` both exit 0; `bin/check-neutrality.sh` source unchanged across the entire phase. First v1.1 partial-requirement closure, clearing the path for Phase 13.2 v1.1 closure verification gate.*
