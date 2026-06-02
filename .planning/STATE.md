@@ -3,10 +3,10 @@ gsd_state_version: 1.0
 milestone: v1.1.1
 milestone_name: Graph Integrity
 status: planning
-stopped_at: v1.1.1 milestone defined (10 reqs, 3 phases) — ready to plan Phase 14
+stopped_at: v1.1.1 milestone defined (10 reqs, 1 phase / ~3 plans) — ready to plan Phase 14
 last_updated: "2026-06-02T11:03:44.632Z"
 progress:
-  total_phases: 3
+  total_phases: 1
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -37,10 +37,10 @@ Items acknowledged and deferred at the v1.1 milestone close (2026-06-02):
 
 Phase: Not started — Phase 14 (Link-Resolution Convention + Decision Record)
 Plan: —
-Status: Planning — v1.1.1 Graph Integrity defined (LINK-01..10 across Phases 14–16)
+Status: Planning — v1.1.1 Graph Integrity defined (LINK-01..10, single phase / ~3 plans)
 Last activity: 2026-06-02 — Milestone v1.1.1 started
 
-v1.1.1 fixes the Obsidian wikilink-resolution defect: Obsidian resolves `[[X]]` by filename + `aliases`, never `title`, so 31/49 wiki pages render as graph orphans (e.g. `domain-driven-design.md`, which has 11 inbound + 7 outbound links yet shows disconnected). **Phase 14** corrects CLAUDE.md §8 + adds the self-alias invariant (`title`, `id` ∈ `aliases`) + a decision record; **Phase 15** adds the `bin/lint.sh` `linkres` check (Obsidian-accurate resolution; distinguishes intentional knowledge-gap red links) + `--fix` + reconciles the masking `orphan` check; **Phase 16** backfills `wiki/` + `examples/` self-aliases, reconciles link-text variants (`[[Bounded Contexts]]`, `[[Hack (Agentive Stack)]]`), and human-verifies a connected graph. Sequenced before the v1.2 schema refactor (999.4). Next: `/gsd-plan-phase 14` (or `/gsd-discuss-phase 14`).
+v1.1.1 fixes the Obsidian wikilink-resolution defect: Obsidian resolves `[[X]]` by filename + `aliases`, never `title`, so 31/49 wiki pages render as graph orphans (e.g. `domain-driven-design.md`, which has 11 inbound + 7 outbound links yet shows disconnected). **Phase 14 — Graph Link Resolution** is one phase, ~3 plans in 2 waves: **Wave 1** (parallel) — convention (CLAUDE.md §8 + self-alias invariant + §5 checklist + templates + DR) ‖ `bin/lint.sh` `linkres` check (Obsidian-accurate; distinguishes knowledge-gap red links) + `--fix` + reconcile masking `orphan` check + tests; **Wave 2** — data remediation (backfill `wiki/` + `examples/` self-aliases, reconcile link-text variants `[[Bounded Contexts]]`/`[[Hack (Agentive Stack)]]`, human-verify connected graph). Sequenced before the v1.2 schema refactor (999.4). Next: `/gsd-plan-phase 14` (or `/gsd-discuss-phase 14`).
 
 ## v1.1 Shareability — Archived 2026-06-02
 
