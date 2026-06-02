@@ -450,6 +450,6 @@ The following are intentionally deferred until real usage demands them, captured
 | 12. Complementary Systems Boundary + GTD Alignment | v1.1 | 4/4 | Complete    | 2026-05-01 |
 | 12.1. NEUT-08 Personal-Term Denylist Curation | v1.1 | 4/4 | Complete    | 2026-05-03 |
 | 12.2. Local Wiki Write Gate | v1.1 | 5/5 | Complete    | 2026-05-04 |
-| 13. Claim Faithfulness Audit | v1.1 | 0/0 | Not started | - |
-| 13.1. Docs Finalization + Obsidian Starter | v1.1 | 4/5 | In progress | 2026-06-01 |
-| 13.2. v1.1 Closure Verification Gate | v1.1 | 0/0 | Not started | - |
+| 13. Claim Faithfulness Audit | v1.1 | 5/5 | Complete | 2026-06-01 |
+| 13.1. Docs Finalization + Obsidian Starter | v1.1 | 5/5 | Complete | 2026-06-01 |
+| 13.2. v1.1 Closure Verification Gate | v1.1 | 0/3 | Planned | - |

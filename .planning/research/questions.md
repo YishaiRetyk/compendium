@@ -7,9 +7,11 @@ updated: 2026-04-16
 
 Questions surfaced during exploration that need resolution before or during phase planning. Answer inline under each question and mark with `RESOLVED (date)` when closed.
 
+> **STATUS — ALL RESOLVED (2026-06-02).** Both questions below concern "Phase 9.5," which shipped as **Phase 09.1 — Progressive Disclosure Extraction** (2/2 plans, atomic extraction commit `bdcc2fe`, AGENTS.md 1785→1412 lines). Q1 (placeholder/§4 overlap) and Q2 (line/token target) were settled during 09.1 planning/execution. Retained for traceability; no open questions remain. The *next-wave* spec-shrink work (workflow/reference extraction) now lives in backlog **999.4 (v1.2 Schema Architecture)** and the `workflows-operations-to-skills` seed.
+
 ---
 
-## Phase 9.5 — Progressive Disclosure Extraction (opened 2026-04-16)
+## Phase 9.5 — Progressive Disclosure Extraction (opened 2026-04-16) — RESOLVED (2026-06-02, shipped as Phase 09.1)
 
 ### Q1. Does the wizard's placeholder rendering overlap §4 example blocks?
 
