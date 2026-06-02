@@ -28,7 +28,7 @@ Items acknowledged and deferred at the v1.1 milestone close (2026-06-02):
 
 | Category | Item | Status |
 |----------|------|--------|
-| quick_task (pending todo) | `a1-lexical-dedup-lint-category` — near-duplicate page detection (`duplicate` lint category) | Pending — `blocked_on: Phase 13.2` cleared; promote via `/gsd-quick` post-v1.1 |
+| quick_task (DONE) | `a1-lexical-dedup-lint-category` — near-duplicate page detection (`duplicate` lint category) | ✅ Delivered 2026-06-02 via quick task 260602-d6a (commit fcddefc; LINT_VERSION 1.4.0) |
 | backlog | Phases 999.3–999.6 (template placeholder system; v1.2 schema progressive-disclosure refactor; external source drift detection; observed GTD review patterns) | In `.planning/ROADMAP.md` Backlog |
 | v1.2-deferred | Obsidian plugin distribution; one-command installer; hosted docs site; brownfield `--apply` mode | Deferred to v1.2 per PROJECT.md |
 | tech-debt | Pre-existing (per superseded 2026-04-30 audit): 3 unsummarized Kahneman raw sources (DRFT-01); brownfield WR-*/IN-* nits; Phase 11 human-UAT visual items; lint `[[Page Title]]` red-link false-positives | Non-blocking |
@@ -320,7 +320,7 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-- `a1-lexical-dedup-lint-category` (2026-06-02) — near-duplicate page detection (`duplicate` lint category). `blocked_on: Phase 13.2` now cleared; promote via `/gsd-quick` in the next milestone. See `.planning/todos/pending/2026-06-02-a1-lexical-dedup-lint-category.md`.
+- `a1-lexical-dedup-lint-category` — ✅ DONE 2026-06-02 via quick task 260602-d6a (commit fcddefc; `duplicate` lint category, LINT_VERSION 1.4.0). a2/(b)/(c) remain deferred to v1.3 (`.planning/seeds/wiki-quality-heuristics.md`).
 
 ### Roadmap Evolution
 
@@ -342,6 +342,7 @@ Recent decisions affecting current work:
 | 260415-gzu | Flip 9 Pending → Complete in REQUIREMENTS.md (QURY-01/04/05, SOPS-01..06) | 2026-04-15 | 03be48f | [260415-gzu-flip-9-pending-requirements-qury-01-qury](./quick/260415-gzu-flip-9-pending-requirements-qury-01-qury/) |
 | 260501-g5n | requirements-sync strict-mode completion check (Phase 999.7 delivered) | 2026-05-01 | 9130f87 | [260501-g5n-requirements-sync-strict-mode-completion](./quick/260501-g5n-requirements-sync-strict-mode-completion/) |
 | 260503-pl1 | CLAUDE.md placeholder rule for template-public files (companion to Phase 12.1 NEUT-08 denylist) | 2026-05-03 | b1c3691 | (no quick dir — single-line edit via /gsd-fast) |
+| 260602-d6a | a1 lexical near-duplicate page detection (`duplicate` lint category; LINT_VERSION 1.4.0) | 2026-06-02 | fcddefc | [260602-d6a-a1-lexical-dedup-lint-category](./quick/260602-d6a-a1-lexical-dedup-lint-category/) |
 
 ## Session Continuity
 

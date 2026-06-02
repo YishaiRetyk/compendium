@@ -57,3 +57,7 @@ noisy at ship time, gate substring containment behind a token-boundary check.
 
 Phase 13.2 closes (or earlier if a duplicate-ish pair causes real MERGE friction):
 `/gsd-quick add a `duplicate` lexical near-duplicate-page lint category to bin/lint.sh per the seed scope`
+
+---
+
+**STATUS: DONE 2026-06-02** — delivered via quick task `260602-d6a` (commit `fcddefc`). `duplicate` lint category shipped; LINT_VERSION 1.4.0. a2/(b)/(c) remain v1.3-deferred in the seed.
