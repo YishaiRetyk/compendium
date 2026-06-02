@@ -714,20 +714,20 @@ All other claims in this research are VERIFIED against the live codebase.
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Should `LINT_VERSION` be bumped in the same commit as the category addition, or as a final step?**
    - What we know: `test_lint_require_version.sh` pins the current version in assertions.
    - What's unclear: Whether to bump in Wave 1b (same as category addition) or Wave 2 (after tests pass).
-   - Recommendation: Bump in the same commit as the `linkres` category addition (Wave 1b). Tests must be updated atomically with the bump in that commit.
+   - RESOLVED: Bump in the same commit as the `linkres` category addition (Wave 1, Plan 02). Tests must be updated atomically with the bump in that commit. Plan 02 implements this.
 
 2. **Should `--fix` emit one `autofix` finding per page or per alias added?**
    - What we know: `has_contradictions` emits one finding per page. `stale` emits one per claim.
-   - Recommendation: One finding per page (listing what was added), matching `has_contradictions` precedent. Message: `"Added self-aliases: ['Bounded Context', 'bounded-context']"`.
+   - RESOLVED: One finding per page (listing what was added), matching `has_contradictions` precedent. Message: `"Added self-aliases: [<title>, <id>]"`. Plan 02 implements this.
 
 3. **Does `duplicate` category need any change from the resolution map reconciliation?**
    - What we know: `duplicate` builds its own `dup_resolution` from title+aliases (line 1691-1695). It includes title in resolution (unlike the corrected `orphan`/`gap`). Its purpose is finding near-duplicate PAGES, not checking link resolution.
-   - Recommendation: Leave `duplicate` unchanged. Its title-in-resolution is correct for its purpose (detecting "Geoff Hinton" vs "Geoffrey Hinton" as near-dup pages, not as link-resolution issues). Document the intentional separation in a comment.
+   - RESOLVED: Leave `duplicate` unchanged. Its title-in-resolution is correct for its purpose (near-dup PAGE detection, not link-resolution), and is intentionally distinct from the corrected `orphan`/`gap`. Plan 02 leaves it unchanged and documents the intentional separation in a comment.
 
 ---
 

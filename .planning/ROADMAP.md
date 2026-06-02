@@ -53,17 +53,24 @@ Full phase details: [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md)
 **Depends on**: Nothing (sole phase of v1.1.1; sequenced before the v1.2 schema refactor 999.4).
 **Requirements**: LINK-01..10
 **Success Criteria** (what must be TRUE):
+
   1. **Convention (LINK-01..03):** `CLAUDE.md` §8 states Obsidian resolves `[[X]]` by filename + `aliases` (never `title`) and mandates the self-alias invariant (`title`, `id` ∈ `aliases`); §5 checklist + `schema/templates/*.md` + `schema/obsidian/*.md` reflect it; `bin/sync-claude.sh --check` clean; a decision record (`trigger_type: schema-update`) is authored, registered, and logged.
   2. **Enforcement (LINK-04..06):** `bin/lint.sh --category linkres` flags unreachable page titles AND Obsidian-accurate unresolved intra-wiki links (while NOT flagging intentional knowledge-gap red links per §3); `--fix` backfills the self-alias idempotently; the `orphan` check is reconciled so it no longer masks unresolved links; new tests cover both, CI `strict` stays green.
   3. **Remediation (LINK-07..09):** `bin/lint.sh --category linkres` exits 0 over `wiki/`; link-text variants (`[[Bounded Contexts]]`, `[[Hack (Agentive Stack)]]`) are reconciled; `examples/` pages carry self-aliases and resolve (respecting `example: true` / lint-skip).
   4. **Connected graph (LINK-10, human-verify):** opening the vault at the repo root (`hideUnresolved` on) shows a connected graph; `domain-driven-design.md` and the other previously-orphaned pages are no longer orphans.
+
 **Non-goals**: No renaming wiki files to spaced titles; no slug-form link rewrite; no near-duplicate page detection (deferred to the delivered `a1-lexical-dedup` `duplicate` category / future work); no `.obsidian/` config shipped in the template.
 **Suggested plan shape** (set at plan time): ~3 plans in 2 waves — Wave 1: convention+DR ‖ `linkres` lint+`--fix`+tests (docs vs. code, independent); Wave 2: data remediation + variant triage + human-verify (depends on both).
 **Plans:** 3 plans
 
 Plans:
+**Wave 1**
+
 - [ ] 14-01-PLAN.md — Correct CLAUDE.md §8/§5 convention, update 12 schema templates, author schema-update DR, sync AGENTS.md (LINK-01, LINK-02, LINK-03)
 - [ ] 14-02-PLAN.md — Add `linkres` lint category, normalize_link helper, --fix self-alias backfill, reconcile orphan/gap to Obsidian-accurate resolution, bump LINT_VERSION 1.5.0, 8-case test coverage (LINK-04, LINK-05, LINK-06)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 14-03-PLAN.md — Run --fix backfill over wiki/ + examples/ (65 pages), reconcile [[Bounded Contexts]] call site, human-verify connected graph in Obsidian (LINK-07, LINK-08, LINK-09, LINK-10)
 
 ## Backlog
@@ -80,6 +87,7 @@ Plans:
 **Plans:** 0 plans
 
 Plans:
+
 - [ ] TBD (promote with /gsd-review-backlog when ready)
 
 ### Phase 999.4: v1.2 Schema Architecture — Progressive Disclosure Refactor (BACKLOG)
@@ -91,6 +99,7 @@ Plans:
 **Advisor-corrected direction:** Markdown-first, not Claude-skills-first. Two independent advisors rejected a `.claude/skills/`-centric extraction as vendor coupling. Adopted framing: *Claude-optimized, markdown-authoritative, future-harness-friendly.* Core target raised from an initially-proposed 180 lines to 500–700 lines to preserve always-loaded safety invariants (privacy defaults, provenance requirement, MUST NOT list, write-back mandatory, structured-op vocabulary).
 
 **Proposed phase sequence within v1.2:**
+
 - **Phase A — Reference extraction** (low-risk): §4, §5, §6, §7, §8, §13 → `schema/reference/*.md`; §14, §15 → `docs/reference/*.md`; §16 deleted.
 - **Phase B — Workflow extraction** (medium-risk): §9, §10, §11.1–11.4 → `schema/workflows/*.md`; §12 structured-op details → `schema/reference/log-format.md`.
 - **Phase C — Claude skills overlay** (optional): thin `.claude/skills/` wrappers pointing to `schema/workflows/*.md`; skill body is one paragraph (router pattern). Consider `disable-model-invocation: true` for explicit triggering.
@@ -107,6 +116,7 @@ Plans:
 **Plans:** 0 plans
 
 Plans:
+
 - [ ] TBD (promote with /gsd-review-backlog when ready)
 
 ### Phase 999.5: External Source Drift Detection (BACKLOG)
@@ -114,13 +124,16 @@ Plans:
 **Goal:** [Captured for future planning] Extend drift detection from local source-file hash changes to URL-backed sources, marking affected source summaries `stale` when upstream content changes.
 **Origin:** Surfaced 2026-04-24 during roadmap review. Valuable once the wiki contains more live web-backed sources, but lower leverage than local write gating (Phase 12.2), boundary clarification (Phase 12), and claim faithfulness audit (Phase 13).
 **Non-goals:**
+
 - No broad web-ingestion system
 - No automatic re-compilation by default
 - No mandatory network dependency for core workflows
+
 **Requirements:** TBD
 **Plans:** 0 plans
 
 Plans:
+
 - [ ] TBD (promote with /gsd-review-backlog when ready)
 
 ### Phase 999.6: Observed GTD Review Patterns (BACKLOG)
@@ -129,16 +142,19 @@ Plans:
 **Origin:** Surfaced 2026-04-24 during roadmap review. The system should document what has worked, not what ought to work in theory — this prevents speculative template-kit documentation.
 
 **Trigger to promote:**
+
 - Compendium has been used in a GTD review loop for at least 2 months
 - At least 3 Dataview queries or review views are actually re-run in practice
 - At least 2–3 review behaviors have proven durable enough to describe as patterns rather than experiments
 
 **Scope when promoted:**
+
 - Capture observed review patterns
 - Distinguish durable patterns from one-off experiments
 - Document how compendium complements task/working-memory systems in practice
 
 **Non-goals:**
+
 - No task-manager features
 - No premature dashboards marketed as canonical
 - No GTD-specific filesystem/schema expansion without separate justification
@@ -147,6 +163,7 @@ Plans:
 **Plans:** 0 plans
 
 Plans:
+
 - [ ] TBD (promote with /gsd-review-backlog when ready)
 
 ### Archived / Delivered (historical — do not plan against)
@@ -175,20 +192,27 @@ These entries are retained for traceability only. Each was superseded by, promot
 **Goal:** [Captured for future planning — historical] Extend `bin/requirements-sync.sh --strict` so it fails when active requirements are still `Pending` at phase/milestone closure, not just when REQUIREMENTS.md and VERIFICATION.md drift.
 **Origin:** Surfaced 2026-05-01 while reconciling Phase 12.1 (NEUT-08 promotion). Current strict mode passes trivially for any active-but-unstarted phase: `requirements-sync --phase 12.1 --strict` reports "0 drift / NEUT-08 Pending / not found / ok" and exits 0. This means closure gates that lean only on `requirements-sync --strict` cannot detect incomplete work — they can only detect *inconsistent* work. Phase 12.1's success criterion now requires a verification artifact in addition to the drift check; longer term the script itself should encode a closure-mode check.
 **Trigger to promote:**
+
 - Multiple phases approaching closure want a single mechanical "all required REQ-IDs Complete" gate, OR
 - The Phase 13.2 closure-verification gate authoring exposes the same gap and benefits from a shared primitive.
+
 **Scope when promoted:**
+
 - New flag (e.g., `--require-complete` or `--mode closure`) that fails when any in-scope REQ-ID has `Pending` status in REQUIREMENTS.md
 - Composes with `--phase N` for phase-scope closure and `--milestone X` (if added) for milestone-scope closure
 - Preserves backward compatibility: default `--strict` semantics (drift-only) unchanged
+
 **Non-goals:**
+
 - No automatic status flipping
 - No replacement of human-authored verification artifacts
 - No coupling to a specific milestone's closure script
+
 **Requirements:** TBD
 **Plans:** 0 plans
 
 Plans:
+
 - [ ] TBD (promote with /gsd-review-backlog when ready)
 
 ### Explicitly Deferred

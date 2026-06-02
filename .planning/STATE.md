@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.1.1
 milestone_name: Graph Integrity
-status: planning
-stopped_at: Phase 14 context gathered — ready to plan
-resume_file: .planning/phases/14-graph-link-resolution/14-CONTEXT.md
-last_updated: "2026-06-02T16:40:00.000Z"
+status: executing
+stopped_at: Phase 13.2 planned (3 plans created in 2 waves; 0 executed)
+last_updated: "2026-06-02T15:33:55.635Z"
+last_activity: 2026-06-02 -- Phase 14 planning complete
 progress:
-  total_phases: 1
+  total_phases: 8
   completed_phases: 0
-  total_plans: 0
+  total_plans: 3
   completed_plans: 0
   percent: 0
 ---
@@ -38,14 +38,15 @@ Items acknowledged and deferred at the v1.1 milestone close (2026-06-02):
 
 Phase: 14 — Graph Link Resolution (context gathered, not yet planned)
 Plan: —
-Status: Planning — Phase 14 CONTEXT.md written (D-01..08 locked); ready for `/gsd-plan-phase 14`
-Last activity: 2026-06-02 — Phase 14 context gathered (linkres classification, severity, --fix scope, variant remediation)
+Status: Ready to execute
+Last activity: 2026-06-02 -- Phase 14 planning complete
 
 v1.1.1 fixes the Obsidian wikilink-resolution defect: Obsidian resolves `[[X]]` by filename + `aliases`, never `title`, so 31/49 wiki pages render as graph orphans (e.g. `domain-driven-design.md`, which has 11 inbound + 7 outbound links yet shows disconnected). **Phase 14 — Graph Link Resolution** is one phase, ~3 plans in 2 waves: **Wave 1** (parallel) — convention (CLAUDE.md §8 + self-alias invariant + §5 checklist + templates + DR) ‖ `bin/lint.sh` `linkres` check (Obsidian-accurate; distinguishes knowledge-gap red links) + `--fix` + reconcile masking `orphan` check + tests; **Wave 2** — data remediation (backfill `wiki/` + `examples/` self-aliases, reconcile link-text variants `[[Bounded Contexts]]`/`[[Hack (Agentive Stack)]]`, human-verify connected graph). Sequenced before the v1.2 schema refactor (999.4). Next: `/gsd-plan-phase 14` (or `/gsd-discuss-phase 14`).
 
 ## v1.1 Shareability — Archived 2026-06-02
 
 **v1.1 Shareability — SHIPPED + ARCHIVED 2026-06-02.** Phase 13.2 (v1.1 Closure Verification Gate) complete, 3/3 plans:
+
 - 13.2-02 (CLOSE-03/04): docs consistency NO-DRIFT across README/ROADMAP/three-layer-model/boundary DR; scope-leak audit 24 hits all ALLOWED, zero leak.
 - 13.2-01 (CLOSE-02): Obsidian render re-run PASS (Dataview 3/2/2/2/5, Obsidian 1.12.7 / Dataview 0.5.68); DEBT-01 → Complete (sole drift row cleared); Codex column → blocked-on-host-runtime (AppArmor); DEBT-04 audited.
 - 13.2-03 (CLOSE-01): committed dangling 12.2-VERIFIER-REPORT.md; authored SC1 reframing DR (dr-2026-06-02-sc1-examples-isolable-subgraph); CLOSE-01..04 → Complete; paired 13.2-VERIFICATION.md + 13.2-VERIFIER-REPORT.md; `requirements-sync --strict --require-complete` exits 0 milestone-wide (0 drift of 97, all 97 Complete).
