@@ -30,6 +30,21 @@ A `bin/`-computed embedding index (markdown stays source of truth; index regener
 **(e) Local-vs-global query routing (lightest; may not need a full phase).**
 §11.2 query workflow has one inherently-*local* retrieval path. Add: classify a question local-vs-global; for broad/global questions, read `overview` TL;DRs first (a global synthesis layer) rather than deep-reading many entity pages. Cheap query-workflow refinement, no deps. Could ship as a small §11.2 enhancement independent of this phase.
 
+## a1 — scoped & queued (decided 2026-06-02)
+
+**Decision:** ship **a1 (lexical dedup) as a standalone `/gsd-quick`**, queued for **after v1.1 closes (Phase 13.2 gate passes)**. NOT bundled with a2/(b)/(c) — those stay deferred to v1.3 (see grouping note). Rationale: a2 is *"the same code path as a1 with one extra candidate-pairing predicate,"* so a1 is a rework-free foundation, not a detour; a2/(d) additionally need §14 Tier 4 + a local embedding model that don't exist. Tracked as pending todo `2026-06-02-a1-lexical-dedup-lint-category`.
+
+**Firmed scope (grounded in `bin/lint.sh` as of 2026-06-02):**
+- New check in the single python3 block (after `gap`, before `drift`); `add_finding('warning', 'duplicate', loser_path, msg)`; `should_run('duplicate')` gating.
+- Candidate iff same-`type` pair AND (title/alias substring containment, len>5, case-insensitive — OR Levenshtein < 3 on titles >5 chars). Pure-stdlib Levenshtein (no new deps). Survivor = higher inbound-wikilink count (reuse the orphan/crossref link graph). Flag each pair once (lexicographic pair-key).
+- Exclude `EXCLUDE_DIRS`/`examples/`, `example: true`, and `status` in {archived, superseded}. Report-only — no `--fix`, no auto-merge; feeds human-confirmed MERGE (§9).
+- Registration: update `--category`/`--skip-category` help+valid-values; bump `LINT_VERSION` 1.2.0 → 1.3.0 (MINOR); leave OUT of the `--ci` error remap so it stays `warning` (non-blocking). Mirror `AGENTS.md §11.3` categories list → `CLAUDE.md` (pre-commit auto-sync) + `schema/AGENTS.template.md` + `docs/reference/ci.md` if it enumerates categories.
+- Test: positive fixture (`Geoff Hinton`/`Geoffrey Hinton`, same type) → 1 finding naming higher-inbound survivor; negative fixture (distinct same-type pages) → 0 findings.
+
+**Corpus evidence (live wiki, 49 real pages, 2026-06-02):** the substring rule WOULD fire on `entities/anthropic.md` vs `entities/anthropic-financial-services.md` (same type, one name a substring of the other) — and that's a **false positive** (parent org vs. a division). This confirms (a) the check fires on real content and (b) report-only + human-confirmed MERGE is the correct shape: the human dismisses the FP. Watch for substring-rule FP rate when this ships; if noisy, gate substring containment behind a token-boundary check.
+
+**Permanent non-goal (reaffirmed):** auto-merge is NOT "the structured version" of a1 — it violates §9 (MERGE is human-confirmed) and the Phase 12 boundary. Cross-type pairing stays out (an entity and a concept with similar names are not duplicates). Both are out-of-scope below.
+
 ## Why this is deferred
 
 1. **Premature without volume.** These are quality heuristics for a wiki past Tier-1 limits (§14). At current page counts they'd find little and add lint noise. The trigger is observed drift, not a date.
