@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.1.1
 milestone_name: Graph Integrity
-status: executing
-stopped_at: "14-03 in progress — awaiting human Obsidian graph verification (Task 2 checkpoint:human-verify)"
+status: blocked
+stopped_at: "14-03 human-verify FAILED — phase premise invalidated (Obsidian ignores aliases for bare-link resolution); re-plan required"
 last_updated: "2026-06-03T00:00:00.000Z"
-last_activity: 2026-06-03 -- Phase 14 Plan 03 Task 1 complete (commit 47701c6); paused at human-verify checkpoint
+last_activity: 2026-06-03 -- Phase 14 human-verify caught goal-blocking premise error; re-plan chosen (see 14-FINDINGS-premise-invalidated.md)
 progress:
   total_phases: 8
   completed_phases: 0
@@ -36,12 +36,30 @@ Items acknowledged and deferred at the v1.1 milestone close (2026-06-02):
 
 ## Current Position
 
-Phase: 14 (graph-link-resolution) — EXECUTING
-Plan: 3 of 3 (in progress — paused at human-verify checkpoint)
-Status: Awaiting human Obsidian graph verification (Task 2 checkpoint)
-Last activity: 2026-06-03 -- 14-03 Task 1 complete; 45 wiki/ + 8 kahneman pages self-aliased via --fix; 10 dataview-fixture pages hand-edited; [[Ralph Playbook]] call site reconciled; linkres 0 errors
+Phase: 14 (graph-link-resolution) — BLOCKED (premise invalidated; re-plan chosen)
+Plan: 3 of 3 executed, but the human-verify gate (LINK-10) FAILED for a fundamental reason
+Status: Re-plan required. See `.planning/phases/14-graph-link-resolution/14-FINDINGS-premise-invalidated.md`
+Last activity: 2026-06-03 -- human-verify caught goal-blocking premise error; user chose re-plan
 
-v1.1.1 fixes the Obsidian wikilink-resolution defect: Obsidian resolves `[[X]]` by filename + `aliases`, never `title`, so 31/49 wiki pages render as graph orphans (e.g. `domain-driven-design.md`, which has 11 inbound + 7 outbound links yet shows disconnected). **Phase 14 — Graph Link Resolution** is one phase, ~3 plans in 2 waves: **Wave 1** (parallel) — convention (CLAUDE.md §8 + self-alias invariant + §5 checklist + templates + DR) ‖ `bin/lint.sh` `linkres` check (Obsidian-accurate; distinguishes knowledge-gap red links) + `--fix` + reconcile masking `orphan` check + tests; **Wave 2** — data remediation (backfill `wiki/` + `examples/` self-aliases, reconcile link-text variants `[[Bounded Contexts]]`/`[[Hack (Agentive Stack)]]`, human-verify connected graph). Sequenced before the v1.2 schema refactor (999.4). Next: `/gsd-plan-phase 14` (or `/gsd-discuss-phase 14`).
+**CRITICAL FINDING (corrects the milestone premise):** Obsidian's link resolver matches `[[X]]`
+**only against filenames/paths — NEVER against the `aliases` frontmatter** (intentional design,
+confirmed by an Obsidian moderator for v1.12.7). Bare `[[Exact Page Title]]` does not resolve to a
+note that lists that string in `aliases`; aliases are display-text-only (`[[slug|Title]]`) +
+autocomplete. So the self-alias approach shipped by 14-01/02/03 does NOT connect the graph — the ~19
+multi-word-title pages stay orphaned. The §8/§5 convention text, DR
+`dr-2026-06-02-obsidian-filename-alias-resolution`, the 12 templates, and the `linkres` check are all
+built on the wrong premise and must be re-corrected. Real fix options: (1) piped links
+`[[slug|Exact Page Title]]` everywhere (recommended; inverts §8 "no display aliases"; no dependency),
+or (2) bundle a small Obsidian resolver plugin (keeps existing convention; unofficial dependency).
+Sources: https://obsidian.md/help/aliases ; https://forum.obsidian.md/t/wikilink-resolution-does-not-honor-frontmatter-aliases-1-12-7/113902
+
+Side cleanup done this session (keep): removed 11 abandoned `.claude/worktrees/` dirs (86 ghost
+duplicate wiki pages Obsidian was indexing); added `.obsidian/app.json` `userIgnoreFilters` excluding
+non-vault dirs (tests/schema/.planning/.claude/bin/.github/.git). Wave-1 post-merge regressions fixed
+in commit 016abe4 (schema/AGENTS.template.md §5 parity + DR illustrative-`[prov:]` false-positive).
+
+Next: re-discuss/re-plan Phase 14 with the corrected premise — `/gsd-discuss-phase 14` (recommended;
+the piped-links-vs-plugin choice is a real design decision) then `/gsd-plan-phase 14 --gaps`.
 
 ## v1.1 Shareability — Archived 2026-06-02
 
