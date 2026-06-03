@@ -41,7 +41,7 @@ Full phase details: [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md)
 
 ### 🚧 v1.1.1 Graph Integrity (Phase 14)
 
-- [ ] **Phase 14: Graph Link Resolution** — Correct the convention to **uniform piped links** `[[id|Title]]` (§8/§5 + superseding DR; `[[X]]` resolves by filename/path only), enforce it (`bin/lint.sh` `linkres` validates link *targets* + `--fix` bare→piped + reconcile `orphan`), and remediate the data (`wiki/` + `examples/` body links → piped form, connected-graph human-verify). (LINK-01..10)
+- [x] **Phase 14: Graph Link Resolution** — Correct the convention to **uniform piped links** `[[id|Title]]` (§8/§5 + superseding DR; `[[X]]` resolves by filename/path only), enforce it (`bin/lint.sh` `linkres` validates link *targets* + `--fix` bare→piped + reconcile `orphan`), and remediate the data (`wiki/` + `examples/` body links → piped form, connected-graph human-verify). (LINK-01..10) (completed 2026-06-03)
 
 > v1.2+ candidates remain in the Backlog below (Phases 999.3–999.6); the v1.2 schema progressive-disclosure refactor (999.4) is sequenced **after** this patch.
 
@@ -68,7 +68,7 @@ Full phase details: [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md)
 **Non-goals**: No renaming wiki files to spaced titles; no bare slug-form link rewrite (`[[id]]` without display); no bundled Obsidian plugin (CONTEXT D-01; v1.2-deferred); no near-duplicate page detection (delivered `duplicate` category); no `.obsidian/` config shipped in the template.
 **Mode**: re-plan (from scratch; prior plans quarantined). Note the work MIGRATES the prior run's shipped state on `main` (53 self-aliases [kept, vestigial], `linkres`-as-self-alias-check + `--fix` self-alias backfill [re-point], wrong-premise §8/§5/DR/templates [correct]) — it is NOT greenfield.
 **Suggested plan shape** (set at plan time): ~3 plans in 2 waves — Wave 1: convention correction + superseding DR ‖ `linkres`/`--fix` re-point + tests (docs vs. code, independent); Wave 2: data remediation (rewrite `wiki/` + `examples/` body links to piped form) + human-verify (depends on both).
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 
 Plans:
 **Wave 1**
@@ -78,7 +78,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 14-03-PLAN.md — Rewrite wiki/ + examples/ body links to piped form + human-verify connected graph (LINK-07, LINK-08, LINK-09, LINK-10)
+- [x] 14-03-PLAN.md — Rewrite wiki/ + examples/ body links to piped form + human-verify connected graph (LINK-07, LINK-08, LINK-09, LINK-10)
 
 ## Backlog
 
@@ -254,4 +254,4 @@ The following are intentionally deferred until real usage demands them, captured
 | 13. Claim Faithfulness Audit | v1.1 | 5/5 | Complete | 2026-06-01 |
 | 13.1. Docs Finalization + Obsidian Starter | v1.1 | 5/5 | Complete | 2026-06-01 |
 | 13.2. v1.1 Closure Verification Gate | v1.1 | 3/3 | Complete | 2026-06-02 |
-| 14. Graph Link Resolution | v1.1.1 | 2/3 | In Progress|  |
+| 14. Graph Link Resolution | v1.1.1 | 3/3 | Complete   | 2026-06-03 |

@@ -29,10 +29,10 @@ Numbering continues from v1.1. New REQ-ID prefix: `LINK`.
 
 ### Data Remediation (Phase 14, Wave 2)
 
-- [ ] **LINK-07**: All `wiki/` body links are rewritten to uniform piped form `[[id|Title]]`; `bin/lint.sh --category linkres` exits 0 over `wiki/`. (The 53 vestigial self-aliases shipped by the prior run stay — harmless residue, per CONTEXT D-07.)
-- [ ] **LINK-08**: Variant reconciliation is **DISSOLVED** (CONTEXT D-06): under uniform piping, plural/parens/casing live in the cosmetic display text and resolve via the `id` target with zero reconciliation — `[[Bounded Contexts]]` → `[[bounded-context|Bounded Contexts]]` and `[[Hack (Agentive Stack)]]` → `[[hack-agentive-stack|Hack (Agentive Stack)]]` both resolve. Verified: no should-resolve intra-wiki link in `wiki/` remains unresolved after the rewrite.
-- [ ] **LINK-09**: `examples/` pages (kahneman cluster + dataview-fixtures) body links are rewritten to uniform piped form and resolve, respecting `example: true` / lint-skip conventions, so the reference cluster forms a clean connected sub-graph.
-- [ ] **LINK-10**: Human-verified in Obsidian — opening the vault at the repo root (`hideUnresolved` on) shows a connected graph; `domain-driven-design.md` (connected via piped inbound links) and the other previously-orphaned pages are no longer orphans.
+- [x] **LINK-07**: All `wiki/` body links are rewritten to uniform piped form `[[id|Title]]`; `bin/lint.sh --category linkres` exits 0 over `wiki/`. (The 53 vestigial self-aliases shipped by the prior run stay — harmless residue, per CONTEXT D-07.)
+- [x] **LINK-08**: Variant reconciliation is **DISSOLVED** (CONTEXT D-06): under uniform piping, plural/parens/casing live in the cosmetic display text and resolve via the `id` target with zero reconciliation — `[[Bounded Contexts]]` → `[[bounded-context|Bounded Contexts]]` and `[[Hack (Agentive Stack)]]` → `[[hack-agentive-stack|Hack (Agentive Stack)]]` both resolve. Verified: no should-resolve intra-wiki link in `wiki/` remains unresolved after the rewrite.
+- [x] **LINK-09**: `examples/` pages (kahneman cluster + dataview-fixtures) body links are rewritten to uniform piped form and resolve, respecting `example: true` / lint-skip conventions, so the reference cluster forms a clean connected sub-graph.
+- [x] **LINK-10**: Human-verified in Obsidian — opening the vault at the repo root (`hideUnresolved` on) shows a connected graph; `domain-driven-design.md` (connected via piped inbound links) and the other previously-orphaned pages are no longer orphans.
 
 ---
 
@@ -61,7 +61,7 @@ Numbering continues from v1.1. New REQ-ID prefix: `LINK`.
 | LINK-04 | Phase 14 | Pending |
 | LINK-05 | Phase 14 | Pending |
 | LINK-06 | Phase 14 | Pending |
-| LINK-07 | Phase 14 | Pending |
-| LINK-08 | Phase 14 | Pending |
-| LINK-09 | Phase 14 | Pending |
-| LINK-10 | Phase 14 | Pending |
+| LINK-07 | Phase 14 | Complete |
+| LINK-08 | Phase 14 | Complete |
+| LINK-09 | Phase 14 | Complete |
+| LINK-10 | Phase 14 | Complete |
