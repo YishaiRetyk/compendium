@@ -266,3 +266,15 @@ report: wiki/maintenance/lint-report.md
 findings: 0 total (0 errors, 0 warnings, 0 info)
 auto_fixes: 0 applied
 report: wiki/maintenance/lint-report.md
+
+## [2026-06-02] lint | wiki health check
+
+findings: 13 total (0 errors, 8 warnings, 5 info)
+auto_fixes: 0 applied
+report: wiki/maintenance/lint-report.md
+
+## [2026-06-02] lint | wiki health check
+
+findings: 0 total (0 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki/maintenance/lint-report.md
