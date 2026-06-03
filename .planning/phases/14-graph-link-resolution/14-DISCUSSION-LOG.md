@@ -1,74 +1,53 @@
-# Phase 14: Graph Link Resolution - Discussion Log
+# Phase 14: Graph Link Resolution — Discussion Log
 
 > **Audit trail only.** Do not use as input to planning, research, or execution agents.
 > Decisions are captured in CONTEXT.md — this log preserves the alternatives considered.
 
-**Date:** 2026-06-02
-**Phase:** 14-graph-link-resolution
-**Areas discussed:** Red-link discrimination, Variant fix direction, Severity & gating, --fix scope
+**Date:** 2026-06-03 (re-discussion after premise invalidation)
+**Mode:** discuss (default)
+
+Context: the original Phase 14 (self-aliases) was executed, then its premise was proven false at the
+LINK-10 human-verify gate — Obsidian resolves `[[X]]` by filename/path only, never via `aliases`.
+The user chose to re-plan. This discussion settled the corrected approach.
+
+## Area 1 — Resolution mechanism
+
+**Options presented (with tradeoff analysis):**
+- A. Piped links `[[id|Title]]` — resolves in stock Obsidian, clean display, no dependency, plain-markdown, mechanically enforceable.
+- B. Bundle an Obsidian resolver plugin — keeps the clean `[[Title]]` convention + shipped self-alias work, but adds an unofficial/fragile internal-API dependency, violates §1 plain-markdown, and conflicts with the v1.2-deferred plugin-distribution boundary.
+- C. Bare slug `[[id]]` — resolves, but shows ugly slugs in reading view (rejected in prior DR).
+
+**User selection:** **A — Piped links.** ("lock Option A and move on")
+**Rationale:** Only option that is simultaneously stock-Obsidian-resolving, readable, dependency-free, plain-markdown, and lint-enforceable. B's three independent dealbreakers (plain-markdown principle, internal-API fragility, v1.2-boundary) outweigh its zero-rewrite win; C sacrifices readability.
+
+## Area 2 — Piping scope (defines the §8 go-forward rule)
+
+**Options presented (with tradeoff analysis):**
+- Uniform — pipe EVERY link unconditionally (`[[id|Title]]` even for single-word titles). Unconditional rule, trivial exact-match `linkres`, eliminates the variant problem, regression-proof; costs more source verbosity + larger diff.
+- Minimal — pipe only links that don't already filename-resolve (~19 multi-word pages); keep bare `[[Title]]` elsewhere. Cleaner source, smaller diff; but conditional rule, retains variant reconciliation, silent re-orphan risk.
+
+**User selection:** **Uniform.** ("uniform")
+**Rationale:** Unconditional rule is reliable for an LLM-authored, lint-enforced wiki; it dissolves the entire variant-reconciliation layer (display text is cosmetic; only the `id` target resolves) and is regression-proof. Verbosity/churn are one-time, scripted, in source agents don't mind.
+
+## Cascading decisions (Claude's discretion — presented, not objected to)
+- `linkres` re-pointed: validate link *targets* resolve to a known `id` (was: self-alias presence).
+- `--fix` re-pointed: rewrite bare `[[X]]` → `[[id|X]]` for unique matches (was: self-alias backfill).
+- Self-alias invariant DROPPED from §5/§8/templates; the 53 shipped self-aliases KEPT as harmless residue.
+- The wrong-premise DR (`dr-2026-06-02-obsidian-filename-alias-resolution`) SUPERSEDED by a corrected one.
+- LINK-01..10 + ROADMAP success criteria REWRITTEN to the piped-link reality (first re-plan action).
+
+## Deferred ideas
+- Bundle an Obsidian plugin → aligns with v1.2-deferred "plugin distribution".
+- Strip vestigial self-aliases → optional future cleanup.
+- v1.2 schema progressive-disclosure refactor (999.4) → still sequenced after this phase.
+
+## Notes
+- No scope creep raised.
+- Process note / retrospective signal: the original Phase 14 premise came from `14-RESEARCH.md` and
+  was never validated against real Obsidian behavior before the convention/lint/data were built —
+  caught only at the human-verify gate. Validate load-bearing third-party-tool assumptions (here:
+  Obsidian link resolution) empirically before building multiple plans on them.
 
 ---
 
-## Red-link discrimination (LINK-05)
-
-| Option | Description | Selected |
-|--------|-------------|----------|
-| Normalized-match heuristic | Normalize (casefold + depluralize + strip parens/punct); unique match → bug, no match → red link | ✓ (refined) |
-| Strict near-match only | Tight edit-distance only; conservative, may miss parens/word-order variants | |
-| Flag all unresolved, tier by confidence | Report everything, split into likely-bug vs likely-red-link tiers | |
-
-**User's choice:** Option 1, with a refinement that splits the buckets across categories: no-match unresolved links stay in the existing `gap` category, NOT `linkres`. This gives `linkres` a gateable contract. Five-way classification table (OK / title-or-id unreachable=bug / unique normalized match=bug / multi-match=ambiguous warning / no-match=gap red-link candidate).
-**Notes:** Normalization must strip parenthesis *characters*, not parenthetical *content* (`Hack (Agentive Stack)` → `hack agentive stack`). Conservative singular map (contexts→context, policies→policy, contracts→contract); no word reordering, no synonyms, no substring, NO edit distance on the gating path (edit distance stays in `duplicate`). Plan implications: `orphan` must stop using `title` as resolver; `gap` switches to Obsidian-accurate resolution but stays informational; `--fix` self-aliases only; CI can gate because no-match red links are excluded.
-
----
-
-## Variant fix direction (LINK-08)
-
-| Option | Description | Selected |
-|--------|-------------|----------|
-| Edit the link text | Rewrite call sites to canonical title; honors §8, keeps aliases minimal | (default rule) |
-| Add alias to target page | Add variant as alias; less call-site churn but grows alias lists | (narrow use) |
-| Case-by-case at remediation | Per-variant triage during Wave 2, logged | ✓ |
-
-**User's choice:** Option 3, with an explicit default. Default = edit the call site for mechanical variants (`[[Bounded Contexts]]` → `[[Bounded Context]]s`); use aliases ONLY for real alternate names/acronyms. Remediation table by variant type (plural/casing/punctuation → edit link; already-canonical parenthetical → self-alias; real alternate name → alias; ambiguous → manual, documented).
-**Notes:** Aliases must stay meaningful — "not a garbage drawer for every grammatical form." Keeps policy coherent: `--fix` = self-aliases only; LINK-08 Wave 2 = manual body-link cleanup; CI gates resolution defects; prose stays readable.
-
----
-
-## Severity & gating (LINK-04/05)
-
-| Option | Description | Selected |
-|--------|-------------|----------|
-| error (gates CI) | linkres → error in --ci, like orphan/crossref | ✓ (narrow contract) |
-| warning (visible, non-blocking) | linkres → warning, like duplicate/contradiction | |
-| Split: title-unreachable=error, link-variant=warning | Two severities by sub-check certainty | (rejected) |
-
-**User's choice:** Option 1 with a narrow contract — error/gating ONLY for high-confidence defects (title/id unreachable; unique normalized match). No-match → `gap` info; multi-match → warning (manual triage). Explicitly NOT "all unresolved links are errors."
-**Notes:** Rejected the title-vs-variant split (Option 3): after the unique-match rule, a unique variant IS a real graph-integrity defect; warning-only would let the breakage recur. Phase 14 must prevent regression, not just fix today's data.
-
----
-
-## --fix scope (LINK-06)
-
-| Option | Description | Selected |
-|--------|-------------|----------|
-| Self-alias backfill only | --fix injects title + id into aliases idempotently, nothing else | ✓ |
-| Self-alias + unambiguous link rewrites | Also auto-rewrite unique-match body links | |
-
-**User's choice:** Option 1. `--fix` strictly mechanical: ensure aliases exists, add title/id if missing, preserve existing, idempotent, do NOT rewrite body links.
-**Notes:** Even a unique-normalized-match body rewrite is editorial (`[[Bounded Contexts]]` might become `[[Bounded Context]]s` or need rephrasing) → belongs in LINK-08 Wave 2 with judgment recorded. Clean boundary: `--fix` repairs page reachability; humans/agents reconcile prose.
-
-## Claude's Discretion
-
-- `bin/lint.sh` code structure for `linkres` (function decomposition, shared resolution-map/normalization helper, LINT_VERSION MINOR bump, `--category`/`--skip-category` wiring).
-- Exact §8 rewrite prose + §5 checklist item wording + template/schema self-alias wording (neutrality rules apply).
-- DR slug + `affected_pages` for the LINK-03 schema-update decision record.
-- Test decomposition under `tests/`.
-- Whether the pluralization map is a literal dict or tiny rule set (must stay explicit/conservative).
-
-## Deferred Ideas
-
-- Auto-rewrite of body-link variants — permanently out of `--fix` (editorial).
-- Synonym / edit-distance / substring matching for `linkres` — excluded to keep CI trustworthy; edit distance stays in `duplicate`.
-- General stemmer for pluralization — rejected for a small explicit map.
-- v1.2 schema progressive-disclosure refactor (backlog 999.4) — sequenced after this phase.
+*Superseded the original 2026-06-02 discussion log (alias-premise alternatives), preserved in git history.*
