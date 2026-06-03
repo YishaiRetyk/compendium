@@ -68,13 +68,13 @@ Full phase details: [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md)
 **Non-goals**: No renaming wiki files to spaced titles; no bare slug-form link rewrite (`[[id]]` without display); no bundled Obsidian plugin (CONTEXT D-01; v1.2-deferred); no near-duplicate page detection (delivered `duplicate` category); no `.obsidian/` config shipped in the template.
 **Mode**: re-plan (from scratch; prior plans quarantined). Note the work MIGRATES the prior run's shipped state on `main` (53 self-aliases [kept, vestigial], `linkres`-as-self-alias-check + `--fix` self-alias backfill [re-point], wrong-premise §8/§5/DR/templates [correct]) — it is NOT greenfield.
 **Suggested plan shape** (set at plan time): ~3 plans in 2 waves — Wave 1: convention correction + superseding DR ‖ `linkres`/`--fix` re-point + tests (docs vs. code, independent); Wave 2: data remediation (rewrite `wiki/` + `examples/` body links to piped form) + human-verify (depends on both).
-**Plans:** 3 plans
+**Plans:** 2/3 plans executed
 
 Plans:
 **Wave 1**
 
-- [ ] 14-01-PLAN.md — Correct CLAUDE.md/AGENTS.md §8/§5 to piped-link convention, remove self-alias invariant, author superseding DR (LINK-01, LINK-02, LINK-03)
-- [ ] 14-02-PLAN.md — Re-point bin/lint.sh linkres to validate link targets + --fix bare→piped rewrite + re-pointed tests (LINK-04, LINK-05, LINK-06)
+- [x] 14-01-PLAN.md — Correct CLAUDE.md/AGENTS.md §8/§5 to piped-link convention, remove self-alias invariant, author superseding DR (LINK-01, LINK-02, LINK-03)
+- [x] 14-02-PLAN.md — Re-point bin/lint.sh linkres to validate link targets + --fix bare→piped rewrite + re-pointed tests (LINK-04, LINK-05, LINK-06)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
