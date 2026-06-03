@@ -4,8 +4,8 @@ milestone: v1.1.1
 milestone_name: Graph Integrity
 status: executing
 stopped_at: Phase 14 context re-gathered (piped-link approach; premise corrected)
-last_updated: "2026-06-03T12:50:02.296Z"
-last_activity: 2026-06-03 -- Phase 14 planning complete
+last_updated: "2026-06-03T16:21:26.839Z"
+last_activity: 2026-06-03 -- Phase 14 execution started
 progress:
   total_phases: 8
   completed_phases: 0
@@ -36,10 +36,10 @@ Items acknowledged and deferred at the v1.1 milestone close (2026-06-02):
 
 ## Current Position
 
-Phase: 14 (graph-link-resolution) — BLOCKED (premise invalidated; re-plan chosen)
-Plan: 3 of 3 executed, but the human-verify gate (LINK-10) FAILED for a fundamental reason
-Status: Ready to execute
-Last activity: 2026-06-03 -- Phase 14 planning complete
+Phase: 14 (graph-link-resolution) — EXECUTING
+Plan: 1 of 3
+Status: Executing Phase 14
+Last activity: 2026-06-03 -- Phase 14 execution started
 
 **CRITICAL FINDING (corrects the milestone premise):** Obsidian's link resolver matches `[[X]]`
 **only against filenames/paths — NEVER against the `aliases` frontmatter** (intentional design,

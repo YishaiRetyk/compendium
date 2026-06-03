@@ -10,7 +10,7 @@ set -euo pipefail
 # Lint rule-set semver per CI-08 / D-26. Bump MAJOR on breaking changes
 # (removed category, changed severity semantics). MINOR on non-breaking
 # additions. PATCH on bug fixes. --require-version X.Y.Z is a minimum check.
-LINT_VERSION="1.5.0"
+LINT_VERSION="1.6.0"
 
 usage() {
     cat <<'EOF'
@@ -384,6 +384,44 @@ BASE_FIELDS = [
 SOURCE_EXTRA_FIELDS = ['path', 'content_hash', 'ingested_at', 'source_type', 'compilation_status']
 
 WIKILINK_RE = re.compile(r'\[\[([^\]|]+)(?:\|[^\]]+)?\]\]')
+
+# Distinguishing regexes: used by linkres scan (Step C) AND orphan inbound scan (Step D).
+# BARE_LINK_RE: matches bare [[target]] (no pipe). Note: BARE_LINK_RE naively also matches
+# the target side of a piped link; caller must subtract piped spans (see _in_piped helper).
+PIPED_LINK_RE = re.compile(r'\[\[([^\]|]+)\|([^\]]+)\]\]')  # (target, display)
+BARE_LINK_RE  = re.compile(r'\[\[([^\]|\n]+)\]\]')           # bare target, no pipe
+
+# ---------------------------------------------------------------------------
+# Shared markdown-masking helper (review HIGH #2, #3 -- load-bearing).
+# Neutralises YAML frontmatter, fenced code blocks, HTML comments, and inline
+# code spans BEFORE both the linkres scan AND the --fix rewrite so that literal
+# [[id|Title]] / [[X]] examples inside those spans are NEVER flagged or rewritten.
+# The replacement is LENGTH-PRESERVING (newlines kept, other chars -> space)
+# so character offsets are aligned between the masked string and the real content.
+# This is REQUIRED for the positional --fix (Step C): bare-link span offsets
+# found in the masked copy map 1:1 to the real content, enabling splice rewrites
+# that preserve frontmatter and code-fence content byte-for-byte.
+# ---------------------------------------------------------------------------
+
+_FENCE_RE   = re.compile(r'(^|\n)(```|~~~)[^\n]*\n.*?\n\2[ \t]*(?=\n|$)', re.DOTALL)
+_HTMLCOM_RE = re.compile(r'<!--.*?-->', re.DOTALL)
+_INLINE_RE  = re.compile(r'`[^`\n]*`')
+_FM_RE      = re.compile(r'\A---\n.*?\n---\n', re.DOTALL)
+
+def mask_markdown(text):
+    """Return a length-preserving copy of `text` with YAML frontmatter, fenced code,
+    HTML comments, and inline code replaced by spaces (newlines kept). Offsets are
+    preserved so positional --fix can map masked-match spans back to the real content.
+    Order matters: frontmatter and fences first (they may contain <!-- / backticks),
+    then HTML comments, then inline code."""
+    def _blank(m):
+        return ''.join('\n' if c == '\n' else ' ' for c in m.group(0))
+    masked = _FM_RE.sub(_blank, text)
+    masked = _FENCE_RE.sub(_blank, masked)
+    masked = _HTMLCOM_RE.sub(_blank, masked)
+    masked = _INLINE_RE.sub(_blank, masked)
+    return masked
+
 PROV_RE = re.compile(
     r'\[prov:([^#\]]+)#([^|\]]+)'
     r'(?:\|([^|\]]+))?'
@@ -1144,9 +1182,13 @@ def _apply_self_alias_fix(fpath, fm, to_add):
 if should_run('orphan'):
     print("  Checking for orphan pages...", file=sys.stderr)
 
-    # Build Obsidian-accurate resolution map: filename stem + aliases ONLY (not title).
-    # D-03: orphan MUST stop using title as a resolver (title not in aliases -> orphan).
-    obsidian_map = {}  # lowercase (stem OR alias) -> set of page ids
+    # Build resolution map: filename stem / id ONLY (NOT aliases, NOT title).
+    # Review HIGH #5: aliases removed from orphan resolution map so that the 53
+    # vestigial self-aliases on main cannot falsely mark pages as connected.
+    # Obsidian resolves [[X]] by filename/path only; the orphan check must mirror
+    # this: a page is only "reached" by an inbound [[id]] or [[stem]] link,
+    # never by an [[Alias]] link against a vestigial self-alias entry.
+    obsidian_map = {}  # lowercase filename stem -> set of page ids (id-only resolution)
     page_ids = set()
 
     for fpath, fm, body, err in all_pages:
@@ -1158,9 +1200,10 @@ if should_run('orphan'):
         page_ids.add(pid)
         stem = os.path.splitext(os.path.basename(fpath))[0].lower()
         obsidian_map.setdefault(stem, set()).add(pid)
-        for alias in (fm.get('aliases') or []):
-            if alias:
-                obsidian_map.setdefault(str(alias).lower(), set()).add(pid)
+        # NOTE: aliases are intentionally NOT indexed here (review HIGH #5).
+        # The old alias-indexing loop has been removed. Orphan resolution is
+        # filename-stem / id ONLY -- alias membership does not save a page from
+        # being an orphan.
 
     # Keep resolution_map as alias for gap block backward compat (Pitfall 3)
     resolution_map = obsidian_map
@@ -1174,7 +1217,11 @@ if should_run('orphan'):
         if fm is None or body is None:
             continue
         linker_id = fm.get('id', '')
-        wikilinks = WIKILINK_RE.findall(body)
+        # Run over the MASKED body so [[id|Title]] examples inside code fences,
+        # HTML comments, or inline code do NOT count as real inbound links.
+        # WIKILINK_RE yields target-before-pipe for both bare and piped forms,
+        # so a piped [[id|Title]] correctly resolves to the page whose stem == id.
+        wikilinks = WIKILINK_RE.findall(mask_markdown(body))
         for target in wikilinks:
             target_lower = target.strip().lower()
             resolved_ids = resolution_map.get(target_lower, set())
@@ -1188,7 +1235,8 @@ if should_run('orphan'):
         if os.path.exists(spath):
             try:
                 scontent = open(spath, encoding='utf-8').read()
-                wikilinks = WIKILINK_RE.findall(scontent)
+                # Mask special files too so code-fence examples don't create fake links.
+                wikilinks = WIKILINK_RE.findall(mask_markdown(scontent))
                 for target in wikilinks:
                     target_lower = target.strip().lower()
                     resolved_ids = resolution_map.get(target_lower, set())
@@ -1542,6 +1590,7 @@ if should_run('gap'):
     # Reuse the obsidian_map from orphan detection if available, otherwise rebuild.
     # NOTE: the gap block uses `resolution_map` (alias for obsidian_map) for backward compat.
     # The guard is now on `obsidian_map` to match the new variable name (Change 5).
+    # Review HIGH #5: self-build also uses id-only (no aliases), consistent with orphan block.
     if 'obsidian_map' not in dir():
         obsidian_map = {}
         for fpath, fm, body, err in all_pages:
@@ -1552,9 +1601,7 @@ if should_run('gap'):
                 continue
             stem = os.path.splitext(os.path.basename(fpath))[0].lower()
             obsidian_map.setdefault(stem, set()).add(pid)
-            for alias in (fm.get('aliases') or []):
-                if alias:
-                    obsidian_map.setdefault(str(alias).lower(), set()).add(pid)
+            # Aliases intentionally NOT indexed (review HIGH #5: id-only resolution)
         resolution_map = obsidian_map  # backward-compat alias
 
     # Collect all unresolved wikilinks with page context
@@ -1828,17 +1875,168 @@ if should_run('duplicate'):
                             f'Survivor by inbound-link count ({n_loser} vs {n_survivor}).')
 
 # ---------------------------------------------------------------------------
-# Check 9.75: Obsidian-accurate link resolution (linkres) -- LINK-04, LINK-05, LINK-06
+# Check 9.75: Link-FORM + target resolution (linkres) -- LINK-04, LINK-05, LINK-06
+# Rule (D-02 unconditional piped form): every intra-wiki body link MUST be
+# [[id|Title]] with `id` a known page id. Scans/rewrites run over MASKED body.
 # ---------------------------------------------------------------------------
 if should_run('linkres'):
-    print("  Checking Obsidian-accurate link resolution (linkres)...", file=sys.stderr)
+    print("  Checking intra-wiki link form + targets (linkres)...", file=sys.stderr)
 
-    # CONFIRMED HIGH BUG #1 FIX: obsidian_map is built inside should_run('orphan')
-    # (~:1084) and does NOT exist under --category linkres. Build it here
-    # defensively (mirrors the gap block's self-build at ~:1482). When --category all
-    # runs, the orphan block already built it and this is a no-op.
+    # known_ids: lowercase page ids AND filename stems (id == filename by convention).
+    # This is the GATE lookup (D-04: exact id match, no normalization on the gating path).
+    known_ids = set()
+    for fpath, fm, body, err in all_pages:
+        if fm is None:
+            continue
+        pid = fm.get('id', '')
+        if pid:
+            known_ids.add(pid.lower())
+        stem = os.path.splitext(os.path.basename(fpath))[0].lower()
+        known_ids.add(stem)
+
+    # norm_map: normalize(id|title|alias|stem) -> set of page ids. ONLY the --fix matcher
+    # and the "is this a malformed target or a genuine gap?" disambiguation use it.
+    # NOT the gate (gate is exact known_ids membership).
+    norm_map = {}
+    for fpath, fm, body, err in all_pages:
+        if fm is None:
+            continue
+        pid = fm.get('id', '')
+        if not pid:
+            continue
+        stem = os.path.splitext(os.path.basename(fpath))[0]
+        names = [stem, pid] + [str(a) for a in (fm.get('aliases') or []) if a]
+        if fm.get('title'):
+            names.append(str(fm['title']))
+        for name in names:
+            key = normalize_link(name)
+            if key:
+                norm_map.setdefault(key, set()).add(pid)
+
+    # Scan worklist: all wiki pages + index.md + log.md, each as (rel, abs_path, FULL_FILE_TEXT).
+    # CRITICAL (review HIGH #2 / cycle-1 #2 -- frontmatter preservation): the worklist MUST carry
+    # the FULL on-disk file content (read fresh from abs_path), NOT the parsed post-frontmatter
+    # `body`. The positional --fix in Step C writes `new_content` back to `abs_path`; if `raw` were
+    # the body-only string, the rewrite would overwrite the whole file with body-only content,
+    # DROPPING the YAML frontmatter and any pre-body content. mask_markdown()'s _FM_RE already
+    # blanks the leading `---...---` frontmatter block (offset-preserving), so reading the FULL file
+    # is the intended, safe design: frontmatter is masked from the scan yet preserved on write.
+    linkres_scan = []
+    for fpath, fm, body, err in all_pages:
+        if fm is not None and body is not None:
+            try:
+                full = open(fpath, encoding='utf-8').read()  # FULL file, NOT `body`
+            except Exception:
+                continue
+            linkres_scan.append((os.path.relpath(fpath), fpath, full))
+    for special in ('index.md', 'log.md'):
+        sp = os.path.join(wiki_dir, special)
+        if os.path.isfile(sp):
+            try:
+                linkres_scan.append((os.path.relpath(sp), sp, open(sp, encoding='utf-8').read()))
+            except Exception:
+                pass
+
+    def _classify_piped(target):
+        """Return ('ok'|'error'|'gap', correct_id_or_None) for a piped target."""
+        t = target.strip()
+        if t.lower() in known_ids:
+            return ('ok', None)
+        # Path-style target (concepts/foo) is NOT id-only -> error (review MEDIUM).
+        if '/' in t:
+            return ('error', None)
+        normed = normalize_link(t)
+        matches = norm_map.get(normed, set()) if normed else set()
+        if len(matches) == 0:
+            # No known page even by normalization -> deliberate not-yet-existing slug = gap (§3).
+            return ('gap', None)
+        if len(matches) == 1:
+            return ('error', list(matches)[0])  # malformed target that maps to a real page
+        return ('error', None)  # ambiguous malformed target
+
+    for rel, abs_path, raw in linkres_scan:
+        masked = mask_markdown(raw)
+
+        # --- Piped links over the MASKED body ---
+        for m in PIPED_LINK_RE.finditer(masked):
+            target, display = m.group(1), m.group(2)
+            verdict, correct_id = _classify_piped(target)
+            if verdict == 'ok' or verdict == 'gap':
+                continue
+            if '/' in target:
+                add_finding('error', 'linkres', rel,
+                            f"piped link [[{target.strip()}|{display}]] uses a path-style "
+                            f"target; use the bare page id [[id|{display}]] (id-only convention)")
+            elif correct_id:
+                add_finding('error', 'linkres', rel,
+                            f"piped link [[{target.strip()}|{display}]] target "
+                            f"'{target.strip()}' is not a known page id "
+                            f"(did you mean [[{correct_id}|{display}]]?)")
+            else:
+                add_finding('error', 'linkres', rel,
+                            f"piped link [[{target.strip()}|{display}]] target "
+                            f"'{target.strip()}' is not a known page id (ambiguous)")
+
+        # --- Bare links over the MASKED body. EVERY bare link is a finding (D-02). ---
+        # Collect piped spans to subtract, so the bare regex does not re-match a piped target.
+        piped_spans = [(m.start(), m.end()) for m in PIPED_LINK_RE.finditer(masked)]
+        def _in_piped(pos):
+            return any(s <= pos < e for s, e in piped_spans)
+
+        # Accumulate positional rewrites for this file (review suggestion: positional, not global sub).
+        rewrites = []  # (start, end, replacement)
+        for m in BARE_LINK_RE.finditer(masked):
+            if _in_piped(m.start()):
+                continue  # this is the target side of a piped link, not a bare link
+            bare = m.group(1).strip()
+            normed = normalize_link(bare)
+            matches = norm_map.get(normed, set()) if normed else set()
+            if len(matches) == 1:
+                correct_id = list(matches)[0]
+                add_finding('error', 'linkres', rel,
+                            f"bare link [[{bare}]] (no pipe); use [[{correct_id}|{bare}]] "
+                            f"(LINK-04: uniform piped form)")
+                if do_fix and not dry_run:
+                    rewrites.append((m.start(), m.end(), f'[[{correct_id}|{bare}]]'))
+            elif len(matches) == 0:
+                # Bare AND unresolvable: still a FORM error (review HIGH #1) but not auto-fixable
+                # (no unique target). It is BOTH a knowledge-gap red link AND a bare-form violation.
+                add_finding('error', 'linkres', rel,
+                            f"bare link [[{bare}]] (no pipe) has no unique page match; "
+                            f"pipe it as [[<id>|{bare}]] once the target page exists "
+                            f"(LINK-04: bare form not allowed even for red links)")
+            else:
+                add_finding('warning', 'linkres', rel,
+                            f"bare link [[{bare}]] matches multiple pages "
+                            f"{sorted(matches)}; pipe it manually with the intended id "
+                            f"(ambiguous -- cannot auto-fix)")
+
+        # --- Apply positional --fix against the REAL content (offsets aligned via masking) ---
+        # `raw` is the FULL file text (frontmatter + body). Rewrite spans were found in the
+        # MASKED copy, whose offsets are index-aligned to `raw` (mask_markdown is length-
+        # preserving), and bare-link spans NEVER fall inside the masked frontmatter region.
+        # So splicing `raw[last:start] + repl + raw[end:]` and writing it back to abs_path
+        # preserves YAML frontmatter byte-for-byte -- only the intended body bare-link spans
+        # change (review HIGH #2 / cycle-1 #2 frontmatter-corruption fix).
+        if do_fix and not dry_run and rewrites:
+            try:
+                out, last = [], 0
+                for start, end, repl in sorted(rewrites):
+                    out.append(raw[last:start]); out.append(repl); last = end
+                out.append(raw[last:])
+                new_content = ''.join(out)
+                if new_content != raw:
+                    with open(abs_path, 'w', encoding='utf-8') as f:
+                        f.write(new_content)
+                    add_finding('info', 'autofix', rel,
+                                f'Rewrote {len(rewrites)} bare link(s) to piped form')
+            except Exception as e:
+                print(f"  warn: --fix failed on {rel}: {e}", file=sys.stderr)
+
+    # Also rebuild obsidian_map without aliases for the gap block's resolution_map,
+    # if it hasn't been built yet (--category linkres without --category orphan).
     if 'obsidian_map' not in dir():
-        obsidian_map = {}  # lowercase (stem OR alias) -> set of page ids; NOT title (D-03)
+        obsidian_map = {}  # lowercase filename stem -> set of page ids (id-only, no aliases)
         for fpath, fm, body, err in all_pages:
             if fm is None:
                 continue
@@ -1847,129 +2045,7 @@ if should_run('linkres'):
                 continue
             stem = os.path.splitext(os.path.basename(fpath))[0].lower()
             obsidian_map.setdefault(stem, set()).add(pid)
-            for alias in (fm.get('aliases') or []):
-                if alias:
-                    obsidian_map.setdefault(str(alias).lower(), set()).add(pid)
         resolution_map = obsidian_map  # backward-compat alias for gap block
-
-    # --- Subcheck A: self-alias invariant (LINK-02, LINK-04, LINK-06) ---
-    # CONFIRMED HIGH (Cycle-2) + MEDIUM (Cycle-3), both orchestrator-verified: BOTH the
-    # linkres ERROR condition AND the --fix `to_add` are computed from LITERAL ALIAS
-    # MEMBERSHIP (existing_lower), NOT from stem-inclusive `reachable`.
-    # Rationale: LINK-02 mandates the literal invariant "every page's `aliases` includes
-    # its `title` AND `id` slug" as a HARD requirement. For a compliant-by-stem page where
-    # id == filename, the id is ALREADY stem-reachable -- so a `reachable`-based predicate
-    # would (a) never append the id to `to_add` (the Cycle-2 regression -- it left Plan 03's
-    # domain-driven-design dual-alias assertion unsatisfiable), AND (b) let the page pass CI
-    # clean without the literal id alias (the Cycle-3 MEDIUM -- LINK-02 would be only
-    # --fix-healed, not CI-enforced). Computing BOTH error and to_add against existing_lower
-    # makes LINK-02 a CI-hard invariant per D-05 ("prevent regression, not just clean data")
-    # and guarantees the error predicate and the --fix predicate are identical.
-    for fpath, fm, body, err in all_pages:
-        if fm is None:
-            continue
-        pid = fm.get('id', '')
-        title = fm.get('title', '')
-        stem = os.path.splitext(os.path.basename(fpath))[0]
-        aliases = [str(a) for a in (fm.get('aliases') or []) if a]
-        existing_lower = {a.lower() for a in aliases}     # LITERAL alias membership (drives BOTH error + --fix)
-        reachable = {stem.lower()} | existing_lower        # Obsidian resolvability (informational only)
-        rel = os.path.relpath(fpath)
-
-        # Error condition (LINK-02 CI-ENFORCEMENT -- Cycle-3 MEDIUM ruling):
-        # LINK-02 is a HARD invariant ("every page's `aliases` MUST include its `title`
-        # and `id` slug"), so the linkres ERROR (not just --fix) gates on LITERAL alias
-        # membership, NOT mere stem-reachability. A page with id == filename but missing
-        # the literal id alias IS a CI error -- even though Obsidian would still resolve it
-        # by stem -- because LINK-02 mandates the explicit alias and D-05's "prevent
-        # regression, not just clean data" framing requires CI to catch the missing alias.
-        if title and title.lower() not in existing_lower:
-            why = ("Obsidian will not resolve [[%s]]" % title) if title.lower() not in reachable \
-                  else "resolves by filename stem but LINK-02 requires the literal title alias"
-            add_finding('error', 'linkres', rel,
-                        f"title '{title}' is not a literal member of aliases "
-                        f"({why}); run --fix to add self-alias")
-        if pid and pid.lower() not in existing_lower:
-            why = "not reachable via filename or aliases" if pid.lower() not in reachable \
-                  else "reachable via filename stem but LINK-02 requires the literal id alias"
-            add_finding('error', 'linkres', rel,
-                        f"id '{pid}' is not a literal member of aliases "
-                        f"({why}); run --fix to add self-alias")
-
-        # --fix: enforce the LITERAL self-alias invariant (LINK-02) independent of
-        # reachability. Add title and/or id whenever they are absent from the actual
-        # aliases list -- so id is added even when id == filename (stem-reachable).
-        to_add = []
-        if title and title.lower() not in existing_lower:
-            to_add.append(title)
-        if pid and pid.lower() not in existing_lower:
-            to_add.append(pid)
-
-        if to_add and do_fix and not dry_run:
-            _apply_self_alias_fix(fpath, fm, to_add)  # single combined call
-
-    # --- Subcheck B: body link variants (LINK-05) ---
-    # Build normalized map: normalize(stem OR alias OR title) -> set of page ids
-    norm_map = {}
-    for fpath, fm, body, err in all_pages:
-        if fm is None:
-            continue
-        pid = fm.get('id', '')
-        stem = os.path.splitext(os.path.basename(fpath))[0]
-        aliases = [str(a) for a in (fm.get('aliases') or []) if a]
-        for name in ([stem] + aliases):
-            key = normalize_link(name)
-            if key:
-                norm_map.setdefault(key, set()).add(pid)
-        # Also add title to norm_map (links using exact title can be normalized-matched)
-        if fm.get('title'):
-            key = normalize_link(fm['title'])
-            if key:
-                norm_map.setdefault(key, set()).add(pid)
-
-    # Check all body links (reuse obsidian_map for exact Obsidian-accurate resolution).
-    # Build the scan worklist as (rel, body) pairs. MEDIUM (Cycle-2 Codex): all_pages
-    # EXCLUDES wiki/index.md and wiki/log.md (EXCLUDE_FILES at lint.sh:395), yet the
-    # orphan block DOES scan them for wikilinks (lint.sh:1124-1125) and broken links in
-    # index.md/log.md must not evade LINK-05. Append index.md/log.md to the linkres
-    # body-link scan too (mirrors the orphan check's link-graph breadth). They are SCANNED
-    # as link sources only -- they are not pages with frontmatter, so Subcheck A does not
-    # apply to them.
-    linkres_scan = [(os.path.relpath(fpath), body)
-                    for fpath, fm, body, err in all_pages
-                    if fm is not None and body is not None]
-    for special in ('index.md', 'log.md'):
-        sp = os.path.join(wiki_dir, special)
-        if os.path.isfile(sp):
-            try:
-                linkres_scan.append((os.path.relpath(sp), open(sp, encoding='utf-8').read()))
-            except Exception:
-                pass
-
-    for rel, body in linkres_scan:
-        for target in WIKILINK_RE.findall(body):
-            t = target.strip()
-            t_lower = t.lower()
-            # Skip if resolves correctly via Obsidian rules (stem or alias)
-            if t_lower in obsidian_map:
-                continue
-            # Check normalized match
-            normed = normalize_link(t)
-            matches = norm_map.get(normed, set()) if normed else set()
-            if len(matches) == 0:
-                continue  # Genuine red link / knowledge-gap candidate -- gap handles this
-            elif len(matches) == 1:
-                target_id = list(matches)[0]
-                add_finding('error', 'linkres', rel,
-                            f"[[{t}]] does not resolve under Obsidian rules "
-                            f"(no filename-stem or alias match), but uniquely "
-                            f"normalized-matches '{target_id}' (D-02); "
-                            f"fix: add alias OR correct link text to canonical title")
-            else:
-                add_finding('warning', 'linkres', rel,
-                            f"[[{t}]] does not resolve under Obsidian rules "
-                            f"and normalized-matches multiple pages: {sorted(matches)}; "
-                            f"manual triage required")
 
 # ---------------------------------------------------------------------------
 # Check 10: Drift detection (DRFT-01, DRFT-02, DRFT-03, DRFT-04)
