@@ -1,119 +1,133 @@
 ---
 phase: 14
 reviewers: [codex]
-reviewed_at: 2026-06-03T15:40:00Z
+reviewed_at: 2026-06-03T16:10:00Z
 plans_reviewed: [14-01-PLAN.md, 14-02-PLAN.md, 14-03-PLAN.md]
-cycle: 3
+cycle: 4
 ---
 
-# Cross-AI Plan Review — Phase 14 (Convergence Cycle 3)
+# Cross-AI Plan Review — Phase 14 (Convergence Cycle 4)
 
-> Convergence cycle 3. The Phase 14 plans (uniform piped links `[[id|Title]]`) were revised to
-> address the 3 HIGH-severity concerns Codex raised in cycle 2. This review assesses the CURRENT
-> plan text and reports only the HIGHs that REMAIN UNRESOLVED.
+> Convergence cycle 4. The Phase 14 plans (uniform piped links `[[id|Title]]`) were revised to
+> address the 2 remaining HIGH-severity concerns Codex raised in cycle 3. This review assesses the
+> CURRENT plan text and reports only the HIGHs that REMAIN UNRESOLVED.
 >
-> **Cycle-2 → cycle-3 disposition:** 2 of 3 cycle-2 HIGHs FULLY RESOLVED (#1 `--fix` frontmatter,
-> #2 T4 fixture); 1 PARTIALLY RESOLVED (#3 unmasked literals — now only `wiki/index.md`); plus 1
-> NEW HIGH raised this cycle (T5 multi-match fixture). **Unresolved HIGH count this cycle: 2.**
+> **Cycle-3 → cycle-4 disposition:** BOTH cycle-3 HIGHs FULLY RESOLVED (#1 backtick the
+> `wiki/index.md` DR literal + extend the unmasked-literal scanner to index.md/log.md/decisions;
+> #2 T5 fixture re-pointed to the "Gamma Contract"/"Gamma Contracts" `_PLURAL_MAP`-collapsing pair).
+> The cycle-3 MEDIUM (stale T-14-03-01 threat-model wording) is also corrected. **One NEW HIGH was
+> raised this cycle:** the plans' load-bearing `linkres wiki/` exit-0 gate is a no-op in plain text
+> mode. **Unresolved HIGH count this cycle: 1.**
 
 ## Codex Review
 
 **Summary**
 
-The cycle-3 plans close the two core implementation defects well: frontmatter preservation is now
-explicitly designed around full-file positional rewrites, and T4's malformed-target fixture now
-correctly normalizes to a known id. One cycle-2 literal-link issue is only partially closed because
-14-01 still authors an unbackticked literal `[[id|Title]]` in `wiki/index.md`. There is also one
-new HIGH: the T5 multi-match fixture is internally inconsistent with the actual normalizer.
+The cycle-4 plans close both cycle-3 defects cleanly: the `wiki/index.md` DR-entry literal is now
+backticked and the unmasked-literal scanner (14-01 Task 3 Step E + verify items 17-18) covers
+`index.md` + `log.md` + `decisions/*.md`, so the literal can no longer slip past every automated
+check; and T5 is re-pointed to the "Gamma Contract"/"Gamma Contracts" pair, which genuinely collapses
+to one key under the actual `_PLURAL_MAP` (`contracts → contract`) — verified against
+`bin/lint.sh:1081`. However, the revision surfaces a NEW, code-verified HIGH that the plans inherited
+silently: the `linkres wiki/` exit-0 gate the plans repeatedly treat as authoritative does NOT fail
+in plain text mode — `bin/lint.sh` only exits non-zero under `--ci`/`--strict`.
 
-**Cycle-2 HIGH Disposition**
+**Cycle-3 HIGH Disposition**
 
-| Cycle-2 HIGH | Disposition | Verification |
+| Cycle-3 HIGH | Disposition | Verification |
 |---|---:|---|
-| #1 14-02 `--fix` frontmatter corruption | FULLY RESOLVED | 14-02 now reads the full file into `linkres_scan` (`open(fpath).read()`, NOT parsed `body`), masks frontmatter length-preservingly via `_FM_RE`, rewrites by positional `raw[last:start]` splicing, and adds T13 byte-for-byte frontmatter-preservation regression. |
-| #2 T4 fixture inconsistency | FULLY RESOLVED | `[[Alpha!|Alpha]]` is valid: `Alpha!` is not literal id `alpha`, but `normalize_link("Alpha!")` strips `!` via `_PUNCT_RE` → `"alpha"`, producing exactly one normalized match → verdict `error`, not `gap`. Verified against `bin/lint.sh` normalize_link. |
-| #3 Unmasked literal wikilinks in live wiki/DR/log prose | PARTIALLY RESOLVED | Old-DR `[[X]]` and the 14-03 log-entry literals are now backticked, but 14-01 Task 3 Step C still adds an unbackticked literal `[[id|Title]]` to the `wiki/index.md` DR summary entry. |
+| #1 Unbackticked literal `[[id|Title]]` in `wiki/index.md` DR entry | FULLY RESOLVED | 14-01 Task 3 Step C now authors the index entry with backticked `` `[[id|Title]]` `` (the only unbackticked `[[...]]` is the real piped link to the new DR), explains why the literal must be masked, and Task 3 Step E adds an unmasked-literal scanner over `wiki/index.md` + `wiki/log.md` + the touched `wiki/decisions/*.md` files. Verify items 17-18 grep `-F '`[[id\|Title]]`'` (backticked present) AND `-E '[^`]\[\[id\|Title\]\][^`]'` (no unbackticked) over `index.md`. The cycle-3 gap (verify only inspected the two DR files) is closed. |
+| #2 T5 multi-match fixture broken ("Topics"/"Topic" not in `_PLURAL_MAP`) | FULLY RESOLVED | 14-02 Task 2 replaces the broken pair with `gamma-one` title="Gamma Contract" / `gamma-two` title="Gamma Contracts"; bare `[[gamma contracts]]` normalizes to "gamma contract" matching BOTH → exactly ONE `warning`. Verified against `bin/lint.sh:1081` (`_PLURAL_MAP = {'contexts','policies','contracts'}` — "contracts"→"contract" collapses; "topics" does not). Verify item 13 + acceptance assert `grep -c "Gamma Topics\|Gamma Topic"` returns 0 (broken pair removed) AND `gamma contracts` present. |
+
+**Cycle-3 MEDIUM Disposition (non-HIGH, tracked for completeness)**
+
+- T-14-03-01 threat-model wording: FULLY RESOLVED. 14-03's T-14-03-01 now reads "--fix (from 14-02)
+  reads the FULL on-disk file and applies POSITIONAL span splices whose offsets are aligned via
+  14-02's length-preserving `mask_markdown()`" — matching the corrected full-file + mask design, not
+  the stale "regex scoped to post-frontmatter body" phrasing.
 
 **Strengths**
 
-- The masking/offset-preservation design is sound: full-file input plus length-preserving masking
-  avoids the prior frontmatter-drop failure mode.
-- T13 is the right regression guard — it proves the exact corruption scenario cannot recur silently.
-- Dependency ordering is now clear: 14-03 depends on 14-01 and 14-02, and the final post-log
-  `linkres wiki/` gate is correctly placed AFTER the log append (14-03 Task 2 Step D).
-- The examples/ dedicated masked scanner avoids the vacuous `bin/lint.sh examples/` pass caused by
-  `EXCLUDE_DIRS` exclusions.
-- The old-DR redirect note correctly distinguishes the real successor link (live, piped) from the
-  literal `` `[[X]]` `` example (backticked).
+- Both cycle-3 HIGHs are closed with verification that points at exact, code-confirmed mechanics
+  (the `_PLURAL_MAP` collapse and the backtick-scanner coverage extension).
+- The 14-01 unmasked-literal scanner (Task 3 Step E) is the right structural fix — it generalises the
+  per-file backtick check to every live `wiki/` file the plan writes, not just the two DR files.
+- The masking/offset-preservation design (14-02), the T13 frontmatter-preservation regression, and the
+  Wave 1 → Wave 2 dependency ordering all remain sound from cycles 2-3.
+- The dedicated masked `examples/` scanner (14-03 Task 2 Step B) correctly avoids the vacuous
+  `bin/lint.sh examples/` pass (verified: `EXCLUDE_DIRS = {'maintenance', 'examples'}` at
+  `bin/lint.sh:397`).
 
 **Concerns**
 
-- **HIGH (PARTIALLY RESOLVED cycle-2 #3): `wiki/index.md` still gets an unmasked literal placeholder
-  link.** 14-01 Task 3 Step C instructs adding the index entry:
-  `` - [[dr-2026-06-03-uniform-piped-links|...]] -- Corrects §8 to mandate uniform [[id|Title]] piped links; ... ``
-  The second `[[id|Title]]` is a literal documentation example, is NOT a real link to a known page
-  id, and is NOT backticked. Under 14-02's `_classify_piped()`, `"id"` is not a known id, normalizes
-  to `"id"` (no page match), has no `/` → returns `gap` → `continue` (no finding). So it does NOT
-  break the `linkres wiki/` exit-0 gate, but it (a) survives as a spurious unresolved red-link node
-  in the Obsidian graph and (b) violates 14-01's own must-have ("the ONLY unbackticked `[[...]]`
-  links are real piped links to known page ids"). 14-01's automated verify only checks the new-DR
-  and old-DR files for backticking — NOT `index.md` — so this literal slips past every automated
-  check in the plan. *Fix: backtick it — ``mandate uniform `[[id|Title]]` piped links``.*
-
-- **HIGH (NEW this cycle): T5's multi-match fixture does not actually create a multi-match.**
-  14-02 Task 2 specifies fixtures `gamma-one` title="Gamma Topics" and `gamma-two` title="Gamma Topic",
-  asserting "both normalize to gamma-topic" so bare `[[gamma topics]]` yields a multi-match WARNING.
-  But `_PLURAL_MAP` in `bin/lint.sh` (lines 1081-1084) only maps `contexts`/`policies`/`contracts` —
-  NOT `topics`. So `normalize_link("Gamma Topics")` → `"gamma topics"` and
-  `normalize_link("Gamma Topic")` → `"gamma topic"` are DIFFERENT keys: `[[gamma topics]]` matches
-  only gamma-one (unique) → the unique-match error+fixable path, NOT the asserted multi-match WARNING.
-  T5 as written will fail (verified against `bin/lint.sh:1081`). *Fix: use a pair the `_PLURAL_MAP`
-  actually collapses (e.g. titles "Gamma Contract" / "Gamma Contracts" with bare `[[gamma contracts]]`),
-  or two pages whose titles normalize identically by some other documented rule.*
+- **HIGH (NEW this cycle): the `linkres wiki/` exit-0 gate is a no-op in plain text mode.** The plans
+  repeatedly treat `bash bin/lint.sh --category linkres wiki/` "exits 0" as the authoritative proof
+  that no bare/broken links remain — most critically 14-03 Task 2 Step D (the "FINAL authoritative
+  final wiki/ linkres gate" introduced to catch an unbackticked literal in the appended log prose),
+  plus 14-03 Task 1 Step E, the must_haves truth (line 79), the `<verify><automated>` blocks
+  (lines 285, 415), verification item 6 (lines 495-499), and success criteria (lines 505, 512). But
+  `bin/lint.sh` exits non-zero ONLY under `--ci` or `--strict` (verified at `bin/lint.sh:2281-2284`
+  and `2407-2410`: `if CI_MODE or STRICT_MODE: sys.exit(1 if has_error else 0)` else `sys.exit(0)`).
+  In plain text mode it ALWAYS exits 0 even with error-severity `linkres` findings. So every
+  plain-mode "exits 0" gate in 14-03 passes unconditionally and proves nothing — including the
+  load-bearing Step D post-append gate that was specifically added to catch a cycle-3-style
+  unbackticked-literal defect in the log entry. (Note 14-03 Task 1's `acceptance_criteria` at line 293
+  DOES use a correct JSON-parsing error-count assertion — but the `<verify><automated>` blocks, the
+  must_haves, Step D, and the verification/success-criteria sections that the executor will actually
+  run as gates do not.) *Fix: route every authoritative `linkres wiki/` gate through `--ci`
+  (`bash bin/lint.sh --ci --category linkres wiki/`, which exits 1 on any error-severity finding) OR
+  through the `--format json | python3 ... count errors == 0` pattern already used at line 293 — and
+  apply the same to 14-03 Task 1 Step E, Task 2 Step D, the must_haves truth, the two `<automated>`
+  blocks, verification item 6, and success criteria. Additionally, because 14-02's own design
+  classifies an unbackticked literal `[[id|Title]]` as a `gap` (not a `linkres` error), even a correct
+  error-counting gate will NOT catch that specific spurious-graph-node case — so 14-03 Step D should
+  ALSO run the 14-01 Step E unmasked-literal scanner over the freshly-appended `wiki/log.md` entry,
+  not rely on `linkres` alone.*
 
 **Suggestions**
 
-- Backtick the literal in the 14-01 index entry: ``mandate uniform `[[id|Title]]` piped links``.
-- Add a verification grep/scanner for unmasked placeholder targets (`[[id|...]]`, `[[X]]`,
-  `[[Title]]`, `[[<...>|...]]`) across `wiki/index.md`, `wiki/log.md`, and `wiki/decisions/*.md` —
-  not just the two DR files.
-- Fix T5 with a plural pair covered by `_PLURAL_MAP` (e.g. "Gamma Contract" / "Gamma Contracts"),
-  or two pages with an identical normalized title.
-- Update 14-03's stale threat-model wording ("--fix regex scoped to post-frontmatter body" in
-  T-14-03-01) to match the corrected full-file-plus-mask design from 14-02.
+- Replace every plain-mode `bash bin/lint.sh --category linkres wiki/; echo "exit: $?"` gate in 14-03
+  with `bash bin/lint.sh --ci --category linkres wiki/` (real exit-1-on-error) or the line-293
+  JSON-error-count pattern; state once, authoritatively, that plain text mode never gates.
+- In 14-03 Task 2 Step D, additionally invoke the 14-01 Task 3 Step E unmasked-literal scanner over
+  the appended log entry — `linkres` alone cannot catch the `[[id|Title]]` gap-classified literal.
+- Harmonise the must_haves truth (line 79), verification item 6, and success criteria (lines 505, 512)
+  with the corrected gate so the plan is internally consistent about what "the gate" actually is.
 
 **Risk Assessment**
 
-Overall risk is **HIGH as written** until the two remaining HIGHs are patched. The production
-rewrite design is much stronger than cycle 2, but the live `wiki/index.md` placeholder can survive
-lint as a silent `gap` (spurious graph node + violates the plan's own must-have), and the T5 fixture
-as written will misvalidate / break the re-pointed test suite.
+Overall risk is **HIGH as written** until the gate defect is patched. The two cycle-3 HIGHs are
+genuinely closed, and the production rewrite + fixture designs are strong. But the single most
+load-bearing safety check in Wave 2 — the post-append `linkres wiki/` gate that is supposed to catch
+exactly the unbackticked-literal class of defect this convergence loop has been fighting — cannot
+fail in the mode the plan invokes it. The executor would see a green "exits 0" and ship a wiki that
+still contains bare-link errors or a spurious-node literal.
 
-Unresolved HIGH count this cycle: 2.
+Unresolved HIGH count this cycle: 1.
 
 ---
 
 ## Consensus Summary
 
-Only one reviewer (Codex) was invoked (`--codex`), consistent with cycles 1 and 2.
+Only one reviewer (Codex) was invoked (`--codex`), consistent with cycles 1-3.
 
 ### Agreed Strengths
 
-- Sound masking/offset-preservation design (full-file input + length-preserving mask) — closes the
-  cycle-2 frontmatter-corruption HIGH.
-- T13 frontmatter-preservation regression test is the correct guard.
-- T4 fixture corrected to `[[Alpha!|Alpha]]` — now genuinely yields `error`, not `gap`.
-- Correct Wave 2 dependency ordering + final post-log `linkres wiki/` gate.
-- Dedicated masked `examples/` scanner (non-vacuous).
+- Both cycle-3 HIGHs FULLY RESOLVED with code-confirmed verification (backtick scanner coverage
+  extension; T5 `_PLURAL_MAP`-collapsing "Gamma Contract"/"Gamma Contracts" pair).
+- Cycle-3 MEDIUM (stale T-14-03-01 wording) corrected.
+- Sound masking/offset-preservation + T13 frontmatter regression + Wave ordering carry over intact.
+- Non-vacuous dedicated `examples/` scanner (bin/lint.sh excludes examples/).
 
-### Agreed Concerns (cycle-3 unresolved HIGHs — 2)
+### Agreed Concerns (cycle-4 unresolved HIGHs — 1)
 
-1. **Unbackticked literal `[[id|Title]]` in the `wiki/index.md` DR entry (cycle-2 #3, PARTIALLY
-   RESOLVED)** — survives the linkres gate as a silent `gap`, produces a spurious unresolved graph
-   node, and violates 14-01's own must-have; 14-01's backtick verify never checks `index.md`.
-2. **T5 multi-match fixture broken (NEW)** — "Topics"/"Topic" are not in `_PLURAL_MAP`
-   (only contexts/policies/contracts), so they normalize to distinct keys: `[[gamma topics]]` is a
-   unique match, not the asserted multi-match WARNING. The re-pointed test will fail.
+1. **`linkres wiki/` exit-0 gate is a no-op in plain text mode (NEW)** — `bin/lint.sh` exits non-zero
+   only under `--ci`/`--strict` (verified `bin/lint.sh:2281-2284`, `2407-2410`); plain mode always
+   exits 0 even with error findings. Every plain-mode "exits 0" gate in 14-03 (incl. the load-bearing
+   Task 2 Step D post-append gate) passes unconditionally. Must route through `--ci` or JSON
+   error-count parsing; and Step D must also run the unmasked-literal scanner over the appended log
+   prose (since 14-02 classifies an unbackticked `[[id|Title]]` literal as a `gap`, not a `linkres`
+   error).
 
 ### Divergent Views
 
@@ -121,12 +135,12 @@ None — single reviewer.
 
 ### Recommended next action
 
-Re-plan to fold in the 2 remaining HIGHs before executing Wave 1:
-- 14-01 Task 3 Step C: backtick the literal `[[id|Title]]` in the `wiki/index.md` entry, and extend
-  the backtick/unmasked-literal verify to cover `index.md` (+ `log.md`, `decisions/*.md`).
-- 14-02 Task 2: fix the T5 fixture to a plural pair actually collapsed by `_PLURAL_MAP` (e.g.
-  "Gamma Contract" / "Gamma Contracts") so `[[gamma contracts]]` truly yields a multi-match WARNING.
-- (MEDIUM/cleanup) 14-03 T-14-03-01: correct the stale "regex scoped to post-frontmatter body"
-  threat-model wording.
+Re-plan to fold in the 1 remaining HIGH before executing Wave 2:
+- 14-03: convert every authoritative `linkres wiki/` gate (Task 1 Step E, Task 2 Step D, must_haves
+  truth line 79, the two `<verify><automated>` blocks, verification item 6, success criteria
+  lines 505/512) to `bash bin/lint.sh --ci --category linkres wiki/` (exits 1 on error) or the
+  JSON-error-count pattern already at line 293.
+- 14-03 Task 2 Step D: additionally run the 14-01 Step E unmasked-literal scanner over the appended
+  `wiki/log.md` entry — `linkres` alone cannot catch the gap-classified `[[id|Title]]` literal.
 
 Run `/gsd-plan-phase 14 --reviews` to incorporate.
