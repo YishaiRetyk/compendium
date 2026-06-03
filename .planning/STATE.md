@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1.1
 milestone_name: Graph Integrity
 status: executing
-stopped_at: Phase 13.2 planned (3 plans created in 2 waves; 0 executed)
-last_updated: "2026-06-03T08:28:03.277Z"
-last_activity: 2026-06-03 -- Phase 14 execution started
+stopped_at: "14-03 in progress — awaiting human Obsidian graph verification (Task 2 checkpoint:human-verify)"
+last_updated: "2026-06-03T00:00:00.000Z"
+last_activity: 2026-06-03 -- Phase 14 Plan 03 Task 1 complete (commit 47701c6); paused at human-verify checkpoint
 progress:
   total_phases: 8
   completed_phases: 0
   total_plans: 3
-  completed_plans: 0
-  percent: 0
+  completed_plans: 2
+  percent: 67
 ---
 
 # Project State
@@ -37,9 +37,9 @@ Items acknowledged and deferred at the v1.1 milestone close (2026-06-02):
 ## Current Position
 
 Phase: 14 (graph-link-resolution) — EXECUTING
-Plan: 1 of 3
-Status: Executing Phase 14
-Last activity: 2026-06-03 -- Phase 14 execution started
+Plan: 3 of 3 (in progress — paused at human-verify checkpoint)
+Status: Awaiting human Obsidian graph verification (Task 2 checkpoint)
+Last activity: 2026-06-03 -- 14-03 Task 1 complete; 45 wiki/ + 8 kahneman pages self-aliased via --fix; 10 dataview-fixture pages hand-edited; [[Ralph Playbook]] call site reconciled; linkres 0 errors
 
 v1.1.1 fixes the Obsidian wikilink-resolution defect: Obsidian resolves `[[X]]` by filename + `aliases`, never `title`, so 31/49 wiki pages render as graph orphans (e.g. `domain-driven-design.md`, which has 11 inbound + 7 outbound links yet shows disconnected). **Phase 14 — Graph Link Resolution** is one phase, ~3 plans in 2 waves: **Wave 1** (parallel) — convention (CLAUDE.md §8 + self-alias invariant + §5 checklist + templates + DR) ‖ `bin/lint.sh` `linkres` check (Obsidian-accurate; distinguishes knowledge-gap red links) + `--fix` + reconcile masking `orphan` check + tests; **Wave 2** — data remediation (backfill `wiki/` + `examples/` self-aliases, reconcile link-text variants `[[Bounded Contexts]]`/`[[Hack (Agentive Stack)]]`, human-verify connected graph). Sequenced before the v1.2 schema refactor (999.4). Next: `/gsd-plan-phase 14` (or `/gsd-discuss-phase 14`).
 
