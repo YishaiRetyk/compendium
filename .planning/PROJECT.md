@@ -72,11 +72,13 @@ The wiki is a persistent, compounding artifact — cross-references are already 
 
 Closure gate (Phase 13.2, CLOSE-01..04): `bin/requirements-sync.sh --strict --require-complete` exits 0 milestone-wide (0 drift of 97 requirements; all 97 Complete).
 
-### Active (v1.1.1 Graph Integrity — formal REQ-IDs in REQUIREMENTS.md)
+### Validated (v1.1.1 Graph Integrity — completed 2026-06-03)
 
-- [ ] Obsidian-accurate link-resolution convention: §8 corrected + self-alias invariant (`title`, `id` ∈ `aliases`) (LINK-01..03)
-- [ ] `bin/lint.sh` resolution check (`linkres`) with `--fix`; reconcile masking `orphan` check (LINK-04..06)
-- [ ] Backfill `wiki/` + `examples/` self-aliases; reconcile link-text variants; graph connects in Obsidian (LINK-07..10)
+> **Re-planned mid-milestone.** The original self-alias premise was proven false — Obsidian resolves `[[X]]` by **filename/path only**, never by `aliases` (intentional design, confirmed for v1.12.7). Shipped the corrected approach: **uniform piped links `[[id|Title]]`** (target = page `id` = filename → always resolves; display = canonical title). See `wiki/decisions/dr-2026-06-03-uniform-piped-links` + `.planning/phases/14-graph-link-resolution/14-FINDINGS-premise-invalidated.md`.
+
+- [x] Obsidian-accurate link-resolution convention: §8/§5 state `[[X]]` resolves by filename/path ONLY; uniform `[[id|Title]]` mandated; self-alias invariant REMOVED; superseding decision record authored (LINK-01..03) — Validated in Phase 14: graph-link-resolution
+- [x] `bin/lint.sh` `linkres` re-pointed to validate link *targets* (bare/broken = error; knowledge-gap red links stay `gap`/info); `--fix` rewrites bare→piped; alias-free `orphan` resolution; shared `mask_markdown` neutralises documentation examples (LINK-04..06) — Validated in Phase 14: graph-link-resolution
+- [x] All `wiki/` + `examples/` body links rewritten to uniform piped form; plural/parens variant problem dissolved; connected graph human-verified in Obsidian (LINK-07..10) — Validated in Phase 14: graph-link-resolution
 
 ### Out of Scope
 
@@ -136,6 +138,8 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
+*Last updated: 2026-06-03 — Phase 14 (Graph Link Resolution) complete, closing milestone v1.1.1 Graph Integrity. The milestone-start premise below was PROVEN FALSE mid-flight (Obsidian resolves `[[X]]` by filename/path ONLY — never by `aliases` — intentional design, confirmed for v1.12.7); caught at the LINK-10 human-verify gate. Re-planned to the corrected approach — **uniform piped links `[[id|Title]]`**: §8/§5 + 12 templates corrected, self-alias invariant removed, superseding DR `dr-2026-06-03-uniform-piped-links`; `bin/lint.sh` `linkres` re-pointed to validate link targets + `--fix` bare→piped + alias-free `orphan` + shared `mask_markdown` (LINT_VERSION 1.6.0); all `wiki/`+`examples/` body links rewritten to piped form; orphan count 19→0, exemplar `domain-driven-design` 18 inbound links; graph human-verified connected in Obsidian. Verifier 10/10; phase-09 tests 30/30 (incl. T14 masking guard). Post-merge integration fixes: masked the provenance + gap scans (review WR-01/WR-04). Deferred: lint mask fence edge-cases (WR-02/03, todo). LINK-01..10 Complete. Next: Phase 999.1 brownfield-vault-initialization.*
+
 *Last updated: 2026-06-02 — Milestone v1.1.1 Graph Integrity started. Patch milestone correcting the Obsidian wikilink-resolution defect (Obsidian resolves `[[X]]` by filename + `aliases`, not `title`; 31/49 wiki pages render as graph orphans). Single phase (14 — Graph Link Resolution), ~3 plans in 2 waves: convention + DR ‖ lint enforcement (`linkres` + `--fix`); then data remediation across `wiki/` + `examples/`. Sequenced before the v1.2 schema refactor (999.4). Requirements LINK-01..10.*
 
 *Last updated: 2026-06-02 after v1.1 Shareability milestone — SHIPPED + ARCHIVED. All 15 v1.1 phase directories (Phases 7–13.2, 52 plans) complete; 97/97 v1.1 requirements Complete with zero drift (`bin/requirements-sync.sh --strict --require-complete` exits 0). Phase 13.2 closure gate (CLOSE-01..04): Obsidian render re-run (Dataview 3/2/2/2/5), Codex agent-parity accepted blocked-on-host-runtime, write-back audited, docs consistency + scope-leak clean. Archived to `.planning/milestones/v1.1-*`; ROADMAP collapsed (Backlog preserved); `REQUIREMENTS.md` removed for a fresh next-milestone; git tag `v1.1`. Deferred: 1 post-v1.1 todo (a1 lexical-dedup lint), backlog 999.3–999.6, v1.2 items (Obsidian plugin, installer, hosted docs, brownfield `--apply`). Next: `/gsd-new-milestone`.*
