@@ -57,7 +57,7 @@ created: 2026-06-02
 
 ## Wave 0 Requirements
 
-- [ ] `tests/phase-09/test_lint_linkres.sh` — new file; 8 cases covering LINK-04, LINK-05, LINK-06:
+- [ ] `tests/phase-09/test_lint_linkres.sh` — new file; 10 cases covering LINK-02, LINK-04, LINK-05, LINK-06:
   1. Title-unreachable → linkres error
   2. After `--fix`, title-unreachable becomes OK (alias backfilled)
   3. Unique-normalized-match → linkres error (`Hack (Agentive Stack)` ↔ `Hack Agentive Stack`)
@@ -66,6 +66,9 @@ created: 2026-06-02
   6. `--fix` idempotency (double-run, identical file contents)
   7. CI `strict` stays green with `linkres` active
   8. `orphan` reconciliation (D-03: previously-masked link now surfaces)
+  9. Colon-title YAML-quoting canary (HIGH BUG #2 — `Topic: Subtitle` stays a STRING after `--fix`)
+  9b. LITERAL id-slug membership (HIGH BUG #3, Cycle-2 — `--fix` adds BOTH title AND id slug even when id == filename stem; LINK-02 literal invariant, not reachability)
+  10. index.md/log.md body-link scan (MEDIUM, Cycle-2 — broken `[[link]]`s in index/log produce linkres findings, cannot evade LINK-05)
 - [ ] `tests/phase-09/test_lint_require_version.sh` — update hardcoded version assertions (1.4.0 → 1.5.0) atomically with the `LINT_VERSION` bump
 
 *Existing `tests/phase-09/lib.sh` (self-contained temp wiki + inline assertions) covers all phase requirements — no new framework, no conftest.*
