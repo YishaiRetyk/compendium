@@ -76,7 +76,9 @@ domains: [test]
 supersedes:
 superseded_by:
 privacy: cloud_safe
-aliases: []
+aliases:
+  - "Attention inference justification"
+  - "dr-2026-04-16-attention"
 has_contradictions: false
 knowledge_domain: science
 example: false

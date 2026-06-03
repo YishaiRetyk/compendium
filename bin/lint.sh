@@ -10,7 +10,7 @@ set -euo pipefail
 # Lint rule-set semver per CI-08 / D-26. Bump MAJOR on breaking changes
 # (removed category, changed severity semantics). MINOR on non-breaking
 # additions. PATCH on bug fixes. --require-version X.Y.Z is a minimum check.
-LINT_VERSION="1.4.0"
+LINT_VERSION="1.5.0"
 
 usage() {
     cat <<'EOF'
@@ -26,7 +26,7 @@ Options:
   --category <cat>    Run only specified category:
                         orphan, crossref, stale, contradiction, gap,
                         provenance, yaml, drift, duplicate, contributor,
-                        brownfield
+                        brownfield, linkres
                       Default: all categories
   --version           Print lint rule-set semver (LINT_VERSION) and exit 0
   --require-version X.Y.Z
@@ -318,6 +318,7 @@ CI_SEVERITY_REMAP = {
     'orphan':             'error',
     'crossref':           'error',
     'provenance':         'error',
+    'linkres':            'error',    # high-confidence graph defects gate CI (LINK-04, LINK-05)
     'stale':              'warning',
     'gap':                'warning',
     'contradiction':      'warning',
@@ -1074,14 +1075,78 @@ if should_run('provenance'):
                             f'Broken prov ref: {source_id} not found in {wiki_dir}sources/')
 
 # ---------------------------------------------------------------------------
+# Shared normalization helper (D-02: used by linkres + reconciled orphan/gap)
+# ---------------------------------------------------------------------------
+
+_PLURAL_MAP = {
+    'contexts': 'context',
+    'policies': 'policy',
+    'contracts': 'contract',
+}
+_PUNCT_RE = re.compile(r'[^\w\s]')   # strips parens, hyphens, punctuation characters
+_WS_RE    = re.compile(r'\s+')
+
+def normalize_link(text):
+    """D-02: casefold, strip punctuation chars (parens stripped as CHARACTERS not
+    content -- 'Hack (Agentive Stack)' -> 'hack agentive stack', NOT 'hack'),
+    collapse whitespace, apply small explicit plural map (contexts->context,
+    policies->policy, contracts->contract). NO edit distance, NO stemmer."""
+    s = text.casefold()
+    s = _PUNCT_RE.sub(' ', s)   # parens/hyphen/punct -> space
+    s = s.replace('_', ' ')     # re \w includes underscore; handle separately
+    s = _WS_RE.sub(' ', s).strip()
+    words = [_PLURAL_MAP.get(w, w) for w in s.split()]
+    return ' '.join(words)
+
+def _yaml_quote_alias(a):
+    """YAML-double-quote a scalar so colons/brackets/leading indicators stay strings.
+    CONFIRMED HIGH BUG #2 fix: an unquoted '  - Topic: Subtitle' parses as a DICT."""
+    s = str(a).replace('\\', '\\\\').replace('"', '\\"')
+    return f'"{s}"'
+
+def _apply_self_alias_fix(fpath, fm, to_add):
+    """Idempotent: append the already-computed missing aliases (to_add: list of raw
+    strings) to the page's aliases block. Caller computes to_add ONCE per page (title
+    and/or id) and calls this ONCE -- no stale-fm second call (review F / Codex). Never
+    removes existing aliases. Regex confined to the frontmatter section (up to second
+    '---') to avoid matching body 'aliases:' text (Pitfall 2). Emits YAML-double-quoted
+    values so colon-bearing titles stay STRINGS (HIGH BUG #2)."""
+    if not to_add:
+        return  # nothing missing -- idempotent no-op
+    try:
+        content = open(fpath, encoding='utf-8').read()
+        fm_end = content.find('\n---', 3)  # skip opening ---
+        fm_section = content[:fm_end] if fm_end != -1 else content
+        existing = [str(a) for a in (fm.get('aliases') or []) if a]
+        new_aliases = existing + list(to_add)
+        # Quote EVERY value (existing too -- harmless, and repairs any prior unquoted entry):
+        aliases_lines = '\n'.join(f'  - {_yaml_quote_alias(a)}' for a in new_aliases)
+        new_block = f'aliases:\n{aliases_lines}'
+        ALIASES_RE = re.compile(r'^aliases:.*?(?=^\w|\Z)', re.MULTILINE | re.DOTALL)
+        new_fm = ALIASES_RE.sub(new_block + '\n', fm_section, count=1)
+        if new_fm == fm_section:
+            print(f"  warn: --fix could not locate aliases block in {os.path.relpath(fpath)} "
+                  f"(skipped to avoid corruption)", file=sys.stderr)
+            return  # Regex did not match; skip to avoid corruption
+        new_content = new_fm + content[len(fm_section):]
+        with open(fpath, 'w', encoding='utf-8') as f:
+            f.write(new_content)
+        add_finding('info', 'autofix', os.path.relpath(fpath),
+                    f'Added self-aliases: {list(to_add)}')
+    except Exception as e:
+        # Review F / Codex LOW: surface batch-fix failures instead of swallowing them.
+        print(f"  warn: --fix failed on {os.path.relpath(fpath)}: {e}", file=sys.stderr)
+
+# ---------------------------------------------------------------------------
 # Check 3: Orphan detection (case-insensitive, alias-aware)
 # ---------------------------------------------------------------------------
 
 if should_run('orphan'):
     print("  Checking for orphan pages...", file=sys.stderr)
 
-    # Build resolution map: lowercase variant -> page id
-    resolution_map = {}  # lowercase name -> set of page ids
+    # Build Obsidian-accurate resolution map: filename stem + aliases ONLY (not title).
+    # D-03: orphan MUST stop using title as a resolver (title not in aliases -> orphan).
+    obsidian_map = {}  # lowercase (stem OR alias) -> set of page ids
     page_ids = set()
 
     for fpath, fm, body, err in all_pages:
@@ -1091,18 +1156,14 @@ if should_run('orphan'):
         if not pid:
             continue
         page_ids.add(pid)
-
-        # Add id, title, aliases (all lowercased) to resolution map
-        variants = set()
-        variants.add(pid.lower())
-        if fm.get('title'):
-            variants.add(fm['title'].lower())
+        stem = os.path.splitext(os.path.basename(fpath))[0].lower()
+        obsidian_map.setdefault(stem, set()).add(pid)
         for alias in (fm.get('aliases') or []):
             if alias:
-                variants.add(str(alias).lower())
+                obsidian_map.setdefault(str(alias).lower(), set()).add(pid)
 
-        for v in variants:
-            resolution_map.setdefault(v, set()).add(pid)
+    # Keep resolution_map as alias for gap block backward compat (Pitfall 3)
+    resolution_map = obsidian_map
 
     # Collect all wikilinks from all pages (lowercased)
     inbound_links = {}  # page_id -> set of linking page_ids
@@ -1478,24 +1539,23 @@ NEXT_H2_RE = re.compile(r'^##\s+', re.MULTILINE)
 if should_run('gap'):
     print("  Checking for knowledge gaps (red links)...", file=sys.stderr)
 
-    # Reuse the resolution_map from orphan detection if available, otherwise rebuild
-    if 'resolution_map' not in dir():
-        resolution_map = {}
+    # Reuse the obsidian_map from orphan detection if available, otherwise rebuild.
+    # NOTE: the gap block uses `resolution_map` (alias for obsidian_map) for backward compat.
+    # The guard is now on `obsidian_map` to match the new variable name (Change 5).
+    if 'obsidian_map' not in dir():
+        obsidian_map = {}
         for fpath, fm, body, err in all_pages:
             if fm is None:
                 continue
             pid = fm.get('id', '')
             if not pid:
                 continue
-            variants = set()
-            variants.add(pid.lower())
-            if fm.get('title'):
-                variants.add(fm['title'].lower())
+            stem = os.path.splitext(os.path.basename(fpath))[0].lower()
+            obsidian_map.setdefault(stem, set()).add(pid)
             for alias in (fm.get('aliases') or []):
                 if alias:
-                    variants.add(str(alias).lower())
-            for v in variants:
-                resolution_map.setdefault(v, set()).add(pid)
+                    obsidian_map.setdefault(str(alias).lower(), set()).add(pid)
+        resolution_map = obsidian_map  # backward-compat alias
 
     # Collect all unresolved wikilinks with page context
     # unresolved_links: target_lower -> { 'pages': set of page_ids, 'in_tldr_keyfacts': bool }
@@ -1766,6 +1826,150 @@ if should_run('duplicate'):
                             f'possible duplicate of "{survivor["title"]}" '
                             f'({survivor["id"]}); same type={t}; consider MERGE (§9). '
                             f'Survivor by inbound-link count ({n_loser} vs {n_survivor}).')
+
+# ---------------------------------------------------------------------------
+# Check 9.75: Obsidian-accurate link resolution (linkres) -- LINK-04, LINK-05, LINK-06
+# ---------------------------------------------------------------------------
+if should_run('linkres'):
+    print("  Checking Obsidian-accurate link resolution (linkres)...", file=sys.stderr)
+
+    # CONFIRMED HIGH BUG #1 FIX: obsidian_map is built inside should_run('orphan')
+    # (~:1084) and does NOT exist under --category linkres. Build it here
+    # defensively (mirrors the gap block's self-build at ~:1482). When --category all
+    # runs, the orphan block already built it and this is a no-op.
+    if 'obsidian_map' not in dir():
+        obsidian_map = {}  # lowercase (stem OR alias) -> set of page ids; NOT title (D-03)
+        for fpath, fm, body, err in all_pages:
+            if fm is None:
+                continue
+            pid = fm.get('id', '')
+            if not pid:
+                continue
+            stem = os.path.splitext(os.path.basename(fpath))[0].lower()
+            obsidian_map.setdefault(stem, set()).add(pid)
+            for alias in (fm.get('aliases') or []):
+                if alias:
+                    obsidian_map.setdefault(str(alias).lower(), set()).add(pid)
+        resolution_map = obsidian_map  # backward-compat alias for gap block
+
+    # --- Subcheck A: self-alias invariant (LINK-02, LINK-04, LINK-06) ---
+    # CONFIRMED HIGH (Cycle-2) + MEDIUM (Cycle-3), both orchestrator-verified: BOTH the
+    # linkres ERROR condition AND the --fix `to_add` are computed from LITERAL ALIAS
+    # MEMBERSHIP (existing_lower), NOT from stem-inclusive `reachable`.
+    # Rationale: LINK-02 mandates the literal invariant "every page's `aliases` includes
+    # its `title` AND `id` slug" as a HARD requirement. For a compliant-by-stem page where
+    # id == filename, the id is ALREADY stem-reachable -- so a `reachable`-based predicate
+    # would (a) never append the id to `to_add` (the Cycle-2 regression -- it left Plan 03's
+    # domain-driven-design dual-alias assertion unsatisfiable), AND (b) let the page pass CI
+    # clean without the literal id alias (the Cycle-3 MEDIUM -- LINK-02 would be only
+    # --fix-healed, not CI-enforced). Computing BOTH error and to_add against existing_lower
+    # makes LINK-02 a CI-hard invariant per D-05 ("prevent regression, not just clean data")
+    # and guarantees the error predicate and the --fix predicate are identical.
+    for fpath, fm, body, err in all_pages:
+        if fm is None:
+            continue
+        pid = fm.get('id', '')
+        title = fm.get('title', '')
+        stem = os.path.splitext(os.path.basename(fpath))[0]
+        aliases = [str(a) for a in (fm.get('aliases') or []) if a]
+        existing_lower = {a.lower() for a in aliases}     # LITERAL alias membership (drives BOTH error + --fix)
+        reachable = {stem.lower()} | existing_lower        # Obsidian resolvability (informational only)
+        rel = os.path.relpath(fpath)
+
+        # Error condition (LINK-02 CI-ENFORCEMENT -- Cycle-3 MEDIUM ruling):
+        # LINK-02 is a HARD invariant ("every page's `aliases` MUST include its `title`
+        # and `id` slug"), so the linkres ERROR (not just --fix) gates on LITERAL alias
+        # membership, NOT mere stem-reachability. A page with id == filename but missing
+        # the literal id alias IS a CI error -- even though Obsidian would still resolve it
+        # by stem -- because LINK-02 mandates the explicit alias and D-05's "prevent
+        # regression, not just clean data" framing requires CI to catch the missing alias.
+        if title and title.lower() not in existing_lower:
+            why = ("Obsidian will not resolve [[%s]]" % title) if title.lower() not in reachable \
+                  else "resolves by filename stem but LINK-02 requires the literal title alias"
+            add_finding('error', 'linkres', rel,
+                        f"title '{title}' is not a literal member of aliases "
+                        f"({why}); run --fix to add self-alias")
+        if pid and pid.lower() not in existing_lower:
+            why = "not reachable via filename or aliases" if pid.lower() not in reachable \
+                  else "reachable via filename stem but LINK-02 requires the literal id alias"
+            add_finding('error', 'linkres', rel,
+                        f"id '{pid}' is not a literal member of aliases "
+                        f"({why}); run --fix to add self-alias")
+
+        # --fix: enforce the LITERAL self-alias invariant (LINK-02) independent of
+        # reachability. Add title and/or id whenever they are absent from the actual
+        # aliases list -- so id is added even when id == filename (stem-reachable).
+        to_add = []
+        if title and title.lower() not in existing_lower:
+            to_add.append(title)
+        if pid and pid.lower() not in existing_lower:
+            to_add.append(pid)
+
+        if to_add and do_fix and not dry_run:
+            _apply_self_alias_fix(fpath, fm, to_add)  # single combined call
+
+    # --- Subcheck B: body link variants (LINK-05) ---
+    # Build normalized map: normalize(stem OR alias OR title) -> set of page ids
+    norm_map = {}
+    for fpath, fm, body, err in all_pages:
+        if fm is None:
+            continue
+        pid = fm.get('id', '')
+        stem = os.path.splitext(os.path.basename(fpath))[0]
+        aliases = [str(a) for a in (fm.get('aliases') or []) if a]
+        for name in ([stem] + aliases):
+            key = normalize_link(name)
+            if key:
+                norm_map.setdefault(key, set()).add(pid)
+        # Also add title to norm_map (links using exact title can be normalized-matched)
+        if fm.get('title'):
+            key = normalize_link(fm['title'])
+            if key:
+                norm_map.setdefault(key, set()).add(pid)
+
+    # Check all body links (reuse obsidian_map for exact Obsidian-accurate resolution).
+    # Build the scan worklist as (rel, body) pairs. MEDIUM (Cycle-2 Codex): all_pages
+    # EXCLUDES wiki/index.md and wiki/log.md (EXCLUDE_FILES at lint.sh:395), yet the
+    # orphan block DOES scan them for wikilinks (lint.sh:1124-1125) and broken links in
+    # index.md/log.md must not evade LINK-05. Append index.md/log.md to the linkres
+    # body-link scan too (mirrors the orphan check's link-graph breadth). They are SCANNED
+    # as link sources only -- they are not pages with frontmatter, so Subcheck A does not
+    # apply to them.
+    linkres_scan = [(os.path.relpath(fpath), body)
+                    for fpath, fm, body, err in all_pages
+                    if fm is not None and body is not None]
+    for special in ('index.md', 'log.md'):
+        sp = os.path.join(wiki_dir, special)
+        if os.path.isfile(sp):
+            try:
+                linkres_scan.append((os.path.relpath(sp), open(sp, encoding='utf-8').read()))
+            except Exception:
+                pass
+
+    for rel, body in linkres_scan:
+        for target in WIKILINK_RE.findall(body):
+            t = target.strip()
+            t_lower = t.lower()
+            # Skip if resolves correctly via Obsidian rules (stem or alias)
+            if t_lower in obsidian_map:
+                continue
+            # Check normalized match
+            normed = normalize_link(t)
+            matches = norm_map.get(normed, set()) if normed else set()
+            if len(matches) == 0:
+                continue  # Genuine red link / knowledge-gap candidate -- gap handles this
+            elif len(matches) == 1:
+                target_id = list(matches)[0]
+                add_finding('error', 'linkres', rel,
+                            f"[[{t}]] does not resolve under Obsidian rules "
+                            f"(no filename-stem or alias match), but uniquely "
+                            f"normalized-matches '{target_id}' (D-02); "
+                            f"fix: add alias OR correct link text to canonical title")
+            else:
+                add_finding('warning', 'linkres', rel,
+                            f"[[{t}]] does not resolve under Obsidian rules "
+                            f"and normalized-matches multiple pages: {sorted(matches)}; "
+                            f"manual triage required")
 
 # ---------------------------------------------------------------------------
 # Check 10: Drift detection (DRFT-01, DRFT-02, DRFT-03, DRFT-04)
