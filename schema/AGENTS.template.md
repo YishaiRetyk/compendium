@@ -124,7 +124,7 @@ Red links (wikilinks to non-existent pages) are allowed and intentional. They si
 - DO NOT create topic-based directories (e.g., `wiki/machine-learning/`). Use frontmatter `domains` field and Dataview queries instead.
 - DO NOT put conventions or rules in any file other than AGENTS.md. This is the sole source of truth.
 - DO NOT put wikilinks in YAML frontmatter. Use string IDs in frontmatter, wikilinks in body text.
-- DO NOT use display aliases in wikilinks: write `[[Attention Mechanism]]` not `[[Attention Mechanism|attention]]`.
+- DO NOT write bare `[[Title]]` wikilinks. ALWAYS write `[[id|Exact Title]]` (target = page `id`; display = exact canonical `title`). Bare links without a pipe do not reliably resolve for multi-word-title pages in Obsidian (which resolves by filename/path ONLY, never by `aliases`).
 - DO NOT put provenance blobs, relation arrays, or decay settings in base frontmatter. Those belong in type-specific fields.
 - DO NOT delete or move files when archiving. Set `status: archived` and remove from index active listings.
 - DO NOT read the entire wiki when answering a query. Read index first, then TL;DR/Key Facts of relevant pages, then Detail only when needed.
@@ -287,7 +287,7 @@ example: false                  # Optional; true for reference-only pages (examp
 | Field | Type | Description |
 |-------|------|-------------|
 | `id` | string | Unique identifier in kebab-case. Used in `sources` lists and `[prov:]` markers. Must match the filename (without `.md`). |
-| `title` | string | Human-readable canonical title. Used in page headings and the self-alias (§8). Obsidian resolves `[[X]]` by **filename stem + `aliases`**, not by this field. |
+| `title` | string | Human-readable canonical title. Used in page headings and as the display text in piped links `[[id|Title]]`. Obsidian resolves `[[X]]` by **filename/path ONLY** — never by this field and never by `aliases`. |
 | `type` | enum | Page type: `entity`, `concept`, `source`, `comparison`, `overview`, `decision`. Determines section structure. |
 | `status` | enum | Lifecycle state: `active` (current), `stale` (may be outdated), `superseded` (replaced by another page), `archived` (no longer relevant). |
 | `summary` | string | One sentence. Used for index scanning and Dataview table previews. Must be a single quoted string, not multi-line. |
@@ -300,7 +300,7 @@ example: false                  # Optional; true for reference-only pages (examp
 | `supersedes` | string | ID of the page this one replaces. Null if not applicable. |
 | `superseded_by` | string | ID of the page that replaces this one. Null if not applicable. |
 | `privacy` | enum | `local_only` (never send to cloud APIs) or `cloud_safe` (can be sent to cloud APIs). |
-| `aliases` | list | Alternative names for Obsidian automatic resolution. Obsidian resolves `[[Alias]]` to the canonical page. |
+| `aliases` | list | OPTIONAL. Genuine alternate names (e.g. common abbreviations). Obsidian uses these for Quick Switcher / autocomplete and as display text in piped links `[[file|Alias]]`. They do NOT affect bare `[[X]]` resolution — that is always filename/path only. |
 | `has_contradictions` | boolean | `true` when any claim on the page has a `[contradiction:...]` marker. Independent of `epistemic_status` -- a `sourced` page can have contradictions. May be set by lint workflow OR by any workflow that inserts contradiction markers (ingest, query). The lint mechanically syncs this field: if `[contradiction:]` markers exist in the body, `has_contradictions` MUST be `true`; if no markers exist, it MUST be `false`. |
 | `example` | boolean | Optional (default `false`). When `true`, the page is a reference-only example (e.g., pages under `examples/kahneman/`). Lint MUST skip these pages for health checks so illustrative content does not trigger warnings. Applies anywhere in the tree, not just under `examples/`. |
 | `knowledge_domain` | string | Primary knowledge domain for staleness decay rate calculation. This is the **staleness policy bucket**, distinct from the `domains` field which is a topical classification list. A page may have `domains: [psychology, economics]` but `knowledge_domain: science` because both topics decay at the science rate. Maps to the decay rate table in Section 6. One of: `software`, `science`, `biography`, `personal-goals`, or a custom domain. Empty string if not yet classified. |
@@ -392,8 +392,7 @@ When creating or updating any wiki page, verify:
 15. For `type: decision` pages: `trigger_type` is one of: `merge`, `split`, `schema-update`, `domain-reorg`, `reframing`, `contradiction-resolution`
 16. For `type: decision` pages: `affected_pages` is present and is a YAML list of string IDs
 17. If `decision_history` is present on any page: it is a YAML list of string IDs
-18. The `title` is a literal member of `aliases`: the exact `title` string appears (case-insensitively) in the `aliases` list, so `[[Title]]` resolves in Obsidian. `bin/lint.sh --fix` backfills it.
-19. The `id` slug is a literal member of `aliases`: the exact `id` string appears in the `aliases` list -- even though `id == filename` makes it stem-reachable, the self-alias invariant (LINK-02) requires it explicitly. Together 18--19 are the self-alias invariant: `aliases ⊇ {title, id}`. `bin/lint.sh --fix` backfills it.
+18. Every intra-wiki body link MUST use the piped form `[[id|Exact Title]]` — target is the page `id` (= filename stem, always resolves in Obsidian); display is the exact canonical `title`. Bare `[[Title]]` links are a convention error.
 
 ## 6. Provenance, Epistemics, and Staleness
 
@@ -657,50 +656,51 @@ This structure means the LLM reads the minimum necessary context for each query,
 
 ### Rules
 
-1. Use `[[Exact Page Title]]` for all cross-references in page body text.
+1. Use `[[id|Exact Title]]` for ALL intra-wiki cross-references in page body text.
+   The target before `|` is the page `id` (= filename stem — always resolves in Obsidian
+   since Obsidian resolves `[[X]]` by **filename/path ONLY**, never by `title` and never
+   by `aliases`). The display text after `|` is the exact canonical `title`.
 2. Link on FIRST mention only per page. Subsequent mentions are plain text.
-3. DO NOT use display aliases: write `[[Attention Mechanism]]` not `[[Attention Mechanism|attention]]`.
-4. Use the `aliases` frontmatter field for alternate names. Obsidian resolves `[[X]]` by matching the filename stem or an `aliases` entry (case-insensitively) -- never by the `title` frontmatter field.
-4a. Every page MUST be self-aliased: its `aliases` list MUST include both its
-    `title` and its `id` slug as literal entries (the self-alias invariant,
-    LINK-02). Obsidian resolves `[[X]]` by **filename stem + `aliases`**, NEVER by
-    the `title` frontmatter field -- so listing the title as an alias is what makes
-    `[[Title]]` resolve. Without the self-alias, `[[Title]]` renders as an
-    unresolved red link even though a page with that title exists. `bin/lint.sh
-    --fix` backfills both entries; `bin/lint.sh --category linkres` flags any page
-    whose title or id is unreachable.
-5. Red links (links to non-existent pages) are ALLOWED and intentional. They signal knowledge gaps for the lint workflow.
+3. ALWAYS write `[[id|Exact Title]]` — bare `[[Title]]` links are a convention error.
+   Examples: `[[attention-mechanism|Attention Mechanism]]`, `[[<entity-id>|Entity Title (Parens)]]`.
+4. The `aliases` frontmatter field is OPTIONAL — for genuine alternate names (Quick Switcher /
+   autocomplete), NOT for link resolution. Obsidian resolves `[[X]]` by **filename/path ONLY**.
+5. Red links (links to not-yet-existing page `id`s) are ALLOWED and intentional. They signal
+   knowledge gaps for the lint workflow. Write them as `[[not-yet-existing-id|Display Text]]`
+   where the `id` is the planned slug.
 6. DO NOT put wikilinks in YAML frontmatter. Use string IDs in frontmatter, wikilinks in body text.
 7. The `## Related Pages` section lists explicit wikilinks to connected pages.
-8. The `## Sources` section in page body lists human-readable source references with wikilinks to source summary pages.
+8. The `## Sources` section in page body lists human-readable source references with wikilinks to
+   source summary pages.
 
 ### Bad vs. Good Wikilink Examples
 
 ```
-BAD:  sources: ["[[Vaswani et al]]"]           (wikilink in frontmatter)
-GOOD: sources: [src-2026-03-15-vaswani-attention]  (string ID in frontmatter)
+BAD:  sources: ["[[Vaswani et al]]"]                    (wikilink in frontmatter)
+GOOD: sources: [src-2026-03-15-vaswani-attention]       (string ID in frontmatter)
 
-BAD:  [[Attention Mechanism|attention]]         (display alias -- breaks graph clarity)
-GOOD: [[Attention Mechanism]]                   (exact title match)
+BAD:  [[Attention Mechanism]]                           (bare link -- does not resolve for multi-word titles)
+GOOD: [[attention-mechanism|Attention Mechanism]]       (piped: target=id, display=title)
 
-BAD:  ...the [[Attention Mechanism]] uses [[Attention Mechanism]] weights...  (linked twice)
-GOOD: ...the [[Attention Mechanism]] uses attention weights...  (linked once, plain text after)
+BAD:  [[attention-mechanism|attention]]                 (display text is not the exact canonical title)
+GOOD: [[attention-mechanism|Attention Mechanism]]       (display = exact title from page frontmatter)
 
-BAD:  See [[attention]]                         (lowercase, non-canonical title)
-GOOD: See [[Attention Mechanism]]               (exact canonical title from page frontmatter)
+BAD:  ...[[attention-mechanism|Attention Mechanism]] uses [[attention-mechanism|Attention Mechanism]] weights...  (linked twice)
+GOOD: ...[[attention-mechanism|Attention Mechanism]] uses attention weights...  (linked once, plain after)
 
-BAD:  aliases: []                   (empty -- [[<page-title>]] will not resolve in Obsidian)
-GOOD: aliases:
-        - "<Page Title>"
-        - <page-id-slug>            (self-aliases guarantee Obsidian resolution)
+BAD:  [[<Entity Title> (Parens)]]                       (bare link, parens title, will not resolve)
+GOOD: [[<entity-id>|Entity Title (Parens)]]             (piped: id target resolves, parens in display)
+
+BAD:  [[<Concept Titles>]]                              (bare plural link)
+GOOD: [[<concept-id>|Concept Titles]]                   (id target resolves; plural cosmetic in display)
 ```
 
 ### Graph View Implications
 
-- Only wikilinks in page body text appear reliably in Obsidian's graph view.
+- Only wikilinks in page body text appear in Obsidian's graph view. Piped links `[[id|Title]]` display the `title` in reading view while forming a graph edge to the `id` target.
 - String IDs in frontmatter do NOT create graph edges. This is intentional -- frontmatter holds structured data; body text holds navigable links.
-- First-mention linking prevents link noise in the graph. A page that mentions "attention" 20 times creates only one graph edge to `[[Attention Mechanism]]`, not 20.
-- Red links appear in the graph as unresolved nodes, providing a visual map of knowledge gaps.
+- First-mention linking prevents link noise. A page that mentions a concept many times creates only one graph edge, not many.
+- Red links (piped links whose `id` target does not exist yet) appear as unresolved nodes, providing a visual map of knowledge gaps.
 
 ## 9. Structured Operations and Executor Model
 
@@ -1612,10 +1612,10 @@ When provenance queries, search, or concurrency become awkward in pure markdown.
 
 ### Obsidian (Primary Human Interface)
 
-- **Graph View:** Visualize the wiki's link structure. Only meaningful links appear because Section 8 enforces first-mention linking and prohibits display aliases.
+- **Graph View:** Visualize the wiki's link structure. All intra-wiki links use piped form `[[id|Title]]` — the `id` target resolves reliably in Obsidian (filename/path only), and the `title` displays in reading view.
 - **Dataview plugin:** Query frontmatter fields with TABLE/LIST/TASK syntax. All frontmatter fields defined in Section 5 are queryable. Example: `TABLE summary, epistemic_status FROM "wiki/entities" WHERE status = "active"`.
 - **Properties:** Obsidian 1.4+ supports typed frontmatter editing. All base fields render as editable properties in the sidebar.
-- **Aliases:** The `aliases` frontmatter field enables Obsidian to resolve alternative page names automatically, supporting the exact-title wikilink convention (Section 8).
+- **Aliases:** The `aliases` frontmatter field is OPTIONAL — useful for Quick Switcher / autocomplete and as display text in piped links `[[file|Alias]]`, but NOT used for bare `[[X]]` resolution (filename/path only).
 - **Backlinks:** Obsidian's backlinks panel shows all pages that link to the current page, complementing the `## Related Pages` section.
 
 ### Git (Version Control)
@@ -1647,7 +1647,7 @@ A compact summary of the most critical rules for fast LLM scanning:
 
 1. **Read `wiki/index.md` first, always.** This is the entry point for all wiki operations.
 2. **TL;DR and Key Facts before Detail.** Read shallow sections first; drill into Detail only when needed.
-3. **`[[Exact Title]]` on first mention only.** No display aliases. No repeated links. No wikilinks in frontmatter.
+3. **`[[id|Exact Title]]` on first mention only.** Piped form only — target = page `id`, display = exact canonical `title`. No bare `[[Title]]` links. No repeated links. No wikilinks in frontmatter.
 4. **`[prov:source_id#locator]` for every factual claim.** Every claim needs provenance. No exceptions.
 5. **One commit per logical operation.** One ingest = one commit, even if it touches many files.
 6. **Privacy default: `local_only`.** When in doubt, do not send to cloud APIs.

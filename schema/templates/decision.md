@@ -14,11 +14,7 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  # Self-alias invariant (AGENTS.md §8): add your page title and id slug here
-  # so [[Title]] resolves in Obsidian. See §8 rule 4a for the full explanation.
-  # Example: if title is "<Page Title>" and id is "<page-id-slug>", add both:
-  #   - "<Page Title>"
-  #   - <page-id-slug>
+  # Optional: genuine alternate names for Quick Switcher / autocomplete (not needed for link resolution)
 has_contradictions: false
 knowledge_domain: ""
 trigger_type:
@@ -27,7 +23,7 @@ affected_pages: []
 
 <!-- FORBIDDEN PATTERNS (see AGENTS.md section 3):
      - No wikilinks in frontmatter (use plain string IDs in sources[], affected_pages[], supersedes, etc.)
-     - No display aliases: write [[Page Title]] not [[Page Title|Alias]]
+     - No bare [[Title]] links: ALWAYS write [[id|Exact Title]] (target=id, display=title)
      - Link each page only on first mention in the body
      - No example content in this template -- fill with real content when using -->
 
@@ -53,7 +49,7 @@ affected_pages: []
 
 ## Affected Pages
 
-<!-- Wikilinks to pages affected by this decision. Format: - [[Page Title]] -- how it was affected -->
+<!-- Wikilinks to pages affected by this decision. Format: - [[page-id|Page Title]] -- how it was affected -->
 
 ## Sources
 
