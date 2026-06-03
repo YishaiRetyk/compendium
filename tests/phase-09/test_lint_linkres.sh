@@ -243,7 +243,7 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - "Src Test 01"
+  - "Source Test 01"
   - "src-test-01"
 has_contradictions: false
 knowledge_domain: science
@@ -559,7 +559,7 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - "Src Test 01"
+  - "Source Test 01"
   - "src-test-01"
 has_contradictions: false
 knowledge_domain: science

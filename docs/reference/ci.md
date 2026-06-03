@@ -24,6 +24,7 @@ All three jobs are required status checks in branch protection on `main`.
 | `orphan` | error | Broken wiki structure — page unreachable from index. |
 | `crossref` | error | Broken wikilink — navigation failure. |
 | `provenance` | error | Claim without source — schema requirement (AGENTS.md §6). |
+| `linkres` | error | Obsidian link unresolvable: page title not in aliases, or body link has unique normalized match (D-02). Graph-integrity defect; blocks CI. |
 | `stale` | warning | Decay-date exceeded — content review recommended, not required. |
 | `gap` | warning | Red link with multiple references — knowledge gap signal. |
 | `contradiction` | warning | Source disagreement — scholarly expectation, not system failure (Phase 5 decision). |

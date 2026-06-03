@@ -13,7 +13,9 @@ domains: [test]
 supersedes:
 superseded_by:
 privacy: cloud_safe
-aliases: []
+aliases:
+  - "Attention"
+  - "attention"
 has_contradictions: false
 knowledge_domain: science
 example: false
