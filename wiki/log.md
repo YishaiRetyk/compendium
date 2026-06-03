@@ -278,3 +278,10 @@ report: wiki/maintenance/lint-report.md
 findings: 0 total (0 errors, 0 warnings, 0 info)
 auto_fixes: 0 applied
 report: wiki/maintenance/lint-report.md
+
+## [2026-06-02] reflect | schema-update: Obsidian filename + alias resolution
+
+UPDATE wiki/decisions/dr-2026-06-02-obsidian-filename-alias-resolution.md
+source: n/a (internal schema decision)
+result: authored schema-update DR; corrected AGENTS.md §8 + §5 (self-alias invariant); updated 12 schema templates; registered in wiki/index.md
+reason: Obsidian resolves [[X]] by filename stem + aliases, not title; 31/49 pages were graph orphans due to missing self-aliases; convention now correct and enforced by linkres lint category (Plan 02)

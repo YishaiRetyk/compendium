@@ -13,7 +13,8 @@ domains: []
 supersedes:
 superseded_by:
 privacy:
-aliases: []
+aliases:
+  - {{title}}
 path:
 url: ""
 content_hash: ""

@@ -13,7 +13,8 @@ domains: []
 supersedes:
 superseded_by:
 privacy: cloud_safe
-aliases: []
+aliases:
+  - {{title}}
 has_contradictions: false
 knowledge_domain: ""
 trigger_type:

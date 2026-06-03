@@ -13,7 +13,8 @@ domains: []
 supersedes:
 superseded_by:
 privacy:
-aliases: []
+aliases:
+  - {{title}}
 ---
 
 <!-- FORBIDDEN PATTERNS (see AGENTS.md section 3):
