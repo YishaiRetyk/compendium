@@ -2,7 +2,7 @@
 id: dr-2026-06-02-obsidian-filename-alias-resolution
 title: "Obsidian Filename + Alias Resolution: Self-Alias Invariant"
 type: decision
-status: active
+status: superseded
 summary: "Corrects AGENTS.md §8 to state Obsidian resolves wikilinks by filename stem + aliases (not title); mandates self-alias invariant; adds bin/lint.sh linkres enforcement."
 created_at: 2026-06-02
 updated_at: 2026-06-02
@@ -14,7 +14,7 @@ tags:
 domains:
   - wiki-infrastructure
 supersedes:
-superseded_by:
+superseded_by: dr-2026-06-03-uniform-piped-links
 privacy: cloud_safe
 aliases:
   - "Obsidian Filename + Alias Resolution: Self-Alias Invariant"
@@ -25,9 +25,11 @@ trigger_type: schema-update
 affected_pages: []
 ---
 
+> This decision record has been superseded by [[dr-2026-06-03-uniform-piped-links|Uniform Piped Links: Correcting the Obsidian Link Resolution Convention]]. The premise stated here (Obsidian resolves `[[X]]` by filename stem + aliases) was proven false at v1.12.7.
+
 <!-- FORBIDDEN PATTERNS (see AGENTS.md section 3):
      - No wikilinks in frontmatter (use plain string IDs in sources[], affected_pages[], supersedes, etc.)
-     - No display aliases: write [[Page Title]] not [[Page Title|Alias]]
+     - No bare `[[Title]]` links: ALWAYS write `[[id|Exact Title]]` (target=id, display=title)
      - Link each page only on first mention in the body -->
 
 ## TL;DR
