@@ -346,3 +346,8 @@ result: ran `--fix` over wiki/ (45 pages updated) + examples/ (8 lint-visible ka
 pages_affected: wiki/overviews/domain-driven-design.md, wiki/concepts/progressive-disclosure.md, all wiki pages backfilled with self-aliases, 8 lint-visible kahneman pages, 10 examples/dataview-fixtures/fixture-*.md
 write_back: NO-WRITE-BACK (remediation operation, not a query synthesis)
 delta_compiled: none
+
+## [2026-06-03] reflect | Phase 14 schema-update DR
+
+reflect recommended: schema-update — Phase 14 re-plan from corrected premise (piped links)
+pages_affected: dr-2026-06-03-uniform-piped-links, dr-2026-06-02-obsidian-filename-alias-resolution
