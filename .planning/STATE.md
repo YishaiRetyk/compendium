@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.1.1
 milestone_name: Graph Integrity
-status: blocked
-stopped_at: "14-03 human-verify FAILED — phase premise invalidated (Obsidian ignores aliases for bare-link resolution); re-plan required"
-last_updated: "2026-06-03T00:00:00.000Z"
-last_activity: 2026-06-03 -- Phase 14 human-verify caught goal-blocking premise error; re-plan chosen (see 14-FINDINGS-premise-invalidated.md)
+status: planning
+stopped_at: Phase 14 context re-gathered (piped-link approach; premise corrected)
+last_updated: "2026-06-03T11:12:56.233Z"
+last_activity: 2026-06-03 -- human-verify caught goal-blocking premise error; user chose re-plan
 progress:
   total_phases: 8
   completed_phases: 0
   total_plans: 3
   completed_plans: 2
-  percent: 67
+  percent: 0
 ---
 
 # Project State
@@ -375,6 +375,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-06-01T15:39:02.594Z
-Stopped at: Phase 13.2 planned (3 plans created in 2 waves; 0 executed)
-Resume file: .planning/phases/13.2-v1-1-closure-verification-gate/13.2-01-PLAN.md
+Last session: 2026-06-03T11:12:56.221Z
+Stopped at: Phase 14 context re-gathered (piped-link approach; premise corrected)
+Resume file: .planning/phases/14-graph-link-resolution/14-CONTEXT.md
