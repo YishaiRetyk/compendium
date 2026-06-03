@@ -1617,7 +1617,14 @@ if should_run('gap'):
         if fm is None or body is None:
             continue
         linker_id = fm.get('id', '')
-        wikilinks = WIKILINK_RE.findall(body)
+        # Mask documentation examples (frontmatter, fenced/inline code, HTML
+        # comments) before the gap red-link scan so literal [[example]] tokens in
+        # prose/code (e.g. a decision record showing [[id|Title]] or [[X]]) are not
+        # flagged as phantom knowledge gaps. Consistent with the linkres/orphan/
+        # provenance masking; mask_markdown is length-preserving so offsets used in
+        # the TL;DR/Key-Facts range check below stay aligned (review WR-01).
+        masked_body = mask_markdown(body)
+        wikilinks = WIKILINK_RE.findall(masked_body)
 
         # Identify TL;DR and Key Facts section boundaries
         tldr_kf_ranges = []
@@ -1645,7 +1652,7 @@ if should_run('gap'):
             # Check if this link appears in a TL;DR or Key Facts section
             # Find the position of this wikilink in the body
             link_pattern = re.compile(r'\[\[' + re.escape(target) + r'(?:\|[^\]]+)?\]\]')
-            for lm in link_pattern.finditer(body):
+            for lm in link_pattern.finditer(masked_body):
                 for (rs, re_end) in tldr_kf_ranges:
                     if rs <= lm.start() < re_end:
                         unresolved_links[target_lower]['in_tldr_keyfacts'] = True

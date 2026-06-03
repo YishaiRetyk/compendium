@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# test_lint_linkres.sh -- 13 cases covering LINK-04, LINK-05, LINK-06 (re-pointed to
+# test_lint_linkres.sh -- 14 cases covering LINK-04, LINK-05, LINK-06 (re-pointed to
 # piped-form enforcement, masked body scan, alias-free orphan resolution).
+# T14 guards that masking extends to the provenance + gap scans (review WR-01/WR-04).
 # Neutral fixtures only (no real vault slugs per CLAUDE.md §3 neutrality).
 # Self-contained: builds its own temp wiki inline. No git needed.
 set -euo pipefail
@@ -719,4 +720,72 @@ else
     exit 1
 fi
 
-echo "PASS: test_lint_linkres -- all 13 test cases passed"
+# ---------------------------------------------------------------------------
+# T14: masking applies to the provenance broken-ref scan AND the gap red-link
+# scan, not only linkres (review WR-01/WR-04). A page whose ONLY [prov:...] and
+# [[...]] tokens live in inline code / fenced blocks must produce ZERO provenance
+# errors and ZERO gap red-link findings. The wikilink example is placed in the
+# ## TL;DR section so that WITHOUT masking the gap scan would flag it
+# (in_tldr_keyfacts => should_flag per D-20) -- this is what makes the test
+# regression-meaningful, not vacuous.
+# ---------------------------------------------------------------------------
+cat > "$MASK_WIKI/concepts/masked-markers.md" <<'EOF'
+---
+id: masked-markers
+title: "Masked Markers"
+type: concept
+status: active
+summary: "Documents marker grammar; all examples are masked."
+created_at: 2026-06-03
+updated_at: 2026-06-03
+sources: []
+epistemic_status: sourced
+tags: [test]
+domains: [test]
+supersedes:
+superseded_by:
+privacy: cloud_safe
+aliases: []
+has_contradictions: false
+knowledge_domain: science
+example: false
+---
+# Masked Markers
+
+## TL;DR
+
+A provenance marker looks like `[prov:nonexistent-src#sec:x|direct]` and a wikilink
+example looks like `[[ghost-only-example]]` -- both inline-code, so masked.
+
+## Detail
+
+Fenced example block:
+
+```
+[prov:another-fake-src#p7] and a link [[second-ghost|Display Text]]
+```
+EOF
+
+bash "$REPO_ROOT/bin/lint.sh" --format json "$MASK_WIKI" \
+    > "$TMP/mask-markers-out.json" 2>/dev/null || true
+python3 - "$TMP/mask-markers-out.json" <<'PYEOF'
+import json, sys
+data = json.load(open(sys.argv[1]))
+prov_errs = [d for d in data if d['category'] == 'provenance'
+             and 'masked-markers' in d.get('path', '')]
+assert len(prov_errs) == 0, (
+    f"FAIL T14a: masked [prov:...] examples must not be flagged as broken refs, got {prov_errs}"
+)
+print("PASS T14a: masked [prov:...] examples produce ZERO provenance findings")
+
+ghosts = {'ghost-only-example', 'second-ghost'}
+gap_hits = [d for d in data if d['category'] == 'gap'
+            and d.get('path', '').startswith('red-link:')
+            and d['path'].split('red-link:', 1)[1].strip().lower() in ghosts]
+assert len(gap_hits) == 0, (
+    f"FAIL T14b: masked [[...]] examples (incl. one in TL;DR) must not be flagged as gap red-links, got {gap_hits}"
+)
+print("PASS T14b: masked [[...]] examples produce ZERO gap red-link findings")
+PYEOF
+
+echo "PASS: test_lint_linkres -- all 14 test cases passed"
