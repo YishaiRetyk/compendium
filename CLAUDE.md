@@ -285,7 +285,7 @@ example: false                  # Optional; true for reference-only pages (examp
 | Field | Type | Description |
 |-------|------|-------------|
 | `id` | string | Unique identifier in kebab-case. Used in `sources` lists and `[prov:]` markers. Must match the filename (without `.md`). |
-| `title` | string | Human-readable canonical title. Wikilinks resolve to this value. |
+| `title` | string | Human-readable canonical title. Used in page headings and the self-alias (§8). Obsidian resolves `[[X]]` by **filename stem + `aliases`**, not by this field. |
 | `type` | enum | Page type: `entity`, `concept`, `source`, `comparison`, `overview`, `decision`. Determines section structure. |
 | `status` | enum | Lifecycle state: `active` (current), `stale` (may be outdated), `superseded` (replaced by another page), `archived` (no longer relevant). |
 | `summary` | string | One sentence. Used for index scanning and Dataview table previews. Must be a single quoted string, not multi-line. |
@@ -390,6 +390,8 @@ When creating or updating any wiki page, verify:
 15. For `type: decision` pages: `trigger_type` is one of: `merge`, `split`, `schema-update`, `domain-reorg`, `reframing`, `contradiction-resolution`
 16. For `type: decision` pages: `affected_pages` is present and is a YAML list of string IDs
 17. If `decision_history` is present on any page: it is a YAML list of string IDs
+18. The `title` is a literal member of `aliases`: the exact `title` string appears (case-insensitively) in the `aliases` list, so `[[Title]]` resolves in Obsidian. `bin/lint.sh --fix` backfills it.
+19. The `id` slug is a literal member of `aliases`: the exact `id` string appears in the `aliases` list -- even though `id == filename` makes it stem-reachable, the self-alias invariant (LINK-02) requires it explicitly. Together 18--19 are the self-alias invariant: `aliases ⊇ {title, id}`. `bin/lint.sh --fix` backfills it.
 
 ## 6. Provenance, Epistemics, and Staleness
 
@@ -654,7 +656,15 @@ This structure means the LLM reads the minimum necessary context for each query,
 1. Use `[[Exact Page Title]]` for all cross-references in page body text.
 2. Link on FIRST mention only per page. Subsequent mentions are plain text.
 3. DO NOT use display aliases: write `[[Attention Mechanism]]` not `[[Attention Mechanism|attention]]`.
-4. Use the `aliases` frontmatter field for alternate names. Obsidian resolves aliases to the canonical page automatically.
+4. Use the `aliases` frontmatter field for alternate names. Obsidian resolves `[[X]]` by matching the filename stem or an `aliases` entry (case-insensitively) -- never by the `title` frontmatter field.
+4a. Every page MUST be self-aliased: its `aliases` list MUST include both its
+    `title` and its `id` slug as literal entries (the self-alias invariant,
+    LINK-02). Obsidian resolves `[[X]]` by **filename stem + `aliases`**, NEVER by
+    the `title` frontmatter field -- so listing the title as an alias is what makes
+    `[[Title]]` resolve. Without the self-alias, `[[Title]]` renders as an
+    unresolved red link even though a page with that title exists. `bin/lint.sh
+    --fix` backfills both entries; `bin/lint.sh --category linkres` flags any page
+    whose title or id is unreachable.
 5. Red links (links to non-existent pages) are ALLOWED and intentional. They signal knowledge gaps for the lint workflow.
 6. DO NOT put wikilinks in YAML frontmatter. Use string IDs in frontmatter, wikilinks in body text.
 7. The `## Related Pages` section lists explicit wikilinks to connected pages.
@@ -674,6 +684,11 @@ GOOD: ...the [[Attention Mechanism]] uses attention weights...  (linked once, pl
 
 BAD:  See [[attention]]                         (lowercase, non-canonical title)
 GOOD: See [[Attention Mechanism]]               (exact canonical title from page frontmatter)
+
+BAD:  aliases: []                   (empty -- [[<page-title>]] will not resolve in Obsidian)
+GOOD: aliases:
+        - "<Page Title>"
+        - <page-id-slug>            (self-aliases guarantee Obsidian resolution)
 ```
 
 ### Graph View Implications
@@ -1071,7 +1086,7 @@ Report-only (no auto-fix): contradictions, knowledge gaps, orphan pages, missing
 | Flag | Effect |
 |------|--------|
 | `--format json` | Emit JSON array `[{severity, category, path, line?, message}]` to stdout; do NOT write `lint-report.md`. |
-| `--ci` | Apply severity-remap dispatch table: `yaml`/`orphan`/`crossref`/`provenance` -> `error`; `stale`/`gap`/`contradiction`/`contradiction-sync`/`drift`/`contributor` -> `warning`; `autofix`/`skip-count` -> `info`. Default-skip `drift-external` category. Exit 1 iff any post-remap finding has severity `error`. |
+| `--ci` | Apply severity-remap dispatch table: `yaml`/`orphan`/`crossref`/`provenance`/`linkres` -> `error`; `stale`/`gap`/`contradiction`/`contradiction-sync`/`drift`/`contributor` -> `warning`; `autofix`/`skip-count` -> `info`. Default-skip `drift-external` category. Exit 1 iff any post-remap finding has severity `error`. |
 | `--skip-category <cat>` | Exclude one category. Repeatable. Inverse of `--category`. |
 | `--strict` | Quality ratchet: fail on (a) new `[epistemic:: inferred]` / `[epistemic:: tentative]` claims without a matching decision record whose `affected_pages` frontmatter contains the page ID; (b) new (git-diff status `A`) pages of type `entity`/`concept`/`overview`/`comparison` with zero `[prov:` markers. Source pages and decision records are exempt by design. |
 | `--staged` | Phase 12.2 local-write-gate scope swap. With `--strict`, replaces the diff source from `git diff origin/main...HEAD` to `git diff --cached --name-only --diff-filter=A` and applies D-10 (new-page provenance) ONLY — D-08 (DR-match) stays CI-only. Files are read from the working tree, not from staged blobs. No-op without `--strict`. Used by `.githooks/pre-commit`. See "Staged-mode rules" below. |

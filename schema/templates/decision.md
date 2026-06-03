@@ -13,7 +13,12 @@ domains: []
 supersedes:
 superseded_by:
 privacy: cloud_safe
-aliases: []
+aliases:
+  # Self-alias invariant (AGENTS.md §8): add your page title and id slug here
+  # so [[Title]] resolves in Obsidian. See §8 rule 4a for the full explanation.
+  # Example: if title is "<Page Title>" and id is "<page-id-slug>", add both:
+  #   - "<Page Title>"
+  #   - <page-id-slug>
 has_contradictions: false
 knowledge_domain: ""
 trigger_type:
