@@ -20,7 +20,9 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - Three Artifacts Build with AI
+  - "Three Artifacts Build with AI"
+  - "Three artifacts that changed how I build with AI"
+  - "src-2026-05-04-three-artifacts-build-with-ai"
 has_contradictions: false
 knowledge_domain: software
 example: false

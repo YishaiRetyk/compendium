@@ -21,7 +21,9 @@ domains:
 supersedes:
 superseded_by:
 privacy: cloud_safe
-aliases: []
+aliases:
+  - "Brownfield Apply-vs-Advisory Architecture + Review-Manifest Pattern"
+  - "dr-2026-04-20-brownfield-apply-vs-advisory"
 has_contradictions: false
 knowledge_domain: software
 ---

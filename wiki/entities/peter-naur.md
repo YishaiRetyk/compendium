@@ -20,8 +20,10 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - Peter Nauer
-  - Naur
+  - "Peter Nauer"
+  - "Naur"
+  - "Peter Naur"
+  - "peter-naur"
 has_contradictions: false
 knowledge_domain: biography
 example: false

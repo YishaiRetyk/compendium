@@ -21,8 +21,10 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - System 1 vs 2
-  - Dual Process Theory Comparison
+  - "System 1 vs 2"
+  - "Dual Process Theory Comparison"
+  - "System 1 vs System 2"
+  - "system-1-vs-system-2"
 has_contradictions: false
 knowledge_domain: science
 ---

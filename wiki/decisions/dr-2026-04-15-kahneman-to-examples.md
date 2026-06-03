@@ -18,7 +18,9 @@ privacy: cloud_safe
 knowledge_domain: software
 supersedes:
 superseded_by:
-aliases: []
+aliases:
+  - "Move Kahneman Cluster from wiki/ to examples/"
+  - "dr-2026-04-15-kahneman-to-examples"
 has_contradictions: false
 neutrality_exempt: true  # This record IS the history of the Kahneman-to-examples relocation; it legitimately names what it relocated. Scanner skips this file (check-neutrality.sh).
 trigger_type: schema-update

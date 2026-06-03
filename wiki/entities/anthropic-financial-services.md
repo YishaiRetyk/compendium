@@ -23,8 +23,10 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - anthropics/financial-services
-  - financial-services-plugins
+  - "anthropics/financial-services"
+  - "financial-services-plugins"
+  - "Anthropic Financial Services"
+  - "anthropic-financial-services"
 has_contradictions: false
 knowledge_domain: software
 example: false

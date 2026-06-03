@@ -20,7 +20,9 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - Eric Evans (DDD)
+  - "Eric Evans (DDD)"
+  - "Eric Evans"
+  - "eric-evans"
 has_contradictions: false
 knowledge_domain: biography
 example: false

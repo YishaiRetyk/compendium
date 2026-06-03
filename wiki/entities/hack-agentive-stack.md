@@ -22,7 +22,9 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - Hack
+  - "Hack"
+  - "Hack (Agentive Stack)"
+  - "hack-agentive-stack"
 has_contradictions: false
 knowledge_domain: biography
 example: false

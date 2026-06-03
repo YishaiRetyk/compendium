@@ -21,7 +21,9 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - DDD
+  - "DDD"
+  - "Domain-Driven Design"
+  - "domain-driven-design"
 has_contradictions: false
 knowledge_domain: software
 example: false

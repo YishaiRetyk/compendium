@@ -21,8 +21,10 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - Agent Skills Quickstart Doc
-  - platform.claude.com Agent Skills quickstart
+  - "Agent Skills Quickstart Doc"
+  - "platform.claude.com Agent Skills quickstart"
+  - "Anthropic Agent Skills Quickstart"
+  - "src-2026-05-06-anthropic-agent-skills-quickstart"
 has_contradictions: false
 knowledge_domain: software
 example: false

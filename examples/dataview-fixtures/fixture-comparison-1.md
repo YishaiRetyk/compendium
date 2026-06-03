@@ -14,7 +14,9 @@ domains:
   - gamma
 supersedes:
 superseded_by:
-aliases: []
+aliases:
+  - "Fixture Comparison One"
+  - fixture-comparison-1
 has_contradictions: false
 knowledge_domain: gamma
 example: true

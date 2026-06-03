@@ -21,10 +21,11 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - Geoffrey Huntley
-  - ghuntley
-  - GeoffreyHuntley
-  - Geoff Huntley
+  - "Geoffrey Huntley"
+  - "ghuntley"
+  - "GeoffreyHuntley"
+  - "Geoff Huntley"
+  - "geoffrey-huntley"
 has_contradictions: false
 knowledge_domain: biography
 example: false

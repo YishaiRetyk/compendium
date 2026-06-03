@@ -24,10 +24,11 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - The Ralph Playbook (Clayton Farr's how-to-ralph-wiggum)
-  - The Ralph Playbook
-  - how-to-ralph-wiggum
-  - ralph-playbook
+  - "The Ralph Playbook (Clayton Farr's how-to-ralph-wiggum)"
+  - "The Ralph Playbook"
+  - "how-to-ralph-wiggum"
+  - "ralph-playbook"
+  - "src-2026-05-06-ralph-playbook"
 has_contradictions: false
 knowledge_domain: software
 example: false

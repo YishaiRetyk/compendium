@@ -16,7 +16,9 @@ domains:
 supersedes:
 superseded_by:
 privacy: cloud_safe
-aliases: []
+aliases:
+  - "Extract §4 Worked Examples and §16 Appendices A+B to Deep References"
+  - "dr-2026-04-16-progressive-disclosure-extraction"
 has_contradictions: false
 knowledge_domain: software
 neutrality_exempt: true  # Why-section legitimately names the rejected `examples/kahneman/` reuse and the prior dr-2026-04-15-kahneman-to-examples decision; mirrors the dr-2026-04-15 precedent (check-neutrality.sh).

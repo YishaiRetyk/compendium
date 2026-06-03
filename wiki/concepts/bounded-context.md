@@ -21,8 +21,10 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - Bounded Contexts
-  - Context Boundary
+  - "Bounded Contexts"
+  - "Context Boundary"
+  - "Bounded Context"
+  - "bounded-context"
 has_contradictions: false
 knowledge_domain: software
 example: false

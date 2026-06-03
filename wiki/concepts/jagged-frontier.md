@@ -20,8 +20,10 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - Jagged Technological Frontier
-  - Jacked Frontier
+  - "Jagged Technological Frontier"
+  - "Jacked Frontier"
+  - "Jagged Frontier"
+  - "jagged-frontier"
 has_contradictions: false
 knowledge_domain: software
 example: false

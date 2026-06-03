@@ -19,7 +19,9 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - TradingAgents Investigation
+  - "TradingAgents Investigation"
+  - "TradingAgents Repository Investigation Snapshot"
+  - "src-2026-05-04-tradingagents-investigation"
 has_contradictions: false
 knowledge_domain: software
 example: false

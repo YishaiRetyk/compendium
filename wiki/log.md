@@ -285,3 +285,64 @@ UPDATE wiki/decisions/dr-2026-06-02-obsidian-filename-alias-resolution.md
 source: n/a (internal schema decision)
 result: authored schema-update DR; corrected AGENTS.md §8 + §5 (self-alias invariant); updated 12 schema templates; registered in wiki/index.md
 reason: Obsidian resolves [[X]] by filename stem + aliases, not title; 31/49 pages were graph orphans due to missing self-aliases; convention now correct and enforced by linkres lint category (Plan 02)
+
+## [2026-06-03] lint | wiki health check
+
+findings: 1 total (1 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki/maintenance/lint-report.md
+
+## [2026-06-03] lint | wiki health check
+
+findings: 1 total (1 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki/maintenance/lint-report.md
+
+## [2026-06-03] lint | wiki health check
+
+findings: 0 total (0 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki/maintenance/lint-report.md
+
+## [2026-06-03] lint | wiki health check
+
+findings: 0 total (0 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki/maintenance/lint-report.md
+
+## [2026-06-03] lint | wiki health check
+
+findings: 0 total (0 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki/maintenance/lint-report.md
+
+## [2026-06-03] lint | wiki health check
+
+findings: 0 total (0 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki/maintenance/lint-report.md
+
+## [2026-06-03] lint | wiki health check
+
+findings: 339 total (339 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki/maintenance/lint-report.md
+
+## [2026-06-03] lint | wiki health check
+
+findings: 384 total (339 errors, 0 warnings, 45 info)
+auto_fixes: 45 applied
+report: wiki/maintenance/lint-report.md
+
+## [2026-06-03] lint | wiki health check
+
+findings: 1 total (1 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki/maintenance/lint-report.md
+
+## [2026-06-03] lint | linkres: self-alias backfill + variant reconciliation
+
+result: ran `--fix` over wiki/ (45 pages updated) + examples/ (8 lint-visible kahneman pages updated); hand-edited 10 dataview-fixture content pages (example:true, --fix-unreachable) to add literal self-aliases (LINK-09); 2 scaffolding files (README.md, log.md) exempt; manually reconciled `Ralph Playbook` link → `The Ralph Playbook` alias (call-site edit in progressive-disclosure.md, D-07); `Bounded Contexts` plural variant was already absent from wiki/
+pages_affected: wiki/overviews/domain-driven-design.md, wiki/concepts/progressive-disclosure.md, all wiki pages backfilled with self-aliases, 8 lint-visible kahneman pages, 10 examples/dataview-fixtures/fixture-*.md
+write_back: NO-WRITE-BACK (remediation operation, not a query synthesis)
+delta_compiled: none

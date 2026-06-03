@@ -18,7 +18,9 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - Thinking Fast and Slow Part 1
+  - "Thinking Fast and Slow Part 1"
+  - "Kahneman - Thinking, Fast and Slow Part 1"
+  - "src-2026-04-09-thinking-fast-and-slow-part1"
 has_contradictions: false
 knowledge_domain: science
 path: sources/2026/2026-04/2026-04-09-thinking-fast-and-slow-part1/source.md

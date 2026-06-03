@@ -20,7 +20,8 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - Loss-Aversion
+  - "Loss-Aversion"
+  - "Loss Aversion"
 has_contradictions: false
 knowledge_domain: science
 ---

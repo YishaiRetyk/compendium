@@ -19,7 +19,9 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - Dexter Investigation
+  - "Dexter Investigation"
+  - "Dexter Repository Investigation Snapshot"
+  - "src-2026-05-04-dexter-investigation"
 has_contradictions: false
 knowledge_domain: software
 example: false

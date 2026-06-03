@@ -23,7 +23,9 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - virattt/dexter
+  - "virattt/dexter"
+  - "Dexter"
+  - "dexter"
 has_contradictions: false
 knowledge_domain: software
 example: false

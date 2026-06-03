@@ -15,7 +15,9 @@ domains:
 supersedes:
 superseded_by:
 privacy: cloud_safe
-aliases: []
+aliases:
+  - "Fixture Concept Two"
+  - fixture-concept-2
 has_contradictions: false
 knowledge_domain: beta
 example: true

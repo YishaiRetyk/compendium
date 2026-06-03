@@ -16,7 +16,9 @@ domains:
 supersedes:
 superseded_by:
 privacy: cloud_safe
-aliases: []
+aliases:
+  - "Introduce Decision Record Page Type"
+  - "dr-2026-04-14-phase6-decision-type"
 has_contradictions: false
 knowledge_domain: software
 trigger_type: schema-update

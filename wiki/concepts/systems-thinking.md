@@ -22,8 +22,10 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - Systems Design
-  - Architectural Thinking
+  - "Systems Design"
+  - "Architectural Thinking"
+  - "Systems Thinking"
+  - "systems-thinking"
 has_contradictions: false
 knowledge_domain: software
 example: false

@@ -22,7 +22,9 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - cantaro86/Financial-Models-Numerical-Methods
+  - "cantaro86/Financial-Models-Numerical-Methods"
+  - "Financial-Models-Numerical-Methods"
+  - "financial-models-numerical-methods"
 has_contradictions: false
 knowledge_domain: software
 example: false

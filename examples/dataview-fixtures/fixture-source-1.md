@@ -15,7 +15,9 @@ domains:
 supersedes:
 superseded_by:
 privacy: cloud_safe
-aliases: []
+aliases:
+  - "Fixture Source One"
+  - fixture-source-1
 has_contradictions: false
 knowledge_domain: alpha
 example: true

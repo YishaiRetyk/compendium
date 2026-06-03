@@ -21,8 +21,10 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - Shared Language
-  - Project Glossary
+  - "Shared Language"
+  - "Project Glossary"
+  - "Ubiquitous Language"
+  - "ubiquitous-language"
 has_contradictions: false
 knowledge_domain: software
 example: false

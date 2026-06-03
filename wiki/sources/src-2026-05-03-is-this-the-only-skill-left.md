@@ -20,7 +20,9 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - Is This the Only Skill Left
+  - "Is This the Only Skill Left"
+  - "Is this the only skill left?"
+  - "src-2026-05-03-is-this-the-only-skill-left"
 has_contradictions: false
 knowledge_domain: software
 example: false

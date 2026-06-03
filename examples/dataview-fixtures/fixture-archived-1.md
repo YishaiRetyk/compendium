@@ -15,7 +15,9 @@ domains:
 supersedes:
 superseded_by:
 privacy: cloud_safe
-aliases: []
+aliases:
+  - "Fixture Archived One"
+  - fixture-archived-1
 has_contradictions: false
 knowledge_domain: gamma
 example: true

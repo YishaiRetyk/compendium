@@ -16,7 +16,9 @@ domains:
 supersedes:
 superseded_by:
 privacy: cloud_safe
-aliases: []
+aliases:
+  - "Fixture Entity Two"
+  - fixture-entity-2
 has_contradictions: false
 knowledge_domain: alpha
 example: true

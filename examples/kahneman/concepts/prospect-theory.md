@@ -20,7 +20,9 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - Prospect Theory (Kahneman-Tversky)
+  - "Prospect Theory (Kahneman-Tversky)"
+  - "Prospect Theory"
+  - "prospect-theory"
 has_contradictions: false
 knowledge_domain: science
 ---

@@ -20,8 +20,10 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - Naur's Theory Building
-  - Theory Building
+  - "Naur's Theory Building"
+  - "Theory Building"
+  - "Programming as Theory Building"
+  - "programming-as-theory-building"
 has_contradictions: false
 knowledge_domain: software
 example: false

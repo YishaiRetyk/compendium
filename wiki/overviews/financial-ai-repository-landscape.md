@@ -29,7 +29,9 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - Financial AI and Quant Finance Repository Landscape
+  - "Financial AI and Quant Finance Repository Landscape"
+  - "Financial AI Repository Landscape"
+  - "financial-ai-repository-landscape"
 has_contradictions: false
 knowledge_domain: software
 example: false

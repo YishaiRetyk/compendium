@@ -21,9 +21,11 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - Agent Skills Best Practices Doc
-  - Skill Authoring Best Practices
-  - platform.claude.com Agent Skills best practices
+  - "Agent Skills Best Practices Doc"
+  - "Skill Authoring Best Practices"
+  - "platform.claude.com Agent Skills best practices"
+  - "Anthropic Agent Skills Best Practices"
+  - "src-2026-05-06-anthropic-agent-skills-best-practices"
 has_contradictions: false
 knowledge_domain: software
 example: false

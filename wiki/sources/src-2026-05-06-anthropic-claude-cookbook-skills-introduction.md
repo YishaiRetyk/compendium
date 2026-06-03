@@ -22,8 +22,10 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - claude-cookbooks notebook 01
-  - 01_skills_introduction.ipynb
+  - "claude-cookbooks notebook 01"
+  - "01_skills_introduction.ipynb"
+  - "Introduction to Claude Skills (claude-cookbooks notebook 01)"
+  - "src-2026-05-06-anthropic-claude-cookbook-skills-introduction"
 has_contradictions: false
 knowledge_domain: software
 example: false

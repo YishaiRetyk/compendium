@@ -22,8 +22,9 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - Decision-Making
-  - Judgment and Decision Making
+  - "Decision-Making"
+  - "Judgment and Decision Making"
+  - "Decision Making"
 has_contradictions: false
 knowledge_domain: science
 ---

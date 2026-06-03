@@ -23,7 +23,9 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - OpenBB-finance/OpenBB
+  - "OpenBB-finance/OpenBB"
+  - "OpenBB"
+  - "openbb"
 has_contradictions: false
 knowledge_domain: software
 example: false

@@ -19,7 +19,9 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - OpenBB Investigation
+  - "OpenBB Investigation"
+  - "OpenBB Repository Investigation Snapshot"
+  - "src-2026-05-04-openbb-investigation"
 has_contradictions: false
 knowledge_domain: software
 example: false

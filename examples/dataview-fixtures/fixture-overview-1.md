@@ -14,7 +14,9 @@ domains:
   - beta
 supersedes:
 superseded_by:
-aliases: []
+aliases:
+  - "Fixture Overview One"
+  - fixture-overview-1
 has_contradictions: false
 knowledge_domain: beta
 example: true

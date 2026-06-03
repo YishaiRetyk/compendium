@@ -23,7 +23,9 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - TauricResearch/TradingAgents
+  - "TauricResearch/TradingAgents"
+  - "TradingAgents"
+  - "tradingagents"
 has_contradictions: false
 knowledge_domain: software
 example: false

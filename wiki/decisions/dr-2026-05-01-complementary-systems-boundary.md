@@ -18,7 +18,9 @@ domains:
 supersedes:
 superseded_by:
 privacy: cloud_safe
-aliases: []
+aliases:
+  - "Complementary Systems Boundary: Compendium as Durable Wiki Memory in a Multi-System Stack"
+  - "dr-2026-05-01-complementary-systems-boundary"
 has_contradictions: false
 knowledge_domain: software
 trigger_type: schema-update

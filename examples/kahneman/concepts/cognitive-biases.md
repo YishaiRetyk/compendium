@@ -21,8 +21,10 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - Cognitive Bias
-  - Heuristic Biases
+  - "Cognitive Bias"
+  - "Heuristic Biases"
+  - "Cognitive Biases"
+  - "cognitive-biases"
 has_contradictions: false
 knowledge_domain: science
 ---

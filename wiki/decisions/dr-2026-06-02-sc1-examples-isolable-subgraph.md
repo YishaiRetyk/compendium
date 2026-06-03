@@ -19,7 +19,9 @@ domains:
 supersedes:
 superseded_by:
 privacy: cloud_safe
-aliases: []
+aliases:
+  - "SC1 Reframing: examples/ Forms a Visually Isolable Sub-Graph"
+  - "dr-2026-06-02-sc1-examples-isolable-subgraph"
 has_contradictions: false
 knowledge_domain: software
 trigger_type: reframing

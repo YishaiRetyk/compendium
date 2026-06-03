@@ -23,11 +23,12 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - Ralph (Autonomous Coding Loop)
-  - Ralph
-  - The Ralph Loop
-  - Ralph Wiggum
-  - ralph technique
+  - "Ralph (Autonomous Coding Loop)"
+  - "Ralph"
+  - "The Ralph Loop"
+  - "Ralph Wiggum"
+  - "ralph technique"
+  - "ralph-loop"
 has_contradictions: false
 knowledge_domain: software
 example: false

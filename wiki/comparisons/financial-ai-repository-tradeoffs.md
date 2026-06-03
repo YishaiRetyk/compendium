@@ -29,7 +29,9 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - Financial AI and Quant Finance Repository Tradeoffs
+  - "Financial AI and Quant Finance Repository Tradeoffs"
+  - "Financial AI Repository Tradeoffs"
+  - "financial-ai-repository-tradeoffs"
 has_contradictions: false
 knowledge_domain: software
 example: false

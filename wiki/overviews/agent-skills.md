@@ -27,11 +27,12 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - Agent Skills
-  - Anthropic Agent Skills
-  - Agent Skill
-  - Skill (Anthropic)
-  - SKILL.md
+  - "Agent Skills"
+  - "Anthropic Agent Skills"
+  - "Agent Skill"
+  - "Skill (Anthropic)"
+  - "SKILL.md"
+  - "agent-skills"
 has_contradictions: false
 knowledge_domain: software
 example: false

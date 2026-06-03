@@ -21,8 +21,10 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - Documented Contracts
-  - Context Contract
+  - "Documented Contracts"
+  - "Context Contract"
+  - "Documented Contract"
+  - "documented-contract"
 has_contradictions: false
 knowledge_domain: software
 example: false

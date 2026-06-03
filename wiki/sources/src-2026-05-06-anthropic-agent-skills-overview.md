@@ -21,8 +21,10 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - Agent Skills Overview Doc
-  - platform.claude.com Agent Skills overview
+  - "Agent Skills Overview Doc"
+  - "platform.claude.com Agent Skills overview"
+  - "Anthropic Agent Skills Overview"
+  - "src-2026-05-06-anthropic-agent-skills-overview"
 has_contradictions: false
 knowledge_domain: software
 example: false

@@ -22,7 +22,9 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - Cognitive Debt
+  - "Cognitive Debt"
+  - "Comprehension Debt"
+  - "comprehension-debt"
 has_contradictions: false
 knowledge_domain: software
 example: false

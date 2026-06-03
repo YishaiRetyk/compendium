@@ -19,7 +19,9 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - Financial AI Repository Comparison Report
+  - "Financial AI Repository Comparison Report"
+  - "Financial AI and Quant Finance Repository Comparison Report"
+  - "src-2026-05-04-financial-ai-repo-comparison-report"
 has_contradictions: false
 knowledge_domain: software
 example: false

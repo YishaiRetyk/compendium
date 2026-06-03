@@ -19,7 +19,9 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - FMNM Investigation
+  - "FMNM Investigation"
+  - "Financial-Models-Numerical-Methods Repository Investigation Snapshot"
+  - "src-2026-05-04-fmnm-investigation"
 has_contradictions: false
 knowledge_domain: software
 example: false

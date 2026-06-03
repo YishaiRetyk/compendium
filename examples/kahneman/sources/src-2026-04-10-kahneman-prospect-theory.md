@@ -20,7 +20,9 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - Kahneman Prospect Theory Article
+  - "Kahneman Prospect Theory Article"
+  - "Prospect Theory and Loss Aversion: Kahneman's Revolution in Decision Science"
+  - "src-2026-04-10-kahneman-prospect-theory"
 has_contradictions: false
 knowledge_domain: science
 path: sources/2026/2026-04/2026-04-10-kahneman-prospect-theory/source.md

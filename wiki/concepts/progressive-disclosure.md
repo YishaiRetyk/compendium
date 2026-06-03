@@ -26,10 +26,11 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - Progressive Disclosure
-  - Three-Level Loading
-  - Three-Level Skill Loading
-  - Skills Progressive Disclosure
+  - "Progressive Disclosure"
+  - "Three-Level Loading"
+  - "Three-Level Skill Loading"
+  - "Skills Progressive Disclosure"
+  - "progressive-disclosure"
 has_contradictions: false
 knowledge_domain: software
 example: false
@@ -37,7 +38,7 @@ example: false
 
 ## TL;DR
 
-Progressive disclosure is the loading discipline Anthropic uses to let many Agent Skills coexist without paying full token cost upfront. Information loads in three levels: Level 1 metadata (the YAML `name` + `description`, always preloaded into the system prompt at ~100 tokens per Skill); Level 2 instructions (the SKILL.md body, read via bash when the Skill is triggered, kept under ~5k tokens); Level 3 resources (additional `.md` references, datasets, scripts — accessed only when explicitly referenced, with script source code executed via bash so it never enters context). The pattern lets a Skill bundle dozens of reference files, comprehensive API docs, or large datasets without context penalty until something is actually read. The same discipline is a general context-engineering principle, not a Skills-only mechanism: the [[Ralph Playbook]] applies it to autonomous coding loops by keeping its always-loaded `AGENTS.md` minimal and deferring status/detail to a separate on-demand file.
+Progressive disclosure is the loading discipline Anthropic uses to let many Agent Skills coexist without paying full token cost upfront. Information loads in three levels: Level 1 metadata (the YAML `name` + `description`, always preloaded into the system prompt at ~100 tokens per Skill); Level 2 instructions (the SKILL.md body, read via bash when the Skill is triggered, kept under ~5k tokens); Level 3 resources (additional `.md` references, datasets, scripts — accessed only when explicitly referenced, with script source code executed via bash so it never enters context). The pattern lets a Skill bundle dozens of reference files, comprehensive API docs, or large datasets without context penalty until something is actually read. The same discipline is a general context-engineering principle, not a Skills-only mechanism: the [[The Ralph Playbook]] applies it to autonomous coding loops by keeping its always-loaded `AGENTS.md` minimal and deferring status/detail to a separate on-demand file.
 
 ## Key Facts
 

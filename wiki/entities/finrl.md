@@ -22,7 +22,9 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - AI4Finance-Foundation/FinRL
+  - "AI4Finance-Foundation/FinRL"
+  - "FinRL"
+  - "finrl"
 has_contradictions: false
 knowledge_domain: software
 example: false

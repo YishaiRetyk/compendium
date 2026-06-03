@@ -19,7 +19,9 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - FinRL Investigation
+  - "FinRL Investigation"
+  - "FinRL Repository Investigation Snapshot"
+  - "src-2026-05-04-finrl-investigation"
 has_contradictions: false
 knowledge_domain: software
 example: false

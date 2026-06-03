@@ -24,8 +24,10 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - claude-cookbooks notebook 03
-  - 03_skills_custom_development.ipynb
+  - "claude-cookbooks notebook 03"
+  - "03_skills_custom_development.ipynb"
+  - "Building Custom Skills for Claude (claude-cookbooks notebook 03)"
+  - "src-2026-05-06-anthropic-claude-cookbook-skills-custom-development"
 has_contradictions: false
 knowledge_domain: software
 example: false

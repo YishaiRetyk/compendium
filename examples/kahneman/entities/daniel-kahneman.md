@@ -21,7 +21,9 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - Kahneman
+  - "Kahneman"
+  - "Daniel Kahneman"
+  - "daniel-kahneman"
 has_contradictions: false
 knowledge_domain: biography
 ---

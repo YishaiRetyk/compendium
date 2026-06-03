@@ -19,7 +19,9 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - Anthropic Financial Services Investigation
+  - "Anthropic Financial Services Investigation"
+  - "Anthropic Financial Services Repository Investigation Snapshot"
+  - "src-2026-05-04-anthropic-financial-services-investigation"
 has_contradictions: false
 knowledge_domain: software
 example: false
