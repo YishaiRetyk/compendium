@@ -61,13 +61,13 @@ Full phase details: [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md)
 
 **Non-goals**: No renaming wiki files to spaced titles; no slug-form link rewrite; no near-duplicate page detection (deferred to the delivered `a1-lexical-dedup` `duplicate` category / future work); no `.obsidian/` config shipped in the template.
 **Suggested plan shape** (set at plan time): ~3 plans in 2 waves — Wave 1: convention+DR ‖ `linkres` lint+`--fix`+tests (docs vs. code, independent); Wave 2: data remediation + variant triage + human-verify (depends on both).
-**Plans:** 3 plans
+**Plans:** 2/3 plans executed
 
 Plans:
 **Wave 1**
 
-- [ ] 14-01-PLAN.md — Correct CLAUDE.md §8/§5 convention, update 12 schema templates, author schema-update DR, sync AGENTS.md (LINK-01, LINK-02, LINK-03)
-- [ ] 14-02-PLAN.md — Add `linkres` lint category, normalize_link helper, --fix self-alias backfill, reconcile orphan/gap to Obsidian-accurate resolution, bump LINT_VERSION 1.5.0, 8-case test coverage (LINK-04, LINK-05, LINK-06)
+- [x] 14-01-PLAN.md — Correct CLAUDE.md §8/§5 convention, update 12 schema templates, author schema-update DR, sync AGENTS.md (LINK-01, LINK-02, LINK-03)
+- [x] 14-02-PLAN.md — Add `linkres` lint category, normalize_link helper, --fix self-alias backfill, reconcile orphan/gap to Obsidian-accurate resolution, bump LINT_VERSION 1.5.0, 8-case test coverage (LINK-04, LINK-05, LINK-06)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -247,4 +247,4 @@ The following are intentionally deferred until real usage demands them, captured
 | 13. Claim Faithfulness Audit | v1.1 | 5/5 | Complete | 2026-06-01 |
 | 13.1. Docs Finalization + Obsidian Starter | v1.1 | 5/5 | Complete | 2026-06-01 |
 | 13.2. v1.1 Closure Verification Gate | v1.1 | 3/3 | Complete | 2026-06-02 |
-| 14. Graph Link Resolution | v1.1.1 | 0/3 | Planned | - |
+| 14. Graph Link Resolution | v1.1.1 | 2/3 | In Progress|  |
