@@ -30,13 +30,13 @@ knowledge_domain: biography
 
 ## TL;DR
 
-Israeli-American psychologist who won the Nobel Memorial Prize in Economic Sciences in 2002 for his work on judgment and decision-making with Amos Tversky. Developer (with Tversky) of [[Prospect Theory]], the decision-theoretic framework that replaced expected utility theory as a descriptive account of human choice, and author of *Thinking, Fast and Slow*, which synthesized decades of research on heuristics, [[Cognitive Biases]], and the dual-process theory of the mind.
+Israeli-American psychologist who won the Nobel Memorial Prize in Economic Sciences in 2002 for his work on judgment and decision-making with Amos Tversky. Developer (with Tversky) of [[prospect-theory|Prospect Theory]], the decision-theoretic framework that replaced expected utility theory as a descriptive account of human choice, and author of *Thinking, Fast and Slow*, which synthesized decades of research on heuristics, [[cognitive-biases|Cognitive Biases]], and the dual-process theory of the mind.
 
 ## Key Facts
 
 - Born in Tel Aviv in 1934, Kahneman grew up in France during the Nazi occupation before returning to the British Mandate of Palestine. [prov:src-2026-04-09-thinking-fast-and-slow-part1#sec:introduction|direct] [epistemic:: sourced]
 - Won the Nobel Memorial Prize in Economic Sciences in 2002 for integrating psychological research into economic theory, particularly regarding human judgment under uncertainty. [prov:src-2026-04-09-thinking-fast-and-slow-part1#sec:introduction|direct] [epistemic:: sourced]
-- His collaboration with [[Amos Tversky]] beginning in the late 1960s produced foundational research on heuristics and biases that reshaped both psychology and economics. [prov:src-2026-04-09-thinking-fast-and-slow-part1#p10|direct] [epistemic:: sourced]
+- His collaboration with [[amos-tversky|Amos Tversky]] beginning in the late 1960s produced foundational research on heuristics and biases that reshaped both psychology and economics. [prov:src-2026-04-09-thinking-fast-and-slow-part1#p10|direct] [epistemic:: sourced]
 - Developed the dual-process framework distinguishing fast, intuitive thinking (System 1) from slow, deliberate thinking (System 2), which became the organizing structure for *Thinking, Fast and Slow*. [prov:src-2026-04-09-thinking-fast-and-slow-part1#sec:two-systems|direct] [epistemic:: sourced]
 - With Amos Tversky, published prospect theory in the journal *Econometrica* in 1979 as a direct alternative to the expected utility model that had anchored rational choice theory since the 1940s. [prov:src-2026-04-10-kahneman-prospect-theory#sec:introduction|direct] [epistemic:: sourced]
 - Held academic appointments over his career at the Hebrew University of Jerusalem, the University of British Columbia, the University of California Berkeley, and Princeton University. [prov:src-2026-04-10-kahneman-prospect-theory#sec:introduction|direct] [epistemic:: sourced]
@@ -49,18 +49,18 @@ Kahneman's career spans more than five decades of research into how people actua
 
 Together, Kahneman and Tversky developed prospect theory, which demonstrated that people evaluate losses and gains asymmetrically -- losses loom larger than equivalent gains. The theory was first published in the journal *Econometrica* in 1979 as a direct alternative to the expected utility model that had anchored rational choice theory since the 1940s. [prov:src-2026-04-10-kahneman-prospect-theory#sec:introduction|direct] [epistemic:: sourced] This finding challenged the expected utility theory that had dominated economics for decades. Their research program cataloged systematic biases in human judgment, including anchoring, availability, and representativeness heuristics.
 
-In *Thinking, Fast and Slow*, Kahneman presented these findings through the lens of [[System 1 vs System 2]] thinking. The book argues that most cognitive errors arise not from stupidity but from the automatic operations of System 1 -- a fast, associative process that is efficient but prone to predictable mistakes. Understanding these patterns is the foundation for better [[Decision Making]].
+In *Thinking, Fast and Slow*, Kahneman presented these findings through the lens of [[system-1-vs-system-2|System 1 vs System 2]] thinking. The book argues that most cognitive errors arise not from stupidity but from the automatic operations of System 1 -- a fast, associative process that is efficient but prone to predictable mistakes. Understanding these patterns is the foundation for better [[decision-making|Decision Making]].
 
 ## Related Pages
 
-- [[Cognitive Biases]]
-- [[System 1 vs System 2]]
-- [[Decision Making]]
-- [[Amos Tversky]]
-- [[Prospect Theory]]
-- [[Loss Aversion]]
+- [[cognitive-biases|Cognitive Biases]]
+- [[system-1-vs-system-2|System 1 vs System 2]]
+- [[decision-making|Decision Making]]
+- [[amos-tversky|Amos Tversky]]
+- [[prospect-theory|Prospect Theory]]
+- [[loss-aversion|Loss Aversion]]
 
 ## Sources
 
-- [[src-2026-04-09-thinking-fast-and-slow-part1]]: "Thinking, Fast and Slow - Part 1" (2011)
-- [[src-2026-04-10-kahneman-prospect-theory]]: "Prospect Theory and Loss Aversion: Kahneman's Revolution in Decision Science" (2026-04-10)
+- [[src-2026-04-09-thinking-fast-and-slow-part1|Kahneman - Thinking, Fast and Slow Part 1]]: "Thinking, Fast and Slow - Part 1" (2011)
+- [[src-2026-04-10-kahneman-prospect-theory|Prospect Theory and Loss Aversion: Kahneman's Revolution in Decision Science]]: "Prospect Theory and Loss Aversion: Kahneman's Revolution in Decision Science" (2026-04-10)

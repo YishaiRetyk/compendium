@@ -31,7 +31,7 @@ knowledge_domain: science
 
 ## TL;DR
 
-Systematic patterns of deviation from rationality in judgment. First cataloged by [[Daniel Kahneman]] and [[Amos Tversky]] in the 1970s, cognitive biases arise from the mind's reliance on mental shortcuts (heuristics) that are efficient but systematically error-prone. They are central to [[Decision Making]] research. A second family of biases -- including the endowment effect, status quo bias, and the disposition effect -- is explained downstream of [[Loss Aversion]] and [[Prospect Theory]] rather than by heuristic shortcuts.
+Systematic patterns of deviation from rationality in judgment. First cataloged by [[daniel-kahneman|Daniel Kahneman]] and [[amos-tversky|Amos Tversky]] in the 1970s, cognitive biases arise from the mind's reliance on mental shortcuts (heuristics) that are efficient but systematically error-prone. They are central to [[decision-making|Decision Making]] research. A second family of biases -- including the endowment effect, status quo bias, and the disposition effect -- is explained downstream of [[loss-aversion|Loss Aversion]] and [[prospect-theory|Prospect Theory]] rather than by heuristic shortcuts.
 
 ## Key Facts
 
@@ -50,7 +50,7 @@ Systematic patterns of deviation from rationality in judgment. First cataloged b
 
 The study of cognitive biases began in the early 1970s when Kahneman and Tversky published a series of papers demonstrating that human judgment systematically departs from the predictions of probability theory and expected utility. Rather than being random, these errors follow predictable patterns that can be traced to specific mental shortcuts -- heuristics -- that the mind uses to simplify complex problems.
 
-The heuristics-and-biases research program identified three core heuristics: representativeness (judging by similarity to a prototype), availability (judging by ease of recall), and anchoring (adjusting insufficiently from an initial value). Each heuristic is useful in many everyday situations but leads to characteristic errors when applied in domains where it does not fit. The dual-process framework presented in *Thinking, Fast and Slow* locates these heuristics in [[System 1 vs System 2]] -- the fast, automatic system that processes information without deliberate effort.
+The heuristics-and-biases research program identified three core heuristics: representativeness (judging by similarity to a prototype), availability (judging by ease of recall), and anchoring (adjusting insufficiently from an initial value). Each heuristic is useful in many everyday situations but leads to characteristic errors when applied in domains where it does not fit. The dual-process framework presented in *Thinking, Fast and Slow* locates these heuristics in [[system-1-vs-system-2|System 1 vs System 2]] -- the fast, automatic system that processes information without deliberate effort.
 
 The field of cognitive bias research has faced scrutiny in recent years due to the broader replication crisis in psychology. While the core heuristics have generally replicated well, the precise magnitude and boundary conditions of specific biases remain subjects of active investigation. Kahneman himself acknowledged some of these concerns in later work, noting that the original effect sizes for certain priming-related biases were likely inflated. This ongoing refinement is a normal part of science, but it means that claims about specific bias magnitudes should be treated with appropriate caution.
 
@@ -58,14 +58,14 @@ Not every cognitive bias catalogued in the literature is a heuristic bias in the
 
 ## Related Pages
 
-- [[Daniel Kahneman]]
-- [[System 1 vs System 2]]
-- [[Decision Making]]
-- [[Amos Tversky]]
-- [[Prospect Theory]]
-- [[Loss Aversion]]
+- [[daniel-kahneman|Daniel Kahneman]]
+- [[system-1-vs-system-2|System 1 vs System 2]]
+- [[decision-making|Decision Making]]
+- [[amos-tversky|Amos Tversky]]
+- [[prospect-theory|Prospect Theory]]
+- [[loss-aversion|Loss Aversion]]
 
 ## Sources
 
-- [[src-2026-04-09-thinking-fast-and-slow-part1]]: "Thinking, Fast and Slow - Part 1" (2011)
-- [[src-2026-04-10-kahneman-prospect-theory]]: "Prospect Theory and Loss Aversion: Kahneman's Revolution in Decision Science" (2026-04-10)
+- [[src-2026-04-09-thinking-fast-and-slow-part1|Kahneman - Thinking, Fast and Slow Part 1]]: "Thinking, Fast and Slow - Part 1" (2011)
+- [[src-2026-04-10-kahneman-prospect-theory|Prospect Theory and Loss Aversion: Kahneman's Revolution in Decision Science]]: "Prospect Theory and Loss Aversion: Kahneman's Revolution in Decision Science" (2026-04-10)

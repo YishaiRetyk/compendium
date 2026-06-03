@@ -43,7 +43,7 @@ compiled_targets:
 
 ## TL;DR
 
-Magazine-style overview of prospect theory, the decision-theoretic framework that [[Daniel Kahneman]] and Amos Tversky published in *Econometrica* in 1979 as an alternative to expected utility theory. The article covers the three core components -- reference dependence, loss aversion, and probability weighting -- along with downstream phenomena (endowment effect, status quo bias, disposition effect) and applied uses in finance, medicine, and public policy.
+Magazine-style overview of prospect theory, the decision-theoretic framework that [[daniel-kahneman|Daniel Kahneman]] and Amos Tversky published in *Econometrica* in 1979 as an alternative to expected utility theory. The article covers the three core components -- reference dependence, loss aversion, and probability weighting -- along with downstream phenomena (endowment effect, status quo bias, disposition effect) and applied uses in finance, medicine, and public policy.
 
 ## Key Takeaways
 
@@ -73,9 +73,9 @@ Magazine-style overview of prospect theory, the decision-theoretic framework tha
 
 ## Notes
 
-This source is the first `article`-type ingest and is used to validate the diff-driven pipeline defined in AGENTS.md section 11.1. The source deliberately overlaps with existing wiki coverage of [[Cognitive Biases]] and [[System 1 vs System 2]], while also introducing enough distinct content (prospect theory's three components, loss-aversion quantification, nudge applications) to test the page-creation judgment of the Diff pass.
+This source is the first `article`-type ingest and is used to validate the diff-driven pipeline defined in AGENTS.md section 11.1. The source deliberately overlaps with existing wiki coverage of [[cognitive-biases|Cognitive Biases]] and [[system-1-vs-system-2|System 1 vs System 2]], while also introducing enough distinct content (prospect theory's three components, loss-aversion quantification, nudge applications) to test the page-creation judgment of the Diff pass.
 
-The article connects naturally to the Phase 2 example cluster around Kahneman's work. It provides the first substantive description of prospect theory in the wiki, creating a home for the `[[Prospect Theory]]` red links that previously existed on multiple pages. It also creates the first dedicated [[Loss Aversion]] page, consolidating claims that had been scattered across the cognitive-biases and decision-making pages.
+The article connects naturally to the Phase 2 example cluster around Kahneman's work. It provides the first substantive description of prospect theory in the wiki, creating a home for the `[[prospect-theory|Prospect Theory]]` red links that previously existed on multiple pages. It also creates the first dedicated [[loss-aversion|Loss Aversion]] page, consolidating claims that had been scattered across the cognitive-biases and decision-making pages.
 
 ## Source Metadata
 

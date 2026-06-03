@@ -39,13 +39,13 @@ compiled_targets:
 
 ## TL;DR
 
-Part 1 of Kahneman's synthesis of decades of research on judgment, heuristics, and cognitive biases. Introduces the dual-process framework (System 1 and System 2) as an organizing metaphor for understanding how the mind makes judgments and decisions. Draws on the author's collaboration with [[Amos Tversky]] and covers the foundational heuristics-and-biases research program.
+Part 1 of Kahneman's synthesis of decades of research on judgment, heuristics, and cognitive biases. Introduces the dual-process framework (System 1 and System 2) as an organizing metaphor for understanding how the mind makes judgments and decisions. Draws on the author's collaboration with [[amos-tversky|Amos Tversky]] and covers the foundational heuristics-and-biases research program.
 
 ## Key Takeaways
 
 - Human cognition operates through two distinct systems: System 1 (fast, automatic, intuitive) and System 2 (slow, deliberate, effortful). Most everyday judgments are produced by System 1 with minimal System 2 oversight. [prov:src-2026-04-09-thinking-fast-and-slow-part1#sec:two-systems|direct] [epistemic:: sourced]
 - Three core heuristics -- representativeness, availability, and anchoring -- account for a wide range of systematic errors in human judgment. These heuristics are not flaws but efficient shortcuts that sometimes misfire. [prov:src-2026-04-09-thinking-fast-and-slow-part1#sec:heuristics|direct] [epistemic:: sourced]
-- [[Cognitive Biases]] are predictable and systematic, not random. Understanding the specific heuristic that produces a bias allows for the design of interventions (such as checklists or structured decision procedures) that can mitigate its effects. [prov:src-2026-04-09-thinking-fast-and-slow-part1#sec:introduction|direct] [epistemic:: sourced]
+- [[cognitive-biases|Cognitive Biases]] are predictable and systematic, not random. Understanding the specific heuristic that produces a bias allows for the design of interventions (such as checklists or structured decision procedures) that can mitigate its effects. [prov:src-2026-04-09-thinking-fast-and-slow-part1#sec:introduction|direct] [epistemic:: sourced]
 - The book is written for a general audience and presents academic research through vivid examples and personal anecdotes, making it both a scientific reference and a narrative work. [prov:src-2026-04-09-thinking-fast-and-slow-part1#sec:introduction|direct] [epistemic:: sourced]
 
 ## Extracted Claims
@@ -57,9 +57,9 @@ Part 1 of Kahneman's synthesis of decades of research on judgment, heuristics, a
 
 ## Notes
 
-This source serves as the foundational text for the wiki's coverage of [[Daniel Kahneman]]'s research program. Part 1 focuses primarily on the heuristics and biases framework, with [[System 1 vs System 2]] as the central organizing metaphor. Later parts of the book extend into prospect theory, experienced utility, and the "two selves" (experiencing vs. remembering).
+This source serves as the foundational text for the wiki's coverage of [[daniel-kahneman|Daniel Kahneman]]'s research program. Part 1 focuses primarily on the heuristics and biases framework, with [[system-1-vs-system-2|System 1 vs System 2]] as the central organizing metaphor. Later parts of the book extend into prospect theory, experienced utility, and the "two selves" (experiencing vs. remembering).
 
-The source connects naturally to [[Cognitive Biases]] (which catalogs the specific biases discussed), [[System 1 vs System 2]] (which examines the dual-process framework in detail), and [[Decision Making]] (which synthesizes the practical implications). Drawing on the patterns across these connections, the source can be seen as arguing that better decisions require not willpower but structural awareness of how System 1 shapes judgment -- an implication that extends beyond what any single chapter states directly. [epistemic:: inferred]
+The source connects naturally to [[cognitive-biases|Cognitive Biases]] (which catalogs the specific biases discussed), [[system-1-vs-system-2|System 1 vs System 2]] (which examines the dual-process framework in detail), and [[decision-making|Decision Making]] (which synthesizes the practical implications). Drawing on the patterns across these connections, the source can be seen as arguing that better decisions require not willpower but structural awareness of how System 1 shapes judgment -- an implication that extends beyond what any single chapter states directly. [epistemic:: inferred]
 
 ## Source Metadata
 

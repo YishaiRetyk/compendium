@@ -31,11 +31,11 @@ knowledge_domain: science
 
 ## TL;DR
 
-[[Daniel Kahneman]]'s dual-process framework distinguishes fast intuitive thinking (System 1) from slow deliberate thinking (System 2). System 1 is the source of [[Cognitive Biases]] -- its speed and automaticity make it efficient but prone to predictable errors. System 2 can override System 1 but is effortful and, in Kahneman's phrase, "lazy." The dual-process distinction also helps explain why findings from [[Prospect Theory]] such as [[Loss Aversion]] are difficult to train away: the flinch at a prospective loss is a System 1 response, and System 2 knowledge of the theory does not reliably veto it.
+[[daniel-kahneman|Daniel Kahneman]]'s dual-process framework distinguishes fast intuitive thinking (System 1) from slow deliberate thinking (System 2). System 1 is the source of [[cognitive-biases|Cognitive Biases]] -- its speed and automaticity make it efficient but prone to predictable errors. System 2 can override System 1 but is effortful and, in Kahneman's phrase, "lazy." The dual-process distinction also helps explain why findings from [[prospect-theory|Prospect Theory]] such as [[loss-aversion|Loss Aversion]] are difficult to train away: the flinch at a prospective loss is a System 1 response, and System 2 knowledge of the theory does not reliably veto it.
 
 ## Bottom Line
 
-Most errors in judgment stem from System 1 operating unchecked. Awareness of the dual-process distinction is the first step toward better [[Decision Making]]: recognizing when a situation calls for System 2 engagement rather than relying on System 1 intuitions. The distinction also sets the expectation for which kinds of debiasing interventions are likely to work -- structural nudges and checklists that recruit System 2 at decision points, rather than exhortations to "think harder."
+Most errors in judgment stem from System 1 operating unchecked. Awareness of the dual-process distinction is the first step toward better [[decision-making|Decision Making]]: recognizing when a situation calls for System 2 engagement rather than relying on System 1 intuitions. The distinction also sets the expectation for which kinds of debiasing interventions are likely to work -- structural nudges and checklists that recruit System 2 at decision points, rather than exhortations to "think harder."
 
 ## Comparison Table
 
@@ -62,5 +62,5 @@ The dual-process distinction also clarifies a puzzle about loss aversion: even p
 
 ## Sources
 
-- [[src-2026-04-09-thinking-fast-and-slow-part1]]: "Thinking, Fast and Slow - Part 1" (2011)
-- [[src-2026-04-10-kahneman-prospect-theory]]: "Prospect Theory and Loss Aversion: Kahneman's Revolution in Decision Science" (2026-04-10)
+- [[src-2026-04-09-thinking-fast-and-slow-part1|Kahneman - Thinking, Fast and Slow Part 1]]: "Thinking, Fast and Slow - Part 1" (2011)
+- [[src-2026-04-10-kahneman-prospect-theory|Prospect Theory and Loss Aversion: Kahneman's Revolution in Decision Science]]: "Prospect Theory and Loss Aversion: Kahneman's Revolution in Decision Science" (2026-04-10)

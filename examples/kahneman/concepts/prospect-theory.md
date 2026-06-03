@@ -29,7 +29,7 @@ knowledge_domain: science
 
 ## TL;DR
 
-Prospect theory is the decision-theoretic framework [[Daniel Kahneman]] and Amos Tversky published in *Econometrica* in 1979 as a direct alternative to expected utility theory. It holds that people evaluate outcomes as gains or losses relative to a psychological reference point, that losses are weighted more heavily than equivalent gains ([[Loss Aversion]]), that marginal sensitivity to gains and losses diminishes, and that probabilities are systematically distorted -- small probabilities overweighted, moderate-to-large probabilities underweighted.
+Prospect theory is the decision-theoretic framework [[daniel-kahneman|Daniel Kahneman]] and Amos Tversky published in *Econometrica* in 1979 as a direct alternative to expected utility theory. It holds that people evaluate outcomes as gains or losses relative to a psychological reference point, that losses are weighted more heavily than equivalent gains ([[loss-aversion|Loss Aversion]]), that marginal sensitivity to gains and losses diminishes, and that probabilities are systematically distorted -- small probabilities overweighted, moderate-to-large probabilities underweighted.
 
 ## Key Facts
 
@@ -52,17 +52,17 @@ Third, **probability weighting** replaces the linear treatment of probabilities 
 
 These three components are not independent embellishments -- together they form a coherent descriptive alternative to expected utility theory. Prospect theory does not say that people are "irrational" in a derogatory sense. It says that a different, characterizable value function captures their behavior better than the expected utility model does, and that the departures are systematic rather than noise.
 
-The framework connects naturally to the dual-process view Kahneman developed later in *Thinking, Fast and Slow*. Prospect theory does not require [[System 1 vs System 2]], but the immediate emotional reaction to a prospective loss -- the flinch that makes loss aversion feel automatic rather than deliberate -- is characteristic of System 1. This is part of the explanation for why knowing the theory does not reliably protect experts from its predictions.
+The framework connects naturally to the dual-process view Kahneman developed later in *Thinking, Fast and Slow*. Prospect theory does not require [[system-1-vs-system-2|System 1 vs System 2]], but the immediate emotional reaction to a prospective loss -- the flinch that makes loss aversion feel automatic rather than deliberate -- is characteristic of System 1. This is part of the explanation for why knowing the theory does not reliably protect experts from its predictions.
 
 ## Related Pages
 
-- [[Daniel Kahneman]]
-- [[Loss Aversion]]
-- [[Cognitive Biases]]
-- [[System 1 vs System 2]]
-- [[Decision Making]]
-- [[Amos Tversky]]
+- [[daniel-kahneman|Daniel Kahneman]]
+- [[loss-aversion|Loss Aversion]]
+- [[cognitive-biases|Cognitive Biases]]
+- [[system-1-vs-system-2|System 1 vs System 2]]
+- [[decision-making|Decision Making]]
+- [[amos-tversky|Amos Tversky]]
 
 ## Sources
 
-- [[src-2026-04-10-kahneman-prospect-theory]]: "Prospect Theory and Loss Aversion: Kahneman's Revolution in Decision Science" (2026-04-10)
+- [[src-2026-04-10-kahneman-prospect-theory|Prospect Theory and Loss Aversion: Kahneman's Revolution in Decision Science]]: "Prospect Theory and Loss Aversion: Kahneman's Revolution in Decision Science" (2026-04-10)

@@ -393,3 +393,15 @@ report: wiki/maintenance/lint-report.md
 findings: 0 total (0 errors, 0 warnings, 0 info)
 auto_fixes: 0 applied
 report: wiki/maintenance/lint-report.md
+
+## [2026-06-03] lint | wiki body-link rewrite to uniform piped form
+
+pages_affected: all wiki/ + examples/ body links rewritten to `[[id|Title]]` form
+result: 0 bare `[[Title]]` links remain; `bin/lint.sh --ci --category linkres` exits 0 over wiki/
+reason: Phase 14 re-plan (LINK-07, LINK-08, LINK-09) — piped-link migration
+
+## [2026-06-03] lint | wiki health check
+
+findings: 0 total (0 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki/maintenance/lint-report.md

@@ -31,7 +31,7 @@ knowledge_domain: science
 
 ## TL;DR
 
-How humans make choices under uncertainty. Research by [[Daniel Kahneman]] and others reveals that decisions are shaped by [[Cognitive Biases]], the asymmetric weighting of gains and losses formalized in [[Prospect Theory]] and [[Loss Aversion]], and the interplay of [[System 1 vs System 2]] thinking. This overview synthesizes findings discussed across multiple wiki pages to present a unified picture of judgment and decision-making research.
+How humans make choices under uncertainty. Research by [[daniel-kahneman|Daniel Kahneman]] and others reveals that decisions are shaped by [[cognitive-biases|Cognitive Biases]], the asymmetric weighting of gains and losses formalized in [[prospect-theory|Prospect Theory]] and [[loss-aversion|Loss Aversion]], and the interplay of [[system-1-vs-system-2|System 1 vs System 2]] thinking. This overview synthesizes findings discussed across multiple wiki pages to present a unified picture of judgment and decision-making research.
 
 ## Key Facts
 
@@ -56,14 +56,14 @@ The "nudge" lineage draws directly on prospect theory rather than generically on
 
 ## Related Pages
 
-- [[Daniel Kahneman]]
-- [[Cognitive Biases]]
-- [[System 1 vs System 2]]
-- [[Prospect Theory]]
-- [[Loss Aversion]]
-- [[Bounded Rationality]]
+- [[daniel-kahneman|Daniel Kahneman]]
+- [[cognitive-biases|Cognitive Biases]]
+- [[system-1-vs-system-2|System 1 vs System 2]]
+- [[prospect-theory|Prospect Theory]]
+- [[loss-aversion|Loss Aversion]]
+- [[bounded-rationality|Bounded Rationality]]
 
 ## Sources
 
-- [[src-2026-04-09-thinking-fast-and-slow-part1]]: "Thinking, Fast and Slow - Part 1" (2011)
-- [[src-2026-04-10-kahneman-prospect-theory]]: "Prospect Theory and Loss Aversion: Kahneman's Revolution in Decision Science" (2026-04-10)
+- [[src-2026-04-09-thinking-fast-and-slow-part1|Kahneman - Thinking, Fast and Slow Part 1]]: "Thinking, Fast and Slow - Part 1" (2011)
+- [[src-2026-04-10-kahneman-prospect-theory|Prospect Theory and Loss Aversion: Kahneman's Revolution in Decision Science]]: "Prospect Theory and Loss Aversion: Kahneman's Revolution in Decision Science" (2026-04-10)
