@@ -61,15 +61,15 @@ Claude API is Anthropic's HTTP API surface, including the Messages API and the S
 
 ## Detail
 
-Skills on the Claude API are a layered request shape: the operator picks a model, a max-tokens budget, a list of beta headers, a `container.skills` array, and the `code_execution_20250825` tool. The model decides — at runtime, from the user message — which Skill (if any) to load. Listing the API (`GET /v1/skills?source=anthropic`) returns only Skill metadata (name + description), implementing the first level of [[Progressive Disclosure]]: Claude knows what Skills exist without paying the token cost of their full instructions.
+Skills on the Claude API are a layered request shape: the operator picks a model, a max-tokens budget, a list of beta headers, a `container.skills` array, and the `code_execution_20250825` tool. The model decides — at runtime, from the user message — which Skill (if any) to load. Listing the API (`GET /v1/skills?source=anthropic`) returns only Skill metadata (name + description), implementing the first level of [[progressive-disclosure|Progressive Disclosure]]: Claude knows what Skills exist without paying the token cost of their full instructions.
 
 When a request comes in, Claude matches the user task to a Skill's metadata, reads the SKILL.md body via bash inside the code-execution container (Level 2), and accesses bundled scripts and reference files only as needed (Level 3). Bundled scripts execute via bash, so script source code never enters the model's context — only stdout/stderr does.
 
-The container's runtime constraints are deliberately tight. With no network access and no runtime package installation, API Skills must be self-contained: they can rely only on packages pre-configured in the code-execution image, and their input data has to arrive via the Messages API (uploaded files, text content) rather than be fetched mid-execution. This is the key difference from [[Claude Code]], where Skills run on the user's actual machine with full network access. The same Skill SKILL.md body can run on both surfaces — but Skills that depend on `pip install requests`, `npm install <pkg>`, or live HTTP calls only work on Claude Code or (per admin settings) Claude.ai, not on the Claude API.
+The container's runtime constraints are deliberately tight. With no network access and no runtime package installation, API Skills must be self-contained: they can rely only on packages pre-configured in the code-execution image, and their input data has to arrive via the Messages API (uploaded files, text content) rather than be fetched mid-execution. This is the key difference from [[claude-code|Claude Code]], where Skills run on the user's actual machine with full network access. The same Skill SKILL.md body can run on both surfaces — but Skills that depend on `pip install requests`, `npm install <pkg>`, or live HTTP calls only work on Claude Code or (per admin settings) Claude.ai, not on the Claude API.
 
 Generated files are returned via a two-step flow: the Messages API response includes `code_execution` tool-use result blocks containing `file_id`s for each artifact written inside the container; the operator then downloads each file via `GET /v1/files/{file_id}/content` with the `files-api-2025-04-14` beta header [prov:src-2026-05-06-anthropic-agent-skills-quickstart#sec:step-3-download-the-created-file|direct|2026-05-06] [epistemic:: sourced]
 
-Custom Skills on the API are workspace-wide rather than per-user, which is the inverse of [[Anthropic]]'s Claude.ai sharing model and a more stringent boundary than [[Claude Code]]'s personal-vs-project filesystem split.
+Custom Skills on the API are workspace-wide rather than per-user, which is the inverse of [[anthropic|Anthropic]]'s Claude.ai sharing model and a more stringent boundary than [[claude-code|Claude Code]]'s personal-vs-project filesystem split.
 
 ### SDK invocation pattern
 
@@ -100,14 +100,14 @@ A single `container.skills` array may carry both `type: "custom"` and `type: "an
 
 ## Related Pages
 
-- [[Anthropic]]
-- [[Agent Skills]]
-- [[Progressive Disclosure]]
-- [[Claude Code]]
+- [[anthropic|Anthropic]]
+- [[agent-skills|Agent Skills]]
+- [[progressive-disclosure|Progressive Disclosure]]
+- [[claude-code|Claude Code]]
 
 ## Sources
 
-- [[Anthropic Agent Skills Overview]] — Anthropic platform docs, 2026-05-06
-- [[Anthropic Agent Skills Quickstart]] — Anthropic platform docs, 2026-05-06
-- [[Introduction to Claude Skills (claude-cookbooks notebook 01)]] — Anthropic claude-cookbooks, 2026-05-06
-- [[Building Custom Skills for Claude (claude-cookbooks notebook 03)]] — Anthropic claude-cookbooks, 2026-05-06
+- [[src-2026-05-06-anthropic-agent-skills-overview|Anthropic Agent Skills Overview]] — Anthropic platform docs, 2026-05-06
+- [[src-2026-05-06-anthropic-agent-skills-quickstart|Anthropic Agent Skills Quickstart]] — Anthropic platform docs, 2026-05-06
+- [[src-2026-05-06-anthropic-claude-cookbook-skills-introduction|Introduction to Claude Skills (claude-cookbooks notebook 01)]] — Anthropic claude-cookbooks, 2026-05-06
+- [[src-2026-05-06-anthropic-claude-cookbook-skills-custom-development|Building Custom Skills for Claude (claude-cookbooks notebook 03)]] — Anthropic claude-cookbooks, 2026-05-06

@@ -55,7 +55,7 @@ All 22 notebooks (1.1–7.1 plus appendices A.1–A.3) are derivatives-pricing a
 
 ## Notes
 
-Compiled into [[Financial-Models-Numerical-Methods]], [[Financial AI Repository Tradeoffs]], and [[Financial AI Repository Landscape]]. Confirms the comparison-report framing.
+Compiled into [[financial-models-numerical-methods|Financial-Models-Numerical-Methods]], [[financial-ai-repository-tradeoffs|Financial AI Repository Tradeoffs]], and [[financial-ai-repository-landscape|Financial AI Repository Landscape]]. Confirms the comparison-report framing.
 
 ## Source Metadata
 

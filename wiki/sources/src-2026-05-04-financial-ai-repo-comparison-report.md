@@ -62,7 +62,7 @@ This report compares six finance-related open-source repositories as a layered e
 
 ## Notes
 
-Compiled into [[Dexter]], [[Financial-Models-Numerical-Methods]], [[OpenBB]], [[Anthropic Financial Services]], [[TradingAgents]], [[FinRL]], [[Financial AI Repository Landscape]], and [[Financial AI Repository Tradeoffs]]. The report itself is an LLM-authored synthesis of public repository documentation, so downstream claims should be refreshed when repository READMEs or project positioning materially change.
+Compiled into [[dexter|Dexter]], [[financial-models-numerical-methods|Financial-Models-Numerical-Methods]], [[openbb|OpenBB]], [[anthropic-financial-services|Anthropic Financial Services]], [[tradingagents|TradingAgents]], [[finrl|FinRL]], [[financial-ai-repository-landscape|Financial AI Repository Landscape]], and [[financial-ai-repository-tradeoffs|Financial AI Repository Tradeoffs]]. The report itself is an LLM-authored synthesis of public repository documentation, so downstream claims should be refreshed when repository READMEs or project positioning materially change.
 
 ## Source Metadata
 

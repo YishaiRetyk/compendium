@@ -33,7 +33,7 @@ example: false
 
 ## TL;DR
 
-Geoffrey Huntley is the originator of [[Ralph (Autonomous Coding Loop)]], the deliberately minimal `while :; do cat PROMPT.md | claude ; done` pattern for running agentic CLI coders autonomously. His original write-up at `ghuntley.com/ralph` plus a series of YouTube videos in late 2025 popularized the technique on AI-tooling timelines through December 2025, prompting community syntheses (notably Clayton Farr's [[The Ralph Playbook (Clayton Farr's how-to-ralph-wiggum)]]) and a public counter-correction ("nah") when summaries departed from his framing.
+Geoffrey Huntley is the originator of [[ralph-loop|Ralph (Autonomous Coding Loop)]], the deliberately minimal `while :; do cat PROMPT.md | claude ; done` pattern for running agentic CLI coders autonomously. His original write-up at `ghuntley.com/ralph` plus a series of YouTube videos in late 2025 popularized the technique on AI-tooling timelines through December 2025, prompting community syntheses (notably Clayton Farr's [[src-2026-05-06-ralph-playbook|The Ralph Playbook (Clayton Farr's how-to-ralph-wiggum)]]) and a public counter-correction ("nah") when summaries departed from his framing.
 
 ## Key Facts
 
@@ -50,7 +50,7 @@ The Ralph technique attributed to Huntley reduces autonomous coding to four movi
 Beyond the loop itself, Huntley's framing emphasizes:
 
 - **Context discipline:** advertised 200K-token windows are about 176K usable, with a 40-60% "smart zone"; tight tasks plus one task per loop drives toward 100% smart-zone utilization.
-- **Backpressure:** tests, typechecks, lints, and builds are the downstream signals that reject invalid work — see [[Backpressure]].
+- **Backpressure:** tests, typechecks, lints, and builds are the downstream signals that reject invalid work — see [[backpressure|Backpressure]].
 - **Plan disposability:** regenerating `IMPLEMENTATION_PLAN.md` is cheap (one planning loop) and preferable to letting Ralph go in circles.
 - **Move outside the loop:** the operator's job is to engineer the environment Ralph runs in, not to do the work in line.
 
@@ -60,10 +60,10 @@ The originating posts and videos are referenced second-hand in this wiki via Cla
 
 ## Related Pages
 
-- [[Ralph (Autonomous Coding Loop)]] — the technique he originated.
-- [[Backpressure]] — the steering mechanism his framing makes central to autonomous coding.
-- [[Claude Code]] — the reference CLI agent for Ralph's invocation pattern (`claude -p --dangerously-skip-permissions --output-format=stream-json --model opus`).
+- [[ralph-loop|Ralph (Autonomous Coding Loop)]] — the technique he originated.
+- [[backpressure|Backpressure]] — the steering mechanism his framing makes central to autonomous coding.
+- [[claude-code|Claude Code]] — the reference CLI agent for Ralph's invocation pattern (`claude -p --dangerously-skip-permissions --output-format=stream-json --model opus`).
 
 ## Sources
 
-- [[The Ralph Playbook (Clayton Farr's how-to-ralph-wiggum)]] — Clayton Farr's synthesis explicitly built around Huntley's posts and videos (2026-05-06).
+- [[src-2026-05-06-ralph-playbook|The Ralph Playbook (Clayton Farr's how-to-ralph-wiggum)]] — Clayton Farr's synthesis explicitly built around Huntley's posts and videos (2026-05-06).

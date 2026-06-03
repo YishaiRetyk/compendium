@@ -46,30 +46,30 @@ Anthropic is the AI safety company that builds Claude. It ships three product su
 
 ## Detail
 
-Anthropic's Skills strategy is filesystem-first and progressive-disclosure-driven (see [[Progressive Disclosure]]). A Skill is a directory containing a `SKILL.md` instructions file plus optional bundled scripts and reference materials. Claude pre-loads only Skill metadata (the `name` and `description` from each SKILL.md's YAML frontmatter) into the system prompt at startup, then reads the body and bundled files on demand via bash when a request matches. This makes installing many Skills cheap.
+Anthropic's Skills strategy is filesystem-first and progressive-disclosure-driven (see [[progressive-disclosure|Progressive Disclosure]]). A Skill is a directory containing a `SKILL.md` instructions file plus optional bundled scripts and reference materials. Claude pre-loads only Skill metadata (the `name` and `description` from each SKILL.md's YAML frontmatter) into the system prompt at startup, then reads the body and bundled files on demand via bash when a request matches. This makes installing many Skills cheap.
 
 Anthropic ships Skills across three surfaces with different rules:
 
-- **[[Claude API]]** supports both pre-built Anthropic-managed Skills and custom uploaded Skills via the `/v1/skills` endpoints. Skills run inside the code-execution container with NO network access and no runtime package installation — only pre-configured dependencies. Custom Skills are workspace-wide.
-- **[[Claude Code]]** supports custom Skills only (no pre-built). Skills are filesystem-based at `~/.claude/skills/` (personal) or `.claude/skills/` (project). Skills here have the same network access as any other program on the user's machine. They can be distributed via Claude Code Plugins.
+- **[[claude-api|Claude API]]** supports both pre-built Anthropic-managed Skills and custom uploaded Skills via the `/v1/skills` endpoints. Skills run inside the code-execution container with NO network access and no runtime package installation — only pre-configured dependencies. Custom Skills are workspace-wide.
+- **[[claude-code|Claude Code]]** supports custom Skills only (no pre-built). Skills are filesystem-based at `~/.claude/skills/` (personal) or `.claude/skills/` (project). Skills here have the same network access as any other program on the user's machine. They can be distributed via Claude Code Plugins.
 - **Claude.ai** supports both pre-built Skills (used automatically when creating documents) and custom Skills uploaded as zip files through Settings → Features on Pro, Max, Team, and Enterprise plans. Custom Skills are individual to each user — Claude.ai does not currently support centralized admin management or org-wide distribution [prov:src-2026-05-06-anthropic-agent-skills-overview#sec:sharing-scope|direct|2026-05-06] [epistemic:: sourced]
 
 Skills are deliberately not synced across surfaces: a Skill uploaded to Claude.ai must be separately uploaded to the API; Skills uploaded via the API are not visible on Claude.ai; Claude Code Skills are filesystem-only and separate from both [prov:src-2026-05-06-anthropic-agent-skills-overview#sec:cross-surface-availability|direct|2026-05-06] [epistemic:: sourced]
 
 Anthropic's authoring guidance treats Skills like onboarding guides for new team members: organize by domain, keep references one level deep so Claude reads complete files, and ship pre-made utility scripts rather than asking Claude to regenerate equivalent code on the fly [prov:src-2026-05-06-anthropic-agent-skills-best-practices#sec:provide-utility-scripts|direct|2026-05-06] [epistemic:: sourced]. The recommended development loop uses one Claude instance ("Claude A") to author Skills used by another instance ("Claude B"), with observations from B feeding back to A [prov:src-2026-05-06-anthropic-agent-skills-best-practices#sec:develop-skills-iteratively-with-claude|direct|2026-05-06] [epistemic:: sourced]
 
-Anthropic's existing Claude Code plugin marketplace [[Anthropic Financial Services]] is a concrete production deployment of Skills: it ships populated SKILL.md prompts (DCF, comps, 3-statement, LBO, merger model, initiating coverage, earnings analysis, model update, tear-sheet) alongside Python validators and Excel templates — implementing the bundle-everything-the-skill-needs pattern from the authoring guide.
+Anthropic's existing Claude Code plugin marketplace [[anthropic-financial-services|Anthropic Financial Services]] is a concrete production deployment of Skills: it ships populated SKILL.md prompts (DCF, comps, 3-statement, LBO, merger model, initiating coverage, earnings analysis, model update, tear-sheet) alongside Python validators and Excel templates — implementing the bundle-everything-the-skill-needs pattern from the authoring guide.
 
 ## Related Pages
 
-- [[Agent Skills]]
-- [[Progressive Disclosure]]
-- [[Claude Code]]
-- [[Claude API]]
-- [[Anthropic Financial Services]]
+- [[agent-skills|Agent Skills]]
+- [[progressive-disclosure|Progressive Disclosure]]
+- [[claude-code|Claude Code]]
+- [[claude-api|Claude API]]
+- [[anthropic-financial-services|Anthropic Financial Services]]
 
 ## Sources
 
-- [[Anthropic Agent Skills Overview]] — Anthropic platform docs, 2026-05-06
-- [[Anthropic Agent Skills Quickstart]] — Anthropic platform docs, 2026-05-06
-- [[Anthropic Agent Skills Best Practices]] — Anthropic platform docs, 2026-05-06
+- [[src-2026-05-06-anthropic-agent-skills-overview|Anthropic Agent Skills Overview]] — Anthropic platform docs, 2026-05-06
+- [[src-2026-05-06-anthropic-agent-skills-quickstart|Anthropic Agent Skills Quickstart]] — Anthropic platform docs, 2026-05-06
+- [[src-2026-05-06-anthropic-agent-skills-best-practices|Anthropic Agent Skills Best Practices]] — Anthropic platform docs, 2026-05-06

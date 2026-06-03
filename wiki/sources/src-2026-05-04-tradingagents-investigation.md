@@ -56,7 +56,7 @@ TradingAgents ships a real `market_analyst` agent that calls a `get_indicators` 
 
 ## Notes
 
-Compiled into [[TradingAgents]], [[Financial AI Repository Tradeoffs]], and [[Financial AI Repository Landscape]]. Confirms and concretizes the comparison-report claim that TradingAgents uses role-specialized agents for fundamentals and technical analysis.
+Compiled into [[tradingagents|TradingAgents]], [[financial-ai-repository-tradeoffs|Financial AI Repository Tradeoffs]], and [[financial-ai-repository-landscape|Financial AI Repository Landscape]]. Confirms and concretizes the comparison-report claim that TradingAgents uses role-specialized agents for fundamentals and technical analysis.
 
 ## Source Metadata
 

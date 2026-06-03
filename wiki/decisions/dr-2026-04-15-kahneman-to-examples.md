@@ -70,14 +70,14 @@ The framing adopted is "the public template ships with an empty wiki and a prese
 
 Moved to `examples/kahneman/`:
 
-- [[daniel-kahneman]] — relocated to examples/kahneman/entities/
-- [[prospect-theory]] — relocated to examples/kahneman/concepts/
-- [[loss-aversion]] — relocated to examples/kahneman/concepts/
-- [[cognitive-biases]] — relocated to examples/kahneman/concepts/
-- [[system-1-vs-system-2]] — relocated to examples/kahneman/comparisons/
-- [[decision-making]] — relocated to examples/kahneman/overviews/
-- [[src-2026-04-09-thinking-fast-and-slow-part1]] — relocated to examples/kahneman/sources/
-- [[src-2026-04-10-kahneman-prospect-theory]] — relocated to examples/kahneman/sources/
+- [[daniel-kahneman|Daniel Kahneman]] — relocated to examples/kahneman/entities/
+- [[prospect-theory|Prospect Theory]] — relocated to examples/kahneman/concepts/
+- [[loss-aversion|Loss Aversion]] — relocated to examples/kahneman/concepts/
+- [[cognitive-biases|Cognitive Biases]] — relocated to examples/kahneman/concepts/
+- [[system-1-vs-system-2|System 1 vs System 2]] — relocated to examples/kahneman/comparisons/
+- [[decision-making|Decision Making]] — relocated to examples/kahneman/overviews/
+- [[src-2026-04-09-thinking-fast-and-slow-part1|Thinking Fast and Slow Part 1]] — relocated to examples/kahneman/sources/
+- [[src-2026-04-10-kahneman-prospect-theory|Kahneman Prospect Theory]] — relocated to examples/kahneman/sources/
 
 Deleted (creator-private, never to ship):
 

@@ -33,7 +33,7 @@ example: false
 
 ## TL;DR
 
-A capability map for generative AI in which the edge of competence is not a smooth curve but a *jagged* line: AI nails certain tasks and fails on others that look comparably difficult, sometimes within the same conversation. [[Hack (Agentive Stack)]] argues that knowing where those edges sit — what the model nails, what it quietly gets wrong — is now part of the new developer literacy [prov:src-2026-05-03-is-this-the-only-skill-left#t00:04:56-00:05:21|direct|2026-05-04].
+A capability map for generative AI in which the edge of competence is not a smooth curve but a *jagged* line: AI nails certain tasks and fails on others that look comparably difficult, sometimes within the same conversation. [[hack-agentive-stack|Hack (Agentive Stack)]] argues that knowing where those edges sit — what the model nails, what it quietly gets wrong — is now part of the new developer literacy [prov:src-2026-05-03-is-this-the-only-skill-left#t00:04:56-00:05:21|direct|2026-05-04].
 
 ## Key Facts
 
@@ -54,13 +54,13 @@ Treating the frontier as smooth produces two kinds of error: (a) over-trusting t
 
 ### Relationship to systems thinking
 
-Knowing where the edges sit is operationally close to the [[Systems Thinking]] question "what breaks if I delete this?" — both are diagnostic skills that resist being delegated to the AI itself, because the AI is the system being audited.
+Knowing where the edges sit is operationally close to the [[systems-thinking|Systems Thinking]] question "what breaks if I delete this?" — both are diagnostic skills that resist being delegated to the AI itself, because the AI is the system being audited.
 
 ## Related Pages
 
-- [[Systems Thinking]] — the broader skill within which jagged-frontier literacy lives
-- [[Hack (Agentive Stack)]] — popularized the framing in this context
+- [[systems-thinking|Systems Thinking]] — the broader skill within which jagged-frontier literacy lives
+- [[hack-agentive-stack|Hack (Agentive Stack)]] — popularized the framing in this context
 
 ## Sources
 
-- [[Is this the only skill left?]] — Hack, 2026-05-03 (transcript). The primary jagged-frontier paper (Dell'Acqua et al., 2023) is referenced indirectly; primary-source verification has not been done.
+- [[src-2026-05-03-is-this-the-only-skill-left|Is this the only skill left?]] — Hack, 2026-05-03 (transcript). The primary jagged-frontier paper (Dell'Acqua et al., 2023) is referenced indirectly; primary-source verification has not been done.

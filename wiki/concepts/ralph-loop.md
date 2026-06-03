@@ -36,7 +36,7 @@ example: false
 
 ## TL;DR
 
-Ralph is a four-part autonomous-coding pattern: (1) a brain-dead bash `while` loop that re-feeds a fixed `PROMPT.md` to a CLI agent, (2) an on-disk `IMPLEMENTATION_PLAN.md` as the only cross-iteration shared state, (3) an `AGENTS.md` operational guide and a `specs/` directory loaded deterministically every iteration, and (4) project-specific [[Backpressure]] (tests, typechecks, lints, builds) that rejects invalid work before commit. Each iteration runs in a fresh context window — the agent reads the plan from disk, picks the most important task, implements + tests + commits, and exits. The mantra is "3 phases, 2 prompts, 1 loop": Phase 1 defines requirements as `specs/*.md`; Phases 2/3 swap `PROMPT_plan.md` and `PROMPT_build.md` against the same loop.
+Ralph is a four-part autonomous-coding pattern: (1) a brain-dead bash `while` loop that re-feeds a fixed `PROMPT.md` to a CLI agent, (2) an on-disk `IMPLEMENTATION_PLAN.md` as the only cross-iteration shared state, (3) an `AGENTS.md` operational guide and a `specs/` directory loaded deterministically every iteration, and (4) project-specific [[backpressure|Backpressure]] (tests, typechecks, lints, builds) that rejects invalid work before commit. Each iteration runs in a fresh context window — the agent reads the plan from disk, picks the most important task, implements + tests + commits, and exits. The mantra is "3 phases, 2 prompts, 1 loop": Phase 1 defines requirements as `specs/*.md`; Phases 2/3 swap `PROMPT_plan.md` and `PROMPT_build.md` against the same loop.
 
 ## Key Facts
 
@@ -61,7 +61,7 @@ Ralph is a funnel of three phases driven by two prompt files and one bash loop:
 
 ### Why a dumb bash loop wins
 
-The continuation mechanism is intentionally dumb: bash restarts the agent → fresh context reads `IMPLEMENTATION_PLAN.md` → agent picks one task → implements + commits + exits → loop restarts. No sophisticated orchestration, no daemons, no state machines. The disk is the durable substrate; the agent is stateless across iterations. This composes cleanly with [[Progressive Disclosure]] (the same files are always loaded in the same order) and avoids the failure modes of long-lived agent sessions (context pollution, drift, lost-in-the-middle effects).
+The continuation mechanism is intentionally dumb: bash restarts the agent → fresh context reads `IMPLEMENTATION_PLAN.md` → agent picks one task → implements + commits + exits → loop restarts. No sophisticated orchestration, no daemons, no state machines. The disk is the durable substrate; the agent is stateless across iterations. This composes cleanly with [[progressive-disclosure|Progressive Disclosure]] (the same files are always loaded in the same order) and avoids the failure modes of long-lived agent sessions (context pollution, drift, lost-in-the-middle effects).
 
 ### Context discipline
 
@@ -76,7 +76,7 @@ Ralph's effectiveness depends on tight context budgeting. The framing puts adver
 Ralph is steered from two directions:
 
 - **Upstream:** deterministic context loading (`PROMPT.md` + `AGENTS.md` + `specs/*`), and existing-code patterns shape what the agent generates. If Ralph generates wrong patterns, add or update utilities and example code so it discovers the right ones.
-- **Downstream:** [[Backpressure]] from tests, typechecks, lints, and builds rejects invalid output before commit. `AGENTS.md` is where project-specific commands wire backpressure in (the prompt says "run tests" generically; `AGENTS.md` says how).
+- **Downstream:** [[backpressure|Backpressure]] from tests, typechecks, lints, and builds rejects invalid output before commit. `AGENTS.md` is where project-specific commands wire backpressure in (the prompt says "run tests" generically; `AGENTS.md` says how).
 
 For criteria that resist programmatic checks (creative quality, aesthetics, UX feel), the playbook proposes an LLM-as-judge fixture (`llm-review.ts`) returning binary `{ pass, feedback }` results, with `intelligence: "fast" | "smart"` selecting model tier and automatic text-vs-vision dispatch by file extension.
 
@@ -102,12 +102,12 @@ Clayton Farr's playbook catalogs five proposed extensions (not yet validated by 
 
 ## Related Pages
 
-- [[Geoffrey Huntley]] — originator of the technique.
-- [[Backpressure]] — the downstream steering mechanism Ralph depends on.
-- [[Claude Code]] — the reference CLI agent for the canonical invocation.
-- [[Progressive Disclosure]] — Ralph's deterministic per-iteration file loading is a progressive-disclosure pattern at the project level.
-- [[Comprehension Debt]] — Ralph's plan-disposability and "let Ralph Ralph" framing pushes against operator comprehension; backpressure and `AGENTS.md` discipline are the counterweights.
+- [[geoffrey-huntley|Geoffrey Huntley]] — originator of the technique.
+- [[backpressure|Backpressure]] — the downstream steering mechanism Ralph depends on.
+- [[claude-code|Claude Code]] — the reference CLI agent for the canonical invocation.
+- [[progressive-disclosure|Progressive Disclosure]] — Ralph's deterministic per-iteration file loading is a progressive-disclosure pattern at the project level.
+- [[comprehension-debt|Comprehension Debt]] — Ralph's plan-disposability and "let Ralph Ralph" framing pushes against operator comprehension; backpressure and `AGENTS.md` discipline are the counterweights.
 
 ## Sources
 
-- [[The Ralph Playbook (Clayton Farr's how-to-ralph-wiggum)]] — Clayton Farr's synthesis of Geoffrey Huntley's Ralph technique (2026-05-06).
+- [[src-2026-05-06-ralph-playbook|The Ralph Playbook (Clayton Farr's how-to-ralph-wiggum)]] — Clayton Farr's synthesis of Geoffrey Huntley's Ralph technique (2026-05-06).

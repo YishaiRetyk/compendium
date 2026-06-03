@@ -51,8 +51,8 @@ YouTube creator and product founder publishing videos on AI-assisted software en
 
 Across the two videos in this wiki, Hack consistently argues that the AI-coding shift requires shifting the focus from prompting to durable artifacts and human judgment:
 
-- **"Is this the only skill left?"** [[Is this the only skill left?]] argues [[Systems Thinking]] is the durable skill in AI-assisted development.
-- **"Three artifacts that changed how I build with AI"** [[Three artifacts that changed how I build with AI]] argues [[Domain-Driven Design]] — specifically [[Ubiquitous Language]], [[Bounded Context]], and [[Documented Contract]] — operationalizes systems thinking day-to-day.
+- **"Is this the only skill left?"** [[src-2026-05-03-is-this-the-only-skill-left|Is this the only skill left?]] argues [[systems-thinking|Systems Thinking]] is the durable skill in AI-assisted development.
+- **"Three artifacts that changed how I build with AI"** [[src-2026-05-04-three-artifacts-build-with-ai|Three artifacts that changed how I build with AI]] argues [[domain-driven-design|Domain-Driven Design]] — specifically [[ubiquitous-language|Ubiquitous Language]], [[bounded-context|Bounded Context]], and [[documented-contract|Documented Contract]] — operationalizes systems thinking day-to-day.
 
 The two videos form a connected sequence: the second explicitly references the first as "the previous videos" and answers a how question raised in its comments [prov:src-2026-05-04-three-artifacts-build-with-ai#t00:02:01-00:02:21|direct|2026-05-04].
 
@@ -60,7 +60,7 @@ The two videos form a connected sequence: the second explicitly references the f
 
 - AI accelerates work but does not replace judgment [prov:src-2026-05-04-three-artifacts-build-with-ai#t00:13:14-00:13:21|direct|2026-05-04]
 - "Almost no one shipping serious software is letting agents write 100% of the code" [prov:src-2026-05-04-three-artifacts-build-with-ai#t00:12:52-00:13:14|direct|2026-05-04]
-- Documentation, specs, and shared vocabulary are the cheapest insurance against [[Comprehension Debt]] [prov:src-2026-05-04-three-artifacts-build-with-ai#t00:11:09-00:11:27|direct|2026-05-04]
+- Documentation, specs, and shared vocabulary are the cheapest insurance against [[comprehension-debt|Comprehension Debt]] [prov:src-2026-05-04-three-artifacts-build-with-ai#t00:11:09-00:11:27|direct|2026-05-04]
 
 ### About Clark
 
@@ -68,13 +68,13 @@ Mentioned as a product within Agentive Stack: an AI analytics and experimentatio
 
 ## Related Pages
 
-- [[Systems Thinking]]
-- [[Domain-Driven Design]]
-- [[Comprehension Debt]]
-- [[Is this the only skill left?]]
-- [[Three artifacts that changed how I build with AI]]
+- [[systems-thinking|Systems Thinking]]
+- [[domain-driven-design|Domain-Driven Design]]
+- [[comprehension-debt|Comprehension Debt]]
+- [[src-2026-05-03-is-this-the-only-skill-left|Is this the only skill left?]]
+- [[src-2026-05-04-three-artifacts-build-with-ai|Three artifacts that changed how I build with AI]]
 
 ## Sources
 
-- [[Is this the only skill left?]] — Hack, 2026-05-03 (transcript)
-- [[Three artifacts that changed how I build with AI]] — Hack, 2026-05-04 (transcript)
+- [[src-2026-05-03-is-this-the-only-skill-left|Is this the only skill left?]] — Hack, 2026-05-03 (transcript)
+- [[src-2026-05-04-three-artifacts-build-with-ai|Three artifacts that changed how I build with AI]] — Hack, 2026-05-04 (transcript)

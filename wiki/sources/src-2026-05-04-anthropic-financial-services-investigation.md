@@ -56,7 +56,7 @@ The repository ships five in-house plugins (`financial-analysis`, `investment-ba
 
 ## Notes
 
-Compiled into [[Anthropic Financial Services]], [[Financial AI Repository Tradeoffs]], and [[Financial AI Repository Landscape]]. Supersedes the comparison-report-derived claim that the repository is "mostly instructions and configuration rather than standalone compute or modeling code" by documenting the validators, templates, and Office-JS integration shipped alongside the SKILL.md prompts.
+Compiled into [[anthropic-financial-services|Anthropic Financial Services]], [[financial-ai-repository-tradeoffs|Financial AI Repository Tradeoffs]], and [[financial-ai-repository-landscape|Financial AI Repository Landscape]]. Supersedes the comparison-report-derived claim that the repository is "mostly instructions and configuration rather than standalone compute or modeling code" by documenting the validators, templates, and Office-JS integration shipped alongside the SKILL.md prompts.
 
 ## Source Metadata
 

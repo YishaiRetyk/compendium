@@ -24,14 +24,12 @@ knowledge_domain: ""
 # Lint Report
 
 **Last run:** 2026-06-03
-**Total findings:** 1
+**Total findings:** 0
 **Auto-fixes applied:** 0
 
-## Errors (1)
+## Errors (0)
 
-### Linkres
-- **wiki/concepts/progressive-disclosure.md** | [[Ralph Playbook]] does not resolve under Obsidian rules (no filename-stem or alias match), but uniquely normalized-matches 'src-2026-05-06-ralph-playbook' (D-02); fix: add alias OR correct link text to canonical title
-
+(none)
 
 ## Warnings (0)
 

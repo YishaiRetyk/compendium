@@ -34,7 +34,7 @@ example: false
 
 ## TL;DR
 
-The tax paid when teams ship AI-generated code that no one on the team understands. Used interchangeably with **cognitive debt** by [[Hack (Agentive Stack)]]. Manifests as bugs nobody remembers writing, drift in domain meaning across sessions, and architectures that look correct but break in non-obvious ways [prov:src-2026-05-03-is-this-the-only-skill-left#t00:01:34-00:01:48|direct|2026-05-04].
+The tax paid when teams ship AI-generated code that no one on the team understands. Used interchangeably with **cognitive debt** by [[hack-agentive-stack|Hack (Agentive Stack)]]. Manifests as bugs nobody remembers writing, drift in domain meaning across sessions, and architectures that look correct but break in non-obvious ways [prov:src-2026-05-03-is-this-the-only-skill-left#t00:01:34-00:01:48|direct|2026-05-04].
 
 ## Key Facts
 
@@ -59,16 +59,16 @@ Senior engineers historically carried system context in their heads. AI does not
 
 ### Relationship to systems thinking
 
-Comprehension debt is the failure mode; [[Systems Thinking]] is the discipline that prevents it. The recap framing in [[Three artifacts that changed how I build with AI]] is explicit: "comprehension debt told you the cost; systems thinking told you the skill; three artifacts give you the practice" [prov:src-2026-05-04-three-artifacts-build-with-ai#t00:14:18-00:14:40|direct|2026-05-04].
+Comprehension debt is the failure mode; [[systems-thinking|Systems Thinking]] is the discipline that prevents it. The recap framing in [[src-2026-05-04-three-artifacts-build-with-ai|Three artifacts that changed how I build with AI]] is explicit: "comprehension debt told you the cost; systems thinking told you the skill; three artifacts give you the practice" [prov:src-2026-05-04-three-artifacts-build-with-ai#t00:14:18-00:14:40|direct|2026-05-04].
 
 ## Related Pages
 
-- [[Systems Thinking]] — the preventive discipline
-- [[Programming as Theory Building]] — the conceptual root
-- [[Domain-Driven Design]] — the proposed practical method for paying the debt down
-- [[Hack (Agentive Stack)]] — popularized the framing
+- [[systems-thinking|Systems Thinking]] — the preventive discipline
+- [[programming-as-theory-building|Programming as Theory Building]] — the conceptual root
+- [[domain-driven-design|Domain-Driven Design]] — the proposed practical method for paying the debt down
+- [[hack-agentive-stack|Hack (Agentive Stack)]] — popularized the framing
 
 ## Sources
 
-- [[Is this the only skill left?]] — Hack, 2026-05-03 (transcript)
-- [[Three artifacts that changed how I build with AI]] — Hack, 2026-05-04 (transcript)
+- [[src-2026-05-03-is-this-the-only-skill-left|Is this the only skill left?]] — Hack, 2026-05-03 (transcript)
+- [[src-2026-05-04-three-artifacts-build-with-ai|Three artifacts that changed how I build with AI]] — Hack, 2026-05-04 (transcript)

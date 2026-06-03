@@ -34,14 +34,14 @@ example: false
 
 ## TL;DR
 
-A core artifact of [[Domain-Driven Design]] in [[Hack (Agentive Stack)]]'s reduction: the explicit written record of how two [[Bounded Context]]s interact at their boundary [prov:src-2026-05-04-three-artifacts-build-with-ai#t00:08:42-00:09:16|direct|2026-05-04]. If context A produces data and context B consumes it, the shape of that data — and the fact of the dependency — is the contract. Changing the contract without updating both sides breaks the system.
+A core artifact of [[domain-driven-design|Domain-Driven Design]] in [[hack-agentive-stack|Hack (Agentive Stack)]]'s reduction: the explicit written record of how two [[bounded-context|Bounded Context]]s interact at their boundary [prov:src-2026-05-04-three-artifacts-build-with-ai#t00:08:42-00:09:16|direct|2026-05-04]. If context A produces data and context B consumes it, the shape of that data — and the fact of the dependency — is the contract. Changing the contract without updating both sides breaks the system.
 
 ## Key Facts
 
 - The third of three artifacts in Hack's DDD-for-AI reduction [prov:src-2026-05-04-three-artifacts-build-with-ai#t00:08:42-00:08:49|direct|2026-05-04]
 - Located "where the boundaries touch" — at the seams between contexts [prov:src-2026-05-04-three-artifacts-build-with-ai#t00:08:42-00:08:49|direct|2026-05-04]
 - Worked example: in Clark, analytics writes events to a database; experimentation reads them to determine A/B test winners. That dependency is a contract; changing event shape breaks experimentation [prov:src-2026-05-04-three-artifacts-build-with-ai#t00:08:49-00:09:06|direct|2026-05-04]
-- Hack frames it as the written-down answer to the [[Systems Thinking]] question "what breaks if I delete this?" [prov:src-2026-05-04-three-artifacts-build-with-ai#t00:09:06-00:09:16|direct|2026-05-04]
+- Hack frames it as the written-down answer to the [[systems-thinking|Systems Thinking]] question "what breaks if I delete this?" [prov:src-2026-05-04-three-artifacts-build-with-ai#t00:09:06-00:09:16|direct|2026-05-04]
 
 ## Detail
 
@@ -69,11 +69,11 @@ The contract decays when it is not updated; the AI session that reads a stale co
 
 ## Related Pages
 
-- [[Domain-Driven Design]] — parent methodology
-- [[Ubiquitous Language]] — defines the terms that appear in contracts
-- [[Bounded Context]] — what contracts connect
-- [[Systems Thinking]] — contracts answer the "what breaks if I delete this?" question
+- [[domain-driven-design|Domain-Driven Design]] — parent methodology
+- [[ubiquitous-language|Ubiquitous Language]] — defines the terms that appear in contracts
+- [[bounded-context|Bounded Context]] — what contracts connect
+- [[systems-thinking|Systems Thinking]] — contracts answer the "what breaks if I delete this?" question
 
 ## Sources
 
-- [[Three artifacts that changed how I build with AI]] — Hack, 2026-05-04 (transcript)
+- [[src-2026-05-04-three-artifacts-build-with-ai|Three artifacts that changed how I build with AI]] — Hack, 2026-05-04 (transcript)

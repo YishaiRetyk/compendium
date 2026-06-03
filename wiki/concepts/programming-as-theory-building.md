@@ -33,7 +33,7 @@ example: false
 
 ## TL;DR
 
-A 1985 paper by Danish computer scientist [[Peter Naur]] arguing that programming is fundamentally an act of building a theory of how a system works — and that theory lives in the programmers' heads, not in the code. The code, in Naur's framing, is just the shadow of the theory [prov:src-2026-05-03-is-this-the-only-skill-left#t00:00:47-00:01:21|direct|2026-05-04].
+A 1985 paper by Danish computer scientist [[peter-naur|Peter Naur]] arguing that programming is fundamentally an act of building a theory of how a system works — and that theory lives in the programmers' heads, not in the code. The code, in Naur's framing, is just the shadow of the theory [prov:src-2026-05-03-is-this-the-only-skill-left#t00:00:47-00:01:21|direct|2026-05-04].
 
 ## Key Facts
 
@@ -50,7 +50,7 @@ Naur's 1985 paper challenged a common view of programming as text production. He
 
 ### Relevance to AI-assisted coding
 
-[[Hack (Agentive Stack)]] reframes Naur's argument for the AI era: AI coding agents now generate the shadow on demand, but the program — the theory — is not gone. It still has to be built [prov:src-2026-05-03-is-this-the-only-skill-left#t00:01:13-00:01:34|direct|2026-05-04]. The risk is that humans see fast-generated code and confuse it with a theory the team actually holds. This is the conceptual root of [[Comprehension Debt]] and the motivation for [[Systems Thinking]] as the AI-era core skill.
+[[hack-agentive-stack|Hack (Agentive Stack)]] reframes Naur's argument for the AI era: AI coding agents now generate the shadow on demand, but the program — the theory — is not gone. It still has to be built [prov:src-2026-05-03-is-this-the-only-skill-left#t00:01:13-00:01:34|direct|2026-05-04]. The risk is that humans see fast-generated code and confuse it with a theory the team actually holds. This is the conceptual root of [[comprehension-debt|Comprehension Debt]] and the motivation for [[systems-thinking|Systems Thinking]] as the AI-era core skill.
 
 ### Implications
 
@@ -60,15 +60,15 @@ If the program is the theory, then:
 - Onboarding is theory transfer, not code reading.
 - AI-generated code is theory-free unless a human builds the theory of it after the fact.
 
-These implications motivate the artifact-driven workflow argued in [[Domain-Driven Design]] — explicit, durable artifacts that re-inject the theory into every AI session.
+These implications motivate the artifact-driven workflow argued in [[domain-driven-design|Domain-Driven Design]] — explicit, durable artifacts that re-inject the theory into every AI session.
 
 ## Related Pages
 
-- [[Peter Naur]] — author
-- [[Systems Thinking]] — the practical descendent in the AI era
-- [[Comprehension Debt]] — the failure mode when the theory isn't built
-- [[Domain-Driven Design]] — proposed remedy via shared artifacts
+- [[peter-naur|Peter Naur]] — author
+- [[systems-thinking|Systems Thinking]] — the practical descendent in the AI era
+- [[comprehension-debt|Comprehension Debt]] — the failure mode when the theory isn't built
+- [[domain-driven-design|Domain-Driven Design]] — proposed remedy via shared artifacts
 
 ## Sources
 
-- [[Is this the only skill left?]] — Hack, 2026-05-03 (transcript). Note: the original Naur paper is referenced via Hack's summary; primary-source verification of specific phrasings has not been done.
+- [[src-2026-05-03-is-this-the-only-skill-left|Is this the only skill left?]] — Hack, 2026-05-03 (transcript). Note: the original Naur paper is referenced via Hack's summary; primary-source verification of specific phrasings has not been done.

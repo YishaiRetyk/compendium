@@ -57,7 +57,7 @@ OpenBB ships a dedicated `technical` extension with named indicator endpoints (B
 
 ## Notes
 
-Compiled into [[OpenBB]], [[Financial AI Repository Tradeoffs]], and [[Financial AI Repository Landscape]]. Supersedes the comparison-report-derived claim that OpenBB users must build "financial reasoning" on top of the data layer — the reasoning surface for TA and basic FA is shipped.
+Compiled into [[openbb|OpenBB]], [[financial-ai-repository-tradeoffs|Financial AI Repository Tradeoffs]], and [[financial-ai-repository-landscape|Financial AI Repository Landscape]]. Supersedes the comparison-report-derived claim that OpenBB users must build "financial reasoning" on top of the data layer — the reasoning surface for TA and basic FA is shipped.
 
 ## Source Metadata
 

@@ -60,12 +60,12 @@ Everything outside `src/tools/finance/` and `src/skills/dcf/` (agent loop, scrat
 
 ## Related Pages
 
-- [[Financial AI Repository Landscape]]
-- [[Financial AI Repository Tradeoffs]]
-- [[Anthropic Financial Services]]
-- [[OpenBB]]
+- [[financial-ai-repository-landscape|Financial AI Repository Landscape]]
+- [[financial-ai-repository-tradeoffs|Financial AI Repository Tradeoffs]]
+- [[anthropic-financial-services|Anthropic Financial Services]]
+- [[openbb|OpenBB]]
 
 ## Sources
 
-- [[Financial AI and Quant Finance Repository Comparison Report]]: "Financial AI and Quant Finance Repository Comparison Report" (2026-05-04)
-- [[Dexter Repository Investigation Snapshot]]: "Dexter Repository Investigation Snapshot" (2026-05-04)
+- [[src-2026-05-04-financial-ai-repo-comparison-report|Financial AI and Quant Finance Repository Comparison Report]]: "Financial AI and Quant Finance Repository Comparison Report" (2026-05-04)
+- [[src-2026-05-04-dexter-investigation|Dexter Repository Investigation Snapshot]]: "Dexter Repository Investigation Snapshot" (2026-05-04)

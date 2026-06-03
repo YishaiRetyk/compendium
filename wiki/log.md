@@ -27,7 +27,7 @@ reason: reduce spec context size while preserving "sole authoritative specificat
 
 ## [2026-04-20] reflect | Phase 11 brownfield apply-vs-advisory architecture + review-feedback hardenings
 
-Structural reasoning captured in Tier-1 decision record [[Brownfield Apply-vs-Advisory Architecture + Review-Manifest Pattern]] (`dr-2026-04-20-brownfield-apply-vs-advisory`). Documents the apply-class vs advisory-class split (D-01), review-manifest pattern for 01-page-typing (D-02, D-04), bootstrap_stage lifecycle gate via verify --promote (D-13, D-14, D-15), and review-feedback hardenings: root resolution (item 1), paired immutable inputs (item 2), shared walker (item 3), EOF-safe review-typing (item 4), top-level-bullets-only regex (item 5), aggregator per-plan gate split (item 6), widened D-03 auto-approve (item 7), hashlib portability (item 8), operational D-09 enforcement (item 9), per-script applied.log variance (item 10), override-label validation (item 11). Alternatives rejected (chain-runner, per-page prompts, scanner-driven privacy promotion, $(pwd) root default, decisions-only-without-candidates, shell sha256sum, decorative D-09 metadata, unified applied.log schema).
+Structural reasoning captured in Tier-1 decision record [[dr-2026-04-20-brownfield-apply-vs-advisory|Brownfield Apply-vs-Advisory Architecture + Review-Manifest Pattern]] (`dr-2026-04-20-brownfield-apply-vs-advisory`). Documents the apply-class vs advisory-class split (D-01), review-manifest pattern for 01-page-typing (D-02, D-04), bootstrap_stage lifecycle gate via verify --promote (D-13, D-14, D-15), and review-feedback hardenings: root resolution (item 1), paired immutable inputs (item 2), shared walker (item 3), EOF-safe review-typing (item 4), top-level-bullets-only regex (item 5), aggregator per-plan gate split (item 6), widened D-03 auto-approve (item 7), hashlib portability (item 8), operational D-09 enforcement (item 9), per-script applied.log variance (item 10), override-label validation (item 11). Alternatives rejected (chain-runner, per-page prompts, scanner-driven privacy promotion, $(pwd) root default, decisions-only-without-candidates, shell sha256sum, decorative D-09 metadata, unified applied.log schema).
 
 ## [2026-04-30] lint | wiki health check
 
@@ -49,7 +49,7 @@ report: wiki/maintenance/lint-report.md
 
 ## [2026-05-01] reflect | Phase 12 complementary-systems boundary
 
-Created decision record [[dr-2026-05-01-complementary-systems-boundary]] (`trigger_type: schema-update`, `affected_pages: []`) capturing that compendium owns durable, provenance-backed wiki memory and review support, while complementary systems own task execution, reminders, calendars, and transactional state. Created `docs/reference/three-layer-model.md` with the 3-layer model, capture/clarify/organize/review routing table, and anti-features section. Added README pointer under "What this is", `docs/reference/index.md` bullet, and the Decisions entry above. Supports BOUND-01, BOUND-02, BOUND-03; verification closes them in Plan 12-04 (`bin/requirements-sync.sh --strict --phase 12` exits 0). Unblocks the CLOSE-04 scope-leak gate for v1.1 closure.
+Created decision record [[dr-2026-05-01-complementary-systems-boundary|dr-2026-05-01-complementary-systems-boundary]] (`trigger_type: schema-update`, `affected_pages: []`) capturing that compendium owns durable, provenance-backed wiki memory and review support, while complementary systems own task execution, reminders, calendars, and transactional state. Created `docs/reference/three-layer-model.md` with the 3-layer model, capture/clarify/organize/review routing table, and anti-features section. Added README pointer under "What this is", `docs/reference/index.md` bullet, and the Decisions entry above. Supports BOUND-01, BOUND-02, BOUND-03; verification closes them in Plan 12-04 (`bin/requirements-sync.sh --strict --phase 12` exits 0). Unblocks the CLOSE-04 scope-leak gate for v1.1 closure.
 
 ## [2026-05-01] lint | wiki health check
 
@@ -135,7 +135,7 @@ result: created 3 source summaries; 1 overview page (agent-skills); 1 concept pa
 write_back: WRITE-BACK — new sources establish the canonical model for Skills, the Skills-vs-prompts distinction, and the surface-specific runtime/sharing rules; not present in wiki before this ingest.
 delta_compiled: src-2026-05-06-anthropic-agent-skills-overview, src-2026-05-06-anthropic-agent-skills-quickstart, src-2026-05-06-anthropic-agent-skills-best-practices (all flipped pending → compiled with compiled_against_hash + compiled_targets populated per §5 invariants).
 pages_affected: agent-skills, progressive-disclosure, anthropic, claude-code, claude-api, anthropic-financial-services, src-2026-05-06-anthropic-agent-skills-overview, src-2026-05-06-anthropic-agent-skills-quickstart, src-2026-05-06-anthropic-agent-skills-best-practices, index
-notes: foundational ingest seeding the AI-agents domain. All three sources are publicly fetched Anthropic platform docs → privacy: cloud_safe. Single-author repo, contributor field omitted per §11.1 step 9a. Adjacent existing entity [[Anthropic Financial Services]] (a Claude Code plugin marketplace) is now properly cross-linked to its umbrella concepts. The wiki page [[Agent Skills]] is structurally an overview because it synthesizes across three sources and ties together a sub-concept ([[Progressive Disclosure]]) with three surface entities ([[Anthropic]], [[Claude Code]], [[Claude API]]) — same pattern as [[Domain-Driven Design]]. No contradictions detected vs. prior wiki content.
+notes: foundational ingest seeding the AI-agents domain. All three sources are publicly fetched Anthropic platform docs → privacy: cloud_safe. Single-author repo, contributor field omitted per §11.1 step 9a. Adjacent existing entity [[anthropic-financial-services|Anthropic Financial Services]] (a Claude Code plugin marketplace) is now properly cross-linked to its umbrella concepts. The wiki page [[agent-skills|Agent Skills]] is structurally an overview because it synthesizes across three sources and ties together a sub-concept ([[progressive-disclosure|Progressive Disclosure]]) with three surface entities ([[anthropic|Anthropic]], [[claude-code|Claude Code]], [[claude-api|Claude API]]) — same pattern as [[domain-driven-design|Domain-Driven Design]]. No contradictions detected vs. prior wiki content.
 
 ## [2026-05-06] lint | wiki health check
 
@@ -253,7 +253,7 @@ report: wiki/maintenance/lint-report.md
 
 ## [2026-06-02] reflect | SC1 reframing decision record (examples/ isolable sub-graph)
 
-Created decision record [[dr-2026-06-02-sc1-examples-isolable-subgraph]] (`trigger_type: reframing`, `affected_pages: []`) formalizing the Phase 13.1 SC1 renegotiation: "graph not contaminated by examples/" → "examples/ forms a visually isolable sub-graph." Forced by Obsidian's single Excluded-files mechanism, which governs both Dataview indexing and graph membership — the fixtures must stay indexed for the DEBT-01 render-count verification, so they necessarily appear in the graph; isolability (a disconnected component) is the deliverable bar. Registered under Decisions in wiki/index.md. Authored as part of the Phase 13.2 v1.1 closure gate (Plan 13.2-03).
+Created decision record [[dr-2026-06-02-sc1-examples-isolable-subgraph|dr-2026-06-02-sc1-examples-isolable-subgraph]] (`trigger_type: reframing`, `affected_pages: []`) formalizing the Phase 13.1 SC1 renegotiation: "graph not contaminated by examples/" → "examples/ forms a visually isolable sub-graph." Forced by Obsidian's single Excluded-files mechanism, which governs both Dataview indexing and graph membership — the fixtures must stay indexed for the DEBT-01 render-count verification, so they necessarily appear in the graph; isolability (a disconnected component) is the deliverable bar. Registered under Decisions in wiki/index.md. Authored as part of the Phase 13.2 v1.1 closure gate (Plan 13.2-03).
 
 ## [2026-06-02] lint | wiki health check
 
@@ -284,7 +284,7 @@ report: wiki/maintenance/lint-report.md
 UPDATE wiki/decisions/dr-2026-06-02-obsidian-filename-alias-resolution.md
 source: n/a (internal schema decision)
 result: authored schema-update DR; corrected AGENTS.md §8 + §5 (self-alias invariant); updated 12 schema templates; registered in wiki/index.md
-reason: Obsidian resolves [[X]] by filename stem + aliases, not title; 31/49 pages were graph orphans due to missing self-aliases; convention now correct and enforced by linkres lint category (Plan 02)
+reason: Obsidian resolves `[[X]]` by filename stem + aliases, not title; 31/49 pages were graph orphans due to missing self-aliases; convention now correct and enforced by linkres lint category (Plan 02)
 
 ## [2026-06-03] lint | wiki health check
 
@@ -351,3 +351,45 @@ delta_compiled: none
 
 reflect recommended: schema-update — Phase 14 re-plan from corrected premise (piped links)
 pages_affected: dr-2026-06-03-uniform-piped-links, dr-2026-06-02-obsidian-filename-alias-resolution
+
+## [2026-06-03] lint | wiki health check
+
+findings: 1 total (1 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki/maintenance/lint-report.md
+
+## [2026-06-03] lint | wiki health check
+
+findings: 1 total (1 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki/maintenance/lint-report.md
+
+## [2026-06-03] lint | wiki health check
+
+findings: 0 total (0 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki/maintenance/lint-report.md
+
+## [2026-06-03] lint | wiki health check
+
+findings: 0 total (0 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki/maintenance/lint-report.md
+
+## [2026-06-03] lint | wiki health check
+
+findings: 0 total (0 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki/maintenance/lint-report.md
+
+## [2026-06-03] lint | wiki health check
+
+findings: 462 total (417 errors, 0 warnings, 45 info)
+auto_fixes: 45 applied
+report: wiki/maintenance/lint-report.md
+
+## [2026-06-03] lint | wiki health check
+
+findings: 0 total (0 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki/maintenance/lint-report.md

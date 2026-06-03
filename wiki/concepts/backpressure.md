@@ -47,7 +47,7 @@ Backpressure, in the agentic-loop sense, is the set of downstream gates — test
 
 ### Why backpressure is the steering mechanism
 
-In an autonomous coding loop like [[Ralph (Autonomous Coding Loop)]], the operator is not in-line. The agent picks the task, decides the implementation approach, runs tests, and commits. The only thing standing between a hallucinated function and a `git push` is whatever rejects invalid work. That rejection layer — collectively, "backpressure" — is what makes the loop converge instead of drift.
+In an autonomous coding loop like [[ralph-loop|Ralph (Autonomous Coding Loop)]], the operator is not in-line. The agent picks the task, decides the implementation approach, runs tests, and commits. The only thing standing between a hallucinated function and a `git push` is whatever rejects invalid work. That rejection layer — collectively, "backpressure" — is what makes the loop converge instead of drift.
 
 Without backpressure, autonomous loops produce three predictable failure modes:
 
@@ -102,10 +102,10 @@ The prompt should also remind Ralph to *create* backpressure when implementing �
 
 ## Related Pages
 
-- [[Ralph (Autonomous Coding Loop)]] — backpressure is the steering mechanism that makes Ralph converge.
-- [[Geoffrey Huntley]] — whose framing makes backpressure central to autonomous coding.
-- [[Comprehension Debt]] — backpressure is what catches AI-generated code that the team would otherwise not understand and not test.
+- [[ralph-loop|Ralph (Autonomous Coding Loop)]] — backpressure is the steering mechanism that makes Ralph converge.
+- [[geoffrey-huntley|Geoffrey Huntley]] — whose framing makes backpressure central to autonomous coding.
+- [[comprehension-debt|Comprehension Debt]] — backpressure is what catches AI-generated code that the team would otherwise not understand and not test.
 
 ## Sources
 
-- [[The Ralph Playbook (Clayton Farr's how-to-ralph-wiggum)]] — Clayton Farr's synthesis of Geoffrey Huntley's Ralph technique, including the acceptance-driven and LLM-as-judge extensions (2026-05-06).
+- [[src-2026-05-06-ralph-playbook|The Ralph Playbook (Clayton Farr's how-to-ralph-wiggum)]] — Clayton Farr's synthesis of Geoffrey Huntley's Ralph technique, including the acceptance-driven and LLM-as-judge extensions (2026-05-06).

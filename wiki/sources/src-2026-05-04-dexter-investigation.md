@@ -56,7 +56,7 @@ Dexter is FA-only by design. It ships `key-ratios`, `fundamentals` (income/balan
 
 ## Notes
 
-Compiled into [[Dexter]], [[Financial AI Repository Tradeoffs]], and [[Financial AI Repository Landscape]]. Refines the comparison-report framing of Dexter as generic "analyst-style research" by surfacing the FA-and-valuation specialization (DCF skill) and the absence of any TA surface.
+Compiled into [[dexter|Dexter]], [[financial-ai-repository-tradeoffs|Financial AI Repository Tradeoffs]], and [[financial-ai-repository-landscape|Financial AI Repository Landscape]]. Refines the comparison-report framing of Dexter as generic "analyst-style research" by surfacing the FA-and-valuation specialization (DCF skill) and the absence of any TA surface.
 
 ## Source Metadata
 

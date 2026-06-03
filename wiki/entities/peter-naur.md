@@ -33,7 +33,7 @@ example: false
 
 ## TL;DR
 
-Danish computer scientist (1928–2016). Co-author of the Algol 60 report (the "N" in BNF — Backus–Naur Form) and author of the influential 1985 paper [[Programming as Theory Building]], which is the conceptual anchor for several arguments about AI-assisted software development [prov:src-2026-05-03-is-this-the-only-skill-left#t00:00:47-00:00:55|direct|2026-05-04].
+Danish computer scientist (1928–2016). Co-author of the Algol 60 report (the "N" in BNF — Backus–Naur Form) and author of the influential 1985 paper [[programming-as-theory-building|Programming as Theory Building]], which is the conceptual anchor for several arguments about AI-assisted software development [prov:src-2026-05-03-is-this-the-only-skill-left#t00:00:47-00:00:55|direct|2026-05-04].
 
 ## Key Facts
 
@@ -50,10 +50,10 @@ The transcript renders the name once as "Peter Nauer" (likely a speech-to-text a
 
 ## Related Pages
 
-- [[Programming as Theory Building]] — his 1985 paper
-- [[Systems Thinking]] — modern descendent of the same intuition
-- [[Comprehension Debt]] — the failure mode his framework predicts
+- [[programming-as-theory-building|Programming as Theory Building]] — his 1985 paper
+- [[systems-thinking|Systems Thinking]] — modern descendent of the same intuition
+- [[comprehension-debt|Comprehension Debt]] — the failure mode his framework predicts
 
 ## Sources
 
-- [[Is this the only skill left?]] — Hack, 2026-05-03 (transcript)
+- [[src-2026-05-03-is-this-the-only-skill-left|Is this the only skill left?]] — Hack, 2026-05-03 (transcript)

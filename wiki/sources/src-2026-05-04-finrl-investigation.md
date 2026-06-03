@@ -64,7 +64,7 @@ FinRL feeds a default TA-indicator list (MACD, Bollinger upper/lower, RSI-30, CC
 
 ## Notes
 
-Compiled into [[FinRL]], [[Financial AI Repository Tradeoffs]], and [[Financial AI Repository Landscape]]. Refines the comparison-report-derived framing of FinRL by clarifying that TA features are core to the RL pipeline; FA is a single example.
+Compiled into [[finrl|FinRL]], [[financial-ai-repository-tradeoffs|Financial AI Repository Tradeoffs]], and [[financial-ai-repository-landscape|Financial AI Repository Landscape]]. Refines the comparison-report-derived framing of FinRL by clarifying that TA features are core to the RL pipeline; FA is a single example.
 
 ## Source Metadata
 

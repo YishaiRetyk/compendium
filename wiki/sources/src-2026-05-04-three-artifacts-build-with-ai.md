@@ -48,7 +48,7 @@ compiled_targets:
 
 ## TL;DR
 
-A follow-up monologue by [[Hack (Agentive Stack)]] answering a how question raised by his earlier [[Is this the only skill left?]] video. He argues that **Domain-Driven Design** — written by [[Eric Evans]] in 2003 — stripped to three core artifacts is the practical method for paying down [[Comprehension Debt]] and operationalizing [[Systems Thinking]] when working with AI coding agents. The three artifacts: a [[Ubiquitous Language]] (a glossary), [[Bounded Context]]s (clear scope boundaries), and [[Documented Contract]]s (the handshakes between contexts).
+A follow-up monologue by [[hack-agentive-stack|Hack (Agentive Stack)]] answering a how question raised by his earlier [[src-2026-05-03-is-this-the-only-skill-left|Is this the only skill left?]] video. He argues that **Domain-Driven Design** — written by [[eric-evans|Eric Evans]] in 2003 — stripped to three core artifacts is the practical method for paying down [[comprehension-debt|Comprehension Debt]] and operationalizing [[systems-thinking|Systems Thinking]] when working with AI coding agents. The three artifacts: a [[ubiquitous-language|Ubiquitous Language]] (a glossary), [[bounded-context|Bounded Context]]s (clear scope boundaries), and [[documented-contract|Documented Contract]]s (the handshakes between contexts).
 
 ## Key Takeaways
 
@@ -89,7 +89,7 @@ A follow-up monologue by [[Hack (Agentive Stack)]] answering a how question rais
 
 **Validity assessment:**
 
-- The DDD attribution is correct: *Domain-Driven Design: Tackling Complexity in the Heart of Software* by [[Eric Evans]], 2003. The three concepts named (ubiquitous language, bounded contexts, contracts/context maps) are core Evans concepts.
+- The DDD attribution is correct: *Domain-Driven Design: Tackling Complexity in the Heart of Software* by [[eric-evans|Eric Evans]], 2003. The three concepts named (ubiquitous language, bounded contexts, contracts/context maps) are core Evans concepts.
 - However, the framing of DDD as "three artifacts" is Hack's pedagogical reduction. The full Evans framework includes many more concepts: aggregates, value objects, domain events, repositories, domain services, anti-corruption layers, context maps. "Documented contracts" in Hack's framing is most directly the descendant of Evans' **Context Map** + **Published Language** concepts; calling it a "contract" is a useful but non-canonical simplification.
 - The healthcare-project anecdote ("44 bounded contexts, three layers of nesting") illustrates a real and well-known DDD anti-pattern: structure without substance. Cannot be independently verified, but is internally consistent.
 - The PRD / ADR / TDD analogies are reasonable. PRDs are the closest cousin to ubiquitous-language documents; ADRs map to part of the documented-contracts artifact; TDD is more orthogonal but shares the spec-before-code spirit.
@@ -108,4 +108,4 @@ A follow-up monologue by [[Hack (Agentive Stack)]] answering a how question rais
 - **Source type:** transcript
 - **Length:** ~15 minutes
 - **Path:** `sources/2026/2026-05/2026-05-04-three-artifacts-build-with-ai.md`
-- **Predecessor:** [[Is this the only skill left?]] (referenced explicitly as "the previous video")
+- **Predecessor:** [[src-2026-05-03-is-this-the-only-skill-left|Is this the only skill left?]] (referenced explicitly as "the previous video")

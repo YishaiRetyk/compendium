@@ -46,13 +46,13 @@ compiled_targets:
 
 ## TL;DR
 
-A YouTube monologue by [[Hack (Agentive Stack)]] arguing that **systems thinking** — the ability to reason about how parts of a software system affect each other over time — is the single most important skill for AI-assisted software development. The talk reframes [[Programming as Theory Building]] (Peter Naur, 1985) for the AI-coding era: if AI generates the "shadow" (code) on demand, the human's job is to hold the theory. Closes with four practices for deliberately training the skill: design before prompting, use specs as scaffolding, run the deletion test, study generated code.
+A YouTube monologue by [[hack-agentive-stack|Hack (Agentive Stack)]] arguing that **systems thinking** — the ability to reason about how parts of a software system affect each other over time — is the single most important skill for AI-assisted software development. The talk reframes [[programming-as-theory-building|Programming as Theory Building]] (Peter Naur, 1985) for the AI-coding era: if AI generates the "shadow" (code) on demand, the human's job is to hold the theory. Closes with four practices for deliberately training the skill: design before prompting, use specs as scaffolding, run the deletion test, study generated code.
 
 ## Key Takeaways
 
 - The code is not the program; the program is the theory in the programmer's head [prov:src-2026-05-03-is-this-the-only-skill-left#t00:00:47-00:01:13|direct|2026-05-04]
 - Systems thinking is now a "day-one" skill, not a senior-only skill accumulated over years [prov:src-2026-05-03-is-this-the-only-skill-left#t00:00:00-00:00:16|direct|2026-05-04]
-- The [[Jagged Frontier]] of AI capability — sharp in some places, dull in others, sometimes within the same session — defines a new core developer literacy [prov:src-2026-05-03-is-this-the-only-skill-left#t00:04:56-00:05:21|direct|2026-05-04]
+- The [[jagged-frontier|Jagged Frontier]] of AI capability — sharp in some places, dull in others, sometimes within the same session — defines a new core developer literacy [prov:src-2026-05-03-is-this-the-only-skill-left#t00:04:56-00:05:21|direct|2026-05-04]
 - A compiler is a verifiable abstraction; an LLM is a probabilistic collaborator that cannot be trusted without understanding [prov:src-2026-05-03-is-this-the-only-skill-left#t00:08:02-00:09:07|direct|2026-05-04]
 - Industry has been correcting after a "seniority-biased technological change" pulled junior hiring; 2026 shows a partial rebound [prov:src-2026-05-03-is-this-the-only-skill-left#t00:10:25-00:11:43|direct|2026-05-04] [epistemic:: tentative]
 
@@ -62,7 +62,7 @@ A YouTube monologue by [[Hack (Agentive Stack)]] arguing that **systems thinking
 
 - Peter Naur's 1985 paper *Programming as Theory Building* argued that the program is what lives inside the programmer's head — how pieces connect and why — and the code is just its shadow [prov:src-2026-05-03-is-this-the-only-skill-left#t00:00:47-00:01:13|direct|2026-05-04]
 - AI coding agents now generate that shadow on demand, but the underlying theory still has to be built [prov:src-2026-05-03-is-this-the-only-skill-left#t00:01:13-00:01:34|direct|2026-05-04]
-- [[Comprehension Debt]] (also called cognitive debt) is the tax paid when shipping AI-generated code that the team doesn't understand [prov:src-2026-05-03-is-this-the-only-skill-left#t00:01:34-00:01:48|direct|2026-05-04]
+- [[comprehension-debt|Comprehension Debt]] (also called cognitive debt) is the tax paid when shipping AI-generated code that the team doesn't understand [prov:src-2026-05-03-is-this-the-only-skill-left#t00:01:34-00:01:48|direct|2026-05-04]
 - A system is a pattern of how parts affect each other over time; this comes from systems dynamics [prov:src-2026-05-03-is-this-the-only-skill-left#t00:03:18-00:03:38|direct|2026-05-04]
 - The orchestra metaphor: code is the instruments, the system is the music, AI plays the instruments, humans must conduct [prov:src-2026-05-03-is-this-the-only-skill-left#t00:03:38-00:04:13|direct|2026-05-04]
 

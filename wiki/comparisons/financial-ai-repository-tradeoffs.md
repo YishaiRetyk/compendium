@@ -79,10 +79,10 @@ Mapping the six repositories along the technical-analysis and fundamental-analys
 
 ## Sources
 
-- [[Financial AI and Quant Finance Repository Comparison Report]]: "Financial AI and Quant Finance Repository Comparison Report" (2026-05-04)
-- [[OpenBB Repository Investigation Snapshot]]: "OpenBB Repository Investigation Snapshot" (2026-05-04)
-- [[FinRL Repository Investigation Snapshot]]: "FinRL Repository Investigation Snapshot" (2026-05-04)
-- [[TradingAgents Repository Investigation Snapshot]]: "TradingAgents Repository Investigation Snapshot" (2026-05-04)
-- [[Financial-Models-Numerical-Methods Repository Investigation Snapshot]]: "Financial-Models-Numerical-Methods Repository Investigation Snapshot" (2026-05-04)
-- [[Dexter Repository Investigation Snapshot]]: "Dexter Repository Investigation Snapshot" (2026-05-04)
-- [[Anthropic Financial Services Repository Investigation Snapshot]]: "Anthropic Financial Services Repository Investigation Snapshot" (2026-05-04)
+- [[src-2026-05-04-financial-ai-repo-comparison-report|Financial AI and Quant Finance Repository Comparison Report]]: "Financial AI and Quant Finance Repository Comparison Report" (2026-05-04)
+- [[src-2026-05-04-openbb-investigation|OpenBB Repository Investigation Snapshot]]: "OpenBB Repository Investigation Snapshot" (2026-05-04)
+- [[src-2026-05-04-finrl-investigation|FinRL Repository Investigation Snapshot]]: "FinRL Repository Investigation Snapshot" (2026-05-04)
+- [[src-2026-05-04-tradingagents-investigation|TradingAgents Repository Investigation Snapshot]]: "TradingAgents Repository Investigation Snapshot" (2026-05-04)
+- [[src-2026-05-04-fmnm-investigation|Financial-Models-Numerical-Methods Repository Investigation Snapshot]]: "Financial-Models-Numerical-Methods Repository Investigation Snapshot" (2026-05-04)
+- [[src-2026-05-04-dexter-investigation|Dexter Repository Investigation Snapshot]]: "Dexter Repository Investigation Snapshot" (2026-05-04)
+- [[src-2026-05-04-anthropic-financial-services-investigation|Anthropic Financial Services Repository Investigation Snapshot]]: "Anthropic Financial Services Repository Investigation Snapshot" (2026-05-04)

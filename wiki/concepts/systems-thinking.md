@@ -35,7 +35,7 @@ example: false
 
 ## TL;DR
 
-A way of reasoning about software where the unit of attention is not a function or file but the **pattern of interactions** between parts of the system over time. [[Hack (Agentive Stack)]] argues that in the AI-coding era, this skill — once accumulated by senior devs over years of failures — is now required from day one because AI generates code humans didn't write and therefore don't yet have the theory of [prov:src-2026-05-03-is-this-the-only-skill-left#t00:09:07-00:09:25|direct|2026-05-04].
+A way of reasoning about software where the unit of attention is not a function or file but the **pattern of interactions** between parts of the system over time. [[hack-agentive-stack|Hack (Agentive Stack)]] argues that in the AI-coding era, this skill — once accumulated by senior devs over years of failures — is now required from day one because AI generates code humans didn't write and therefore don't yet have the theory of [prov:src-2026-05-03-is-this-the-only-skill-left#t00:09:07-00:09:25|direct|2026-05-04].
 
 ## Key Facts
 
@@ -73,17 +73,17 @@ Hack notes that AI is collapsing the traditional silos (backend / frontend / ops
 
 ### Operational successor
 
-The follow-up video proposes [[Domain-Driven Design]] — specifically the three artifacts of [[Ubiquitous Language]], [[Bounded Context]]s, and [[Documented Contract]]s — as the practical, day-to-day method for exercising systems thinking when working with AI agents [prov:src-2026-05-04-three-artifacts-build-with-ai#t00:02:01-00:02:55|direct|2026-05-04]. The two videos are explicitly framed as a "cost / skill / practice" sequence: comprehension debt names the cost, systems thinking names the skill, and the three artifacts name the practice [prov:src-2026-05-04-three-artifacts-build-with-ai#t00:14:18-00:14:40|direct|2026-05-04].
+The follow-up video proposes [[domain-driven-design|Domain-Driven Design]] — specifically the three artifacts of [[ubiquitous-language|Ubiquitous Language]], [[bounded-context|Bounded Context]]s, and [[documented-contract|Documented Contract]]s — as the practical, day-to-day method for exercising systems thinking when working with AI agents [prov:src-2026-05-04-three-artifacts-build-with-ai#t00:02:01-00:02:55|direct|2026-05-04]. The two videos are explicitly framed as a "cost / skill / practice" sequence: comprehension debt names the cost, systems thinking names the skill, and the three artifacts name the practice [prov:src-2026-05-04-three-artifacts-build-with-ai#t00:14:18-00:14:40|direct|2026-05-04].
 
 ## Related Pages
 
-- [[Comprehension Debt]] — the failure mode systems thinking prevents
-- [[Programming as Theory Building]] — Peter Naur's 1985 paper that grounds the frame
-- [[Jagged Frontier]] — the AI-capability shape that makes the skill necessary
-- [[Domain-Driven Design]] — the proposed practical method for exercising the skill
-- [[Hack (Agentive Stack)]] — the source of this framing
+- [[comprehension-debt|Comprehension Debt]] — the failure mode systems thinking prevents
+- [[programming-as-theory-building|Programming as Theory Building]] — Peter Naur's 1985 paper that grounds the frame
+- [[jagged-frontier|Jagged Frontier]] — the AI-capability shape that makes the skill necessary
+- [[domain-driven-design|Domain-Driven Design]] — the proposed practical method for exercising the skill
+- [[hack-agentive-stack|Hack (Agentive Stack)]] — the source of this framing
 
 ## Sources
 
-- [[Is this the only skill left?]] — Hack, 2026-05-03 (transcript)
-- [[Three artifacts that changed how I build with AI]] — Hack, 2026-05-04 (transcript)
+- [[src-2026-05-03-is-this-the-only-skill-left|Is this the only skill left?]] — Hack, 2026-05-03 (transcript)
+- [[src-2026-05-04-three-artifacts-build-with-ai|Three artifacts that changed how I build with AI]] — Hack, 2026-05-04 (transcript)

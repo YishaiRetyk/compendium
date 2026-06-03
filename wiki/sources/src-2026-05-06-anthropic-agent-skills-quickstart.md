@@ -65,9 +65,9 @@ Anthropic's API quickstart for Agent Skills: list available pre-built Skills via
 
 ## Notes
 
-This source operationalizes the abstract architecture defined in [[Anthropic Agent Skills Overview]] — translating "three-level progressive disclosure" into a concrete request body, beta headers, and a file-download loop. Compiled into [[Agent Skills]] and [[Claude API]].
+This source operationalizes the abstract architecture defined in [[src-2026-05-06-anthropic-agent-skills-overview|Anthropic Agent Skills Overview]] — translating "three-level progressive disclosure" into a concrete request body, beta headers, and a file-download loop. Compiled into [[agent-skills|Agent Skills]] and [[claude-api|Claude API]].
 
-The quickstart is notable for what it does NOT cover: it walks the *consumer* path (use a pre-built Skill), not the *author* path (write a SKILL.md). Authoring guidance lives in [[Anthropic Agent Skills Best Practices]].
+The quickstart is notable for what it does NOT cover: it walks the *consumer* path (use a pre-built Skill), not the *author* path (write a SKILL.md). Authoring guidance lives in [[src-2026-05-06-anthropic-agent-skills-best-practices|Anthropic Agent Skills Best Practices]].
 
 The four code-block columns (cURL / `ant` CLI / Python / TypeScript) in the doc are not separate claims — they are the same operation expressed in four interfaces. Provenance for any one of them is sufficient for downstream extraction.
 

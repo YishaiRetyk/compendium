@@ -60,13 +60,13 @@ Other shipped agents include `news_analyst.py` (tools `get_news`, `get_global_ne
 
 ## Related Pages
 
-- [[Financial AI Repository Landscape]]
-- [[Financial AI Repository Tradeoffs]]
-- [[Dexter]]
-- [[FinRL]]
-- [[OpenBB]]
+- [[financial-ai-repository-landscape|Financial AI Repository Landscape]]
+- [[financial-ai-repository-tradeoffs|Financial AI Repository Tradeoffs]]
+- [[dexter|Dexter]]
+- [[finrl|FinRL]]
+- [[openbb|OpenBB]]
 
 ## Sources
 
-- [[Financial AI and Quant Finance Repository Comparison Report]]: "Financial AI and Quant Finance Repository Comparison Report" (2026-05-04)
-- [[TradingAgents Repository Investigation Snapshot]]: "TradingAgents Repository Investigation Snapshot" (2026-05-04)
+- [[src-2026-05-04-financial-ai-repo-comparison-report|Financial AI and Quant Finance Repository Comparison Report]]: "Financial AI and Quant Finance Repository Comparison Report" (2026-05-04)
+- [[src-2026-05-04-tradingagents-investigation|TradingAgents Repository Investigation Snapshot]]: "TradingAgents Repository Investigation Snapshot" (2026-05-04)

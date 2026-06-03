@@ -38,7 +38,7 @@ example: false
 
 ## TL;DR
 
-Progressive disclosure is the loading discipline Anthropic uses to let many Agent Skills coexist without paying full token cost upfront. Information loads in three levels: Level 1 metadata (the YAML `name` + `description`, always preloaded into the system prompt at ~100 tokens per Skill); Level 2 instructions (the SKILL.md body, read via bash when the Skill is triggered, kept under ~5k tokens); Level 3 resources (additional `.md` references, datasets, scripts — accessed only when explicitly referenced, with script source code executed via bash so it never enters context). The pattern lets a Skill bundle dozens of reference files, comprehensive API docs, or large datasets without context penalty until something is actually read. The same discipline is a general context-engineering principle, not a Skills-only mechanism: the [[The Ralph Playbook]] applies it to autonomous coding loops by keeping its always-loaded `AGENTS.md` minimal and deferring status/detail to a separate on-demand file.
+Progressive disclosure is the loading discipline Anthropic uses to let many Agent Skills coexist without paying full token cost upfront. Information loads in three levels: Level 1 metadata (the YAML `name` + `description`, always preloaded into the system prompt at ~100 tokens per Skill); Level 2 instructions (the SKILL.md body, read via bash when the Skill is triggered, kept under ~5k tokens); Level 3 resources (additional `.md` references, datasets, scripts — accessed only when explicitly referenced, with script source code executed via bash so it never enters context). The pattern lets a Skill bundle dozens of reference files, comprehensive API docs, or large datasets without context penalty until something is actually read. The same discipline is a general context-engineering principle, not a Skills-only mechanism: the [[src-2026-05-06-ralph-playbook|The Ralph Playbook]] applies it to autonomous coding loops by keeping its always-loaded `AGENTS.md` minimal and deferring status/detail to a separate on-demand file.
 
 ## Key Facts
 
@@ -69,7 +69,7 @@ Three concrete patterns operationalize the discipline at SKILL.md scale [prov:sr
 - **Pattern 2 — domain-specific organization**: a Skill spanning multiple domains keeps SKILL.md as a navigation hub (e.g., "Finance: see reference/finance.md; Sales: see reference/sales.md") so that a query about sales metrics doesn't pull in finance schemas.
 - **Pattern 3 — conditional details**: basic content is inlined in SKILL.md; advanced features (tracked changes, OOXML internals, etc.) live in dedicated files Claude only reads when the user's request triggers them.
 
-The same disciplined load pattern shows up in [[Agent Skills]] usage at the [[Claude API]] surface — listing Skills via `GET /v1/skills?source=anthropic` returns only metadata, not bodies — and in this wiki's own navigation rule: scan `## TL;DR` and `## Key Facts` first, drill into `## Detail` only when the shallow material is insufficient.
+The same disciplined load pattern shows up in [[agent-skills|Agent Skills]] usage at the [[claude-api|Claude API]] surface — listing Skills via `GET /v1/skills?source=anthropic` returns only metadata, not bodies — and in this wiki's own navigation rule: scan `## TL;DR` and `## Key Facts` first, drill into `## Detail` only when the shallow material is insufficient.
 
 ### Level 2 includes all top-level markdown, not just SKILL.md
 
@@ -104,15 +104,15 @@ The connection is interpretive rather than a claim either source makes about the
 
 ## Related Pages
 
-- [[Agent Skills]]
-- [[Anthropic]]
-- [[Claude API]]
-- [[Claude Code]]
+- [[agent-skills|Agent Skills]]
+- [[anthropic|Anthropic]]
+- [[claude-api|Claude API]]
+- [[claude-code|Claude Code]]
 
 ## Sources
 
-- [[Anthropic Agent Skills Overview]] — Anthropic platform docs, 2026-05-06
-- [[Anthropic Agent Skills Best Practices]] — Anthropic platform docs, 2026-05-06
-- [[Introduction to Claude Skills (claude-cookbooks notebook 01)]] — Anthropic claude-cookbooks, 2026-05-06
-- [[Building Custom Skills for Claude (claude-cookbooks notebook 03)]] — Anthropic claude-cookbooks, 2026-05-06
-- [[The Ralph Playbook (Clayton Farr's how-to-ralph-wiggum)]] — Clayton Farr / Geoffrey Huntley, 2026-05-06
+- [[src-2026-05-06-anthropic-agent-skills-overview|Anthropic Agent Skills Overview]] — Anthropic platform docs, 2026-05-06
+- [[src-2026-05-06-anthropic-agent-skills-best-practices|Anthropic Agent Skills Best Practices]] — Anthropic platform docs, 2026-05-06
+- [[src-2026-05-06-anthropic-claude-cookbook-skills-introduction|Introduction to Claude Skills (claude-cookbooks notebook 01)]] — Anthropic claude-cookbooks, 2026-05-06
+- [[src-2026-05-06-anthropic-claude-cookbook-skills-custom-development|Building Custom Skills for Claude (claude-cookbooks notebook 03)]] — Anthropic claude-cookbooks, 2026-05-06
+- [[src-2026-05-06-ralph-playbook|The Ralph Playbook (Clayton Farr's how-to-ralph-wiggum)]] — Clayton Farr / Geoffrey Huntley, 2026-05-06

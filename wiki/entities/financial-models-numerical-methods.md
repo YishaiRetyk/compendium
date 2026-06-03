@@ -58,11 +58,11 @@ The repository is a numerical-methods-for-quant-finance pedagogy repo, not a TA,
 
 ## Related Pages
 
-- [[Financial AI Repository Landscape]]
-- [[Financial AI Repository Tradeoffs]]
-- [[FinRL]]
+- [[financial-ai-repository-landscape|Financial AI Repository Landscape]]
+- [[financial-ai-repository-tradeoffs|Financial AI Repository Tradeoffs]]
+- [[finrl|FinRL]]
 
 ## Sources
 
-- [[Financial AI and Quant Finance Repository Comparison Report]]: "Financial AI and Quant Finance Repository Comparison Report" (2026-05-04)
-- [[Financial-Models-Numerical-Methods Repository Investigation Snapshot]]: "Financial-Models-Numerical-Methods Repository Investigation Snapshot" (2026-05-04)
+- [[src-2026-05-04-financial-ai-repo-comparison-report|Financial AI and Quant Finance Repository Comparison Report]]: "Financial AI and Quant Finance Repository Comparison Report" (2026-05-04)
+- [[src-2026-05-04-fmnm-investigation|Financial-Models-Numerical-Methods Repository Investigation Snapshot]]: "Financial-Models-Numerical-Methods Repository Investigation Snapshot" (2026-05-04)

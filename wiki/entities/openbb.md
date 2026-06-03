@@ -58,13 +58,13 @@ No DCF or valuation-model endpoint is shipped natively. Sentiment analysis is no
 
 ## Related Pages
 
-- [[Financial AI Repository Landscape]]
-- [[Financial AI Repository Tradeoffs]]
-- [[Dexter]]
-- [[TradingAgents]]
-- [[FinRL]]
+- [[financial-ai-repository-landscape|Financial AI Repository Landscape]]
+- [[financial-ai-repository-tradeoffs|Financial AI Repository Tradeoffs]]
+- [[dexter|Dexter]]
+- [[tradingagents|TradingAgents]]
+- [[finrl|FinRL]]
 
 ## Sources
 
-- [[Financial AI and Quant Finance Repository Comparison Report]]: "Financial AI and Quant Finance Repository Comparison Report" (2026-05-04)
-- [[OpenBB Repository Investigation Snapshot]]: "OpenBB Repository Investigation Snapshot" (2026-05-04)
+- [[src-2026-05-04-financial-ai-repo-comparison-report|Financial AI and Quant Finance Repository Comparison Report]]: "Financial AI and Quant Finance Repository Comparison Report" (2026-05-04)
+- [[src-2026-05-04-openbb-investigation|OpenBB Repository Investigation Snapshot]]: "OpenBB Repository Investigation Snapshot" (2026-05-04)

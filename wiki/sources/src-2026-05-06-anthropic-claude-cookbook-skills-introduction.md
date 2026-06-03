@@ -72,13 +72,13 @@ Anthropic's claude-cookbooks notebook walking through the use of pre-built Skill
 
 ## Notes
 
-This source is the SDK-level companion to [[Anthropic Agent Skills Quickstart]]. The platform doc establishes the request body shape and beta headers abstractly; this cookbook pins the exact SDK call (`client.beta.messages.create()`), the required SDK version (0.71.0+), and the parameter name (`betas=`, not `extra_headers`) — all operational facts that the platform doc leaves implicit because it shows `cURL`/CLI/Python/TypeScript variants side-by-side.
+This source is the SDK-level companion to [[src-2026-05-06-anthropic-agent-skills-quickstart|Anthropic Agent Skills Quickstart]]. The platform doc establishes the request body shape and beta headers abstractly; this cookbook pins the exact SDK call (`client.beta.messages.create()`), the required SDK version (0.71.0+), and the parameter name (`betas=`, not `extra_headers`) — all operational facts that the platform doc leaves implicit because it shows `cURL`/CLI/Python/TypeScript variants side-by-side.
 
-Compiled into [[Agent Skills]], [[Claude API]], and the [[Progressive Disclosure]] concept (the listing API exposes only L1 metadata).
+Compiled into [[agent-skills|Agent Skills]], [[claude-api|Claude API]], and the [[progressive-disclosure|Progressive Disclosure]] concept (the listing API exposes only L1 metadata).
 
 The cookbook's "98% savings applies to the initial context. Once you use a skill, the full instructions are loaded" disclaimer is a useful refinement of the prior wiki claim about progressive disclosure — the savings come from L1 only; once L2 fires, the body's full ~5k tokens load. Not a contradiction; a clarification.
 
-Adjacent existing wiki: the cookbook's framing of Skills as "expertise packages" higher-level than tools/MCP is consistent with [[Agent Skills]] but adds an explicit positioning vs the MCP/tool-use ecosystem that the platform docs don't make explicit.
+Adjacent existing wiki: the cookbook's framing of Skills as "expertise packages" higher-level than tools/MCP is consistent with [[agent-skills|Agent Skills]] but adds an explicit positioning vs the MCP/tool-use ecosystem that the platform docs don't make explicit.
 
 ## Source Metadata
 

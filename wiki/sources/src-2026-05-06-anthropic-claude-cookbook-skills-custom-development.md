@@ -72,15 +72,15 @@ Anthropic's claude-cookbooks notebook walking through end-to-end custom-Skill au
 
 ## Notes
 
-This source is the SDK-level companion to [[Anthropic Agent Skills Best Practices]] for the *uploading* and *managing* path, where best-practices is silent. Specifically: best-practices covers SKILL.md authoring (what to write); this notebook covers Skills API operations (how to ship it).
+This source is the SDK-level companion to [[src-2026-05-06-anthropic-agent-skills-best-practices|Anthropic Agent Skills Best Practices]] for the *uploading* and *managing* path, where best-practices is silent. Specifically: best-practices covers SKILL.md authoring (what to write); this notebook covers Skills API operations (how to ship it).
 
-Compiled into [[Agent Skills]] (composition + multi-md-files claims), [[Claude API]] (Skills API endpoints, display_title uniqueness, custom-skill type discriminator, versioning lifecycle), and [[Progressive Disclosure]] (the "all .md files load at L2" refinement).
+Compiled into [[agent-skills|Agent Skills]] (composition + multi-md-files claims), [[claude-api|Claude API]] (Skills API endpoints, display_title uniqueness, custom-skill type discriminator, versioning lifecycle), and [[progressive-disclosure|Progressive Disclosure]] (the "all .md files load at L2" refinement).
 
 The "all .md files in top-level dir load at L2" claim is a meaningful refinement: the prior wiki Progressive Disclosure page describes Level 2 as "the SKILL.md body" full stop. After this ingest, Level 2 is "all top-level `.md` files in the Skill directory" — SKILL.md is the entry point but not the whole story. The ~5k token budget recommendation thus applies to the *sum* of top-level markdown, not just SKILL.md.
 
-The `display_title` uniqueness constraint is workspace-scoped, which interacts with Skills' workspace-wide sharing (per [[Anthropic Agent Skills Overview]]) — two engineers in one workspace cannot upload Skills with the same display_title independently. This is operationally important for team workflows.
+The `display_title` uniqueness constraint is workspace-scoped, which interacts with Skills' workspace-wide sharing (per [[src-2026-05-06-anthropic-agent-skills-overview|Anthropic Agent Skills Overview]]) — two engineers in one workspace cannot upload Skills with the same display_title independently. This is operationally important for team workflows.
 
-The composition pattern (`[custom, anthropic]` in `container.skills`) is the API-level confirmation that Skills are designed to compose, not just to substitute. [[Anthropic Financial Services]] is a Plugins-distribution example of the same pattern at a different scale.
+The composition pattern (`[custom, anthropic]` in `container.skills`) is the API-level confirmation that Skills are designed to compose, not just to substitute. [[anthropic-financial-services|Anthropic Financial Services]] is a Plugins-distribution example of the same pattern at a different scale.
 
 ## Source Metadata
 

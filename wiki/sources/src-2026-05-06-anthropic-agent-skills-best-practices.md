@@ -81,9 +81,9 @@ Authoring guidance for SKILL.md files. Default assumption: Claude is already sma
 
 ## Notes
 
-This source is the canonical authoring guide for [[Agent Skills]]. Compiled into [[Agent Skills]], [[Progressive Disclosure]], and the entity pages [[Anthropic]] and [[Claude Code]].
+This source is the canonical authoring guide for [[agent-skills|Agent Skills]]. Compiled into [[agent-skills|Agent Skills]], [[progressive-disclosure|Progressive Disclosure]], and the entity pages [[anthropic|Anthropic]] and [[claude-code|Claude Code]].
 
-The doc echoes themes already present in the wiki: the "Claude is already smart, cut what it knows" principle aligns with [[Comprehension Debt]] (don't pad with redundant context); the Claude-A-writes-for-Claude-B iteration loop is structurally similar to the [[Documented Contract]] pattern from DDD where one party writes a contract that another consumes; "build evals before docs" is functionally an evaluation-driven development pattern.
+The doc echoes themes already present in the wiki: the "Claude is already smart, cut what it knows" principle aligns with [[comprehension-debt|Comprehension Debt]] (don't pad with redundant context); the Claude-A-writes-for-Claude-B iteration loop is structurally similar to the [[documented-contract|Documented Contract]] pattern from DDD where one party writes a contract that another consumes; "build evals before docs" is functionally an evaluation-driven development pattern.
 
 The doc explicitly distinguishes between **executing** and **reading** scripts: "Run analyze_form.py" (execute, doesn't load source into context) vs "See analyze_form.py for the algorithm" (read, loads source). This dual usage pattern is unique to the Skills filesystem-and-bash architecture.
 

@@ -32,7 +32,7 @@ example: false
 
 ## TL;DR
 
-Author of the 2003 book *Domain-Driven Design: Tackling Complexity in the Heart of Software*, which introduced the [[Domain-Driven Design]] methodology [prov:src-2026-05-04-three-artifacts-build-with-ai#t00:02:33-00:02:39|direct|2026-05-04]. His original book remains, in [[Hack (Agentive Stack)]]'s words, "probably a solid starting point" for the methodology [prov:src-2026-05-04-three-artifacts-build-with-ai#t00:09:23-00:09:29|direct|2026-05-04].
+Author of the 2003 book *Domain-Driven Design: Tackling Complexity in the Heart of Software*, which introduced the [[domain-driven-design|Domain-Driven Design]] methodology [prov:src-2026-05-04-three-artifacts-build-with-ai#t00:02:33-00:02:39|direct|2026-05-04]. His original book remains, in [[hack-agentive-stack|Hack (Agentive Stack)]]'s words, "probably a solid starting point" for the methodology [prov:src-2026-05-04-three-artifacts-build-with-ai#t00:09:23-00:09:29|direct|2026-05-04].
 
 ## Key Facts
 
@@ -48,7 +48,7 @@ Evans' book argued that complex business software must be organized around the l
 
 ### Relevance to AI-assisted development
 
-The methodology was originally designed to keep complex systems coherent across team turnover — i.e., across a sequence of humans whose mental models of the system do not naturally line up. AI coding agents present the same problem in a sharpened form: each session is a new "team member" with no carry-over context. This is the connection [[Hack (Agentive Stack)]] draws on to argue that DDD is more relevant now than it has been in years [prov:src-2026-05-04-three-artifacts-build-with-ai#t00:11:39-00:12:03|direct|2026-05-04].
+The methodology was originally designed to keep complex systems coherent across team turnover — i.e., across a sequence of humans whose mental models of the system do not naturally line up. AI coding agents present the same problem in a sharpened form: each session is a new "team member" with no carry-over context. This is the connection [[hack-agentive-stack|Hack (Agentive Stack)]] draws on to argue that DDD is more relevant now than it has been in years [prov:src-2026-05-04-three-artifacts-build-with-ai#t00:11:39-00:12:03|direct|2026-05-04].
 
 ### Note on the source
 
@@ -56,11 +56,11 @@ The wiki currently has only secondary attestation of Evans' work, via Hack's fra
 
 ## Related Pages
 
-- [[Domain-Driven Design]] — the methodology he introduced
-- [[Ubiquitous Language]] — core concept from his book
-- [[Bounded Context]] — core concept from his book
-- [[Documented Contract]] — Hack's simplification of related Evans concepts
+- [[domain-driven-design|Domain-Driven Design]] — the methodology he introduced
+- [[ubiquitous-language|Ubiquitous Language]] — core concept from his book
+- [[bounded-context|Bounded Context]] — core concept from his book
+- [[documented-contract|Documented Contract]] — Hack's simplification of related Evans concepts
 
 ## Sources
 
-- [[Three artifacts that changed how I build with AI]] — Hack, 2026-05-04 (transcript)
+- [[src-2026-05-04-three-artifacts-build-with-ai|Three artifacts that changed how I build with AI]] — Hack, 2026-05-04 (transcript)

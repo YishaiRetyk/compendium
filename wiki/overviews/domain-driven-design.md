@@ -33,7 +33,7 @@ example: false
 
 ## TL;DR
 
-A software-engineering methodology introduced by [[Eric Evans]] in his 2003 book *Domain-Driven Design: Tackling Complexity in the Heart of Software*. Its central thesis: software must reflect a shared understanding of the domain it serves [prov:src-2026-05-04-three-artifacts-build-with-ai#t00:00:05-00:00:17|direct|2026-05-04]. [[Hack (Agentive Stack)]] re-frames DDD for AI-assisted development by reducing it to three artifacts — [[Ubiquitous Language]], [[Bounded Context]]s, and [[Documented Contract]]s — that re-inject shared understanding into every AI coding session [prov:src-2026-05-04-three-artifacts-build-with-ai#t00:06:39-00:09:16|direct|2026-05-04].
+A software-engineering methodology introduced by [[eric-evans|Eric Evans]] in his 2003 book *Domain-Driven Design: Tackling Complexity in the Heart of Software*. Its central thesis: software must reflect a shared understanding of the domain it serves [prov:src-2026-05-04-three-artifacts-build-with-ai#t00:00:05-00:00:17|direct|2026-05-04]. [[hack-agentive-stack|Hack (Agentive Stack)]] re-frames DDD for AI-assisted development by reducing it to three artifacts — [[ubiquitous-language|Ubiquitous Language]], [[bounded-context|Bounded Context]]s, and [[documented-contract|Documented Contract]]s — that re-inject shared understanding into every AI coding session [prov:src-2026-05-04-three-artifacts-build-with-ai#t00:06:39-00:09:16|direct|2026-05-04].
 
 ## Key Facts
 
@@ -59,15 +59,15 @@ Hack argues that the AI-coding workflow surfaces the exact problem DDD was desig
 
 #### 1. Ubiquitous Language
 
-A glossary: every important term in the system, defined in one sentence, with no ambiguity. Hack reports >50 such terms in his product Clark, organized by area [prov:src-2026-05-04-three-artifacts-build-with-ai#t00:06:48-00:07:30|direct|2026-05-04]. See [[Ubiquitous Language]] for full treatment.
+A glossary: every important term in the system, defined in one sentence, with no ambiguity. Hack reports >50 such terms in his product Clark, organized by area [prov:src-2026-05-04-three-artifacts-build-with-ai#t00:06:48-00:07:30|direct|2026-05-04]. See [[ubiquitous-language|Ubiquitous Language]] for full treatment.
 
 #### 2. Bounded Contexts
 
-The system as a set of distinct areas, each with its own rules and data. Clark has six: analytics, experimentation, goals, SDKs, billing, organizations [prov:src-2026-05-04-three-artifacts-build-with-ai#t00:07:34-00:08:00|direct|2026-05-04]. The metaphor: rooms in a building, each with different rules; you only need to know which room you're in to operate. See [[Bounded Context]].
+The system as a set of distinct areas, each with its own rules and data. Clark has six: analytics, experimentation, goals, SDKs, billing, organizations [prov:src-2026-05-04-three-artifacts-build-with-ai#t00:07:34-00:08:00|direct|2026-05-04]. The metaphor: rooms in a building, each with different rules; you only need to know which room you're in to operate. See [[bounded-context|Bounded Context]].
 
 #### 3. Documented Contracts
 
-Where boundaries touch — the handshake written down. Example: analytics writes events; experimentation reads them; that dependency is a contract whose violation breaks the downstream system [prov:src-2026-05-04-three-artifacts-build-with-ai#t00:08:42-00:09:16|direct|2026-05-04]. See [[Documented Contract]].
+Where boundaries touch — the handshake written down. Example: analytics writes events; experimentation reads them; that dependency is a contract whose violation breaks the downstream system [prov:src-2026-05-04-three-artifacts-build-with-ai#t00:08:42-00:09:16|direct|2026-05-04]. See [[documented-contract|Documented Contract]].
 
 ### Cousin practices
 
@@ -92,13 +92,13 @@ Pre-AI, these artifacts felt like overhead because senior engineers carried equi
 
 ## Related Pages
 
-- [[Eric Evans]] — author of the original methodology
-- [[Ubiquitous Language]] — first artifact
-- [[Bounded Context]] — second artifact
-- [[Documented Contract]] — third artifact
-- [[Systems Thinking]] — the higher-level skill DDD operationalizes
-- [[Comprehension Debt]] — the failure mode DDD prevents
+- [[eric-evans|Eric Evans]] — author of the original methodology
+- [[ubiquitous-language|Ubiquitous Language]] — first artifact
+- [[bounded-context|Bounded Context]] — second artifact
+- [[documented-contract|Documented Contract]] — third artifact
+- [[systems-thinking|Systems Thinking]] — the higher-level skill DDD operationalizes
+- [[comprehension-debt|Comprehension Debt]] — the failure mode DDD prevents
 
 ## Sources
 
-- [[Three artifacts that changed how I build with AI]] — Hack, 2026-05-04 (transcript). The Evans 2003 book is referenced through Hack's framing; primary-source verification of specific phrasings has not been done.
+- [[src-2026-05-04-three-artifacts-build-with-ai|Three artifacts that changed how I build with AI]] — Hack, 2026-05-04 (transcript). The Evans 2003 book is referenced through Hack's framing; primary-source verification of specific phrasings has not been done.

@@ -62,16 +62,16 @@ A repo-wide grep for TA indicator names returns only false positives ("version",
 
 ## Related Pages
 
-- [[Financial AI Repository Landscape]]
-- [[Financial AI Repository Tradeoffs]]
-- [[Dexter]]
-- [[TradingAgents]]
-- [[OpenBB]]
-- [[Anthropic]]
-- [[Claude Code]]
-- [[Agent Skills]]
+- [[financial-ai-repository-landscape|Financial AI Repository Landscape]]
+- [[financial-ai-repository-tradeoffs|Financial AI Repository Tradeoffs]]
+- [[dexter|Dexter]]
+- [[tradingagents|TradingAgents]]
+- [[openbb|OpenBB]]
+- [[anthropic|Anthropic]]
+- [[claude-code|Claude Code]]
+- [[agent-skills|Agent Skills]]
 
 ## Sources
 
-- [[Financial AI and Quant Finance Repository Comparison Report]]: "Financial AI and Quant Finance Repository Comparison Report" (2026-05-04)
-- [[Anthropic Financial Services Repository Investigation Snapshot]]: "Anthropic Financial Services Repository Investigation Snapshot" (2026-05-04)
+- [[src-2026-05-04-financial-ai-repo-comparison-report|Financial AI and Quant Finance Repository Comparison Report]]: "Financial AI and Quant Finance Repository Comparison Report" (2026-05-04)
+- [[src-2026-05-04-anthropic-financial-services-investigation|Anthropic Financial Services Repository Investigation Snapshot]]: "Anthropic Financial Services Repository Investigation Snapshot" (2026-05-04)

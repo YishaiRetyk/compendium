@@ -74,11 +74,11 @@ Agent Skills are filesystem-based directories that package instructions, optiona
 
 ## Notes
 
-This source defines the canonical model for Agent Skills and is the upstream reference for the [[Agent Skills]] overview, [[Progressive Disclosure]] concept, and entity pages [[Anthropic]], [[Claude Code]], and [[Claude API]]. Compiled into those pages alongside [[Anthropic Agent Skills Quickstart]] and [[Anthropic Agent Skills Best Practices]] (the two companion docs covered by this ingest).
+This source defines the canonical model for Agent Skills and is the upstream reference for the [[agent-skills|Agent Skills]] overview, [[progressive-disclosure|Progressive Disclosure]] concept, and entity pages [[anthropic|Anthropic]], [[claude-code|Claude Code]], and [[claude-api|Claude API]]. Compiled into those pages alongside [[src-2026-05-06-anthropic-agent-skills-quickstart|Anthropic Agent Skills Quickstart]] and [[src-2026-05-06-anthropic-agent-skills-best-practices|Anthropic Agent Skills Best Practices]] (the two companion docs covered by this ingest).
 
 The doc establishes that Skills are deliberately *not* prompts — prompts apply to one conversation, while Skills are reusable filesystem-based assets that load on demand. It also draws an explicit "onboarding guide for a new team member" analogy for the SKILL.md + bundled files structure.
 
-Adjacent existing wiki content: [[Anthropic Financial Services]] is a concrete case of Skills in production (Claude Code plugin marketplace shipping `SKILL.md` prompts plus Python validators and Excel templates) — its existing claims about "populated SKILL.md prompts" and "Claude Code plugin" become directly groundable in this source's definitional vocabulary.
+Adjacent existing wiki content: [[anthropic-financial-services|Anthropic Financial Services]] is a concrete case of Skills in production (Claude Code plugin marketplace shipping `SKILL.md` prompts plus Python validators and Excel templates) — its existing claims about "populated SKILL.md prompts" and "Claude Code plugin" become directly groundable in this source's definitional vocabulary.
 
 ## Source Metadata
 

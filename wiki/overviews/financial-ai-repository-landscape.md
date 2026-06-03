@@ -58,24 +58,24 @@ The report's production-facing guidance is to separate concerns: use a real data
 
 ### Analysis-style refinement (2026-05-04)
 
-Direct repository inspection clarifies the analysis-style coverage along technical and fundamental dimensions. Only TradingAgents and OpenBB ship both TA and FA. Dexter and Anthropic Financial Services are FA-only — Dexter from the agent angle (with a DCF valuation skill), Anthropic Financial Services from the workflow-packaging angle (with the broadest set of FA skills including DCF, comps, 3-statement, LBO, merger model, and initiating coverage). FinRL is TA-first with a partial fundamentals example. Financial-Models-Numerical-Methods is neither — it operates on price/return time series and synthetic SDE paths and never touches issuer fundamentals. The full mapping appears in the [[Financial AI Repository Tradeoffs]] page [prov:src-2026-05-04-tradingagents-investigation#sec:fundamental-analysis|direct|2026-05-04] [prov:src-2026-05-04-openbb-investigation#sec:fundamental-analysis|direct|2026-05-04] [prov:src-2026-05-04-dexter-investigation#sec:fundamental-analysis|direct|2026-05-04] [prov:src-2026-05-04-anthropic-financial-services-investigation#sec:fundamental-analysis|direct|2026-05-04] [prov:src-2026-05-04-finrl-investigation#sec:technical-analysis|direct|2026-05-04] [prov:src-2026-05-04-fmnm-investigation#sec:fundamental-analysis|direct|2026-05-04] [epistemic:: sourced]
+Direct repository inspection clarifies the analysis-style coverage along technical and fundamental dimensions. Only TradingAgents and OpenBB ship both TA and FA. Dexter and Anthropic Financial Services are FA-only — Dexter from the agent angle (with a DCF valuation skill), Anthropic Financial Services from the workflow-packaging angle (with the broadest set of FA skills including DCF, comps, 3-statement, LBO, merger model, and initiating coverage). FinRL is TA-first with a partial fundamentals example. Financial-Models-Numerical-Methods is neither — it operates on price/return time series and synthetic SDE paths and never touches issuer fundamentals. The full mapping appears in the [[financial-ai-repository-tradeoffs|Financial AI Repository Tradeoffs]] page [prov:src-2026-05-04-tradingagents-investigation#sec:fundamental-analysis|direct|2026-05-04] [prov:src-2026-05-04-openbb-investigation#sec:fundamental-analysis|direct|2026-05-04] [prov:src-2026-05-04-dexter-investigation#sec:fundamental-analysis|direct|2026-05-04] [prov:src-2026-05-04-anthropic-financial-services-investigation#sec:fundamental-analysis|direct|2026-05-04] [prov:src-2026-05-04-finrl-investigation#sec:technical-analysis|direct|2026-05-04] [prov:src-2026-05-04-fmnm-investigation#sec:fundamental-analysis|direct|2026-05-04] [epistemic:: sourced]
 
 ## Related Pages
 
-- [[OpenBB]]
-- [[Financial-Models-Numerical-Methods]]
-- [[FinRL]]
-- [[TradingAgents]]
-- [[Dexter]]
-- [[Anthropic Financial Services]]
-- [[Financial AI Repository Tradeoffs]]
+- [[openbb|OpenBB]]
+- [[financial-models-numerical-methods|Financial-Models-Numerical-Methods]]
+- [[finrl|FinRL]]
+- [[tradingagents|TradingAgents]]
+- [[dexter|Dexter]]
+- [[anthropic-financial-services|Anthropic Financial Services]]
+- [[financial-ai-repository-tradeoffs|Financial AI Repository Tradeoffs]]
 
 ## Sources
 
-- [[Financial AI and Quant Finance Repository Comparison Report]]: "Financial AI and Quant Finance Repository Comparison Report" (2026-05-04)
-- [[OpenBB Repository Investigation Snapshot]]: "OpenBB Repository Investigation Snapshot" (2026-05-04)
-- [[FinRL Repository Investigation Snapshot]]: "FinRL Repository Investigation Snapshot" (2026-05-04)
-- [[TradingAgents Repository Investigation Snapshot]]: "TradingAgents Repository Investigation Snapshot" (2026-05-04)
-- [[Financial-Models-Numerical-Methods Repository Investigation Snapshot]]: "Financial-Models-Numerical-Methods Repository Investigation Snapshot" (2026-05-04)
-- [[Dexter Repository Investigation Snapshot]]: "Dexter Repository Investigation Snapshot" (2026-05-04)
-- [[Anthropic Financial Services Repository Investigation Snapshot]]: "Anthropic Financial Services Repository Investigation Snapshot" (2026-05-04)
+- [[src-2026-05-04-financial-ai-repo-comparison-report|Financial AI and Quant Finance Repository Comparison Report]]: "Financial AI and Quant Finance Repository Comparison Report" (2026-05-04)
+- [[src-2026-05-04-openbb-investigation|OpenBB Repository Investigation Snapshot]]: "OpenBB Repository Investigation Snapshot" (2026-05-04)
+- [[src-2026-05-04-finrl-investigation|FinRL Repository Investigation Snapshot]]: "FinRL Repository Investigation Snapshot" (2026-05-04)
+- [[src-2026-05-04-tradingagents-investigation|TradingAgents Repository Investigation Snapshot]]: "TradingAgents Repository Investigation Snapshot" (2026-05-04)
+- [[src-2026-05-04-fmnm-investigation|Financial-Models-Numerical-Methods Repository Investigation Snapshot]]: "Financial-Models-Numerical-Methods Repository Investigation Snapshot" (2026-05-04)
+- [[src-2026-05-04-dexter-investigation|Dexter Repository Investigation Snapshot]]: "Dexter Repository Investigation Snapshot" (2026-05-04)
+- [[src-2026-05-04-anthropic-financial-services-investigation|Anthropic Financial Services Repository Investigation Snapshot]]: "Anthropic Financial Services Repository Investigation Snapshot" (2026-05-04)

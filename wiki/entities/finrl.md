@@ -80,13 +80,13 @@ Implicit hardware behavior: the SB3 path at `finrl/agents/stablebaselines3/model
 
 ## Related Pages
 
-- [[Financial AI Repository Landscape]]
-- [[Financial AI Repository Tradeoffs]]
-- [[TradingAgents]]
-- [[Financial-Models-Numerical-Methods]]
-- [[OpenBB]]
+- [[financial-ai-repository-landscape|Financial AI Repository Landscape]]
+- [[financial-ai-repository-tradeoffs|Financial AI Repository Tradeoffs]]
+- [[tradingagents|TradingAgents]]
+- [[financial-models-numerical-methods|Financial-Models-Numerical-Methods]]
+- [[openbb|OpenBB]]
 
 ## Sources
 
-- [[Financial AI and Quant Finance Repository Comparison Report]]: "Financial AI and Quant Finance Repository Comparison Report" (2026-05-04)
-- [[FinRL Repository Investigation Snapshot]]: "FinRL Repository Investigation Snapshot" (2026-05-04)
+- [[src-2026-05-04-financial-ai-repo-comparison-report|Financial AI and Quant Finance Repository Comparison Report]]: "Financial AI and Quant Finance Repository Comparison Report" (2026-05-04)
+- [[src-2026-05-04-finrl-investigation|FinRL Repository Investigation Snapshot]]: "FinRL Repository Investigation Snapshot" (2026-05-04)

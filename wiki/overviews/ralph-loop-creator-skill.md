@@ -141,21 +141,21 @@ Before promoting the skill, test it on at least three scenarios:
 
 ## Related Pages
 
-- [[Agent Skills]]
-- [[Ralph (Autonomous Coding Loop)]]
-- [[Backpressure]]
-- [[Claude Code]]
-- [[Geoffrey Huntley]]
-- [[Progressive Disclosure]]
-- [[Systems Thinking]]
-- [[Comprehension Debt]]
-- [[Domain-Driven Design]]
+- [[agent-skills|Agent Skills]]
+- [[ralph-loop|Ralph (Autonomous Coding Loop)]]
+- [[backpressure|Backpressure]]
+- [[claude-code|Claude Code]]
+- [[geoffrey-huntley|Geoffrey Huntley]]
+- [[progressive-disclosure|Progressive Disclosure]]
+- [[systems-thinking|Systems Thinking]]
+- [[comprehension-debt|Comprehension Debt]]
+- [[domain-driven-design|Domain-Driven Design]]
 
 ## Sources
 
-- [[Anthropic Agent Skills Overview]] — Anthropic platform documentation, 2026-05-06
-- [[Anthropic Agent Skills Best Practices]] — Anthropic platform documentation, 2026-05-06
-- [[Building Custom Skills for Claude (claude-cookbooks notebook 03)]] — Anthropic claude-cookbooks, 2026-05-06
-- [[The Ralph Playbook (Clayton Farr's how-to-ralph-wiggum)]] — Clayton Farr's synthesis of Geoffrey Huntley's Ralph technique, 2026-05-06
-- [[Is this the only skill left?]] — Hack (Agentive Stack), 2026-05-03
-- [[Three artifacts that changed how I build with AI]] — Hack (Agentive Stack), 2026-05-04
+- [[src-2026-05-06-anthropic-agent-skills-overview|Anthropic Agent Skills Overview]] — Anthropic platform documentation, 2026-05-06
+- [[src-2026-05-06-anthropic-agent-skills-best-practices|Anthropic Agent Skills Best Practices]] — Anthropic platform documentation, 2026-05-06
+- [[src-2026-05-06-anthropic-claude-cookbook-skills-custom-development|Building Custom Skills for Claude (claude-cookbooks notebook 03)]] — Anthropic claude-cookbooks, 2026-05-06
+- [[src-2026-05-06-ralph-playbook|The Ralph Playbook (Clayton Farr's how-to-ralph-wiggum)]] — Clayton Farr's synthesis of Geoffrey Huntley's Ralph technique, 2026-05-06
+- [[src-2026-05-03-is-this-the-only-skill-left|Is this the only skill left?]] — Hack (Agentive Stack), 2026-05-03
+- [[src-2026-05-04-three-artifacts-build-with-ai|Three artifacts that changed how I build with AI]] — Hack (Agentive Stack), 2026-05-04

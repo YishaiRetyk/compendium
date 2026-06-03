@@ -34,7 +34,7 @@ example: false
 
 ## TL;DR
 
-A core artifact of [[Domain-Driven Design]]: a glossary of every important term in the system, defined clearly in one sentence with no ambiguity, used consistently by humans, code, and AI agents [prov:src-2026-05-04-three-artifacts-build-with-ai#t00:06:48-00:07:30|direct|2026-05-04]. In [[Hack (Agentive Stack)]]'s framing, it functions as "a contract between you and your AI" — the shared understanding that prevents AI from building the wrong thing with the right name.
+A core artifact of [[domain-driven-design|Domain-Driven Design]]: a glossary of every important term in the system, defined clearly in one sentence with no ambiguity, used consistently by humans, code, and AI agents [prov:src-2026-05-04-three-artifacts-build-with-ai#t00:06:48-00:07:30|direct|2026-05-04]. In [[hack-agentive-stack|Hack (Agentive Stack)]]'s framing, it functions as "a contract between you and your AI" — the shared understanding that prevents AI from building the wrong thing with the right name.
 
 ## Key Facts
 
@@ -76,11 +76,11 @@ The closest pre-DDD cousin is the glossary section of a PRD (Product Requirement
 
 ## Related Pages
 
-- [[Domain-Driven Design]] — parent methodology
-- [[Bounded Context]] — sibling artifact, defines where each term's meaning holds
-- [[Documented Contract]] — sibling artifact, formalizes inter-context handshakes
-- [[Comprehension Debt]] — the failure mode this artifact prevents
+- [[domain-driven-design|Domain-Driven Design]] — parent methodology
+- [[bounded-context|Bounded Context]] — sibling artifact, defines where each term's meaning holds
+- [[documented-contract|Documented Contract]] — sibling artifact, formalizes inter-context handshakes
+- [[comprehension-debt|Comprehension Debt]] — the failure mode this artifact prevents
 
 ## Sources
 
-- [[Three artifacts that changed how I build with AI]] — Hack, 2026-05-04 (transcript)
+- [[src-2026-05-04-three-artifacts-build-with-ai|Three artifacts that changed how I build with AI]] — Hack, 2026-05-04 (transcript)

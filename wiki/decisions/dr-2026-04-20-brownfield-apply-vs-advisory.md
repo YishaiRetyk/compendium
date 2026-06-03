@@ -86,7 +86,7 @@ Why 02/03/04 do NOT adopt the review-manifest pattern:
 
 ## Consequences
 
-- [[AGENTS.md]] §11.5 Brownfield Workflow is the new authoritative contract; §11.5 Release Workflow renumbered to §11.6 (opportunistic fix of Phase 10 WR-03 forward-ref typo).
+- `AGENTS.md` §11.5 Brownfield Workflow is the new authoritative contract; §11.5 Release Workflow renumbered to §11.6 (opportunistic fix of Phase 10 WR-03 forward-ref typo).
 - `schema/brownfield/migrations/` becomes a new tracked directory of canonical migration scripts; byte-equality CI-enforced via `tests/phase-11/test_canonical_byte_equality.sh`.
 - `.brownfield/` gains the candidate/decisions/applied-log artifacts (all gitignored per TMPL-04).
 - `bootstrap_stage` gains the `verified` lifecycle state; `verify --promote` is the ONLY v1.1 writer of that state.
