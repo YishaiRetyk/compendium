@@ -41,7 +41,7 @@ Full phase details: [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md)
 
 ### 🚧 v1.1.1 Graph Integrity (Phase 14)
 
-- [ ] **Phase 14: Graph Link Resolution** — Correct the convention (§8 + self-alias invariant + DR), enforce it (`bin/lint.sh` `linkres` check + `--fix` + reconcile `orphan`), and remediate the data (`wiki/` + `examples/` self-aliases, variant reconciliation, connected-graph human-verify). (LINK-01..10)
+- [ ] **Phase 14: Graph Link Resolution** — Correct the convention to **uniform piped links** `[[id|Title]]` (§8/§5 + superseding DR; `[[X]]` resolves by filename/path only), enforce it (`bin/lint.sh` `linkres` validates link *targets* + `--fix` bare→piped + reconcile `orphan`), and remediate the data (`wiki/` + `examples/` body links → piped form, connected-graph human-verify). (LINK-01..10)
 
 > v1.2+ candidates remain in the Backlog below (Phases 999.3–999.6); the v1.2 schema progressive-disclosure refactor (999.4) is sequenced **after** this patch.
 
@@ -71,8 +71,13 @@ Full phase details: [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md)
 **Plans:** 3 plans
 
 Plans:
+**Wave 1**
+
 - [ ] 14-01-PLAN.md — Correct CLAUDE.md/AGENTS.md §8/§5 to piped-link convention, remove self-alias invariant, author superseding DR (LINK-01, LINK-02, LINK-03)
 - [ ] 14-02-PLAN.md — Re-point bin/lint.sh linkres to validate link targets + --fix bare→piped rewrite + re-pointed tests (LINK-04, LINK-05, LINK-06)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 14-03-PLAN.md — Rewrite wiki/ + examples/ body links to piped form + human-verify connected graph (LINK-07, LINK-08, LINK-09, LINK-10)
 
 ## Backlog
