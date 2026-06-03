@@ -1,56 +1,62 @@
 ---
 phase: 14
 reviewers: [gemini, codex]
-reviewed_at: 2026-06-02T17:08:19Z
+reviewed_at: 2026-06-03T07:46:08Z
 plans_reviewed: [14-01-PLAN.md, 14-02-PLAN.md, 14-03-PLAN.md]
-cycle: 2
+cycle: 3
 ---
 
-# Cross-AI Plan Review — Phase 14 (Cycle 2, re-review)
+# Cross-AI Plan Review — Phase 14 (Cycle 3, re-review)
 
-> Re-review after the Cycle-1 replan. Two independent external reviewers (Gemini, Codex).
+> Re-review after the Cycle-2 replan. Two independent external reviewers (Gemini, Codex).
 > Claude (self-CLI) was skipped for independence per the review workflow's self-CLI rule —
 > this review session is itself running inside Claude Code. The orchestrator independently
-> verified the load-bearing Codex HIGH finding against the embedded plan code (see Consensus).
+> verified the load-bearing Codex finding against the plan files (see Consensus).
 >
-> Cycle-1 raised three HIGHs (alias YAML-quoting, obsidian_map NameError under --category
-> linkres, examples/ example:true exemption count). This cycle assesses whether those are
-> resolved AND hunts for regressions introduced by the revision.
+> Cycle-2 raised two HIGHs: (#1, orchestrator-confirmed) `--fix` `to_add` computed from
+> stem-inclusive `reachable` so the id slug was never added for `id == filename` pages,
+> breaking the LINK-02 literal invariant; (#2, spec-interpretation fork) Plan 03 widened
+> `example: true` "not lint-enforced" into "not remediated", potentially missing LINK-09.
+> This cycle assesses whether those are resolved AND hunts for regressions.
 
 ## Gemini Review
 
-# Phase 14 Plan Review: Graph Link Resolution (Revision 2)
+The Phase 14 implementation plans have converged to a high degree of technical rigor. Cycle 3 successfully resolves the two prior HIGH-severity concerns regarding the literal self-alias invariant and the remediation scope for example pages. The logic for `bin/lint.sh` now correctly distinguishes between graph reachability (the error trigger) and literal schema compliance (the `--fix` path), ensuring that pages are brought into full alignment with LINK-02 even when technically resolving. Remediation for `example: true` fixtures is explicitly addressed via hand-edits, closing the spec-interpretation gap. Defensive coding in `lint.sh` (isolated category calls, YAML-quoting) and comprehensive test coverage (10 cases including index/log scans and colon-title canaries) minimize the risk of regression or data corruption.
 
-This review assesses the revised implementation plans for Phase 14 (v1.1.1 Graph Integrity). This is a re-review focusing on the resolution of three previously identified HIGH-severity concerns and any new issues introduced by the revisions.
+### 1. Cycle-2 HIGH Disposition
 
-## 1. Summary
-The revised plans are **excellent** and exhibit a high degree of technical rigor. They successfully resolve all three HIGH-severity concerns raised in the previous cycle (alias YAML-quoting, `NameError` prevention, and exemption count reconciliation). The decomposition into a documentation/schema wave and a tool/data wave is logically sound. The inclusion of specific "canary" tests for the colon-title corruption bug and the `obsidian_map` isolation crash demonstrates a proactive "trust but verify" approach. The plans are ready for execution.
+*   **HIGH #1 (`to_add` literal membership): RESOLVED.**
+    *   **Evidence:** Plan 02, Change 6 (Subcheck A) explicitly separates `reachable` (which includes the `stem.lower()`) from `existing_lower` (which is literal alias membership). It then computes `to_add` against `existing_lower`:
+        ```python
+        existing_lower = {a.lower() for a in aliases}     # LITERAL membership
+        # ...
+        if title and title.lower() not in existing_lower:
+            to_add.append(title)
+        if pid and pid.lower() not in existing_lower:
+            to_add.append(pid)
+        ```
+    *   This ensures the `id` slug is added even when `id == filename`, satisfying the literal requirement of LINK-02. The logic is verified by a dedicated regression canary in `tests/phase-09/test_lint_linkres.sh` (Test 9b).
 
-## 2. Strengths
-- **Surgical Tooling Updates:** The `bin/lint.sh` updates (Plan 02) follow existing project patterns perfectly while introducing necessary helper functions (`normalize_link`, `_yaml_quote_alias`) that are well-encapsulated.
-- **Defensive Design:** The use of `if 'obsidian_map' not in dir():` guards ensures that the `linkres` check can be run in isolation (via `--category`) without crashing—a critical fix for developer UX and testability.
-- **Robust Verification:** The 9-case test suite (`test_lint_linkres.sh`) is comprehensive, covering not just the happy path but also idempotency, reachability, and YAML parse-integrity for complex titles.
-- **Clear Convention Correction:** Plan 01 correctly identifies and replaces the false "Wikilinks resolve to this `title` value" claim at its source in `AGENTS.md`, replacing it with the reality of filename+alias resolution.
-- **Quantified Remediation:** Plan 03 provides a precise count of affected files (53 pages), correctly excluding `example: true` fixtures that are mechanically invisible to the linter.
+*   **HIGH #2 (LINK-09 examples remediation): RESOLVED.**
+    *   **Evidence:** Plan 03 (Objective) explicitly rules that "lint-skip means NOT-LINT-ENFORCED, not NOT-REMEDIATED." Task 1, Step 2b of Plan 03 provides a detailed hand-edit procedure for all 10 `example: true` dataview-fixture content pages, including a Python validation script to ensure they carry the literal self-alias.
 
-## 3. Concerns
-- **[RESOLVED] Alias YAML-Quoting:** Plan 02 now includes `_yaml_quote_alias` and Test 9 (the colon-title canary), which specifically prevents the corruption of decision pages with titles like `Topic: Subtitle`.
-- **[RESOLVED] isolation Crash:** Plan 02 now builds `obsidian_map` defensively inside the `linkres` block, preventing the `NameError` crash when running the category in isolation.
-- **[RESOLVED] Exemption Counts:** Plan 03 correctly identifies the remediation scope as "45 wiki + 8 lint-visible examples", adjusting for the unconditional `example: true` skip in `bin/lint.sh:972`.
+### 2. Strengths
+*   **Defensive Integration:** Plan 02, Change 6 builds the `obsidian_map` defensively inside the `linkres` block if it doesn't already exist. This prevents `NameError` crashes when the check is called in isolation via `--category linkres` (addressing Cycle-1 HIGH #1).
+*   **Data Integrity:** The implementation of `_yaml_quote_alias` in Plan 02 and the corresponding canary tests in Plan 03 ensure that colon-bearing titles (common in decision records) do not corrupt the YAML frontmatter during `--fix` operations.
+*   **Comprehensive Testing:** The 10-case test suite in `test_lint_linkres.sh` is excellent. It asserts through real JSON output (Test 3) rather than mock logic, and it covers the recently identified `index.md`/`log.md` body-link scan requirement (Test 10).
+*   **Single-Writer Wave Discipline:** Plan 01 owns all `AGENTS.md` edits for the wave, while Plan 02 handles downstream `docs/` and code. This prevents the parallel-write hazards common in multi-agent environments.
 
-### New Observations (Low Severity)
-- **Log Count Placeholders:** In Plan 03 Task 1 Step 6, the log entry uses `<N_wiki>` placeholders. While correct to derive these from the run, the executor must ensure they don't accidentally leave the brackets in the final `log.md` commit. (Disposition: Accept; standard procedure).
-- **LINT_VERSION Sequence:** The plan correctly sequences the `LINT_VERSION` bump and the `test_lint_require_version.sh` update in the same commit. This prevents a temporary CI breakage.
+### 3. Concerns
+*   **None (HIGH/MEDIUM severity).** The plans are now fully aligned with the locked requirements and previous review feedback.
+*   **LOW:** In Plan 03, Task 1, Step 6, the user must manually replace `<N_wiki>` and `<N_ex>` placeholders in the log. While a verification step is included to check for these markers, failing to do so would leave uninformative text in the permanent wiki log.
 
-## 4. Suggestions
-- **Execution Order:** Ensure Plan 02 (Enforcement) is tested against the existing wiki state *before* running the Plan 03 fixes. The plan already specifies this in the "CI-RED-WINDOW STRATEGY" note, which is a great piece of operational foresight.
-- **Spot-check:** When running Task 1 of Plan 03, the executor should explicitly verify the content of `wiki/overviews/domain-driven-design.md` after `--fix` to ensure the preservation of the existing `DDD` alias alongside the new ones.
+### 4. Suggestions
+*   **Human Verification Nuance:** During the LINK-10 human-verify checkpoint in Plan 03, pay special attention to the `examples/dataview-fixtures/` sub-cluster. Since these were hand-edited, verify that they interlink correctly in the graph as expected, separate from the main wiki cluster.
 
-## 5. Risk Assessment
-- **Overall Risk:** **LOW**
-- **Justification:** The technical path is well-defined, reuse of existing `lint.sh` patterns is high, and the potential for data corruption (the highest risk) has been mitigated through YAML quoting and isolated regex application to frontmatter. The "Canary" tests provide a solid safety net.
+### 5. Risk Assessment: LOW
+The plans are surgically precise, address all previous concerns with code-level evidence, and include robust automated and human verification steps. The transition of existing data is handled both mechanically and (where required) manually, ensuring a high-quality outcome for the Obsidian graph.
 
-**Verdict: APPROVED.** All prior HIGH-severity concerns are resolved. The plans are idiomatically complete and align with the requested architectural direction.
+**Review Status: APPROVED**
 
 ---
 
@@ -58,150 +64,216 @@ The revised plans are **excellent** and exhibit a high degree of technical rigor
 
 ## Summary
 
-The revised plans are much stronger, and two prior HIGH issues are genuinely addressed: YAML alias quoting and defensive `obsidian_map` creation under `--category linkres`. The example-count issue is correctly diagnosed mechanically, but Plan 03 now overcorrects by exempting `example: true` pages from remediation, which appears to conflict with LINK-09 and the milestone target that `examples/` pages carry self-aliases. There is also a new HIGH correctness gap: the proposed `--fix` does not actually add the `id` slug alias for normal compliant pages because it treats the filename stem as sufficient reachability.
+HIGH #1 is resolved in the embedded `bin/lint.sh` design: `--fix` now computes missing aliases from literal alias membership, so the id slug is added even when it is already filename-stem reachable. HIGH #2 is only partially resolved: Plan 03 adds the correct hand-edit workflow for the 10 `example:true` dataview fixture pages, but stale contradictory text still says all 12 `example:true` pages are exempt and should not be hand-edited. As submitted, the plans are close, but not convergence-clean.
+
+## Cycle-2 HIGH Disposition
+
+### HIGH #1: `to_add` computed from reachability instead of literal aliases
+
+**RESOLVED.**
+
+The revised embedded code separates reachability from literal alias membership:
+
+```python
+existing_lower = {a.lower() for a in aliases}     # LITERAL alias membership (drives --fix)
+reachable = {stem.lower()} | existing_lower        # Obsidian resolvability (drives error)
+```
+
+And `to_add` is now computed against `existing_lower`, not `reachable`:
+
+```python
+if title and title.lower() not in existing_lower:
+    to_add.append(title)
+if pid and pid.lower() not in existing_lower:
+    to_add.append(pid)
+```
+
+This directly fixes the prior failure: for `id == filename stem`, the id is still added because it is absent from aliases even though it is stem-reachable. Test 9b also explicitly guards this:
+
+```python
+assert 'my-concept' in aliases
+```
+
+### HIGH #2: `example:true` pages treated as remediation-exempt
+
+**PARTIALLY RESOLVED.**
+
+Correct remediation is present in Plan 03:
+
+```text
+10 dataview-fixture content pages ... literal self-alias (title + id) by HAND-EDIT
+```
+
+And Task 1 Step 2b explicitly lists the 10 fixture files and includes a YAML parse/self-alias verification loop.
+
+However, contradictory stale text remains. Plan 01's decision-record Consequences still says:
+
+```text
+the 12 `example: true` fixture pages are exempt per the lint-skip convention
+```
+
+Plan 03 Task 1 Step 2 also says:
+
+```text
+The 12 `example: true` pages ... stay EXEMPT per LINK-09
+Do not attempt to hand-edit the 12 example:true pages
+```
+
+That directly contradicts Step 2b and the Cycle-2 ruling. The human checkpoint repeats the stale framing:
+
+```text
+the 12 example:true fixtures stay exempt
+```
+
+So the implementation path can be correct, but the plan/spec text is not clean enough to call this fully resolved.
 
 ## Strengths
 
-- The `obsidian_map` NameError concern is resolved. Plan 02 explicitly builds `obsidian_map` inside the `linkres` block when orphan/gap were skipped, matching the live risk at [bin/lint.sh](/home/yishai/Documents/compendium/bin/lint.sh:1080).
+- The `--fix` literal-membership bug is fixed at the actual code level, not just in prose.
+- `_yaml_quote_alias()` addresses the colon-title YAML corruption risk.
+- `linkres` is made callable in isolation with a defensive `obsidian_map` build.
+- `index.md` and `log.md` are now included in body-link scanning:
 
-- The YAML quoting concern is resolved. `_yaml_quote_alias`, colon-title tests, and Plan 03 canaries directly cover the prior corruption case.
+```python
+for special in ('index.md', 'log.md'):
+    ...
+    linkres_scan.append(...)
+```
 
-- The example skip behavior is now understood correctly. Live code skips `example: true` before checks at [bin/lint.sh](/home/yishai/Documents/compendium/bin/lint.sh:956), so `--fix` cannot reach those pages.
-
-- The normalization rules are well-scoped: no edit distance, no stemming, no synonym matching, explicit plural map only.
-
-- Plan 03’s CI-red-window discussion is realistic: Plan 02 alone makes full CI red until data remediation lands.
+- §11.3 schema drift is addressed in Plan 01 by adding `linkres` to the error remap, while Plan 02 updates `docs/reference/ci.md`.
+- Test 9b is a good regression canary for the exact Cycle-2 HIGH #1 failure mode.
 
 ## Concerns
 
-- [HIGH] The self-alias invariant is weakened from “`title` and `id` are in `aliases`” to “reachable via filename stem or aliases.” Plan 02 computes `to_add` only when `pid.lower() not in reachable`; for normal pages where `id == filename`, the `id` is already “reachable,” so it will not be added to `aliases`. This contradicts LINK-02/LINK-06 and Plan 03’s expected `domain-driven-design` alias block.
+- **HIGH:** HIGH #2 still has contradictory instructions. Remove every statement saying the 12 `example:true` pages are exempt. The correct split is: 10 dataview fixtures hand-edited, 2 scaffolding files exempt.
 
-- [HIGH] Plan 03’s treatment of `example: true` pages conflicts with LINK-09 as written. It correctly says lint cannot touch the 12 skipped fixtures, but then declares them exempt from graph-resolvable self-aliases. The milestone says all `wiki/` and `examples/` pages carry self-aliases, and LINK-09 says examples pages carry self-aliases while respecting skip conventions. “Not lint-enforced” should not automatically mean “not remediated.”
+- **MEDIUM:** LINK-02 literal self-alias membership is fixed by `--fix`, but not fully enforced by `linkres` without `--fix`. The error condition still uses `reachable`, so a page with `id == filename` but missing the literal id alias can pass CI. If LINK-02 is a hard invariant, `title/id not in existing_lower` should be a `linkres` error or at least a CI-gating finding.
 
-- [MEDIUM] `linkres` appears to scan only `all_pages` bodies, which excludes `wiki/index.md` and `wiki/log.md`. Orphan scans those specially, but the new body-link variant check does not. Broken links in index/log could evade LINK-05 even though they affect the Obsidian graph.
+- **MEDIUM:** `schema/obsidian/*.md` only gets:
 
-- [MEDIUM] AGENTS/CLAUDE §11.3 CI severity mapping is not updated in Plan 02. `docs/reference/ci.md` is updated, but that page says AGENTS.md §11.3 is source of truth. Adding `linkres` to `bin/lint.sh` and `docs/reference/ci.md` without AGENTS/CLAUDE §11.3 creates schema drift.
+```yaml
+aliases:
+  - {{title}}
+```
 
-- [LOW] Plan 03’s spot-check examples show unquoted aliases, but Plan 02 intentionally re-emits all aliases quoted. That is harmless but the expected block should match the actual writer style.
+That does not obviously ship both literal `title` and `id` aliases. If `{{title}}` expands to the filename slug, it misses the human title; if it expands to the human title, it misses the id slug.
 
-- [LOW] Several tasks say “commit” but show only `git add` plus a commit message. Add the actual `git commit -m ...` command if the executor is expected to commit.
+- **LOW:** Plan 02 still says "9 cases" in a few places while describing 10 cases including 9b and 10.
+
+- **LOW:** Plan 02 threat model still says `_apply_self_alias_fix` uses `except Exception: pass`, but the embedded helper now prints a warning. Update the threat text to match the code.
 
 ## Suggestions
 
-- Change Plan 02 subcheck A fix logic so `--fix` always ensures literal alias membership for both `title` and `id`, independent of reachability. Keep reachability as the error condition if desired, but compute `to_add` from actual aliases:
-  `if title not in aliases: add title; if pid not in aliases: add pid`.
-
-- In Plan 01, restore LINK-02 wording to literal self-alias membership, or explicitly revise the requirement. Current “reachable” wording does not match the stated invariant.
-
-- In Plan 03, either hand-edit the 12 `example: true` pages to add self-aliases, or formally change LINK-09 to say they are exempt from remediation. The better fit for the milestone is: lint skips them, but remediation still updates them mechanically or via a separate script.
-
-- Add final verification for examples:
-  `bash bin/lint.sh --category linkres examples/ --format json`
-  plus a direct alias-membership check over all 20 example markdown files if LINK-09 remains literal.
-
-- Extend `linkres` body-link scanning to include `wiki/index.md` and `wiki/log.md`, or explicitly document that LINK-05 excludes scaffolding files.
-
-- Update AGENTS.md/CLAUDE.md §11.3 CI severity table alongside `docs/reference/ci.md`.
+- Delete or rewrite the stale exemption text in Plan 01 DR Consequences, Plan 03 Step 2, and the human checkpoint.
+- Add a `linkres` test where a page has `aliases: ["My Concept"]` but lacks `"my-concept"` and assert it fails if LINK-02 is meant to be CI-enforced.
+- Make the Obsidian templates explicitly address both aliases, or stop claiming they ship the full invariant.
+- Keep the Plan 03 fixture self-alias verification; it is the right guard for LINK-09.
 
 ## Risk Assessment
 
-Overall risk: **MEDIUM-HIGH**.
-
-The core lint design is close, and the two technical prior HIGHs are fixed. The remaining risk is requirements drift: the revised plans now enforce reachability rather than literal self-alias membership, and they exempt `example: true` files from remediation rather than just from lint. Those two issues could let the phase finish “green” while missing LINK-02/LINK-09 as originally stated.
+**HIGH as submitted.** The code-level fix for HIGH #1 is solid, but HIGH #2 is still contradicted by multiple plan sections, including the proposed decision-record content. After removing those stale exemption statements and deciding whether literal self-alias membership should be CI-enforced, risk would drop to LOW/MEDIUM.
 
 ---
 
 ## Consensus Summary
 
-The two reviewers **agree the three Cycle-1 HIGHs are technically resolved** (YAML alias
-quoting via `_yaml_quote_alias` + Test 9 canary; defensive `obsidian_map` build inside the
-`linkres` block; correct mechanical diagnosis that `bin/lint.sh:972` skips `example: true`
-pages so `--fix` cannot reach them). They **diverge sharply on overall risk**: Gemini rates
-the revised plans **LOW / APPROVED**; Codex rates them **MEDIUM-HIGH**, raising two NEW
-concerns this cycle.
+Both reviewers **agree Cycle-2 HIGH #1 (`to_add` literal membership) is genuinely RESOLVED**
+at the code level: Plan 02 subcheck A now computes `to_add` from `existing_lower` (literal alias
+membership), not stem-inclusive `reachable`, so the id slug is added even when `id == filename`.
+Test 9b is the regression canary. Orchestrator independently confirmed this against 14-02-PLAN.md
+lines 593–615 — **RESOLVED**.
 
-The orchestrator independently verified Codex's load-bearing HIGH against the embedded plan
-code. **It is confirmed real** (details below). Gemini reviewed at the design/intent level and
-did not trace the `to_add` computation; Codex traced it. As in Cycle 1, the deeper code-level
-trace wins.
+They **diverge on HIGH #2 (LINK-09 examples remediation) and on overall risk**. Gemini rates the
+plans **LOW / APPROVED**, reading HIGH #2 as RESOLVED because the correct hand-edit workflow now
+exists (Plan 03 objective + Step 2b). Codex rates them **HIGH as submitted / PARTIALLY RESOLVED**,
+because the revision *added* the correct workflow but *left in place* three pieces of stale
+contradictory text that still declare the 12 `example: true` pages exempt — one of which is a
+direct intra-task contradiction, and one of which is the proposed decision-record body that would
+be committed into the permanent wiki.
+
+**The orchestrator independently verified Codex's load-bearing HIGH against the plan files. It is
+confirmed real** (grep evidence below). As in Cycles 1 and 2, the deeper trace (Codex) wins over
+the design-intent read (Gemini): Gemini saw the new correct workflow and stopped; Codex (and the
+orchestrator) found that the old wrong workflow text coexists with it.
 
 ### Agreed Strengths
 
-- All three Cycle-1 HIGHs are resolved at the code level (quoting, NameError guard, example
-  skip diagnosis). Both reviewers state this explicitly.
-- Conservative, well-scoped normalization (`normalize_link`): explicit plural map only, no
-  edit distance / stemmer / substring matching.
-- Strong "canary" test design — Test 9 (colon-title YAML integrity) and the isolation crash
-  guard directly target the prior bugs.
-- Realistic CI-red-window discussion in Plan 03 (Plan 02 alone turns full CI red until
-  remediation lands).
+- **HIGH #1 fix is at the code level, not prose** — both reviewers cite the `existing_lower` /
+  `reachable` split and the Test 9b canary explicitly.
+- `_yaml_quote_alias()` + colon-title canaries (Test 9, Plan 03 Step 5b) close the YAML-corruption
+  risk on the two real colon-titled decision pages.
+- Defensive `if 'obsidian_map' not in dir():` build makes `--category linkres` callable in
+  isolation (no NameError) — Cycle-1 HIGH #1 stays fixed.
+- `index.md`/`log.md` body-link scan added (Plan 02 lines 641–658 + Test 10) — Cycle-2 MEDIUM
+  closed.
+- §11.3 source-of-truth severity-remap table updated in Plan 01 Edit E alongside `docs/reference/ci.md`
+  in Plan 02 — Cycle-2 MEDIUM schema-drift closed; single-writer-per-wave discipline preserved.
 
 ### Agreed Concerns (highest priority)
 
-- **[HIGH — confirmed live by orchestrator] `--fix` does NOT add the `id` slug alias for
-  compliant pages, contradicting the self-alias invariant and Plan 03's own success
-  criterion.** Plan 02 subcheck A (14-02-PLAN.md lines 556–575) computes `to_add` against
-  `reachable = {stem.lower()} | {alias.lower() ...}` — which **includes the filename stem**.
-  For any compliant page where `id == filename`, `pid.lower()` is already in `reachable` via
-  the stem, so `id` is never appended to `aliases` (the plan even annotates this branch as
-  "near-dead for compliant pages", line 568). But:
-    - The milestone target + LINK-02 mandate the literal invariant "every page's `aliases`
-      includes its `title` **and `id` slug**".
-    - Plan 03's verification (14-03-PLAN.md line 281) explicitly asserts
-      `wiki/overviews/domain-driven-design.md` aliases include **both** "Domain-Driven Design"
-      **and** "domain-driven-design" (the id slug) after `--fix`.
-    With the current `to_add` logic, the id-slug half of that assertion will NOT hold —
-    `--fix` adds only the `title`, never the slug, for the typical `id == filename` page.
-    Note this is a **regression vs. the RESEARCH.md §8 reference implementation** (lines
-    454–474), which computed `to_add` against `existing_lower` (actual alias membership, NOT
-    stem-inclusive `reachable`) and therefore DID add the id slug. The Plan-02 revision
-    diverged from RESEARCH when it refactored the helper to a caller-computed `to_add`.
-    **Fix (Codex, endorsed):** compute `to_add` from literal alias membership, not
-    reachability — `if title not in aliases: add title; if pid not in aliases: add pid` — OR
-    revise LINK-02 / Plan 03 wording to drop the literal-id-slug invariant. The two must agree.
-
-- **[HIGH per Codex / interpretation drift] `example: true` pages: "not lint-enforced" was
-  widened to "not remediated", which may miss LINK-09 as written.** The plans correctly show
-  lint cannot touch the 12 `example: true` fixtures, then declare them exempt from carrying
-  self-aliases. The milestone says all `wiki/` **and `examples/`** pages carry self-aliases;
-  LINK-09 says examples pages carry self-aliases *while respecting skip conventions*. Codex
-  reads that as "lint skips them, but remediation still updates them (mechanically or via a
-  separate hand-edit)"; the plans read it as "skipped ⇒ exempt". This is a genuine
-  spec-interpretation fork, not a code bug — it needs an explicit ruling (hand-edit the 12,
-  or formally amend LINK-09 to declare them exempt). Gemini accepted the plans' reading.
+- **[HIGH — confirmed live by orchestrator] HIGH #2 is only PARTIALLY RESOLVED: the plans carry
+  the correct hand-edit workflow AND three pieces of stale contradictory "12 exempt" text.** The
+  correct ruling is present (Plan 03 objective lines 63–69: "lint-skip means NOT-LINT-ENFORCED,
+  not NOT-REMEDIATED"; Step 2b lines 183–216 hand-edit the 10 dataview fixtures). But stale
+  contradictory text remains in three places (grep-confirmed):
+    - **14-01-PLAN.md line 439** (decision-record Consequences body): *"the 12 `example: true`
+      fixture pages are exempt per the lint-skip convention."* This is the worst instance — it is
+      the proposed DR content, so executing Plan 01 verbatim would commit the WRONG ruling into the
+      permanent `wiki/decisions/` record, directly contradicting LINK-09 and Plan 03.
+    - **14-03-PLAN.md line 175** (Task 1 Step 2): *"The 12 `example: true` pages … stay EXEMPT per
+      LINK-09 … Do not attempt to hand-edit the 12 example:true pages."* This directly contradicts
+      Step 2b (line 183) in the SAME task, which mandates hand-editing 10 of those 12. An executor
+      reading Step 2 first could skip Step 2b and leave LINK-09 unmet.
+    - **14-03-PLAN.md line 351** (human-verify checkpoint `<what-built>`): *"the 12 example:true
+      fixtures stay exempt"* — same stale framing surfaced to the human reviewer.
+    **Fix (Codex, endorsed):** delete/rewrite all three stale statements to the agreed split —
+    *10 dataview fixtures hand-edited (Step 2b), 2 scaffolding files (kahneman README.md + log.md)
+    exempt.* This is a text-consistency fix, not a code change; the executable workflow is already
+    correct. Until the contradiction is removed, the phase can finish "green" on the wrong reading
+    (skip Step 2b) or commit a self-contradicting decision record.
 
 ### Divergent Views
 
-- **Overall risk:** Gemini **LOW / APPROVED** vs Codex **MEDIUM-HIGH**. Same pattern as
-  Cycle 1: design-level review (Gemini) saw the prior bugs fixed and stopped; code-trace
-  review (Codex) found the `to_add` regression and the LINK-09 interpretation gap. Orchestrator
-  verification sides with Codex on the `to_add` HIGH.
-- **LINK-09 examples remediation:** Codex wants the 12 example pages either hand-edited or
-  LINK-09 formally amended; Gemini treats the plans' "exempt" reading as correct and final.
+- **HIGH #2 disposition:** Gemini RESOLVED (the correct workflow exists) vs Codex PARTIALLY
+  RESOLVED (the wrong workflow text also still exists). Orchestrator sides with Codex —
+  contradictory instructions in an executable plan are a real defect, and one instance lands in the
+  committed DR. **Counts as 1 unresolved HIGH this cycle.**
+- **Overall risk:** Gemini LOW / APPROVED vs Codex HIGH as submitted. Same Cycle-1/Cycle-2 pattern:
+  design-level review approves once the right thing appears; code/text-trace review fails on the
+  wrong thing still being present.
 
-### Lower-severity items (non-blocking, worth folding in)
+### Lower-severity items (non-blocking, worth folding into the same fix pass)
 
-- **[MEDIUM — Codex]** `linkres` body-link scan runs over `all_pages` only, excluding
-  `wiki/index.md` and `wiki/log.md` (which `orphan` scans specially). Broken links there could
-  evade LINK-05. Fix: extend the scan to index/log, or explicitly document the exclusion.
-- **[MEDIUM — Codex]** Plan 02 updates `docs/reference/ci.md` severity table but not
-  AGENTS.md/CLAUDE.md §11.3 — yet `ci.md` declares §11.3 the source of truth. Adding `linkres`
-  to the severity remap without updating §11.3 is schema drift. Fix: update §11.3 in the same
-  change (and re-run `bin/sync-claude.sh --check`).
-- **[LOW — Codex]** Plan 03 spot-check examples show unquoted aliases, but Plan 02 re-emits all
-  aliases quoted — expected blocks should match the actual writer style.
-- **[LOW — Codex]** A few tasks say "commit" but show only `git add` + message; add the literal
-  `git commit -m ...` if the executor is expected to commit.
-- **[LOW — Gemini]** Plan 03 Task 1 Step 6 uses `<N_wiki>` placeholders in the log entry —
-  ensure the brackets are replaced with real counts before committing.
+- **[MEDIUM — Codex]** LINK-02 literal membership is enforced only by `--fix`, not by `linkres`
+  without `--fix`: the error condition uses `reachable`, so a page with `id == filename` but no
+  literal id alias passes CI clean. If LINK-02 is meant to be a CI-hard invariant (not just a
+  `--fix`-healable one), make `title/id not in existing_lower` an error (or CI-gating finding) and
+  add a test for the `aliases: ["My Concept"]`-but-missing-`"my-concept"` case. **Decision needed:**
+  is the literal invariant CI-enforced, or only `--fix`-healed? The requirement text (LINK-02
+  "MUST include") leans toward CI-enforced; the current design only heals it.
+- **[MEDIUM — Codex]** `schema/obsidian/*.md` ships only `aliases: - {{title}}`. Depending on what
+  `{{title}}` expands to, this ships at most one of the two literal aliases — it does not obviously
+  ship BOTH the human title AND the id slug, yet Plan 01's must-have claims the obsidian templates
+  carry the self-alias invariant. Either make the obsidian templates ship both, or soften the
+  must-have wording to "seeds the title self-alias (Obsidian auto-fills; id slug added on first
+  lint --fix)".
+- **[LOW — Codex]** Plan 02 still says "9 cases" in several places (objective line 68, task name,
+  done block) while actually describing 10 (incl. 9b + 10). Cosmetic count drift.
+- **[LOW — Codex]** Plan 02 threat-model row T-14-02-04 still describes `except Exception: pass`,
+  but the embedded helper now `print(...)`s a warning. Align the threat text with the code.
+- **[LOW — Gemini]** Plan 03 Step 6 `<N_wiki>` / `<N_ex>` log placeholders — ensure replaced with
+  real counts before commit (a guard grep is already in the plan; keep it).
 
 ### Recommendation
 
-The three Cycle-1 HIGHs are genuinely closed, but the revision introduced **one confirmed new
-HIGH** (`--fix` drops the id-slug alias, breaking the self-alias invariant and Plan 03's stated
-verification) plus **one HIGH-rated spec-interpretation fork** (LINK-09 examples remediation).
-Do not execute Plan 02/03 verbatim. Reconcile the `to_add` computation with LINK-02/Plan 03
-(make `--fix` add the literal id slug, OR amend the invariant), and rule explicitly on the
-12 `example: true` pages. Also fold in the §11.3 severity-table update and the index/log
-body-link scan. With those applied, the phase cleanly achieves LINK-01..10.
+Cycle-2 HIGH #1 is genuinely closed at the code level (`to_add` from literal membership + Test 9b),
+and the Cycle-2 MEDIUMs (index/log scan, §11.3 drift) are closed. **One HIGH remains: HIGH #2 is
+only partially resolved** — the correct examples-remediation workflow is present but coexists with
+three stale "12 exempt" statements, including the proposed decision-record body (Plan 01 line 439)
+and a direct intra-task contradiction (Plan 03 line 175 vs 183). Do not execute verbatim. Remove
+the three stale exemption statements (text-only fix; the executable workflow is already correct),
+and rule on the two MEDIUMs (is literal self-alias membership CI-enforced or only `--fix`-healed;
+do the obsidian templates ship both aliases). With those applied, the phase cleanly achieves
+LINK-01..10.
+
 Recommended next step: `/gsd-plan-phase 14 --reviews`.
