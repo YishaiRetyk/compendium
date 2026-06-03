@@ -108,7 +108,7 @@ None.
 
 ## Affected Pages
 
-- [[Attention]]
+- [[attention|Attention]]
 
 ## Sources
 

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# test_lint_linkres.sh -- 11 cases covering LINK-04, LINK-05, LINK-06 (D-01 to D-06)
+# test_lint_linkres.sh -- 13 cases covering LINK-04, LINK-05, LINK-06 (re-pointed to
+# piped-form enforcement, masked body scan, alias-free orphan resolution).
+# Neutral fixtures only (no real vault slugs per CLAUDE.md §3 neutrality).
 # Self-contained: builds its own temp wiki inline. No git needed.
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -12,20 +14,20 @@ WIKI="$TMP/wiki"
 mkdir -p "$WIKI" "$WIKI/concepts" "$WIKI/entities" "$WIKI/sources"
 
 # ---------------------------------------------------------------------------
-# Fixture pages (PINNED -- do NOT improvise per plan spec)
+# Neutral fixture pages
+# Slugs: alpha, beta, gamma-one, gamma-two, hub, prov-page, src-test-01, fmtest
 # ---------------------------------------------------------------------------
 
-# Page A: my-concept.md -- title-unreachable (aliases empty, stem 'my-concept' != title 'My Concept')
-# Used in: Tests 1, 2, 6, 8, 10
-cat > "$WIKI/concepts/my-concept.md" <<'EOF'
+# alpha.md -- simple page with single-word id == filename stem
+cat > "$WIKI/concepts/alpha.md" <<'EOF'
 ---
-id: my-concept
-title: "My Concept"
+id: alpha
+title: "Alpha"
 type: concept
 status: active
-summary: "A test concept page."
-created_at: 2026-06-02
-updated_at: 2026-06-02
+summary: "A neutral test concept."
+created_at: 2026-06-03
+updated_at: 2026-06-03
 sources: []
 epistemic_status: sourced
 tags: [test]
@@ -38,147 +40,20 @@ has_contradictions: false
 knowledge_domain: science
 example: false
 ---
-# My Concept
+# Alpha
 Body text.
 EOF
 
-# Page B: hack-agentive-stack.md -- SELF-ALIASED so subcheck A is silent for B.
-# Title has parens; the alias covers exact title. Body links test parens-stripping.
-# Used in: Test 3 (linker page has [[Hack Agentive Stack]] -- no parens)
-cat > "$WIKI/entities/hack-agentive-stack.md" <<'EOF'
+# beta.md -- title with parenthetical (tests parens stripping is not relevant for T1 piped-OK)
+cat > "$WIKI/concepts/beta.md" <<'EOF'
 ---
-id: hack-agentive-stack
-title: "Hack (Agentive Stack)"
-type: entity
-status: active
-summary: "A page with parens in title."
-created_at: 2026-06-02
-updated_at: 2026-06-02
-sources: []
-epistemic_status: sourced
-tags: [test]
-domains: [test]
-supersedes:
-superseded_by:
-privacy: cloud_safe
-aliases:
-  - "Hack (Agentive Stack)"
-  - "hack-agentive-stack"
-has_contradictions: false
-knowledge_domain: science
-example: false
----
-# Hack (Agentive Stack)
-Body text.
-EOF
-
-# Page C: ctx-one.md -- SELF-ALIASED. Title "Bounded Contexts" (plural).
-# Used in: Test 4 (multi-match warning)
-cat > "$WIKI/concepts/ctx-one.md" <<'EOF'
----
-id: ctx-one
-title: "Bounded Contexts"
+id: beta
+title: "Beta (Parenthetical)"
 type: concept
 status: active
-summary: "Bounded contexts concept."
-created_at: 2026-06-02
-updated_at: 2026-06-02
-sources: []
-epistemic_status: sourced
-tags: [test]
-domains: [test]
-supersedes:
-superseded_by:
-privacy: cloud_safe
-aliases:
-  - "Bounded Contexts"
-  - "ctx-one"
-has_contradictions: false
-knowledge_domain: science
-example: false
----
-# Bounded Contexts
-Body text.
-EOF
-
-# Page D: ctx-two.md -- SELF-ALIASED. Title "Bounded Context" (singular).
-# Used in: Test 4 (multi-match warning)
-# normalize_link("Bounded Contexts") -> "bounded context" (contexts->context in plural map)
-# normalize_link("Bounded Context") -> "bounded context"
-# Both normalize to same string -> multi-match when linked via [[bounded-context]]
-cat > "$WIKI/concepts/ctx-two.md" <<'EOF'
----
-id: ctx-two
-title: "Bounded Context"
-type: concept
-status: active
-summary: "Bounded context (singular) concept."
-created_at: 2026-06-02
-updated_at: 2026-06-02
-sources: []
-epistemic_status: sourced
-tags: [test]
-domains: [test]
-supersedes:
-superseded_by:
-privacy: cloud_safe
-aliases:
-  - "Bounded Context"
-  - "ctx-two"
-has_contradictions: false
-knowledge_domain: science
-example: false
----
-# Bounded Context
-Body text.
-EOF
-
-# Page E: linker.md -- SELF-ALIASED. Has body links for multiple tests.
-# [[My Concept]] -> Test 8 (orphan), Test 10 (index/log scan, resolves after --fix)
-# [[Hack Agentive Stack]] -> Test 3 (parens stripped, unique match)
-# [[Completely Unknown Page]] -> Test 5 (no match, stays gap)
-# [[bounded-context]] -> Test 4 (multi-match warning, not an exact stem/alias of either ctx page)
-cat > "$WIKI/concepts/linker.md" <<'EOF'
----
-id: linker
-title: "Linker"
-type: concept
-status: active
-summary: "A linker page for testing."
-created_at: 2026-06-02
-updated_at: 2026-06-02
-sources: []
-epistemic_status: sourced
-tags: [test]
-domains: [test]
-supersedes:
-superseded_by:
-privacy: cloud_safe
-aliases:
-  - "Linker"
-  - "linker"
-has_contradictions: false
-knowledge_domain: science
-example: false
----
-# Linker
-References [[My Concept]] for the main concept.
-See also [[Hack Agentive Stack]] for an example.
-Does not know about [[Completely Unknown Page]].
-Related to [[bounded-context]] domain work.
-EOF
-
-# Page F: topic-subtitle.md -- colon-space title, empty aliases.
-# Tests that --fix YAML-double-quotes the alias (HIGH BUG #2 canary).
-cat > "$WIKI/concepts/topic-subtitle.md" <<'EOF'
----
-id: topic-subtitle
-title: "Topic: Subtitle"
-type: concept
-status: active
-summary: "Page with colon in title."
-created_at: 2026-06-02
-updated_at: 2026-06-02
+summary: "Concept with parens in title."
+created_at: 2026-06-03
+updated_at: 2026-06-03
 sources: []
 epistemic_status: sourced
 tags: [test]
@@ -191,21 +66,130 @@ has_contradictions: false
 knowledge_domain: science
 example: false
 ---
-# Topic: Subtitle
+# Beta (Parenthetical)
 Body text.
 EOF
 
-# Page G: provenance-page.md -- SELF-ALIASED, full base frontmatter, has [prov:] marker.
-# Used in: Test 7 (--strict green)
-cat > "$WIKI/entities/provenance-page.md" <<'EOF'
+# gamma-one.md -- multi-match partner (title "Gamma Contract")
+# normalize_link("Gamma Contract") -> "gamma contract"
+# normalize_link("Gamma Contracts") -> "gamma contract"  (contracts in _PLURAL_MAP)
+# Both normalize to the same key -> multi-match via bare [[gamma contracts]]
+cat > "$WIKI/concepts/gamma-one.md" <<'EOF'
 ---
-id: provenance-page
-title: "Provenance Page"
-type: entity
+id: gamma-one
+title: "Gamma Contract"
+type: concept
 status: active
-summary: "A properly formed entity page with provenance."
-created_at: 2026-06-02
-updated_at: 2026-06-02
+summary: "Multi-match partner one."
+created_at: 2026-06-03
+updated_at: 2026-06-03
+sources: []
+epistemic_status: sourced
+tags: [test]
+domains: [test]
+supersedes:
+superseded_by:
+privacy: cloud_safe
+aliases: []
+has_contradictions: false
+knowledge_domain: science
+example: false
+---
+# Gamma Contract
+Body text.
+EOF
+
+# gamma-two.md -- multi-match partner (title "Gamma Contracts")
+cat > "$WIKI/concepts/gamma-two.md" <<'EOF'
+---
+id: gamma-two
+title: "Gamma Contracts"
+type: concept
+status: active
+summary: "Multi-match partner two."
+created_at: 2026-06-03
+updated_at: 2026-06-03
+sources: []
+epistemic_status: sourced
+tags: [test]
+domains: [test]
+supersedes:
+superseded_by:
+privacy: cloud_safe
+aliases: []
+has_contradictions: false
+knowledge_domain: science
+example: false
+---
+# Gamma Contracts
+Body text.
+EOF
+
+# hub.md -- the linking page with varied test links
+# Links:
+#   [[alpha|Alpha]]               piped, known id       -> OK (T1)
+#   [[Alpha]]                     bare, unique match    -> ERROR + fixable (T2, T6)
+#   [[future-page|Future Page]]   piped, no match, no / -> GAP (T3)
+#   [[Alpha!|Alpha]]              piped, target "Alpha!" normalizes to "alpha" != literal id -> ERROR (T4)
+#   [[concepts/alpha|Alpha]]      piped, path-style     -> ERROR (T4b)
+#   [[gamma contracts]]           bare LOWERCASE, multi-match -> WARNING (T5)
+#   [[Totally Unknown Thing]]     bare, no match        -> ERROR (T7, bare-no-match)
+# Plus masked spans (T12):
+#   fenced code block with [[Alpha]] and [[anything|X]]
+#   inline code span `[[Alpha]]`
+#   HTML comment <!-- [[Alpha]] example -->
+cat > "$WIKI/concepts/hub.md" <<'EOF'
+---
+id: hub
+title: "Hub"
+type: concept
+status: active
+summary: "Hub page with varied link forms for testing."
+created_at: 2026-06-03
+updated_at: 2026-06-03
+sources: []
+epistemic_status: sourced
+tags: [test]
+domains: [test]
+supersedes:
+superseded_by:
+privacy: cloud_safe
+aliases: []
+has_contradictions: false
+knowledge_domain: science
+example: false
+---
+# Hub
+
+A properly piped link: [[alpha|Alpha]].
+A bare link: [[Alpha]].
+A genuine gap (red link): [[future-page|Future Page]].
+A malformed piped target: [[Alpha!|Alpha]].
+A path-style piped target: [[concepts/alpha|Alpha]].
+A bare multi-match: [[gamma contracts]].
+A bare no-match: [[Totally Unknown Thing]].
+
+These must NOT be flagged (masked spans):
+
+```
+[[Alpha]] and [[anything|X]] inside a fenced code block
+```
+
+Also `[[Alpha]]` in inline code is masked.
+
+<!-- [[Alpha]] example in HTML comment is masked -->
+EOF
+
+# prov-page.md -- clean piped links + [prov:] marker (T10, --strict compat)
+cat > "$WIKI/concepts/prov-page.md" <<'EOF'
+---
+id: prov-page
+title: "Prov Page"
+type: concept
+status: active
+summary: "Page with clean piped links and provenance."
+created_at: 2026-06-03
+updated_at: 2026-06-03
 sources:
   - src-test-01
 epistemic_status: sourced
@@ -214,18 +198,17 @@ domains: [test]
 supersedes:
 superseded_by:
 privacy: cloud_safe
-aliases:
-  - "Provenance Page"
-  - "provenance-page"
+aliases: []
 has_contradictions: false
 knowledge_domain: science
 example: false
 ---
-# Provenance Page
-This page has provenance [prov:src-test-01#sec:intro|direct|2026-06-02].
+# Prov Page
+
+This page has a piped link [[alpha|Alpha]] and provenance [prov:src-test-01#sec:intro|direct|2026-06-03].
 EOF
 
-# Source summary page for Test 7 provenance reference
+# src-test-01.md -- source summary for provenance anchor
 cat > "$WIKI/sources/src-test-01.md" <<'EOF'
 ---
 id: src-test-01
@@ -233,8 +216,8 @@ title: "Source Test 01"
 type: source
 status: active
 summary: "Minimal source summary for testing."
-created_at: 2026-06-02
-updated_at: 2026-06-02
+created_at: 2026-06-03
+updated_at: 2026-06-03
 sources: []
 epistemic_status: sourced
 tags: [test]
@@ -242,15 +225,13 @@ domains: [test]
 supersedes:
 superseded_by:
 privacy: cloud_safe
-aliases:
-  - "Source Test 01"
-  - "src-test-01"
+aliases: []
 has_contradictions: false
 knowledge_domain: science
-path: sources/2026/2026-06/2026-06-02-test-source.md
+path: sources/2026/2026-06/2026-06-03-test-source.md
 url: ""
 content_hash: "sha256:abc123"
-ingested_at: 2026-06-02
+ingested_at: 2026-06-03
 source_type: article
 compilation_status: compiled
 compiled_against_hash: "sha256:abc123"
@@ -265,148 +246,180 @@ Test source.
 ## Extracted Claims
 - Test claim.
 ## Source Metadata
-Published: 2026-06-02
+Published: 2026-06-03
 EOF
 
-# Page H: lit-concept.md -- id == filename stem, title IS a literal alias, id slug is NOT.
-# Obsidian would resolve 'lit-concept' by stem, but the literal id alias is absent.
-# Used in: Test 9c (literal-membership CI-enforcement canary)
-# MUST produce a linkres error PRE-FIX because id slug is missing from aliases.
-cat > "$WIKI/concepts/lit-concept.md" <<'EOF'
+# fmtest.md -- NON-TRIVIAL frontmatter for T13 (frontmatter-preservation regression guard)
+# Has multiple fields including colon-bearing summary, tags list, non-empty aliases list.
+# Body has a bare [[Alpha]] link that --fix must pipe.
+# T13 asserts the frontmatter block is byte-for-byte unchanged after --fix.
+cat > "$WIKI/concepts/fmtest.md" <<'EOF'
 ---
-id: lit-concept
-title: "Lit Concept"
+id: fmtest
+title: "FM Test"
 type: concept
 status: active
-summary: "Page where title is a literal alias but id slug is not."
-created_at: 2026-06-02
-updated_at: 2026-06-02
+summary: "Page with non-trivial frontmatter: testing colon values, tags, aliases."
+created_at: 2026-06-03
+updated_at: 2026-06-03
 sources: []
 epistemic_status: sourced
-tags: [test]
+tags:
+  - test-tag
+  - another-tag
 domains: [test]
 supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - "Lit Concept"
+  - "FM Test"
+  - "fmtest"
 has_contradictions: false
 knowledge_domain: science
 example: false
 ---
-# Lit Concept
-Body text.
+# FM Test
+
+Body with a bare link: [[Alpha]].
 EOF
 
-# Index and log stubs with [[My Concept]] body links (Test 10).
-# Before --fix, [[My Concept]] is unresolved (Page A has empty aliases,
-# so obsidian_map has 'my-concept' as the stem key but NOT 'my concept').
-printf '# Index\n\n- [[My Concept]] -- the canonical concept\n' > "$WIKI/index.md"
-printf '# Log\n\n## [2026-06-02] note\n\nSee [[My Concept]] for details.\n' > "$WIKI/log.md"
+# Index and log with bare [[Alpha]] links -> must be scanned (T9)
+printf '# Index\n\n- [[Alpha]] -- alpha page\n' > "$WIKI/index.md"
+printf '# Log\n\n## [2026-06-03] note\n\nSee [[Alpha]] for details.\n' > "$WIKI/log.md"
 
 # ---------------------------------------------------------------------------
-# Capture PRE-FIX JSON (tests 1, 3, 4, 5, 9c, 10 run against this)
+# Capture frontmatter block of fmtest.md BEFORE --fix (for T13)
+# ---------------------------------------------------------------------------
+FM_PRE=$(python3 -c "
+import sys
+content = open('$WIKI/concepts/fmtest.md', 'r').read()
+# Find the second --- delimiter
+fm_end = content.index('---', 3)
+fm_block = content[:fm_end + 3]
+sys.stdout.write(fm_block)
+")
+
+# ---------------------------------------------------------------------------
+# Capture PRE-FIX JSON (run before any --fix)
 # ---------------------------------------------------------------------------
 bash "$REPO_ROOT/bin/lint.sh" --category linkres --format json "$WIKI" \
     > "$TMP/pre-fix.json" 2>/dev/null; PRE_EXIT=$?
 
 # ---------------------------------------------------------------------------
-# Tests 1, 3, 4, 5, 9c, 10 -- run on PRE-FIX output
+# T1 through T5, T7, T9, T10, T12 -- PRE-FIX assertions
 # ---------------------------------------------------------------------------
 python3 - "$TMP/pre-fix.json" <<'PYEOF'
 import json, sys
 data = json.load(open(sys.argv[1]))
 lr = [d for d in data if d['category'] == 'linkres']
+errors = [d for d in lr if d['severity'] == 'error']
+warnings = [d for d in lr if d['severity'] == 'warning']
 
-# --- Test 1: title-unreachable errors ---
-# Pages with empty aliases AND title != filename stem should produce errors.
-# My Concept: id=my-concept, title='My Concept', aliases=[] -> error
-# Topic: Subtitle: id=topic-subtitle, title='Topic: Subtitle', aliases=[] -> errors (title + maybe id)
-# lit-concept: id=lit-concept, title='Lit Concept', aliases=['Lit Concept'] -> only id error (title covered)
-title_errs = [d for d in lr if d['severity'] == 'error']
-assert len(title_errs) >= 2, (
-    f"FAIL T1: expected >=2 title-unreachable errors, got {len(title_errs)}. "
-    f"All linkres findings: {[(d['severity'],d['path'],d['message'][:60]) for d in lr]}"
+# --- T1: piped known-id [[alpha|Alpha]] produces ZERO linkres errors for a page with ONLY that link ---
+# prov-page.md has [[alpha|Alpha]] (piped, known id) and should produce zero linkres errors.
+# This distinguishes "known piped link is OK" from bare-link errors.
+t1_prov_errors = [d for d in errors if d['path'].endswith('prov-page.md')]
+assert len(t1_prov_errors) == 0, (
+    f"FAIL T1: prov-page.md has only piped [[alpha|Alpha]] (known id) and should produce zero "
+    f"linkres errors, got {t1_prov_errors}"
 )
-print("PASS T1: title-unreachable errors detected (>=2 error findings)")
+print("PASS T1: piped [[alpha|Alpha]] with known id produces zero linkres errors (prov-page.md is clean)")
 
-# --- Test 3: parens-litmus via REAL lint output ---
-# [[Hack Agentive Stack]] (no parens) in linker.md body.
-# normalize_link('Hack Agentive Stack') -> 'hack agentive stack'
-# normalize_link('Hack (Agentive Stack)') -> 'hack  agentive stack' -> 'hack agentive stack' (punct->space, collapse)
-# So 'hack agentive stack' should uniquely match hack-agentive-stack.
-t3 = [d for d in lr if d['severity'] == 'error'
-      and 'hack-agentive-stack' in d['message']
-      and '[[Hack Agentive Stack]]' in d['message']]
-assert len(t3) == 1, (
-    f"FAIL T3: expected 1 error citing hack-agentive-stack for [[Hack Agentive Stack]], "
-    f"got {[d['message'] for d in lr]}"
+# --- T2: bare [[Alpha]] (unique match) -> linkres ERROR ---
+t2 = [d for d in errors if d['path'].endswith('hub.md')
+      and 'bare link [[Alpha]]' in d.get('message', '')]
+assert len(t2) >= 1, (
+    f"FAIL T2: expected linkres ERROR for bare [[Alpha]] in hub.md, got {[d['message'] for d in errors if 'hub' in d['path']]}"
 )
-print("PASS T3: parens stripped as CHARACTERS -- [[Hack Agentive Stack]] uniquely matched hack-agentive-stack via real lint output")
+print("PASS T2: bare [[Alpha]] produces a linkres ERROR")
 
-# --- Test 4: multi-match warning (pinned fixture) ---
-# [[bounded-context]] in linker.md: hyphen variant not an exact stem/alias of ctx-one or ctx-two.
-# normalize_link('bounded-context') -> 'bounded context'
-# normalize_link('Bounded Contexts') -> 'bounded context' (plural map)
-# normalize_link('Bounded Context') -> 'bounded context'
-# Matches BOTH ctx-one and ctx-two -> one WARNING, not error.
-t4 = [d for d in lr if d['severity'] == 'warning'
-      and 'ctx-one' in d['message'] and 'ctx-two' in d['message']]
-assert len(t4) == 1, (
-    f"FAIL T4: expected 1 multi-match warning listing ctx-one+ctx-two for [[bounded-context]], "
-    f"got {[d['message'] for d in lr if d['severity'] == 'warning']}"
+# --- T3: piped [[future-page|Future Page]] (no match, no slash) -> ZERO linkres findings (genuine gap) ---
+t3 = [d for d in lr if 'future-page' in d.get('message', '') or 'Future Page' in d.get('message', '')]
+assert len(t3) == 0, (
+    f"FAIL T3: [[future-page|Future Page]] (genuine gap) should produce zero linkres findings, got {t3}"
 )
-# Self-aliased ctx pages should not emit subcheck-A errors
-ctx_errs = [d for d in lr if d['severity'] == 'error'
-            and ('ctx-one' in d['path'] or 'ctx-two' in d['path'])]
-assert not ctx_errs, (
-    f"FAIL T4: self-aliased ctx pages should emit no subcheck-A errors, got {ctx_errs}"
-)
-print("PASS T4: [[bounded-context]] variant produced exactly one multi-match WARNING (not error)")
+print("PASS T3: piped [[future-page|Future Page]] (no match, no slash) produces zero linkres findings (genuine gap)")
 
-# --- Test 5: no-match stays in gap (zero linkres findings for unknown page) ---
-# [[Completely Unknown Page]] has no normalized match -> zero linkres findings for it
-unknown_findings = [d for d in lr
-                    if 'Completely Unknown Page' in d['message']]
-assert len(unknown_findings) == 0, (
-    f"FAIL T5: [[Completely Unknown Page]] should produce 0 linkres findings "
-    f"(no-match stays in gap), got {unknown_findings}"
+# --- T4: piped [[Alpha!|Alpha]] -> linkres ERROR ---
+# normalize_link("Alpha!") strips ! via _PUNCT_RE -> "alpha" == id alpha -> verdict 'error', not 'gap'
+t4 = [d for d in errors if 'Alpha!' in d.get('message', '')]
+assert len(t4) >= 1, (
+    f"FAIL T4: expected linkres ERROR for [[Alpha!|Alpha]] (malformed target normalizes to known id), got {t4}"
 )
-print("PASS T5: [[Completely Unknown Page]] produces zero linkres findings (stays in gap)")
+# Assert NO gap finding for this link
+t4_gap = [d for d in lr if d['severity'] == 'info' and 'Alpha!' in d.get('message', '')]
+assert len(t4_gap) == 0, (
+    f"FAIL T4: [[Alpha!|Alpha]] should be an ERROR not a gap, but found gap/info findings: {t4_gap}"
+)
+print("PASS T4: [[Alpha!|Alpha]] produces a linkres ERROR (normalizes to known id, not a gap)")
 
-# --- Test 9c: literal LINK-02 id-alias membership is CI-ENFORCED ---
-# lit-concept.md: id=lit-concept == filename stem (Obsidian resolves by stem),
-# but the literal id alias 'lit-concept' is absent from aliases list.
-# Under stem-reachable gating this page would pass CI clean.
-# Under literal-membership gating it MUST be a linkres error.
-t9c = [d for d in lr if d['severity'] == 'error'
-       and d['path'].endswith('lit-concept.md')
-       and 'lit-concept' in d['message']
-       and ('literal member of aliases' in d['message'] or 'literal id alias' in d['message']
-            or 'LINK-02' in d['message'] or 'literal' in d['message'])]
-assert len(t9c) == 1, (
-    f"FAIL T9c: expected 1 literal-membership error for lit-concept "
-    f"(id slug missing though stem-reachable), "
-    f"got {[(d['path'], d['message']) for d in lr]}"
+# --- T4b: piped [[concepts/alpha|Alpha]] -> linkres ERROR (path-style target) ---
+t4b = [d for d in errors if 'concepts/alpha' in d.get('message', '') or 'path-style' in d.get('message', '')]
+assert len(t4b) >= 1, (
+    f"FAIL T4b: expected linkres ERROR for path-style piped target [[concepts/alpha|Alpha]], got {t4b}"
 )
-print("PASS T9c: literal LINK-02 id-alias membership is CI-ENFORCED (stem-reachable is not sufficient)")
+print("PASS T4b: [[concepts/alpha|Alpha]] produces a linkres ERROR (path-style target, id-only convention)")
 
-# --- Test 10: index.md and log.md body links are scanned ---
-# Before --fix, [[My Concept]] in index.md/log.md is unresolved (Page A aliases=[]).
-# obsidian_map has key 'my-concept' (stem) but NOT 'my concept' or 'My Concept'.
-# normalize_link('My Concept') -> 'my concept' -> uniquely matches my-concept in norm_map.
-# -> Should produce linkres errors for both index.md and log.md.
-idx = [d for d in lr if d['path'].endswith('index.md') and 'My Concept' in d['message']]
-log = [d for d in lr if d['path'].endswith('log.md') and 'My Concept' in d['message']]
-assert len(idx) == 1, (
-    f"FAIL T10: expected 1 linkres finding citing [[My Concept]] in index.md, "
-    f"got {[(d['path'], d['message']) for d in lr]}"
+# --- T5: bare LOWERCASE [[gamma contracts]] -> exactly ONE linkres WARNING (multi-match) ---
+# normalize_link("gamma contracts") -> "gamma contract" (contracts->contract in _PLURAL_MAP)
+# This matches BOTH gamma-one (title "Gamma Contract") AND gamma-two (title "Gamma Contracts")
+# -> multi-match -> WARNING, NOT an error+fixable unique-match
+t5 = [d for d in warnings if 'gamma' in d.get('message', '').lower()
+      and 'gamma-one' in d.get('message', '') and 'gamma-two' in d.get('message', '')]
+assert len(t5) == 1, (
+    f"FAIL T5: expected exactly ONE multi-match WARNING for [[gamma contracts]] citing gamma-one+gamma-two, "
+    f"got {[d['message'] for d in warnings]}"
 )
-assert len(log) == 1, (
-    f"FAIL T10: expected 1 linkres finding citing [[My Concept]] in log.md, "
-    f"got {[(d['path'], d['message']) for d in lr]}"
+# Assert it is a WARNING, NOT an error
+assert t5[0]['severity'] == 'warning', (
+    f"FAIL T5: multi-match should be a WARNING not {t5[0]['severity']}"
 )
-print("PASS T10: index.md and log.md body links are scanned by linkres (broken links there cannot evade LINK-05)")
+print("PASS T5: bare [[gamma contracts]] produces exactly ONE WARNING (genuine multi-match via _PLURAL_MAP)")
+
+# --- T7: bare [[Totally Unknown Thing]] (no match) -> linkres ERROR (form violation, not a gap) ---
+t7 = [d for d in errors if 'Totally Unknown Thing' in d.get('message', '')]
+assert len(t7) >= 1, (
+    f"FAIL T7: bare [[Totally Unknown Thing]] (no match) should be a linkres ERROR, got {[d['message'] for d in lr if 'Unknown' in d.get('message','')]}"
+)
+# The message should indicate it has no unique page match
+assert any('no unique page match' in d.get('message', '') or 'no pipe' in d.get('message', '') for d in t7), (
+    f"FAIL T7: error message should indicate bare form violation, got {[d['message'] for d in t7]}"
+)
+print("PASS T7: bare [[Totally Unknown Thing]] produces a linkres ERROR (bare-no-match is still a FORM violation)")
+
+# --- T9: index.md AND log.md bare [[Alpha]] -> linkres errors ---
+idx = [d for d in errors if d['path'].endswith('index.md') and 'Alpha' in d.get('message', '')]
+log = [d for d in errors if d['path'].endswith('log.md') and 'Alpha' in d.get('message', '')]
+assert len(idx) >= 1, (
+    f"FAIL T9: expected linkres error for [[Alpha]] in index.md, got {[(d['path'],d['message'][:60]) for d in lr]}"
+)
+assert len(log) >= 1, (
+    f"FAIL T9: expected linkres error for [[Alpha]] in log.md, got {[(d['path'],d['message'][:60]) for d in lr]}"
+)
+print("PASS T9: index.md and log.md bare [[Alpha]] links produce linkres errors (specials scanned)")
+
+# --- T10: prov-page.md (piped [[alpha|Alpha]] + [prov:] marker) -> ZERO linkres errors ---
+t10 = [d for d in errors if d['path'].endswith('prov-page.md')]
+assert len(t10) == 0, (
+    f"FAIL T10: prov-page.md should produce zero linkres errors (clean piped link), got {t10}"
+)
+print("PASS T10: prov-page.md with piped links and [prov:] marker produces zero linkres errors")
+
+# --- T12: masked spans -- [[Alpha]] inside fenced code, inline code, HTML comment -> ZERO findings ---
+# hub.md has those masked spans; the findings for hub.md should NOT include extra errors from masked spans
+# Count linkres findings referencing masked-span content (fenced code / comment / inline code)
+# The masked [[Alpha]] inside ``` ... ``` should NOT appear as an additional finding beyond the bare [[Alpha]] in body
+hub_errors = [d for d in errors if d['path'].endswith('hub.md')]
+# We expect errors for: bare [[Alpha]], [[Alpha!|Alpha]], [[concepts/alpha|Alpha]], [[Totally Unknown Thing]]
+# NOT extra errors from inside the fenced code block or inline code or HTML comment
+# (those also contain [[Alpha]] but should be masked)
+# Count distinct bare-Alpha errors for hub.md: should be exactly 1 (the body bare [[Alpha]])
+bare_alpha_hub = [d for d in hub_errors if 'bare link [[Alpha]]' in d.get('message', '')]
+assert len(bare_alpha_hub) == 1, (
+    f"FAIL T12: expected exactly 1 bare-[[Alpha]] error for hub.md (masked spans ignored), "
+    f"got {len(bare_alpha_hub)}: {[d['message'] for d in bare_alpha_hub]}"
+)
+print("PASS T12: masked spans (fenced code, inline code, HTML comment) are NOT scanned -- only 1 bare [[Alpha]] error from hub.md body")
 PYEOF
 
 # ---------------------------------------------------------------------------
@@ -415,189 +428,81 @@ PYEOF
 bash "$REPO_ROOT/bin/lint.sh" --fix --category linkres "$WIKI" > /dev/null 2>/dev/null || true
 
 # ---------------------------------------------------------------------------
+# T6: --fix rewrites bare [[Alpha]] in hub.md to [[alpha|Alpha]]
+# ---------------------------------------------------------------------------
+python3 - "$WIKI/concepts/hub.md" <<'PYEOF'
+import sys
+content = open(sys.argv[1]).read()
+assert '[[alpha|Alpha]]' in content, (
+    f"FAIL T6: expected [[alpha|Alpha]] in hub.md after --fix, content: {content[:300]}"
+)
+# Original bare [[Alpha]] (the body one) should have been piped
+# (there should be no remaining bare [[Alpha]] in the body -- the code-fence [[Alpha]] was masked)
+# Find the non-fenced body: check that the bare [[Alpha]] in the body was rewritten
+# The body has one bare [[Alpha]] (line 6 of body) and masked ones (fenced/inline/comment)
+# After fix, the body bare one should become [[alpha|Alpha]] and the masked ones stay unchanged
+lines = content.split('\n')
+body_start = content.index('\n---\n', 4) + 4  # after closing frontmatter ---
+body = content[body_start:]
+# The bare link in body should now be piped
+assert '[[alpha|Alpha]]' in body, f"FAIL T6: body should contain [[alpha|Alpha]] after --fix, body: {body[:300]}"
+print("PASS T6: --fix rewrote bare [[Alpha]] in hub.md body to [[alpha|Alpha]]")
+PYEOF
+
+# ---------------------------------------------------------------------------
 # Capture POST-FIX JSON
 # ---------------------------------------------------------------------------
 bash "$REPO_ROOT/bin/lint.sh" --category linkres --format json "$WIKI" \
     > "$TMP/post-fix.json" 2>/dev/null || true
 
-# ---------------------------------------------------------------------------
-# Tests 2, 6, 9, 9b -- run after --fix
-# ---------------------------------------------------------------------------
+# T2 error gone after --fix
+python3 - "$TMP/post-fix.json" "$TMP/pre-fix.json" <<'PYEOF'
+import json, sys
+post = json.load(open(sys.argv[1]))
+pre = json.load(open(sys.argv[2]))
+post_lr = [d for d in post if d['category'] == 'linkres']
+# The bare [[Alpha]] error in hub.md body should now be gone
+bare_alpha_errors_post = [d for d in post_lr if d['severity'] == 'error'
+                          and d['path'].endswith('hub.md')
+                          and 'bare link [[Alpha]]' in d.get('message', '')]
+assert len(bare_alpha_errors_post) == 0, (
+    f"FAIL T2-post: bare [[Alpha]] error in hub.md should be gone after --fix, got {bare_alpha_errors_post}"
+)
+print("PASS T2-post: bare [[Alpha]] error in hub.md is gone after --fix")
+PYEOF
 
-# --- Test 2: after --fix, no more linkres errors for page A ---
+# ---------------------------------------------------------------------------
+# T7 post-fix: bare [[Totally Unknown Thing]] is UNFIXABLE -- error remains
+# ---------------------------------------------------------------------------
 python3 - "$TMP/post-fix.json" <<'PYEOF'
 import json, sys
-data = json.load(open(sys.argv[1]))
-lr = [d for d in data if d['category'] == 'linkres']
-
-# Page A (my-concept.md) should have no linkres errors after --fix
-my_concept_errs = [d for d in lr if d['severity'] == 'error'
-                   and 'my-concept' in d['path']]
-assert len(my_concept_errs) == 0, (
-    f"FAIL T2: expected 0 linkres errors for my-concept.md after --fix, "
-    f"got {my_concept_errs}"
+post = json.load(open(sys.argv[1]))
+t7_post = [d for d in post if d['category'] == 'linkres' and d['severity'] == 'error'
+           and 'Totally Unknown Thing' in d.get('message', '')]
+assert len(t7_post) >= 1, (
+    f"FAIL T7-post: bare [[Totally Unknown Thing]] (no match) error should remain after --fix (unfixable), "
+    f"got {t7_post}"
 )
-print("PASS T2: after --fix, my-concept.md produces 0 linkres errors (alias backfilled)")
+print("PASS T7-post: bare [[Totally Unknown Thing]] error remains after --fix (no unique match, unfixable)")
 PYEOF
 
-# --- Test 9: colon-title YAML-quoting (CONFIRMED HIGH BUG #2 canary) ---
-python3 - "$WIKI/concepts/topic-subtitle.md" <<'PYEOF'
-import yaml, sys
-fm = next(yaml.safe_load_all(open(sys.argv[1])))
-aliases = fm.get('aliases') or []
-# The title must be present as a STRING, never parsed into a dict {'Topic': 'Subtitle'}.
-assert all(isinstance(a, str) for a in aliases), (
-    f"FAIL T9: alias parsed as non-string (colon corrupted YAML): {aliases}"
-)
-assert 'Topic: Subtitle' in aliases, (
-    f"FAIL T9: quoted title alias missing/corrupted: {aliases}"
-)
-print("PASS T9: colon-title alias emitted YAML-quoted, re-parses as a string")
-PYEOF
-
-# --- Test 9b: LITERAL id-slug membership (CONFIRMED HIGH BUG #3 canary, Cycle-2) ---
-python3 - "$WIKI/concepts/my-concept.md" <<'PYEOF'
-import yaml, sys
-fm = next(yaml.safe_load_all(open(sys.argv[1])))
-aliases = [str(a) for a in (fm.get('aliases') or [])]
-# id 'my-concept' == filename stem (stem-reachable), but LINK-02 mandates LITERAL membership.
-# A reachability-based to_add would add only the title and SKIP the id.
-assert 'My Concept' in aliases, f"FAIL T9b: title alias missing: {aliases}"
-assert 'my-concept' in aliases, (
-    f"FAIL T9b: id-slug alias missing "
-    f"(reachability regression -- to_add must use literal membership, not stem-inclusive reachable): "
-    f"{aliases}"
-)
-print("PASS T9b: --fix added BOTH literal title 'My Concept' AND id slug 'my-concept' (LINK-02 literal invariant)")
-PYEOF
-
-# --- Test 6: --fix idempotency ---
-# Capture sha256 of topic-subtitle.md before second --fix run
-SHA_BEFORE=$(python3 -c "import hashlib; print(hashlib.sha256(open('$WIKI/concepts/topic-subtitle.md','rb').read()).hexdigest())")
-# Run --fix a second time
+# ---------------------------------------------------------------------------
+# T8: --fix is idempotent -- second run produces byte-identical hub.md
+# ---------------------------------------------------------------------------
+SHA_BEFORE=$(python3 -c "import hashlib; print(hashlib.sha256(open('$WIKI/concepts/hub.md','rb').read()).hexdigest())")
 bash "$REPO_ROOT/bin/lint.sh" --fix --category linkres "$WIKI" > /dev/null 2>/dev/null || true
-# Capture sha256 after second --fix run
-SHA_AFTER=$(python3 -c "import hashlib; print(hashlib.sha256(open('$WIKI/concepts/topic-subtitle.md','rb').read()).hexdigest())")
+SHA_AFTER=$(python3 -c "import hashlib; print(hashlib.sha256(open('$WIKI/concepts/hub.md','rb').read()).hexdigest())")
 if [ "$SHA_BEFORE" = "$SHA_AFTER" ]; then
-    echo "PASS T6: --fix is idempotent (second run produces byte-identical file)"
+    echo "PASS T8: --fix is idempotent (second run produces byte-identical hub.md)"
 else
-    echo "FAIL T6: --fix is NOT idempotent (file changed on second run)" >&2
+    echo "FAIL T8: --fix is NOT idempotent (hub.md changed on second run)" >&2
     exit 1
 fi
 
-# Also confirm second --fix run emits no new autofix findings for the already-fixed pages
-bash "$REPO_ROOT/bin/lint.sh" --fix --category linkres --format json "$WIKI" \
-    > "$TMP/second-fix.json" 2>/dev/null || true
-python3 - "$TMP/second-fix.json" <<'PYEOF'
-import json, sys
-data = json.load(open(sys.argv[1]))
-# After second --fix, no more autofix findings for already-fixed pages
-# (my-concept and topic-subtitle should not be in autofix findings)
-autofix = [d for d in data if d['category'] == 'autofix'
-           and ('my-concept' in d['path'] or 'topic-subtitle' in d['path'])]
-assert len(autofix) == 0, (
-    f"FAIL T6b: second --fix run still produced autofix findings for already-fixed pages: {autofix}"
-)
-print("PASS T6b: second --fix run produces no new autofix findings for already-fixed pages")
-PYEOF
-
 # ---------------------------------------------------------------------------
-# Test 7: --strict stays green for a properly-formed self-aliased page
+# T11: orphan reconciliation + alias-does-not-count
+# Build a fresh isolated wiki for orphan testing.
 # ---------------------------------------------------------------------------
-# Create a fresh isolated wiki with just the provenance page + its source summary
-STRICT_WIKI="$TMP/strict-wiki"
-mkdir -p "$STRICT_WIKI/entities" "$STRICT_WIKI/sources"
-cat > "$STRICT_WIKI/index.md" <<'EOF'
-# Index
-EOF
-cat > "$STRICT_WIKI/log.md" <<'EOF'
-# Log
-EOF
-
-cat > "$STRICT_WIKI/entities/provenance-page.md" <<'EOF'
----
-id: provenance-page
-title: "Provenance Page"
-type: entity
-status: active
-summary: "A properly formed entity page with provenance."
-created_at: 2026-06-02
-updated_at: 2026-06-02
-sources:
-  - src-test-01
-epistemic_status: sourced
-tags: [test]
-domains: [test]
-supersedes:
-superseded_by:
-privacy: cloud_safe
-aliases:
-  - "Provenance Page"
-  - "provenance-page"
-has_contradictions: false
-knowledge_domain: science
-example: false
----
-# Provenance Page
-This page has provenance [prov:src-test-01#sec:intro|direct|2026-06-02].
-EOF
-
-cat > "$STRICT_WIKI/sources/src-test-01.md" <<'EOF'
----
-id: src-test-01
-title: "Source Test 01"
-type: source
-status: active
-summary: "Minimal source summary for testing."
-created_at: 2026-06-02
-updated_at: 2026-06-02
-sources: []
-epistemic_status: sourced
-tags: [test]
-domains: [test]
-supersedes:
-superseded_by:
-privacy: cloud_safe
-aliases:
-  - "Source Test 01"
-  - "src-test-01"
-has_contradictions: false
-knowledge_domain: science
-path: sources/2026/2026-06/2026-06-02-test-source.md
-url: ""
-content_hash: "sha256:abc123"
-ingested_at: 2026-06-02
-source_type: article
-compilation_status: compiled
-compiled_against_hash: "sha256:abc123"
-compiled_targets: []
-example: false
----
-# Source Test 01
-Test source.
-EOF
-
-# --strict scopes via git diff which is not available here; test --category linkres specifically
-# A properly self-aliased page with provenance should produce zero linkres errors
-bash "$REPO_ROOT/bin/lint.sh" --category linkres --format json "$STRICT_WIKI" \
-    > "$TMP/strict-out.json" 2>/dev/null || true
-python3 - "$TMP/strict-out.json" <<'PYEOF'
-import json, sys
-data = json.load(open(sys.argv[1]))
-lr = [d for d in data if d['category'] == 'linkres' and d['severity'] == 'error']
-assert len(lr) == 0, (
-    f"FAIL T7: expected 0 linkres errors for a properly self-aliased page, got {lr}"
-)
-print("PASS T7: properly self-aliased page with [prov:] markers produces 0 linkres errors")
-PYEOF
-
-# ---------------------------------------------------------------------------
-# Test 8: orphan reconciliation (D-03)
-# ---------------------------------------------------------------------------
-# After --fix on the main wiki, Page A 'my-concept' has aliases ['My Concept', 'my-concept'].
-# The linker page has [[My Concept]] which should now resolve via the new alias.
-# So my-concept should no longer be an orphan.
-# Count orphan findings before and after fix (use a fresh wiki for the before state).
 ORPHAN_WIKI="$TMP/orphan-wiki"
 mkdir -p "$ORPHAN_WIKI/concepts"
 cat > "$ORPHAN_WIKI/index.md" <<'EOF'
@@ -607,16 +512,18 @@ cat > "$ORPHAN_WIKI/log.md" <<'EOF'
 # Log
 EOF
 
-# Before-fix version of Page A (aliases=[])
-cat > "$ORPHAN_WIKI/concepts/my-concept.md" <<'EOF'
+# page-a: id=alpha, aliases empty. Reached only by a piped [[alpha|Alpha]] in page-b.
+# With id-only resolution, piped [[alpha|Alpha]] -> target "alpha" -> resolves via stem "alpha".
+# So page-a should NOT be an orphan (piped inbound link counts as inbound to the id target).
+cat > "$ORPHAN_WIKI/concepts/alpha.md" <<'EOF'
 ---
-id: my-concept
-title: "My Concept"
+id: alpha
+title: "Alpha"
 type: concept
 status: active
-summary: "A test concept page."
-created_at: 2026-06-02
-updated_at: 2026-06-02
+summary: "A neutral test concept."
+created_at: 2026-06-03
+updated_at: 2026-06-03
 sources: []
 epistemic_status: sourced
 tags: [test]
@@ -629,20 +536,47 @@ has_contradictions: false
 knowledge_domain: science
 example: false
 ---
-# My Concept
-Body.
+# Alpha
+Body text.
 EOF
 
-# Linker that references [[My Concept]]
+# page-b: links to alpha via piped [[alpha|Alpha]]
 cat > "$ORPHAN_WIKI/concepts/linker.md" <<'EOF'
 ---
 id: linker
 title: "Linker"
 type: concept
 status: active
-summary: "Links to my-concept."
-created_at: 2026-06-02
-updated_at: 2026-06-02
+summary: "Links to alpha."
+created_at: 2026-06-03
+updated_at: 2026-06-03
+sources: []
+epistemic_status: sourced
+tags: [test]
+domains: [test]
+supersedes:
+superseded_by:
+privacy: cloud_safe
+aliases: []
+has_contradictions: false
+knowledge_domain: science
+example: false
+---
+# Linker
+References [[alpha|Alpha]] for details.
+EOF
+
+# page-c: has a vestigial self-alias but NO real inbound links.
+# Under alias-free orphan resolution, the self-alias must NOT prevent orphan detection.
+cat > "$ORPHAN_WIKI/concepts/alone.md" <<'EOF'
+---
+id: alone
+title: "Alone"
+type: concept
+status: active
+summary: "Page with self-alias but no real inbound links."
+created_at: 2026-06-03
+updated_at: 2026-06-03
 sources: []
 epistemic_status: sourced
 tags: [test]
@@ -651,46 +585,138 @@ supersedes:
 superseded_by:
 privacy: cloud_safe
 aliases:
-  - "Linker"
-  - "linker"
+  - "Alone"
+  - "alone"
 has_contradictions: false
 knowledge_domain: science
 example: false
 ---
-# Linker
-References [[My Concept]] for details.
+# Alone
+No one links here.
 EOF
 
-# Before fix: [[My Concept]] doesn't resolve (obsidian uses stem 'my-concept', not title)
-# So my-concept should be an orphan
 bash "$REPO_ROOT/bin/lint.sh" --category orphan --format json "$ORPHAN_WIKI" \
-    > "$TMP/orphan-before.json" 2>/dev/null || true
+    > "$TMP/orphan-out.json" 2>/dev/null || true
 
-# Apply --fix to add the title alias
-bash "$REPO_ROOT/bin/lint.sh" --fix --category linkres "$ORPHAN_WIKI" > /dev/null 2>/dev/null || true
-
-# After fix: [[My Concept]] now resolves via the new title alias -> my-concept no longer orphan
-bash "$REPO_ROOT/bin/lint.sh" --category orphan --format json "$ORPHAN_WIKI" \
-    > "$TMP/orphan-after.json" 2>/dev/null || true
-
-python3 - "$TMP/orphan-before.json" "$TMP/orphan-after.json" <<'PYEOF'
+python3 - "$TMP/orphan-out.json" <<'PYEOF'
 import json, sys
-before = json.load(open(sys.argv[1]))
-after = json.load(open(sys.argv[2]))
+data = json.load(open(sys.argv[1]))
+orphans = [d for d in data if d['category'] == 'orphan']
 
-before_orphan = [d for d in before if d['category'] == 'orphan' and 'my-concept' in d['path']]
-after_orphan = [d for d in after if d['category'] == 'orphan' and 'my-concept' in d['path']]
+# alpha should NOT be an orphan (piped [[alpha|Alpha]] inbound link resolves via id stem)
+alpha_orphan = [d for d in orphans if 'alpha' in d['path'] and 'alpha.md' in d['path']]
+assert len(alpha_orphan) == 0, (
+    f"FAIL T11: alpha should NOT be an orphan (piped inbound [[alpha|Alpha]] resolves via stem), "
+    f"got {alpha_orphan}"
+)
+print("PASS T11a: piped [[alpha|Alpha]] inbound link counts as inbound to the alpha page (id-stem resolution)")
 
-assert len(before_orphan) >= 1, (
-    f"FAIL T8: expected my-concept to be an orphan BEFORE --fix "
-    f"(orphan check uses stem resolution, not title), "
-    f"got {before_orphan}. This may indicate the orphan check still resolves by title (D-03 regression)."
+# alone SHOULD be an orphan (self-aliases must NOT save it from orphan detection)
+alone_orphan = [d for d in orphans if 'alone' in d['path']]
+assert len(alone_orphan) >= 1, (
+    f"FAIL T11: alone SHOULD be an orphan (alias-only inbound resolution must NOT prevent orphan), "
+    f"got {alone_orphan}. Orphan findings: {orphans}"
 )
-assert len(after_orphan) == 0, (
-    f"FAIL T8: expected 0 orphan findings for my-concept AFTER --fix added title alias, "
-    f"got {after_orphan}"
-)
-print("PASS T8: orphan count for my-concept decreases after --fix adds title alias (D-03: orphan uses stem+alias resolution)")
+print("PASS T11b: alias-only resolution does NOT save 'alone' from orphan detection (review HIGH #5)")
 PYEOF
 
-echo "PASS: test_lint_linkres -- all 11 test cases passed"
+# ---------------------------------------------------------------------------
+# T12 (additional): build a dedicated masking fixture to assert zero findings
+# ---------------------------------------------------------------------------
+MASK_WIKI="$TMP/mask-wiki"
+mkdir -p "$MASK_WIKI/concepts" "$MASK_WIKI/sources"
+cat > "$MASK_WIKI/index.md" <<'EOF'
+# Index
+EOF
+cat > "$MASK_WIKI/log.md" <<'EOF'
+# Log
+EOF
+
+# This page's ONLY [[...]] occurrences are inside masked spans.
+# Linkres should emit ZERO findings for it.
+cat > "$MASK_WIKI/concepts/masked-only.md" <<'EOF'
+---
+id: masked-only
+title: "Masked Only"
+type: concept
+status: active
+summary: "All links are in masked spans."
+created_at: 2026-06-03
+updated_at: 2026-06-03
+sources: []
+epistemic_status: sourced
+tags: [test]
+domains: [test]
+supersedes:
+superseded_by:
+privacy: cloud_safe
+aliases: []
+has_contradictions: false
+knowledge_domain: science
+example: false
+---
+# Masked Only
+
+```
+[[NonExistent]] and [[also-not-real|X]] in fenced code block
+```
+
+Inline: `[[NonExistent]]` also masked.
+
+<!-- [[NonExistent]] in HTML comment also masked -->
+EOF
+
+bash "$REPO_ROOT/bin/lint.sh" --category linkres --format json "$MASK_WIKI" \
+    > "$TMP/mask-out.json" 2>/dev/null || true
+python3 - "$TMP/mask-out.json" <<'PYEOF'
+import json, sys
+data = json.load(open(sys.argv[1]))
+lr = [d for d in data if d['category'] == 'linkres']
+errors_for_masked = [d for d in lr if d['severity'] in ('error', 'warning')
+                     and 'masked-only' in d['path']]
+assert len(errors_for_masked) == 0, (
+    f"FAIL T12: masked-only.md should produce zero linkres findings (all [[...]] in masked spans), "
+    f"got {errors_for_masked}"
+)
+print("PASS T12: [[...]] inside fenced code, inline code, HTML comment produce ZERO linkres findings")
+PYEOF
+
+# ---------------------------------------------------------------------------
+# T13: --fix preserves YAML frontmatter byte-for-byte (regression guard)
+# ---------------------------------------------------------------------------
+# We captured FM_PRE above before --fix was run on the main wiki.
+# At this point --fix has already run on $WIKI (for T6/T8).
+# Check that fmtest.md's frontmatter is unchanged.
+FM_POST=$(python3 -c "
+import sys
+content = open('$WIKI/concepts/fmtest.md', 'r').read()
+fm_end = content.index('---', 3)
+fm_block = content[:fm_end + 3]
+sys.stdout.write(fm_block)
+")
+
+# Assert body bare [[Alpha]] was piped
+python3 - "$WIKI/concepts/fmtest.md" <<'PYEOF'
+import sys
+content = open(sys.argv[1]).read()
+fm_end = content.index('---', 3)
+body = content[fm_end + 3:]
+assert '[[alpha|Alpha]]' in body, (
+    f"FAIL T13a: --fix should have piped bare [[Alpha]] in fmtest.md body, body={body[:200]}"
+)
+print("PASS T13a: --fix piped the bare [[Alpha]] in fmtest.md body")
+PYEOF
+
+# Assert frontmatter is byte-for-byte identical
+if [ "$FM_PRE" = "$FM_POST" ]; then
+    echo "PASS T13b: --fix preserved fmtest.md YAML frontmatter byte-for-byte"
+else
+    echo "FAIL T13b: --fix CORRUPTED fmtest.md YAML frontmatter!" >&2
+    echo "--- PRE ---" >&2
+    printf '%s\n' "$FM_PRE" >&2
+    echo "--- POST ---" >&2
+    printf '%s\n' "$FM_POST" >&2
+    exit 1
+fi
+
+echo "PASS: test_lint_linkres -- all 13 test cases passed"
