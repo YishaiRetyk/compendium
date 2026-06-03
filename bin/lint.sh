@@ -1106,7 +1106,12 @@ if should_run('provenance'):
         if err or fm is None:
             continue
         rel = os.path.relpath(fpath)
-        prov_matches = PROV_RE.findall(body)
+        # Mask frontmatter, fenced code, inline code, and HTML comments before
+        # scanning so literal [prov:...] examples in documentation prose (e.g. a
+        # decision record showing the provenance grammar inside backticks) are not
+        # mis-flagged as broken references. Consistent with the linkres masking
+        # introduced in 14-02; real markers in prose remain validated.
+        prov_matches = PROV_RE.findall(mask_markdown(body))
         for source_id, locator, support_type, checked_at in prov_matches:
             if source_id not in source_registry:
                 add_finding('error', 'provenance', rel,
