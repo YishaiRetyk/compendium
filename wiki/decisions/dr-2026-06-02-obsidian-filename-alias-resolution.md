@@ -56,7 +56,7 @@ The framing replaced: "Obsidian resolves aliases to the canonical page automatic
 
 ## Alternatives Considered
 
-1. **Rename wiki files to spaced titles** (e.g., `Domain-Driven Design.md`) -- rejected because it breaks the `id == filename` invariant (§5), provenance source IDs, and all tooling that relies on slug filenames. Every `[prov:domain-driven-design#...]` marker would need updating, and the `id: domain-driven-design` frontmatter field would diverge from the filename.
+1. **Rename wiki files to spaced titles** (e.g., `Domain-Driven Design.md`) -- rejected because it breaks the `id == filename` invariant (§5), provenance source IDs, and all tooling that relies on slug filenames. Every provenance marker referencing the `domain-driven-design` source ID would need updating, and the `id: domain-driven-design` frontmatter field would diverge from the filename.
 
 2. **Rewrite body links to slug form** (e.g., `[[domain-driven-design]]`) -- rejected because it abandons the readable `[[Exact Page Title]]` linking convention (§8) and makes prose harder to read. The link text would be slug-like identifiers rather than human-readable titles.
 
