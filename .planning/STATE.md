@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.1.1
 milestone_name: Graph Integrity
-status: executing
-stopped_at: Phase 14 context re-gathered (piped-link approach; premise corrected)
-last_updated: "2026-06-03T17:12:14.067Z"
+status: ready_to_plan
+stopped_at: Phase 14 complete (3/3) — ready to discuss Phase 999.1
+last_updated: 2026-06-03T17:28:01.485Z
 last_activity: 2026-06-03
 progress:
   total_phases: 8
   completed_phases: 1
   total_plans: 3
-  completed_plans: 3
+  completed_plans: 58
   percent: 13
 ---
 
@@ -21,7 +21,7 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-15)
 
 **Core value:** The wiki is a persistent, compounding artifact -- cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested.
-**Current focus:** Phase 14 — graph-link-resolution
+**Current focus:** Phase 999.1 — brownfield vault initialization
 
 ## Deferred Items
 
@@ -36,9 +36,9 @@ Items acknowledged and deferred at the v1.1 milestone close (2026-06-02):
 
 ## Current Position
 
-Phase: 14 (graph-link-resolution) — EXECUTING
-Plan: 2 of 3
-Status: Ready to execute
+Phase: 999.1
+Plan: Not started
+Status: Ready to plan
 Last activity: 2026-06-03
 
 **CRITICAL FINDING (corrects the milestone premise):** Obsidian's link resolver matches `[[X]]`
@@ -103,7 +103,7 @@ Phase 12.1 closure: 4/4 plans complete; NEUT-08 flipped to Complete in REQUIREME
 
 **Velocity:**
 
-- Total plans completed: 24
+- Total plans completed: 27
 - Average duration: -
 - Total execution time: 0 hours
 
@@ -116,6 +116,7 @@ Phase 12.1 closure: 4/4 plans complete; NEUT-08 flipped to Complete in REQUIREME
 | 10 | 6 | - | - |
 | 11 | 5 | - | - |
 | 12 | 4 | - | - |
+| 14 | 3 | - | - |
 
 **Recent Trend:**
 
