@@ -41,25 +41,22 @@ Plan: Not started
 Status: Ready to plan
 Last activity: 2026-06-03
 
-**CRITICAL FINDING (corrects the milestone premise):** Obsidian's link resolver matches `[[X]]`
-**only against filenames/paths — NEVER against the `aliases` frontmatter** (intentional design,
-confirmed by an Obsidian moderator for v1.12.7). Bare `[[Exact Page Title]]` does not resolve to a
-note that lists that string in `aliases`; aliases are display-text-only (`[[slug|Title]]`) +
-autocomplete. So the self-alias approach shipped by 14-01/02/03 does NOT connect the graph — the ~19
-multi-word-title pages stay orphaned. The §8/§5 convention text, DR
-`dr-2026-06-02-obsidian-filename-alias-resolution`, the 12 templates, and the `linkres` check are all
-built on the wrong premise and must be re-corrected. Real fix options: (1) piped links
-`[[slug|Exact Page Title]]` everywhere (recommended; inverts §8 "no display aliases"; no dependency),
-or (2) bundle a small Obsidian resolver plugin (keeps existing convention; unofficial dependency).
+**RESOLVED (Phase 14 complete, 2026-06-03):** The milestone's original self-alias premise was proven
+false — Obsidian resolves `[[X]]` by **filename/path ONLY**, never by `aliases` (intentional design,
+confirmed for v1.12.7; caught at the LINK-10 human-verify gate). Phase 14 was re-planned and shipped
+the corrected approach — **uniform piped links `[[id|Title]]`** (target = page `id` = filename →
+always resolves; display = canonical title): §8/§5 + 12 templates corrected, self-alias invariant
+removed, superseding DR `dr-2026-06-03-uniform-piped-links`; `bin/lint.sh` `linkres` re-pointed to
+validate link targets + `--fix` bare→piped + alias-free `orphan` + shared `mask_markdown`
+(LINT_VERSION 1.6.0); all `wiki/` + `examples/` body links rewritten to piped form. Result: orphan
+count 19→0, exemplar `domain-driven-design` has 18 inbound links, graph human-verified connected in
+Obsidian. Verifier 10/10; LINK-01..10 Complete. Post-merge fixes masked the provenance + gap scans
+(review WR-01/WR-04); fence-edge-case hardening deferred (WR-02/03, `.planning/todos/pending/`).
+Kept side cleanup: 11 abandoned `.claude/worktrees/` dirs removed; `.obsidian/app.json`
+`userIgnoreFilters` excludes non-vault dirs.
 Sources: https://obsidian.md/help/aliases ; https://forum.obsidian.md/t/wikilink-resolution-does-not-honor-frontmatter-aliases-1-12-7/113902
 
-Side cleanup done this session (keep): removed 11 abandoned `.claude/worktrees/` dirs (86 ghost
-duplicate wiki pages Obsidian was indexing); added `.obsidian/app.json` `userIgnoreFilters` excluding
-non-vault dirs (tests/schema/.planning/.claude/bin/.github/.git). Wave-1 post-merge regressions fixed
-in commit 016abe4 (schema/AGENTS.template.md §5 parity + DR illustrative-`[prov:]` false-positive).
-
-Next: re-discuss/re-plan Phase 14 with the corrected premise — `/gsd-discuss-phase 14` (recommended;
-the piped-links-vs-plugin choice is a real design decision) then `/gsd-plan-phase 14 --gaps`.
+Next: Phase 999.1 brownfield-vault-initialization — `/gsd-discuss-phase 999.1` (recommended) or `/gsd-plan-phase 999.1`.
 
 ## v1.1 Shareability — Archived 2026-06-02
 
