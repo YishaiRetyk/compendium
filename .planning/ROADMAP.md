@@ -49,29 +49,29 @@ Full phase details: [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md)
 
 ### Phase 14: Graph Link Resolution
 
-**Goal**: The Obsidian graph connects and stays connected — the schema tells the truth about link resolution (filename + aliases, not `title`) and mandates the self-alias invariant, a mechanical `linkres` lint check enforces it with `--fix`, and the existing `wiki/` + `examples/` pages are remediated so previously-orphaned pages (e.g. `domain-driven-design.md`) connect.
+> ⚠️ **Premise corrected & re-planned 2026-06-03.** The original Phase 14 (self-aliases) was executed,
+> then proven false at the LINK-10 human-verify gate — Obsidian resolves `[[X]]` by **filename/path
+> ONLY**, never via `aliases`. The corrected approach is **uniform piped links** `[[id|Title]]`. The
+> wrong-premise artifacts are quarantined under `14-graph-link-resolution/_superseded-premise/`. See
+> `14-FINDINGS-premise-invalidated.md` + `14-CONTEXT.md` (D-01..D-09).
+
+**Goal**: The Obsidian graph connects and stays connected — the schema tells the truth about link resolution (`[[X]]` resolves by **filename/path ONLY**, never `title`, never `aliases`) and mandates **uniform piped links** `[[id|Title]]`, a mechanical `linkres` lint check enforces resolvable link *targets* with `--fix` (bare→piped rewrite), and the existing `wiki/` + `examples/` body links are remediated to piped form so previously-orphaned pages (e.g. `domain-driven-design.md`) connect.
 **Depends on**: Nothing (sole phase of v1.1.1; sequenced before the v1.2 schema refactor 999.4).
 **Requirements**: LINK-01..10
 **Success Criteria** (what must be TRUE):
 
-  1. **Convention (LINK-01..03):** `CLAUDE.md` §8 states Obsidian resolves `[[X]]` by filename + `aliases` (never `title`) and mandates the self-alias invariant (`title`, `id` ∈ `aliases`); §5 checklist + `schema/templates/*.md` + `schema/obsidian/*.md` reflect it; `bin/sync-claude.sh --check` clean; a decision record (`trigger_type: schema-update`) is authored, registered, and logged.
-  2. **Enforcement (LINK-04..06):** `bin/lint.sh --category linkres` flags unreachable page titles AND Obsidian-accurate unresolved intra-wiki links (while NOT flagging intentional knowledge-gap red links per §3); `--fix` backfills the self-alias idempotently; the `orphan` check is reconciled so it no longer masks unresolved links; new tests cover both, CI `strict` stays green.
-  3. **Remediation (LINK-07..09):** `bin/lint.sh --category linkres` exits 0 over `wiki/`; link-text variants (`[[Bounded Contexts]]`, `[[Hack (Agentive Stack)]]`) are reconciled; `examples/` pages carry self-aliases and resolve (respecting `example: true` / lint-skip).
-  4. **Connected graph (LINK-10, human-verify):** opening the vault at the repo root (`hideUnresolved` on) shows a connected graph; `domain-driven-design.md` and the other previously-orphaned pages are no longer orphans.
+  1. **Convention (LINK-01..03):** `CLAUDE.md` §8 (+ §5 `title` note) states `[[X]]` resolves by filename/path only (never `title`, never `aliases`) and mandates uniform `[[id|Exact Title]]`; the self-alias invariant is REMOVED from §5/§8/`schema/templates/*.md`/`schema/obsidian/*.md`; `schema/AGENTS.template.md` mirrors the edits; `bin/sync-claude.sh --check` clean; a `schema-update` decision record is authored, registered, logged, and SUPERSEDES `dr-2026-06-02-obsidian-filename-alias-resolution`.
+  2. **Enforcement (LINK-04..06):** `bin/lint.sh --category linkres` flags bare `[[X]]` (no pipe) and piped links whose target is not a known page `id` as errors, while NOT flagging knowledge-gap red links (target = not-yet-existing `id`, stays `gap` per §3); `--fix` rewrites bare→`[[id|X]]` for unique matches (multi-match warns, no-match stays a red link), idempotently; the `orphan` check resolves by `id`/filename only; new tests cover bare-link/unknown-target/unique-fix/multi-match-warn/gap-exclusion; CI `strict` stays green.
+  3. **Remediation (LINK-07..09):** `wiki/` + `examples/` body links rewritten to uniform piped form `[[id|Title]]`; `bin/lint.sh --category linkres` exits 0 over both; the old variant problem (`[[Bounded Contexts]]`, `[[Hack (Agentive Stack)]]`) is dissolved (display text is cosmetic; only the `id` target resolves); `example: true` / lint-skip respected.
+  4. **Connected graph (LINK-10, human-verify):** opening the vault at the repo root (`hideUnresolved` on) shows a connected graph; `domain-driven-design.md` (connected via piped inbound links) and the other previously-orphaned pages are no longer orphans.
 
-**Non-goals**: No renaming wiki files to spaced titles; no slug-form link rewrite; no near-duplicate page detection (deferred to the delivered `a1-lexical-dedup` `duplicate` category / future work); no `.obsidian/` config shipped in the template.
-**Suggested plan shape** (set at plan time): ~3 plans in 2 waves — Wave 1: convention+DR ‖ `linkres` lint+`--fix`+tests (docs vs. code, independent); Wave 2: data remediation + variant triage + human-verify (depends on both).
-**Plans:** 2/3 plans executed
+**Non-goals**: No renaming wiki files to spaced titles; no bare slug-form link rewrite (`[[id]]` without display); no bundled Obsidian plugin (CONTEXT D-01; v1.2-deferred); no near-duplicate page detection (delivered `duplicate` category); no `.obsidian/` config shipped in the template.
+**Mode**: re-plan (from scratch; prior plans quarantined). Note the work MIGRATES the prior run's shipped state on `main` (53 self-aliases [kept, vestigial], `linkres`-as-self-alias-check + `--fix` self-alias backfill [re-point], wrong-premise §8/§5/DR/templates [correct]) — it is NOT greenfield.
+**Suggested plan shape** (set at plan time): ~3 plans in 2 waves — Wave 1: convention correction + superseding DR ‖ `linkres`/`--fix` re-point + tests (docs vs. code, independent); Wave 2: data remediation (rewrite `wiki/` + `examples/` body links to piped form) + human-verify (depends on both).
+**Plans:** 0/0 (re-planning)
 
 Plans:
-**Wave 1**
-
-- [x] 14-01-PLAN.md — Correct CLAUDE.md §8/§5 convention, update 12 schema templates, author schema-update DR, sync AGENTS.md (LINK-01, LINK-02, LINK-03)
-- [x] 14-02-PLAN.md — Add `linkres` lint category, normalize_link helper, --fix self-alias backfill, reconcile orphan/gap to Obsidian-accurate resolution, bump LINT_VERSION 1.5.0, 8-case test coverage (LINK-04, LINK-05, LINK-06)
-
-**Wave 2** *(blocked on Wave 1 completion)*
-
-- [ ] 14-03-PLAN.md — Run --fix backfill over wiki/ + examples/ (65 pages), reconcile [[Bounded Contexts]] call site, human-verify connected graph in Obsidian (LINK-07, LINK-08, LINK-09, LINK-10)
+*(to be regenerated by /gsd-plan-phase 14 on the corrected premise)*
 
 ## Backlog
 
