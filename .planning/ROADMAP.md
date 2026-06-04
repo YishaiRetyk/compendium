@@ -171,6 +171,7 @@ Plans:
 
 **Goal:** [Captured for future planning] Extend drift detection from local source-file hash changes to URL-backed sources, marking affected source summaries `stale` when upstream content changes.
 **Origin:** Surfaced 2026-04-24 during roadmap review. Valuable once the wiki contains more live web-backed sources, but lower leverage than local write gating (Phase 12.2), boundary clarification (Phase 12), and claim faithfulness audit (Phase 13).
+**See also:** `.planning/seeds/research-report-ingest.md` — ingesting AI deep-research reports produces URL-backed citation registries that are the natural trigger to promote this; best designed together or back-to-back.
 **Non-goals:**
 
 - No broad web-ingestion system
