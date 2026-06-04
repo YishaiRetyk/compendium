@@ -4,8 +4,9 @@
 .obsidian/cache
 .trash/
 
-# Local agent/tool state
+# Local agent/tool state (settings.cloud.json is tracked -- the cloud deny-profile artifact)
 .claude/
+!.claude/settings.cloud.json
 .git.backup-*/
 
 # Brownfield workflow artifacts
