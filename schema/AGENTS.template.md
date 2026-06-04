@@ -283,7 +283,7 @@ aliases:                           # Alternative names for Obsidian resolution
   - Alternate Name
 has_contradictions: false       # true when page contains [contradiction:...] markers
 knowledge_domain: "{{PRIMARY_DOMAIN}}"   # Primary decay-rate bucket (set by wizard from user's domain)
-privacy_default: {{DEFAULT_PRIVACY}}     # Illustrative wizard-supplied default privacy tier (see `privacy` above for the actual enum field)
+privacy_default: {{DEFAULT_PRIVACY}}     # Wizard-recorded default tier preference -- NOT a per-page field; privacy is structural (wiki-cloud/ vs wiki-local/) per §13
 example: false                  # Optional; true for reference-only pages (examples/). Lint skips these.
 ---
 ```
@@ -793,12 +793,12 @@ Each operation type has specific rules beyond the 5 global checks:
 **UPDATE**
 - Precondition: Target page exists and has `status: active` (do not UPDATE archived or superseded pages — un-archive or un-supersede first).
 - Postcondition: `updated_at` field is set to today's date. `sources` list includes any new source IDs. Provenance markers are added for new claims.
-- Privacy: If new content derives from `local_only` sources but target is `cloud_safe`, STOP — see Section 13 and query workflow Section 11.2 privacy rules.
+- Privacy tier: If new content derives from `wiki-local/` sources but target is in `wiki-cloud/`, STOP — see Section 13 and query workflow Section 11.2 privacy rules.
 
 **MERGE**
 - Precondition: Both pages exist, are distinct, and both have `status: active`.
 - Postcondition: One surviving page contains the combined content. The other page has `status: superseded` and `superseded_by` set to the surviving page's ID. `sources` lists from both pages are merged (union). All provenance markers from both pages are preserved.
-- Privacy: If either source page is `local_only`, the surviving page MUST be `local_only`.
+- Privacy tier: If either source page is under `wiki-local/`, the surviving page MUST remain under `wiki-local/`.
 
 **SUPERSEDE**
 - Precondition: Target page exists, has `status: active`, and `superseded_by` is empty/null.
@@ -942,7 +942,7 @@ Commit:   ingest(<source-slug>): <one-line summary>
 
 - Source is unreadable or corrupted. Log failure in `wiki-cloud/log.md`, do NOT create partial wiki pages.
 - Source duplicates an already-ingested source (check `content_hash` against existing source summary pages). Log the duplicate detection, do NOT re-ingest.
-- Privacy classification cannot be determined. Default to `local_only` and log the classification gap.
+- Privacy tier cannot be determined. Default to `wiki-local/` placement and log the classification gap.
 
 ### 11.2 Query Workflow
 
@@ -987,15 +987,15 @@ Write-back is **mandatory** when the answer produces novel or durable synthesis.
 - If no single page cleanly owns the synthesis, or the output is a distinct reusable artifact (comparison, overview, reflection), CREATE a new page.
 - New pages are typed by semantic role (entity, concept, comparison, overview) -- NEVER by workflow origin. There is no "query result" page type.
 
-#### Privacy Inheritance for Write-Back
+#### Privacy Tier for Write-Back
 
-**Deterministic rule (from Section 13, restated here for clarity):** If ANY source contributing to the synthesis has `privacy: local_only`, the write-back target page MUST have `privacy: local_only`. A page is only `cloud_safe` if ALL contributing sources are `cloud_safe`. This is not a judgment call -- it is a mechanical check.
+**Deterministic structural rule (§13 asymmetric model):** If ANY source contributing to the synthesis lives under `wiki-local/` (its source-summary is in `wiki-local/sources/`), the write-back target page MUST go into `wiki-local/`. A page in `wiki-cloud/` may cite only sources whose summaries are under `wiki-cloud/sources/`. This is a structural check, not a judgment call.
 
 **How to apply:**
 1. Collect all source IDs referenced in the synthesized answer (from provenance markers and the `sources` frontmatter list of pages read).
-2. Check each source's `privacy` field.
-3. If ANY source is `local_only`, the write-back target is `local_only`.
-4. If updating an existing `cloud_safe` page with `local_only`-derived content: STOP. Either (a) create a separate `local_only` page for the sensitive synthesis, or (b) change the existing page to `local_only` if appropriate.
+2. Check each source-summary's tier: is the summary page under `wiki-cloud/sources/` or `wiki-local/sources/`?
+3. If ANY contributing source summary is under `wiki-local/`, the write-back target belongs in `wiki-local/`.
+4. If updating an existing `wiki-cloud/` page with `wiki-local/`-sourced content: STOP. Either (a) create a new page in `wiki-local/` for the sensitive synthesis, or (b) move the existing page to `wiki-local/` if appropriate.
 5. Run `bin/validate-op.sh` -- it enforces this rule mechanically (Check 4).
 
 #### Delta Compilation

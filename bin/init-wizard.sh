@@ -714,7 +714,6 @@ tags:
   - setup
 domains:
   - wiki-infrastructure
-privacy: cloud_safe
 knowledge_domain: software
 supersedes:
 superseded_by:

@@ -26,7 +26,6 @@ assert_file_exists "$DR" "decision record must exist at dr-<TODAY>-initial-setup
 assert_grep '^type: decision$' "$DR" "type: decision must be in frontmatter"
 assert_grep '^trigger_type: schema-update$' "$DR" "trigger_type: schema-update must be in frontmatter"
 assert_grep '^affected_pages: \[\]$' "$DR" "affected_pages: [] must be in frontmatter"
-assert_grep '^privacy: cloud_safe$' "$DR" "privacy: cloud_safe must be in frontmatter"
 assert_grep '^created_at: 2026-04-16$' "$DR" "created_at must be TODAY-derived from WIZARD_GENERATED_AT"
 assert_grep '^updated_at: 2026-04-16$' "$DR" "updated_at must be TODAY-derived from WIZARD_GENERATED_AT"
 assert_grep '^knowledge_domain: software$' "$DR" "knowledge_domain: software must be in frontmatter"

@@ -88,8 +88,8 @@ The `sed` pipeline applies all 4 substitutions from Sections 2–5 below in a si
 > Note: this example deviates from the prompt default (`local_only` per D-11) to match the public canonical fixture `schema/fixtures/canonical-AGENTS.md`. See `schema/fixtures/README.md` for the rationale (`bin/release.sh`'s privacy-leak regex). Hand-editors targeting the canonical byte-equality check MUST use `cloud_safe` here; hand-editors personalizing for their own private repo MAY use `local_only` and accept that their AGENTS.md will differ from the canonical fixture.
 
 ```diff
--privacy_default: {{DEFAULT_PRIVACY}}     # Illustrative wizard-supplied default privacy tier (see `privacy` above for the actual enum field)
-+privacy_default: cloud_safe              # Illustrative wizard-supplied default privacy tier (see `privacy` above for the actual enum field)
+-privacy_default: {{DEFAULT_PRIVACY}}     # Wizard-recorded default tier preference -- NOT a per-page field; privacy is structural (wiki-cloud/ vs wiki-local/) per §13
++privacy_default: cloud_safe              # Wizard-recorded default tier preference -- NOT a per-page field; privacy is structural (wiki-cloud/ vs wiki-local/) per §13
 ```
 
 **Example value used in this walkthrough:** `cloud_safe`
@@ -178,7 +178,6 @@ tags:
   - setup
 domains:
   - wiki-infrastructure
-privacy: cloud_safe
 knowledge_domain: software
 supersedes:
 superseded_by:
