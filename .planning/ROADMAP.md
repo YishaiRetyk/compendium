@@ -316,7 +316,7 @@ The following are intentionally deferred until real usage demands them, captured
 | 13.1. Docs Finalization + Obsidian Starter | v1.1 | 5/5 | Complete | 2026-06-01 |
 | 13.2. v1.1 Closure Verification Gate | v1.1 | 3/3 | Complete | 2026-06-02 |
 | 14. Graph Link Resolution | v1.1.1 | 3/3 | Complete    | 2026-06-03 |
-| 15. Privacy Architecture | v1.2 | 3/3 | Complete   | 2026-06-04 |
+| 15. Privacy Architecture | v1.2 | 3/3 | Complete    | 2026-06-04 |
 | 16. Reference Extraction | v1.2 | 0/TBD | Not started | - |
 | 17. Workflow Extraction | v1.2 | 0/TBD | Not started | - |
 | 18. Skills Overlay | v1.2 | 0/TBD | Not started | - |

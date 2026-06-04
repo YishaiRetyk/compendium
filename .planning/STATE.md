@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Schema Architecture
-status: verifying
-stopped_at: Completed 15-02-PLAN.md
-last_updated: "2026-06-04T15:15:17.832Z"
+status: ready_to_plan
+stopped_at: Phase 15 complete (3/3) — ready to discuss Phase 999.1
+last_updated: 2026-06-04T17:10:32.710Z
 last_activity: 2026-06-04
 progress:
   total_phases: 11
   completed_phases: 1
   total_plans: 3
-  completed_plans: 3
+  completed_plans: 61
   percent: 9
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-04)
 
 **Core value:** The wiki is a persistent, compounding artifact -- cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested.
-**Current focus:** Phase 15 — privacy-architecture
+**Current focus:** v1.2 Schema Architecture — Phase 15 (Privacy Architecture) complete; next is Phase 16 (Reference Extraction)
 
 ## Current Position
 
-Phase: 15 (privacy-architecture) — EXECUTING
-Plan: 3 of 3 (15-01 COMPLETE)
-Status: Phase complete — ready for verification
-Last activity: 2026-06-04
+Phase: 16 — Reference Extraction (Not started — gates on Phase 15, now ✓ complete)
+Plan: Not started
+Status: Ready to plan (`/gsd-plan-phase 16`)
+Last activity: 2026-06-04 -- Phase 15 complete (3/3 plans, verification passed; PRIV-04/07 wizard-template gap closed inline)
 
 ### v1.2 Phase Summary
 
@@ -91,7 +91,7 @@ Phase 12.2 closure: 5/5 plans complete; WGATE-01..04 → Complete; verifier PASS
 
 **Velocity:**
 
-- Total plans completed: 27
+- Total plans completed: 30
 - Average duration: -
 - Total execution time: 0 hours
 
@@ -105,6 +105,7 @@ Phase 12.2 closure: 5/5 plans complete; WGATE-01..04 → Complete; verifier PASS
 | 11 | 5 | - | - |
 | 12 | 4 | - | - |
 | 14 | 3 | - | - |
+| 15 | 3 | - | - |
 
 **Recent Trend:**
 
