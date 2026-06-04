@@ -65,14 +65,14 @@ try:
 
     # Check required base fields (always required)
     required = ['id','title','type','status','summary','created_at','updated_at',
-                'sources','epistemic_status','tags','domains','privacy']
+                'sources','epistemic_status','tags','domains']
     missing = [f for f in required if f not in fm]
     if missing:
         print(f'FAIL: Missing required fields: {missing}', file=sys.stderr)
         sys.exit(1)
 
     # Validate enum values
-    valid_types = {'entity','concept','source','comparison','overview'}
+    valid_types = {'entity','concept','source','comparison','overview','decision'}
     if fm['type'] not in valid_types:
         print(f\"FAIL: Invalid type '{fm['type']}', must be one of: {sorted(valid_types)}\", file=sys.stderr)
         sys.exit(1)
@@ -87,10 +87,8 @@ try:
         print(f\"FAIL: Invalid epistemic_status '{fm['epistemic_status']}', must be one of: {sorted(valid_epistemic)}\", file=sys.stderr)
         sys.exit(1)
 
-    valid_privacy = {'local_only','cloud_safe'}
-    if fm['privacy'] not in valid_privacy:
-        print(f\"FAIL: Invalid privacy '{fm['privacy']}', must be one of: {sorted(valid_privacy)}\", file=sys.stderr)
-        sys.exit(1)
+    # Privacy is structural (Phase 15): determined by directory tier
+    # (wiki-cloud/ vs wiki-local/), not a frontmatter field. No enum check here.
 
     # Per-operation checks
     if op == 'ARCHIVE' and fm['status'] == 'archived':
@@ -147,53 +145,40 @@ check_privacy() {
     python3 -c "
 import sys, yaml, os
 
-content = open(sys.argv[1]).read()
+file = sys.argv[1]
 op = sys.argv[2]
 
-if not content.startswith('---'):
-    print('FAIL: No privacy field — no frontmatter found', file=sys.stderr)
+# Phase 15 structural privacy: a page's tier is its directory, not a frontmatter
+# field. A page under wiki-local/ is local_only; under wiki-cloud/ is cloud_safe.
+# Source inheritance becomes a path check: a cloud-tier page must not derive from
+# a source whose SUMMARY page lives under wiki-local/ (that would leak local
+# content to the cloud tier).
+def is_local(p):
+    p = (p or '').lstrip('/')
+    return p == 'wiki-local' or p.startswith('wiki-local/') or '/wiki-local/' in ('/' + p)
+
+page_local = is_local(file)
+
+# Parse sources for the structural inheritance check (frontmatter is optional here
+# for the privacy decision -- the tier comes from the path, not the field).
+sources = []
+content = open(file).read()
+if content.startswith('---'):
+    try:
+        end = content.index('---', 3)
+        fm = yaml.safe_load(content[3:end]) or {}
+        sources = fm.get('sources', []) or []
+    except (ValueError, yaml.YAMLError):
+        pass  # frontmatter issues are Check 4's concern, not this check's
+
+# A contributing source is local iff its SUMMARY page lives under wiki-local/sources/.
+local_sources = [s for s in sources if os.path.exists(f'wiki-local/sources/{s}.md')]
+if local_sources and not page_local:
+    print(f\"FAIL: Privacy violation -- page is under wiki-cloud/ (cloud_safe) but source(s) {local_sources} live under wiki-local/. The page must live under wiki-local/ per the asymmetric two-dir model.\", file=sys.stderr)
     sys.exit(1)
 
-try:
-    end = content.index('---', 3)
-except ValueError:
-    print('FAIL: Unterminated frontmatter', file=sys.stderr)
-    sys.exit(1)
-
-fm = yaml.safe_load(content[3:end])
-if fm is None:
-    print('FAIL: Empty frontmatter', file=sys.stderr)
-    sys.exit(1)
-
-page_privacy = fm.get('privacy', 'MISSING')
-if page_privacy == 'MISSING':
-    print('FAIL: No privacy field in frontmatter', file=sys.stderr)
-    sys.exit(1)
-if page_privacy not in ('local_only', 'cloud_safe'):
-    print(f\"FAIL: Invalid privacy value: {page_privacy}\", file=sys.stderr)
-    sys.exit(1)
-
-# Check source privacy inheritance (Section 13 rule)
-sources = fm.get('sources', []) or []
-local_sources = []
-for src_id in sources:
-    src_path = f'wiki-cloud/sources/{src_id}.md'
-    if os.path.exists(src_path):
-        src_content = open(src_path).read()
-        if src_content.startswith('---'):
-            try:
-                src_end = src_content.index('---', 3)
-                src_fm = yaml.safe_load(src_content[3:src_end])
-                if src_fm and src_fm.get('privacy') == 'local_only':
-                    local_sources.append(src_id)
-            except (ValueError, yaml.YAMLError):
-                pass  # Source page has broken frontmatter — not this check's concern
-
-if local_sources and page_privacy == 'cloud_safe':
-    print(f\"FAIL: Privacy violation -- page is cloud_safe but source(s) {local_sources} are local_only. Page must be local_only per Section 13 inheritance rule.\", file=sys.stderr)
-    sys.exit(1)
-
-print(f'PASS (privacy: {page_privacy})')
+tier = 'local_only' if page_local else 'cloud_safe'
+print(f'PASS (privacy: {tier})')
 " "$file" "$op"
 }
 

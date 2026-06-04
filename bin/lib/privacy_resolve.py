@@ -37,11 +37,22 @@ _WIKI_LOCAL_PREFIX = 'wiki-local/'
 
 
 def _is_local(path):
-    """Return True iff the path lives under the local-only tier."""
+    """Return True iff the path lives under the local-only tier.
+
+    Case-insensitive (WR-02): on case-insensitive filesystems (default macOS,
+    Windows) a page at ``WIKI-LOCAL/secret.md`` is the same directory as
+    ``wiki-local/``; a case-sensitive match would fail OPEN (classify it
+    cloud_safe). Folding case is strictly fail-closed-safe -- a genuine
+    cloud-tier path cannot spuriously contain ``wiki-local/``.
+    """
     if not path:
         return False
-    # Normalise: strip leading './' or '/' so relative paths compare cleanly
-    p = str(path).lstrip('./')
+    # Normalise: strip a single leading './' then any leading '/' (WR-03 -- a
+    # prefix strip, not the char-class strip that lstrip('./') performed).
+    p = str(path)
+    if p.startswith('./'):
+        p = p[2:]
+    p = p.lstrip('/').lower()
     return p.startswith(_WIKI_LOCAL_PREFIX) or ('/' + _WIKI_LOCAL_PREFIX) in ('/' + p)
 
 
