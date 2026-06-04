@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Schema Architecture
-status: executing
-stopped_at: Phase 15 context gathered
-last_updated: "2026-06-04T15:00:52.295Z"
+status: verifying
+stopped_at: Completed 15-02-PLAN.md
+last_updated: "2026-06-04T15:15:17.832Z"
 last_activity: 2026-06-04
 progress:
   total_phases: 11
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 3
-  completed_plans: 2
-  percent: 0
+  completed_plans: 3
+  percent: 9
 ---
 
 # Project State
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-06-04)
 
 Phase: 15 (privacy-architecture) — EXECUTING
 Plan: 3 of 3 (15-01 COMPLETE)
-Status: Ready to execute Plan 15-02
+Status: Phase complete — ready for verification
 Last activity: 2026-06-04
 
 ### v1.2 Phase Summary
@@ -158,6 +158,7 @@ Phase 12.2 closure: 5/5 plans complete; WGATE-01..04 → Complete; verifier PASS
 | Phase 11-brownfield-suggest-verify P05 | 40min | 2 tasks | 13 files |
 | Phase 12.2 P04 | 25min | 4 tasks | 6 files |
 | Phase 14 P03 | 20min | 3 tasks | 57 files |
+| Phase 15-privacy-architecture P02 | 5min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -341,6 +342,7 @@ Recent decisions affecting current work:
 - [Phase 11-brownfield-suggest-verify]: [Phase 11-05] Single comprehensive Tier-1 DR over 11 micro-DRs for review-feedback items 1-11 — they are implementation details of the apply-vs-advisory + review-manifest + lifecycle-gate architecture, not independent architectural choices
 - [Phase ?]: Phase 12.2-04: schema/AGENTS.template.md got the FULL Phase 9 + 12.2 §11.3 CI mode block (closes pre-existing Phase 9 mirror gap)
 - [Phase ?]: Phase 12.2-04: pre-existing AGENTS↔CLAUDE drift from b1c3691 fixed first (Plan 02 deferred-items.md) before §11.3 amendment
+- [Phase ?]: D-09 cloud->local linkres check + cloud deny-profile shipped (PRIV-03/05); LINT_VERSION 1.7.0; .claude/settings.cloud.json fail-open artifact; docs complete from Plan 01
 
 ### Pending Todos
 
@@ -374,8 +376,8 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-06-04T15:00:52.286Z
-Stopped at: Phase 15 context gathered
+Last session: 2026-06-04T15:15:17.823Z
+Stopped at: Completed 15-02-PLAN.md
 Resume file: None
 
 ## Operator Next Steps
