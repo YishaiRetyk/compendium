@@ -1,12 +1,13 @@
 ---
 phase: 15
 reviewers: [codex]
-reviewed_at: 2026-06-04T13:33:23Z
-cycles: 2
+reviewed_at: 2026-06-04T16:50:00Z
+cycles: 3
 cycle_1_reviewed_at: 2026-06-04T13:07:56Z
 cycle_2_reviewed_at: 2026-06-04T13:33:23Z
+cycle_3_reviewed_at: 2026-06-04T16:50:00Z
 plans_reviewed: [15-00-PLAN.md, 15-01-PLAN.md, 15-02-PLAN.md]
-note: "claude CLI skipped both cycles — review ran inside Claude Code (CLAUDE_CODE_ENTRYPOINT=cli); the self-CLI is skipped for independence per the review workflow. Codex provided the independent external review. Findings were additionally code-verified against the live tree by the orchestrating agent. Cycle 2 re-reviews the replan that addressed cycle 1's 8 HIGH concerns; see the Cycle 2 section appended below."
+note: "claude CLI skipped all three cycles — review ran inside Claude Code (CLAUDE_CODE_ENTRYPOINT=cli); the self-CLI is skipped for independence per the review workflow. Codex provided the independent external review. Findings were additionally code-verified against the live tree by the orchestrating agent. Cycle 2 re-reviewed the replan that addressed cycle 1's 8 HIGH concerns and raised 1 residual HIGH (raw-sources/ boundary). Cycle 3 (FINAL) re-reviews the replan that closed that HIGH via a fail-closed CI-wired guard (bin/check-sources-cloud-safe.sh) + RED regression tripwire; current_high resolved to 0. See the Cycle 3 section appended below."
 ---
 
 # Cross-AI Plan Review — Phase 15 (Privacy Architecture)
@@ -181,3 +182,65 @@ Counting per the cycle contract: 5 cycle-1 HIGHs are FULLY RESOLVED (verificatio
 ### Divergent Views
 
 None — single external reviewer both cycles. Orchestrator code-verification independently confirmed the deny-profile scope (`Read(./wiki-local/**)` only) and the empty raw-source-local state, corroborating the new HIGH's premise.
+
+---
+
+# Cross-AI Plan Review — Phase 15 — CYCLE 3 (FINAL: re-review after raw-source guard replan)
+
+Cycle 2 closed with exactly **one** unresolved HIGH: the raw-`sources/` privacy-boundary hole (cloud sessions can read sensitive raw files under `sources/`; the deny-profile covers only `wiki-local/`). The cycle-3 replan closes that HIGH with a fail-closed, CI-wired guard. Cycle 3 re-runs Codex to confirm (a) the raw-source HIGH is now FULLY RESOLVED, (b) the resolution is structural (not relocation), and (c) the replan introduced no new HIGH. As in cycles 1–2, the `claude` CLI was skipped (self-CLI, running inside Claude Code); Codex provided the independent external review, and the orchestrating agent code-verified every load-bearing premise against the live tree.
+
+## Orchestrator pre-review code verification (cycle 3)
+
+Before invoking Codex, every cycle-3 premise was re-checked against the current tree:
+
+- **Raw-source state confirmed:** `sources/` has **23** raw `.md` files, **all cloud-safe** — zero carry `privacy: local_only`, and no `sources/local-only/` directory exists. The guard bites no one today; it protects the forward trust model.
+- **Deny-profile scope confirmed:** the planned profile is `{ "permissions": { "deny": ["Read(./wiki-local/**)"] } }` — `sources/` is genuinely **not** read-denied to cloud (`.claude/settings.cloud.json` is a Plan-02 artifact, not yet created). So the "prevent sensitive content from existing un-migrated" model is the correct structural lever, not "deny reads."
+- **Guard uses proper frontmatter parsing:** `bin/lib/brownfield_yaml.py:186` `read_fm_body` exists; Plan 15-01 Task 6 mandates the guard parse via `read_fm_body` (NOT grep) to avoid prose false-hits.
+- **CI host confirmed:** `.github/workflows/lint.yml` has a live `privacy-leak` job (runs `bin/check-privacy.sh`); the new `bin/check-sources-cloud-safe.sh` is wired alongside it.
+- **Predicate re-keys target real code (D-02 atomicity):** `bin/lib/privacy_resolve.py` is still the 3-level ladder (docstring lines 6–43: "three-level precedence", "stricter wins", "fail-closed"); `bin/check-neutrality.sh:262` `source_local_only_wiki()` walks `os.path.join(ROOT,"wiki")` (:265) with the to-be-dead `^privacy:\s*local_only` regex (:279). Plan 15-01 Task 6 collapses the ladder and re-keys the leak-source predicate in the **same** security-atomic commit — no dead-predicate intermediate.
+- **Wave-0 tripwire present:** `tests/phase-15/test_raw_sources_cloud_safe_guard.sh` is in the Plan 15-00 RED-test scaffold (13 RED tests total — the cycle-2 LOW count drift "5 RED/4 files" is resolved; the plan now states 13 consistently).
+
+## Codex Review (cycle 3)
+
+**Summary**
+
+Phase 15 is ready to execute. The carried-forward raw-`sources/` HIGH is now addressed by an explicit repository invariant, CI enforcement, and a RED regression test. `current_high` moves to **0**.
+
+**Cycle-2 HIGH Disposition — raw-`sources/` boundary: RESOLVED**
+
+The raw-`sources/` concern is fully resolved under the chosen privacy model. Since `sources/` is not read-denied to cloud sessions, the structural control must be **admission control**: sensitive raw content must not *exist* there. The new `bin/check-sources-cloud-safe.sh` guard, its CI wiring in `privacy-leak`, and `test_raw_sources_cloud_safe_guard.sh` create a verifiable fail-closed boundary for that invariant. This is acceptable as a structural resolution — **not** merely relocation of the hole — because the model is now explicit: `sources/` is cloud-safe-only; local-only material belongs elsewhere or must be migrated before cloud use. The docs correctly avoid claiming cloud sessions are denied from reading `sources/`.
+
+Previously resolved HIGHs stay resolved: the predicate re-keys remain security-atomic, resolver behavior is structural, neutrality/privacy/audit checks are re-keyed together, generated templates/lint no longer preserve `privacy`, and Wave-0 tests cover those regressions. The two prior partials remain non-HIGH: D-09 cross-tier link checking is now planned with enforcement, and the cloud deny-profile is still fail-open but honestly labeled and backed by verification/runbook guidance.
+
+**New Concerns**
+
+- **No new HIGH concerns.**
+- **MEDIUM** — The guard should fail on missing or malformed raw-source frontmatter and ideally require explicit `privacy: cloud_safe`, not only *absence* of `privacy: local_only`. If the script already does this, the concern is moot; if not, the architecture is still materially improved, but the invariant leans more on curator discipline. *(Orchestrator note: a reasonable hardening for execution — but non-blocking. The 23 current raw sources carry no privacy frontmatter at all, so an "absence-of-local_only" check already passes them; requiring explicit `cloud_safe` would be a stricter posture worth adopting at execution time. Filed as a MEDIUM polish item, not a phase gate.)*
+
+**Net Unresolved HIGH Count: 0**
+
+**Risk Assessment:** LOW–MEDIUM. Low for the carried-forward HIGH (the structural invariant is now testable and CI-enforced). Medium residual operational risk only around source-misclassification or bypassing the documented source-ingestion discipline.
+
+## Cycle 3 Consensus Summary
+
+The cycle-3 replan closes the single carried-forward HIGH (raw-`sources/` boundary) with a fail-closed, CI-wired admission-control guard plus a Wave-0 RED regression tripwire. Codex and the orchestrator's independent code-verification converge: this is a genuine structural resolution, not a relocation, because `sources/` must remain cloud-readable for legitimate ingest — so blocking sensitive content from *existing* un-migrated (and failing CI the moment it appears) is the correct lever. No new HIGH was introduced.
+
+### Cumulative HIGH disposition across all 3 cycles
+
+- **Cycle 1:** 8 HIGH raised.
+- **Cycle 2:** 5 FULLY RESOLVED (verification-backed), 2 PARTIALLY RESOLVED, **1 new HIGH** (raw-`sources/` boundary). Net unresolved = 1.
+- **Cycle 3:** the 1 carried-forward HIGH **FULLY RESOLVED** (fail-closed guard + CI wiring + RED tripwire). 0 new HIGH. The two cycle-2 partials remain MEDIUM-grade (D-09 enforcement now planned; deny-profile fail-open but honestly labeled) — neither is a standalone HIGH. Net unresolved = **0**.
+
+### New / carried MEDIUM items (non-blocking, for execution)
+
+- Harden `bin/check-sources-cloud-safe.sh` to require explicit `privacy: cloud_safe` (or fail on malformed/missing frontmatter), rather than only asserting absence of `local_only` (cycle-3 MEDIUM).
+- Pass-C manifest reviewability is now specified (path + TSV schema + verifier) — was cycle-2 MEDIUM, now addressed in Plan 15-01 Task 1.
+- check-privacy path-vs-content scope honesty documented in Plan 15-02 Task 2 (cycle-1/2 MEDIUM, addressed).
+
+### Net unresolved HIGH count: 0
+
+**current_high = 0** — no unmitigated HIGH concern remains. Phase 15 is cleared to execute.
+
+### Divergent Views
+
+None — single external reviewer all three cycles. Orchestrator code-verification independently confirmed the raw-source state (23 cloud-safe sources, no `sources/local-only/`), the deny-profile scope (`Read(./wiki-local/**)` only), and that the guard parses frontmatter via `read_fm_body` — corroborating the RESOLVED verdict.
