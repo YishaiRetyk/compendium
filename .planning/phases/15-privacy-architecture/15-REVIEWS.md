@@ -1,9 +1,12 @@
 ---
 phase: 15
 reviewers: [codex]
-reviewed_at: 2026-06-04T13:07:56Z
+reviewed_at: 2026-06-04T13:33:23Z
+cycles: 2
+cycle_1_reviewed_at: 2026-06-04T13:07:56Z
+cycle_2_reviewed_at: 2026-06-04T13:33:23Z
 plans_reviewed: [15-00-PLAN.md, 15-01-PLAN.md, 15-02-PLAN.md]
-note: "claude CLI skipped — review ran inside Claude Code (CLAUDE_CODE_ENTRYPOINT=cli); the self-CLI is skipped for independence per the review workflow. Codex provided the independent external review. Findings below were additionally code-verified against the live tree by the orchestrating agent."
+note: "claude CLI skipped both cycles — review ran inside Claude Code (CLAUDE_CODE_ENTRYPOINT=cli); the self-CLI is skipped for independence per the review workflow. Codex provided the independent external review. Findings were additionally code-verified against the live tree by the orchestrating agent. Cycle 2 re-reviews the replan that addressed cycle 1's 8 HIGH concerns; see the Cycle 2 section appended below."
 ---
 
 # Cross-AI Plan Review — Phase 15 (Privacy Architecture)
@@ -90,3 +93,91 @@ Only one external reviewer (Codex) was invoked — the `claude` CLI was skipped 
 ### Divergent Views
 
 None — single reviewer. The orchestrator's pre-review code analysis converged with Codex on concerns 1, 2, and 7 independently, which raises confidence in those three in the absence of a second model.
+
+---
+
+# Cross-AI Plan Review — Phase 15 — CYCLE 2 (re-review after replan)
+
+Cycle 1 raised 8 HIGH concerns (7 numbered + the D-02 atomicity framing). The plans were re-planned to address them. Cycle 2 re-runs Codex against the revised plans to assess (a) whether each cycle-1 HIGH is resolved, and (b) whether the replan introduced new concerns. As in cycle 1, the `claude` CLI was skipped (self-CLI, running inside Claude Code); Codex provided the independent external review, and the orchestrating agent code-verified the load-bearing premises against the live tree.
+
+## Orchestrator pre-review code verification (cycle 2)
+
+Before invoking Codex, every cycle-1 HIGH premise was re-checked against the current tree to confirm the replan targets real code:
+
+- **HIGH #5 confirmed live:** `bin/lint.sh:375` `VALID_PRIVACY`, `:378` `BASE_FIELDS` (contains `privacy`), `:1065-1066` enum check — all present. Plan 15-01 Task 3 removes all three.
+- **HIGH #4 confirmed live:** `bin/lint.sh:2434` emits `privacy: cloud_safe`; `bin/audit-claims.sh:863,936` emit `privacy: local_only`. Plan 15-01 Task 3 strips all.
+- **HIGH #3 confirmed live:** `bin/audit-claims.sh:250` `source_registry[sfm['id']] = sfm` (frontmatter only). Plan 15-01 Task 6 adds `summary_rel_path`.
+- **HIGH #2 confirmed live:** `bin/audit-claims.sh:745-746` passes `(sfm or {}).get('path','')` (raw `sources/...` path) into `resolve_effective_claim_privacy`. Plan 15-01 Task 6 swaps it to the summary path.
+- **HIGH #1 confirmed live:** the 3 phase-13 resolver tests exist and `bin/lib/privacy_resolve.py` is the 3-level ladder (`three-level`, `stricter wins`, `fail-closed`). Plan 15-01 Task 5 rewrites the tests; Task 6 collapses the ladder.
+- **HIGH #6 confirmed live:** `bin/check-neutrality.sh:265` walks `os.path.join(ROOT,"wiki")`, `:279` has the `^privacy:\s*local_only` regex, `:308` preserves the git-history literal. Plan 15-01 Task 6 re-keys the walk + drops the dead regex in the SAME commit.
+- **HIGH #7 confirmed live + count corrected:** bare `wiki/` references across the 9 phase dirs = 6+6+12+3+6+18+1+11+31 = **94 files** (cycle-1 estimate "~40" was an undercount; the replan now says 94). Plan 15-01 Task 1 manifest-classifies them across all 9 dirs.
+- **Raw-source state:** `sources/` has no `local/cloud` tier and currently zero raw sources carry `privacy: local_only`. The planned deny profile is `Read(./wiki-local/**)` only — `sources/` is NOT denied to cloud sessions (relevant to the new HIGH below).
+
+## Codex Review (cycle 2)
+
+**Summary**
+
+The replan is much stronger and closes most cycle-1 gaps in the right place: Wave 0 now has RED tests, Plan 15-01 pulls the privacy predicate rewrites into the security-atomic migration, and Plan 15-02 is mostly additive. I would not execute it unchanged yet: the new "raw `sources/` is cloud-safe-only" rule is a real privacy-policy change and is not enforced by the directory boundary, and a few verification criteria remain too vague for a phase whose failure mode is irreversible leakage.
+
+**Cycle-1 HIGH Disposition**
+
+| # | Verdict | Justification |
+|---|---|---|
+| #1 Resolver collapse breaks phase-13 gate | RESOLVED | Plan 15-01 Task 5 explicitly rewrites `test_privacy_resolve_precedence`, `test_claim_page_privacy`, and `test_raw_source_privacy` to structural assertions, and Task 4(c) requires the full phase-13 suite green. |
+| #2 FAITH-04 loses raw-source privacy | PARTIALLY RESOLVED | Plan 15-01 Task 6 fixes the audit egress predicate by storing `summary_rel_path` and passing the source-summary path, but "raw `sources/` is cloud-safe-only" is not a safe structural model for sensitive raw sources. |
+| #3 Source summary tier unavailable + audit control-plane mis-routed | RESOLVED | Plan 15-01 Task 6 adds `summary_rel_path` / `source_summary_path`, and Task 3 routes audit state/report to `wiki-local/maintenance/` with acceptance forbidding `wiki-cloud/maintenance/audit-*`. |
+| #4 Generated maintenance frontmatter reintroduces `privacy` | RESOLVED | Plan 15-00 adds `test_generated_frontmatter_clean.sh`; Plan 15-01 Task 3 strips audit/lint generated templates, and Task 4 strips schema templates/examples. |
+| #5 Lint still requires/validates `privacy` | RESOLVED | Plan 15-01 Task 3 removes `privacy` from `BASE_FIELDS`, removes `VALID_PRIVACY` / `Invalid privacy`, and requires `test_lint_required_field_dropped.sh` green. |
+| #6 D-02 atomicity violated | RESOLVED, execution-risk remains | Plan 15-01 Task 6 moves all predicate re-keys into the lockstep commit, and Task 4(d) requires one migration commit with no prior partial commit. |
+| #7 Blanket fixture re-key unsafe / under-scoped | PARTIALLY RESOLVED | Plan 15-01 Task 1 correctly replaces blanket rewrite with four manifest buckets across all 9 phase dirs / 94 files, but the manifest has no concrete path, schema, or automated verifier. |
+
+**New Concerns Introduced By The Replan**
+
+- **HIGH — Raw `sources/` remains outside the privacy boundary.** Plan 15-01 Task 6 and Plan 15-02 Task 2 define raw `sources/` as cloud-safe-only, with local sensitivity represented only by the source summary under `wiki-local/sources/`. That protects FAITH-04 classification, but it does not stop a cloud session from reading sensitive raw source files in `sources/` (the planned deny profile is `Read(./wiki-local/**)` only — code-verified: `sources/` is not denied). This is a real hole unless the project now forbids sensitive raw sources. Fix by adding a structural raw-source tier (`sources-cloud/` + `sources-local/`), denying `sources/` to cloud by default, or making migration fail if any existing raw source is not mechanically proven cloud-safe. *(Orchestrator note: cycle-1 Suggestion #2 explicitly listed "a hard rule that raw `sources/` is cloud-safe only, documented and tested" as an acceptable option, and the replan chose exactly that — so this is the sanctioned resolution's residual hole, not an ignored item. It currently bites no one: the creator vault has zero local raw sources today. It is HIGH because it silently changes the forward trust model for any future user with a sensitive raw source, and is unmitigated structurally.)*
+
+- **MEDIUM — Pass C manifest is not reviewable enough.** Task 1 says the helper "emits a per-file classification manifest" but specifies no artifact path, format, or automated assertion. Add a manifest path (e.g. `.planning/phases/15-privacy-architecture/pass-c-manifest.tsv`), require every bare `wiki/` occurrence to be classified, and add a verifier that rejects unclassified bucket-1/bucket-2 occurrences.
+
+- **MEDIUM — Task 1 clean-tree precheck conflicts with creating the helper.** Task 1 says to write `bin/migrate-privacy-dirs.sh`, then Pass 0 verifies `git status --porcelain` is empty. If the helper is untracked/modified, it fails its own precheck. Run the clean-tree check before creating the helper, use an inline block, or explicitly ignore the helper path.
+
+- **MEDIUM — Template byte-equality wording is wrong/ambiguous.** Task 2 / success criteria say `CLAUDE.md ≡ AGENTS.md ≡ template`, but `schema/AGENTS.template.md` is a wizard template with placeholders. The byte-equality invariant should be only `CLAUDE.md ≡ AGENTS.md`; the template is mirrored semantically and validated through the regenerated `canonical-AGENTS.md`.
+
+- **MEDIUM — Two-root lint discovery needs duplicate-ID semantics.** Plan 15-02 Task 1 builds `page_tier[id] = cloud|local` across both roots. If the same `id` exists in both tiers, last-writer-wins can hide or falsely report a cloud→local link. Add a duplicate-ID lint error or make `page_tier[id]` a set with a defined resolution rule.
+
+- **MEDIUM — `check-privacy` test wording conflicts with its documented scope.** Plan 15-00 Task 2 says copied `wiki-local` content into `docs/` should make `check-privacy.sh` exit 2, while Plan 15-01 Task 6 says `check-privacy` is only a path/release guard, not a content scanner. Make the test specifically use `docs/wiki-local/...`; leave arbitrary copied text to `check-neutrality.sh`.
+
+- **LOW — Plan 15-00 Task 2 count drift.** It says "remaining 5 RED tests" / "All 5 files exist" but lists 4. Harmless; correct to avoid executor confusion.
+
+**Remaining Concerns**
+
+- The biggest remaining issue is raw-source privacy (the HIGH above): the replan fixes source-summary-tier classification but not raw-source readability from cloud runs — a trust-model change, not documentation polish.
+- The cycle-1 MEDIUM around `check-privacy` scope is still only partly settled: the tests and docs must agree it is path-based while `check-neutrality` handles copied-content terms.
+- The Plan 15-02 cloud-deny behavioral check still allows a manual fallback — acceptable only because the docs honestly label the profile fail-open; it must not be treated as a fail-closed gate.
+
+**Risk Assessment**
+
+Overall risk: **HIGH** until raw-source handling is corrected. If the project explicitly guarantees that every raw file under `sources/` is cloud-safe and adds a mechanical migration check for that invariant, the remaining plan risk drops to MEDIUM: mostly large-commit executability, fixture-manifest verification, and two-root lint edge cases.
+
+## Cycle 2 Consensus Summary
+
+The replan resolved 5 of 7 cycle-1 HIGHs cleanly (#1, #3, #4, #5, #6) and partially resolved 2 (#2, #7). It introduced exactly one new HIGH — the raw-`sources/` privacy hole — which is the residual gap of the cycle-1-sanctioned "raw sources are cloud-safe-only" option.
+
+### Cycle-1 HIGH disposition rollup
+
+- **Fully resolved (5):** #1 (phase-13 tests rewritten + suite-green gate), #3 (summary_rel_path + audit control-plane routed local), #4 (generated-frontmatter stripped + gated by a Wave-0 RED test), #5 (privacy removed from lint BASE_FIELDS/enum + gated), #6 (all predicate re-keys pulled into one security-atomic commit). Each is verification-backed by a Wave-0 RED test that goes GREEN only after the fix lands, and each premise was code-verified live.
+- **Partially resolved (2):**
+  - **#2 (FAITH-04 source-tier privacy):** the audit *classification* egress is fixed (summary-path predicate), but the underlying "raw sources/ cloud-safe-only" model leaves raw sensitive sources structurally readable — this folds into the new HIGH.
+  - **#7 (Pass C manifest):** scope is now correct (94 files / 9 dirs / 4 buckets), but the manifest artifact has no specified path/schema/verifier, so the classification is reviewable only by inspecting the helper's runtime output.
+
+### New HIGH (1)
+
+- **Raw `sources/` outside the privacy boundary** — cloud sessions can read sensitive raw source files; the deny profile covers only `wiki-local/`. Sanctioned-option residual; unmitigated structurally. Recommend a structural raw-source tier OR a mechanical migration assertion that every raw source is cloud-safe.
+
+### Net unresolved HIGH count: 1
+
+Counting per the cycle contract: 5 cycle-1 HIGHs are FULLY RESOLVED (verification-backed) and excluded; 2 are PARTIALLY RESOLVED and #2 collapses into the single new HIGH (raw-source hole). The raw-source HIGH is the one unresolved HIGH carrying forward. #7's partial state is a MEDIUM-grade gap (manifest reviewability), not a standalone HIGH.
+
+**current_high = 1** (the raw-`sources/` privacy boundary hole).
+
+### Divergent Views
+
+None — single external reviewer both cycles. Orchestrator code-verification independently confirmed the deny-profile scope (`Read(./wiki-local/**)` only) and the empty raw-source-local state, corroborating the new HIGH's premise.
