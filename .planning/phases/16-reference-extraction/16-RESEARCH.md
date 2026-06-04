@@ -485,7 +485,7 @@ Phase 16 has minimal security surface — it is a pure text extraction that does
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Routing table operation rows — pre-declare or defer to Phase 17?**
    - What we know: Phase 17 creates `schema/workflows/*.md` files
