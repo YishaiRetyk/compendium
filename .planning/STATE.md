@@ -3,10 +3,11 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Schema Architecture
 status: planning
-last_updated: "2026-06-04"
-last_activity: 2026-06-04
+stopped_at: Phase 15 context gathered
+last_updated: "2026-06-04T12:05:31.282Z"
+last_activity: 2026-06-04 — v1.2 roadmap created (Phases 15–18)
 progress:
-  total_phases: 4
+  total_phases: 11
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -373,9 +374,9 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-06-04
-Stopped at: v1.2 roadmap created (Phases 15–18, 28/28 requirements mapped)
-Resume file: None
+Last session: 2026-06-04T12:05:31.273Z
+Stopped at: Phase 15 context gathered
+Resume file: .planning/phases/15-privacy-architecture/15-CONTEXT.md
 
 ## Operator Next Steps
 
