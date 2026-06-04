@@ -99,11 +99,23 @@ Plans:
   4. `AGENTS.md` is byte-identical to `CLAUDE.md`; `schema/AGENTS.template.md` mirrors all routing stubs; `bin/sync-claude.sh --check` and `bin/init-wizard.sh --dry-run` both pass.
   5. All CI gates are green (`lint` 3-job, `neutrality`, `setup-parity`; `check-privacy.sh`; `check-neutrality.sh`) over the new `schema/reference/*.md` tree.
 
-**Plans**: TBD
+**Plans**: 5 plans
 
 Plans:
 
-- [ ] 16-01: TBD
+**Wave 0** *(neutrality gate prerequisite)*
+
+- [ ] 16-00-PLAN.md — Add `schema` to check-neutrality.sh PUBLIC_PATHS (critical gap; must precede all extraction commits)
+
+**Wave 1** *(sequential — AGENTS.md is a shared-edit file)*
+
+- [ ] 16-01-PLAN.md — Extract §4 page-types + §5 frontmatter to schema/reference/; dissolve §7
+- [ ] 16-02-PLAN.md — Extract §6 with consumer-split → provenance.md + lint.md seed (decay only)
+- [ ] 16-03-PLAN.md — Extract §8 wikilinks + §13 privacy to schema/reference/; §14/§15 to docs/reference/; delete §16
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 16-04-PLAN.md — Add routing table; mirror stubs into AGENTS.template.md; write REF-10 DR; run full CI gate suite
 
 ### Phase 17: Workflow Extraction
 
