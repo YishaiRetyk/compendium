@@ -1,26 +1,25 @@
 ---
-id:
-title:
+id: null
+title: null
 type: source
 status: active
 summary: ""
-created_at:
-updated_at:
+created_at: null
+updated_at: null
 sources: []
-epistemic_status:
+epistemic_status: null
 tags: []
 domains: []
-supersedes:
-superseded_by:
-privacy:
-aliases:
+supersedes: null
+superseded_by: null
+aliases: null
   # Optional: genuine alternate names for Quick Switcher / autocomplete (not needed for link resolution)
-path:
+path: null
 url: ""
 content_hash: ""
-ingested_at:
-source_type:
-compilation_status:
+ingested_at: null
+source_type: null
+compilation_status: null
 compiled_against_hash: ""
 compiled_targets: []
 ---

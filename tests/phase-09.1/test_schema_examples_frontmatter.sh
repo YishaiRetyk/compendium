@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # I-5: Each schema/examples/<type>.md has valid YAML frontmatter with example: true,
-# privacy: cloud_safe, and matching type: enum.
+# and matching type: enum. (Phase 15: privacy field stripped from all examples.)
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib.sh"
@@ -43,8 +43,9 @@ for name, expected_type in EXPECTED_TYPES.items():
         errors.append(f"{p}: type={fm.get('type')!r}, expected {expected_type!r}")
     if fm.get("example") is not True:
         errors.append(f"{p}: example != True (got {fm.get('example')!r})")
-    if fm.get("privacy") != "cloud_safe":
-        errors.append(f"{p}: privacy != cloud_safe (got {fm.get('privacy')!r})")
+    # Phase 15: privacy field stripped from all examples (directory is the tier classifier)
+    if "privacy" in fm:
+        errors.append(f"{p}: privacy field should be removed (Phase 15: field stripped)")
 
 if errors:
     for e in errors: print("FAIL:", e, file=sys.stderr)

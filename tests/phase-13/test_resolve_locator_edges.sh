@@ -11,7 +11,7 @@ REPO="$(make_bare_repo)"
 trap 'cleanup_fixture_repo "$REPO"' EXIT
 SEED="$(cd "$REPO" && git rev-parse HEAD)"
 
-write_page "$REPO" "wiki/sources/src-ed.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/sources/src-ed.md" <<'EOF'
 ---
 id: src-ed
 title: "ED"
@@ -44,7 +44,7 @@ PAGE3_MARKER tail content with no upper marker.
 EOF
 
 # (a) slug/case/space tolerance: #sec:self-attention matches "## Self-Attention"
-write_page "$REPO" "wiki/concepts/a.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/concepts/a.md" <<'EOF'
 ---
 id: edgea
 title: "EdgeA"
@@ -56,7 +56,7 @@ Slug tolerant [prov:src-ed#sec:self-attention|direct|2026-04-15]
 EOF
 
 # (b) no matching heading -> insufficient-locator
-write_page "$REPO" "wiki/concepts/b.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/concepts/b.md" <<'EOF'
 ---
 id: edgeb
 title: "EdgeB"
@@ -68,7 +68,7 @@ No such section [prov:src-ed#sec:nonexistent|direct|2026-04-15]
 EOF
 
 # (c) malformed locator -> insufficient-locator, no crash
-write_page "$REPO" "wiki/concepts/c.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/concepts/c.md" <<'EOF'
 ---
 id: edgec
 title: "EdgeC"
@@ -80,7 +80,7 @@ Malformed [prov:src-ed#bogus99|direct|2026-04-15]
 EOF
 
 # (d) unknown source_id -> insufficient-locator, no crash
-write_page "$REPO" "wiki/concepts/d.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/concepts/d.md" <<'EOF'
 ---
 id: edged
 title: "EdgeD"
@@ -92,7 +92,7 @@ Unknown source [prov:src-nope#sec:self-attention|direct|2026-04-15]
 EOF
 
 # (e) #p3- with missing upper marker -> page3..EOF
-write_page "$REPO" "wiki/concepts/e.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/concepts/e.md" <<'EOF'
 ---
 id: edgee
 title: "EdgeE"
@@ -106,7 +106,7 @@ EOF
 # (f) #para over fenced code block: para indexing treats the fence as ONE paragraph.
 # body paragraphs: 1=Self-Attention heading is skipped, p1=SELFATT_MARKER,
 # p2=FENCE_PARA_START, p3=the whole code fence, p4=PAGE3_MARKER tail.
-write_page "$REPO" "wiki/concepts/f.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/concepts/f.md" <<'EOF'
 ---
 id: edgef
 title: "EdgeF"
@@ -118,7 +118,7 @@ Code para [prov:src-ed#para3|direct|2026-04-15]
 EOF
 
 # (g) two [prov:] markers on one claim line -> two findings
-write_page "$REPO" "wiki/concepts/g.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/concepts/g.md" <<'EOF'
 ---
 id: edgeg
 title: "EdgeG"

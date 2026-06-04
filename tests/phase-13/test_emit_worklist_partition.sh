@@ -13,7 +13,7 @@ trap 'cleanup_fixture_repo "$REPO"' EXIT
 SEED="$(cd "$REPO" && git rev-parse HEAD)"
 
 # cloud_safe source (full slug is fine to leak)
-write_page "$REPO" "wiki/sources/src-cloudy.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/sources/src-cloudy.md" <<'EOF'
 ---
 id: src-cloudy
 title: "Cloudy"
@@ -24,7 +24,6 @@ content_hash: "sha256:aaaa"
 compiled_against_hash: "sha256:aaaa"
 ingested_at: 2026-04-15
 source_type: paper
-privacy: cloud_safe
 ---
 EOF
 write_page "$REPO" "sources/2026/2026-04/cloudy/source.md" <<'EOF'
@@ -33,8 +32,8 @@ write_page "$REPO" "sources/2026/2026-04/cloudy/source.md" <<'EOF'
 CLOUD_OK_MARKER content.
 EOF
 
-# local_only source with a DISTINCTIVE sentinel slug in id/path/locator.
-write_page "$REPO" "wiki/sources/src-zztoplocalsentinel.md" <<'EOF'
+# local_only source with a DISTINCTIVE sentinel slug (structural: summary under wiki-local/sources/).
+write_page "$REPO" "wiki-local/sources/src-zztoplocalsentinel.md" <<'EOF'
 ---
 id: src-zztoplocalsentinel
 title: "LocalSentinel"
@@ -45,7 +44,6 @@ content_hash: "sha256:bbbb"
 compiled_against_hash: "sha256:bbbb"
 ingested_at: 2026-04-15
 source_type: paper
-privacy: local_only
 ---
 EOF
 write_page "$REPO" "sources/2026/2026-04/zztoplocalsentinel/source.md" <<'EOF'
@@ -54,23 +52,21 @@ write_page "$REPO" "sources/2026/2026-04/zztoplocalsentinel/source.md" <<'EOF'
 LOCAL_SECRET_MARKER secret content.
 EOF
 
-write_page "$REPO" "wiki/concepts/cloudy.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/concepts/cloudy.md" <<'EOF'
 ---
 id: cloudyc
 title: "Cloudyc"
 type: concept
 status: active
-privacy: cloud_safe
 ---
 Cloud claim [prov:src-cloudy#sec:introduction|direct|2026-04-15]
 EOF
-write_page "$REPO" "wiki/concepts/zzlocalpage.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/concepts/zzlocalpage.md" <<'EOF'
 ---
 id: zzlocalpagec
 title: "ZzLocalPagec"
 type: concept
 status: active
-privacy: cloud_safe
 ---
 Local claim [prov:src-zztoplocalsentinel#sec:zzsentinelsection|direct|2026-04-15]
 EOF

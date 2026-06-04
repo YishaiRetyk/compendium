@@ -31,12 +31,12 @@ if ! bash "$TMP/.brownfield/migrations/01-page-typing.sh" --apply >/dev/null 2>&
 fi
 
 # Record one page's resulting type
-POST_TYPE=$(grep -E '^type:' "$TMP/wiki/concepts/attention-mechanism.md" | head -1)
+POST_TYPE=$(grep -E '^type:' "$TMP/wiki-cloud/concepts/attention-mechanism.md" | head -1)
 
 # Now mutate that page's body + heading to inject conflicting signals that
 # a re-classifier would interpret differently (change H1 to entity-like
 # proper name). We do NOT rerun suggest — decisions.yaml stays fixed.
-sed -i 's/^# Attention Mechanism$/# Jane Doe (person)/' "$TMP/wiki/concepts/attention-mechanism.md"
+sed -i 's/^# Attention Mechanism$/# Jane Doe (person)/' "$TMP/wiki-cloud/concepts/attention-mechanism.md"
 
 # Re-apply 01. The page's type MUST still be decided by decisions.yaml,
 # NOT reclassified from the new signals.
@@ -45,7 +45,7 @@ if ! bash "$TMP/.brownfield/migrations/01-page-typing.sh" --apply >/dev/null 2>&
     exit 1
 fi
 
-POST2_TYPE=$(grep -E '^type:' "$TMP/wiki/concepts/attention-mechanism.md" | head -1)
+POST2_TYPE=$(grep -E '^type:' "$TMP/wiki-cloud/concepts/attention-mechanism.md" | head -1)
 
 if [ "$POST_TYPE" != "$POST2_TYPE" ]; then
     echo "FAIL: 01 re-classified page despite decisions.yaml being authoritative" >&2

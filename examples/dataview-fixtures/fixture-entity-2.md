@@ -9,16 +9,15 @@ updated_at: 2026-04-01
 sources: []
 epistemic_status: sourced
 tags:
-  - tag-x
-  - tag-y
+- tag-x
+- tag-y
 domains:
-  - alpha
-supersedes:
-superseded_by:
-privacy: cloud_safe
+- alpha
+supersedes: null
+superseded_by: null
 aliases:
-  - "Fixture Entity Two"
-  - fixture-entity-2
+- "Fixture Entity Two"
+- fixture-entity-2
 has_contradictions: false
 knowledge_domain: alpha
 example: true

@@ -9,11 +9,10 @@ updated_at: 2026-04-15
 sources: []
 epistemic_status: sourced
 tags:
-  - meta
-  - example
+- meta
+- example
 domains:
-  - wiki-infrastructure
-privacy: cloud_safe
+- wiki-infrastructure
 knowledge_domain: software
 example: true
 ---

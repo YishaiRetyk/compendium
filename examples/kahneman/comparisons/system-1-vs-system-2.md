@@ -3,28 +3,28 @@ id: system-1-vs-system-2
 title: "System 1 vs System 2"
 type: comparison
 status: active
-summary: "Comparison of Kahneman's dual-process framework: fast intuitive thinking versus slow deliberate thinking"
+summary: "Comparison of Kahneman's dual-process framework: fast intuitive thinking
+  versus slow deliberate thinking"
 created_at: 2026-04-09
 updated_at: 2026-04-10
 sources:
-  - src-2026-04-09-thinking-fast-and-slow-part1
-  - src-2026-04-10-kahneman-prospect-theory
+- src-2026-04-09-thinking-fast-and-slow-part1
+- src-2026-04-10-kahneman-prospect-theory
 epistemic_status: sourced
 tags:
-  - dual-process-theory
-  - cognition
-  - psychology
+- dual-process-theory
+- cognition
+- psychology
 domains:
-  - psychology
-  - cognitive-science
-supersedes:
-superseded_by:
-privacy: cloud_safe
+- psychology
+- cognitive-science
+supersedes: null
+superseded_by: null
 aliases:
-  - "System 1 vs 2"
-  - "Dual Process Theory Comparison"
-  - "System 1 vs System 2"
-  - "system-1-vs-system-2"
+- "System 1 vs 2"
+- "Dual Process Theory Comparison"
+- "System 1 vs System 2"
+- "system-1-vs-system-2"
 has_contradictions: false
 knowledge_domain: science
 ---

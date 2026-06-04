@@ -9,7 +9,7 @@
 The LLM Wiki Compiler is a personal knowledge management system with three layers:
 
 1. **Raw sources** (`sources/`) -- Immutable input documents (articles, papers, transcripts, journal entries, images). The human curates this layer. Sources are never modified after ingestion.
-2. **The wiki** (`wiki/`) -- LLM-generated and maintained markdown pages. This is the compiled artifact: summaries, entity pages, concept pages, comparisons, overviews, an index, and an activity log.
+2. **The wiki** (`wiki-cloud/` + `wiki-local/`) -- LLM-generated and maintained markdown pages. This is the compiled artifact: summaries, entity pages, concept pages, comparisons, overviews, an index, and an activity log. `wiki-cloud/` is the cloud-safe tier; `wiki-local/` is the local-only tier.
 3. **The schema** (this file + `schema/`) -- The specification that governs LLM behavior. This file is the sole source of truth.
 
 **Core principle:** The wiki is a persistent, compounding artifact. Cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested. Knowledge accumulates rather than being re-derived.
@@ -38,7 +38,7 @@ This file (`{{AGENT_FILENAME}}`) is the canonical agent spec; the wizard selects
 ```
 life/                               # repo root
 ├── AGENTS.md                       # This file (sole authority)
-├── sources/                        # Raw immutable sources
+├── sources/                        # Raw immutable sources (cloud-safe-only; see §13)
 │   ├── YYYY/                       # Year grouping
 │   │   └── YYYY-MM/               # Month grouping
 │   │       ├── YYYY-MM-DD-slug/   # Bundle: source.md + assets
@@ -46,14 +46,19 @@ life/                               # repo root
 │   │       │   └── figure1.png
 │   │       └── YYYY-MM-DD-slug.md # Single file (no assets)
 │   └── assets/                     # Optional: shared/tool-managed assets only
-├── wiki/                           # LLM-maintained pages
+├── wiki-cloud/                     # Cloud-safe tier: LLM-maintained pages (readable by cloud sessions)
 │   ├── entities/                   # People, tools, organizations
 │   ├── concepts/                   # Ideas, theories, frameworks
 │   ├── sources/                    # Source summary pages (one per ingested source)
 │   ├── comparisons/                # Comparison pages
 │   ├── overviews/                  # High-level topic summaries
-│   ├── index.md                    # Content catalog (master page list)
-│   └── log.md                      # Chronological activity log
+│   ├── decisions/                  # Decision record pages
+│   ├── maintenance/                # Control-plane files (lint-report.md)
+│   ├── index.md                    # Cloud-tier content catalog
+│   └── log.md                      # Cloud-tier chronological activity log
+├── wiki-local/                     # Local-only tier: mirrors wiki-cloud/ convention; created on demand
+│   ├── maintenance/                # Audit control-plane (audit-report.md, audit-state.md)
+│   └── [entities|concepts|sources|comparisons|overviews|decisions]/  # created when first local page exists
 ├── schema/                         # Templates + AGENTS.template.md wizard source
 │   ├── AGENTS.template.md          # Wizard source ({{PRIMARY_DOMAIN}} etc.)
 │   └── templates/                  # Page templates per type
@@ -64,18 +69,20 @@ life/                               # repo root
 └── .githooks/                      # Repo-local git hooks (e.g., pre-commit sync check)
 ```
 
-**Permitted top-level directories:** `sources/`, `wiki/`, `schema/`, `examples/`, `docs/`, `.github/`, `bin/`, `.githooks/`. Content in `examples/` is reference-only (see `example: true` in Section 5); it is skipped by lint and excluded from the published wiki.
+**Permitted top-level directories:** `sources/`, `wiki-cloud/`, `wiki-local/`, `schema/`, `examples/`, `docs/`, `.github/`, `bin/`, `.githooks/`. Content in `examples/` is reference-only (see `example: true` in Section 5); it is skipped by lint and excluded from the published wiki.
 
 **Source directory rules:**
 - Sources use chronological nesting: `YYYY/YYYY-MM/YYYY-MM-DD-slug/`
 - When a source has assets (images, figures, attachments): create a bundle directory with `source.md` as the main file and assets co-located alongside it.
 - When a source is text-only: use a single file `YYYY-MM-DD-slug.md` (no bundle directory needed).
-- Source metadata (type, topic, privacy) is stored in the source file's frontmatter, not encoded in the directory structure.
+- `sources/` is cloud-safe-only. A source that must be local lives as its source-summary page under `wiki-local/sources/` (the resolver keys off the summary page tier, not the raw source path).
 
 **Wiki directory rules:**
-- Pages are organized by type subdirectory: `entities/`, `concepts/`, `sources/`, `comparisons/`, `overviews/`.
+- `wiki-cloud/` is the cloud-safe tier. `wiki-local/` is the local-only tier. Both use the same six page-type subdirectories (`entities/`, `concepts/`, `sources/`, `comparisons/`, `overviews/`, `decisions/`).
+- `wiki-local/` subdirs are created on demand (D-06) -- no pre-created empty dirs. The schema documents the convention so agents know `wiki-local/entities/` is the right home before it exists.
+- `wiki-cloud/index.md` and `wiki-cloud/log.md` are the cloud-tier navigation artifacts. A local `wiki-local/index.md` and `wiki-local/log.md` are created lazily when the first navigable local content beyond the 2 control-plane files is added (D-07 partition -- forced by the model: cloud cannot list local page existence).
 - Topics and categories are represented via frontmatter fields (`tags`, `domains`), NOT via filesystem hierarchy.
-- `wiki/index.md` and `wiki/log.md` live directly inside `wiki/` (they are wiki-layer artifacts).
+- `wiki-local/maintenance/` holds the audit control-plane (`audit-report.md`, `audit-state.md`). `wiki-cloud/maintenance/` holds `lint-report.md`.
 
 **Schema directory rules:**
 - `schema/` is optional and holds templates and examples.
@@ -109,7 +116,7 @@ All commits use conventional commit format with wiki operation types:
 
 When searching for information in the wiki:
 
-1. Read `wiki/index.md` FIRST to find relevant pages.
+1. Read `wiki-cloud/index.md` FIRST to find relevant pages.
 2. Scan `## TL;DR` and `## Key Facts` sections of relevant pages BEFORE reading Detail sections.
 3. Only read `## Detail` and `## Sources` sections when shallow sections are insufficient.
 
@@ -121,7 +128,7 @@ Red links (wikilinks to non-existent pages) are allowed and intentional. They si
 
 ### What Agents Must NOT Do
 
-- DO NOT create topic-based directories (e.g., `wiki/machine-learning/`). Use frontmatter `domains` field and Dataview queries instead.
+- DO NOT create topic-based directories (e.g., `wiki-cloud/machine-learning/`). Use frontmatter `domains` field and Dataview queries instead.
 - DO NOT put conventions or rules in any file other than AGENTS.md. This is the sole source of truth.
 - DO NOT put wikilinks in YAML frontmatter. Use string IDs in frontmatter, wikilinks in body text.
 - DO NOT write bare `[[Title]]` wikilinks. ALWAYS write `[[id|Exact Title]]` (target = page `id`; display = exact canonical `title`). Bare links without a pipe do not reliably resolve for multi-word-title pages in Obsidian (which resolves by filename/path ONLY, never by `aliases`).
@@ -129,7 +136,7 @@ Red links (wikilinks to non-existent pages) are allowed and intentional. They si
 - DO NOT delete or move files when archiving. Set `status: archived` and remove from index active listings.
 - DO NOT read the entire wiki when answering a query. Read index first, then TL;DR/Key Facts of relevant pages, then Detail only when needed.
 - DO NOT create multiple commits for a single logical operation. One ingest = one commit, even if it touches 15 files.
-- DO NOT send `local_only` content to cloud LLM APIs under any circumstances.
+- DO NOT read `wiki-local/` from a cloud session -- the tier boundary is structural (directory + harness permission), not a per-turn rule. local→cloud is the forbidden leak direction.
 - DO NOT link to the same page more than once in a single page body. Link on first mention only.
 
 ## 4. Page Types and Templates
@@ -166,7 +173,7 @@ See: schema/examples/concept.md for a concrete filled-in instance.
 
 **Section order:** TL;DR -> Key Takeaways -> Extracted Claims -> Notes -> Source Metadata
 
-**When to use:** Every time a source is ingested, a source summary page is created in `wiki/sources/`.
+**When to use:** Every time a source is ingested, a source summary page is created in `wiki-cloud/sources/`.
 
 **Additional frontmatter fields** (beyond the base set):
 
@@ -219,7 +226,7 @@ Decision records capture why structural changes were made to the wiki. They answ
 - Major supersession (SUPERSEDE of a key page or concept)
 - Contradiction-resolution decisions (structural resolution, not the contradiction itself)
 
-**Directory:** `wiki/decisions/`
+**Directory:** `wiki-cloud/decisions/`
 
 **File naming:** `dr-YYYY-MM-DD-slug.md`. The `dr-` prefix prevents ID collisions with other page types. The date provides natural chronological sorting. The slug provides human readability.
 
@@ -272,7 +279,6 @@ domains:                           # Topic/category classification
   - domain-name
 supersedes:                        # ID of page this replaces (if any)
 superseded_by:                     # ID of page that replaces this (if any)
-privacy: local_only|cloud_safe     # Privacy routing tier
 aliases:                           # Alternative names for Obsidian resolution
   - Alternate Name
 has_contradictions: false       # true when page contains [contradiction:...] markers
@@ -299,7 +305,6 @@ example: false                  # Optional; true for reference-only pages (examp
 | `domains` | list | YAML list of topic/category classifications in kebab-case. Used for cross-domain Dataview queries. |
 | `supersedes` | string | ID of the page this one replaces. Null if not applicable. |
 | `superseded_by` | string | ID of the page that replaces this one. Null if not applicable. |
-| `privacy` | enum | `local_only` (never send to cloud APIs) or `cloud_safe` (can be sent to cloud APIs). |
 | `aliases` | list | OPTIONAL. Genuine alternate names (e.g. common abbreviations). Obsidian uses these for Quick Switcher / autocomplete and as display text in piped links `[[file|Alias]]`. They do NOT affect bare `[[X]]` resolution — that is always filename/path only. |
 | `has_contradictions` | boolean | `true` when any claim on the page has a `[contradiction:...]` marker. Independent of `epistemic_status` -- a `sourced` page can have contradictions. May be set by lint workflow OR by any workflow that inserts contradiction markers (ingest, query). The lint mechanically syncs this field: if `[contradiction:]` markers exist in the body, `has_contradictions` MUST be `true`; if no markers exist, it MUST be `false`. |
 | `example` | boolean | Optional (default `false`). When `true`, the page is a reference-only example (e.g., pages under `examples/kahneman/`). Lint MUST skip these pages for health checks so illustrative content does not trigger warnings. Applies anywhere in the tree, not just under `examples/`. |
@@ -375,24 +380,23 @@ Any page type may include this field when referenced by a decision record:
 
 When creating or updating any wiki page, verify:
 
-1. All base fields are present (id, title, type, status, summary, created_at, updated_at, sources, epistemic_status, tags, domains, supersedes, superseded_by, privacy, aliases)
+1. All base fields are present (id, title, type, status, summary, created_at, updated_at, sources, epistemic_status, tags, domains, supersedes, superseded_by, aliases)
 2. `type` is one of: `entity`, `concept`, `source`, `comparison`, `overview`, `decision`
 3. `status` is one of: `active`, `stale`, `superseded`, `archived`
 4. `epistemic_status` is one of: `sourced`, `mixed`, `tentative`, `stale`
-5. `privacy` is one of: `local_only`, `cloud_safe`
-6. `created_at` and `updated_at` match ISO 8601 pattern `YYYY-MM-DD`
-7. `sources` is a YAML list of string IDs, NOT wikilinks
-8. `tags` and `domains` are YAML lists of lowercase kebab-case strings
-9. `summary` is a single quoted string, not multi-line
-10. `id` matches the filename (without `.md` extension)
-11. For `type: source` pages: `path`, `content_hash`, `ingested_at`, and `source_type` are present
-12. For `type: source` pages: `compilation_status` is one of: `pending`, `partial`, `compiled`, `stale`
-13. `has_contradictions` is a boolean (`true` or `false`)
-14. `knowledge_domain` is a non-empty string for pages with provenance-backed claims
-15. For `type: decision` pages: `trigger_type` is one of: `merge`, `split`, `schema-update`, `domain-reorg`, `reframing`, `contradiction-resolution`
-16. For `type: decision` pages: `affected_pages` is present and is a YAML list of string IDs
-17. If `decision_history` is present on any page: it is a YAML list of string IDs
-18. Every intra-wiki body link MUST use the piped form `[[id|Exact Title]]` — target is the page `id` (= filename stem, always resolves in Obsidian); display is the exact canonical `title`. Bare `[[Title]]` links are a convention error.
+5. `created_at` and `updated_at` match ISO 8601 pattern `YYYY-MM-DD`
+6. `sources` is a YAML list of string IDs, NOT wikilinks
+7. `tags` and `domains` are YAML lists of lowercase kebab-case strings
+8. `summary` is a single quoted string, not multi-line
+9. `id` matches the filename (without `.md` extension)
+10. For `type: source` pages: `path`, `content_hash`, `ingested_at`, and `source_type` are present
+11. For `type: source` pages: `compilation_status` is one of: `pending`, `partial`, `compiled`, `stale`
+12. `has_contradictions` is a boolean (`true` or `false`)
+13. `knowledge_domain` is a non-empty string for pages with provenance-backed claims
+14. For `type: decision` pages: `trigger_type` is one of: `merge`, `split`, `schema-update`, `domain-reorg`, `reframing`, `contradiction-resolution`
+15. For `type: decision` pages: `affected_pages` is present and is a YAML list of string IDs
+16. If `decision_history` is present on any page: it is a YAML list of string IDs
+17. Every intra-wiki body link MUST use the piped form `[[id|Exact Title]]` — target is the page `id` (= filename stem, always resolves in Obsidian); display is the exact canonical `title`. Bare `[[Title]]` links are a convention error.
 
 ## 6. Provenance, Epistemics, and Staleness
 
@@ -486,13 +490,13 @@ GOOD: [prov:src-2026-03-15-vaswani-attention#sec:abstract] (always include a loc
 
 ### Source Registry
 
-Each source summary page in `wiki/sources/` serves as the registry entry for that source. Its frontmatter contains: `id` (the source_id), `path`, `title`, `source_type`, `url`, `content_hash`, `ingested_at`.
+Each source summary page in `wiki-cloud/sources/` serves as the registry entry for that source. Its frontmatter contains: `id` (the source_id), `path`, `title`, `source_type`, `url`, `content_hash`, `ingested_at`.
 
 This is the Dataview-native approach -- query source metadata with:
 
 ```dataview
 TABLE source_type, ingested_at, content_hash
-FROM "wiki/sources"
+FROM "wiki-cloud/sources"
 WHERE status = "active"
 SORT ingested_at DESC
 ```
@@ -501,7 +505,7 @@ No separate registry file is needed. Source summary pages ARE the registry.
 
 ### Provenance Validation Rules
 
-1. Every `[prov:...]` reference MUST resolve to a known source ID in `wiki/sources/`.
+1. Every `[prov:...]` reference MUST resolve to a known source ID in `wiki-cloud/sources/`.
 2. Every locator MUST be syntactically valid (matches one of the defined patterns above).
 3. If a source's `content_hash` has changed since `checked_at`, dependent claims SHOULD be reviewed and the page's `epistemic_status` SHOULD be set to `stale`.
 4. The lint workflow checks these rules automatically.
@@ -593,7 +597,7 @@ Example:
 
 Rules:
 - Contradiction markers sit alongside provenance markers on the affected claim
-- Both source references in the contradiction marker MUST resolve to known sources in `wiki/sources/`
+- Both source references in the contradiction marker MUST resolve to known sources in `wiki-cloud/sources/`
 - The lint does NOT decide which source is correct -- it surfaces the disagreement
 - Pages with any contradiction marker must have `has_contradictions: true` in frontmatter (lint syncs this mechanically)
 - Contradictions are severity: **warning** (source disagreement is expected in scholarship)
@@ -614,7 +618,7 @@ The lint workflow applies mechanical staleness fixes (per D-12):
 
 **Page-level status:** The lint only auto-updates page-level `epistemic_status` to `stale` when the rollup clearly warrants it (per D-13): all material claims are stale, OR the TL;DR/Key Facts section contains materially stale claims. Default: do NOT auto-change page-level status.
 
-**Logging:** All auto-fix staleness changes are logged in `wiki/maintenance/lint-report.md` and `wiki/log.md` (per D-14).
+**Logging:** All auto-fix staleness changes are logged in `wiki-cloud/maintenance/lint-report.md` and `wiki-cloud/log.md` (per D-14).
 
 ## 7. Progressive Disclosure
 
@@ -622,7 +626,7 @@ The lint workflow applies mechanical staleness fixes (per D-12):
 
 ### Rules for LLM Agents
 
-1. When searching for information, read `wiki/index.md` FIRST.
+1. When searching for information, read `wiki-cloud/index.md` FIRST.
 2. Scan `## TL;DR` and `## Key Facts` sections of relevant pages BEFORE reading `## Detail` sections.
 3. Only read `## Detail` and `## Sources` sections when shallow sections are insufficient to answer the question.
 4. When creating pages, `## TL;DR` MUST be 1 short paragraph or 2-4 bullets.
@@ -645,7 +649,7 @@ See Section 4 for fully worked examples of each type.
 ### Why This Matters
 
 An LLM processing a query about "attention mechanisms" should be able to:
-1. Read `wiki/index.md` to find `wiki/concepts/attention-mechanism.md` (seconds)
+1. Read `wiki-cloud/index.md` to find `wiki-cloud/concepts/attention-mechanism.md` (seconds)
 2. Read its `## TL;DR` to confirm relevance (seconds)
 3. Read `## Key Facts` for specific claims with provenance (seconds)
 4. Only read `## Detail` if the above is insufficient (more expensive)
@@ -735,9 +739,9 @@ For the full incremental update policy governing how new claims integrate with e
 3. Set `superseded_by` on both old pages to point to the new page ID.
 4. Set `status: superseded` on both old pages.
 5. Replace the body of both old pages with a brief redirect note: `> This page has been merged into [[New Page Title]].`
-6. Update `wiki/index.md`: add the new page, move old pages to "Archived" section (if one exists) or remove them from active listings.
+6. Update `wiki-cloud/index.md`: add the new page, move old pages to "Archived" section (if one exists) or remove them from active listings.
 7. Log: `"MERGE <page_a> + <page_b> -> <new_page>: <rationale>"`
-7a. **Decision record (inline -- Tier 1):** If this merge represents a significant structural choice -- combining two established pages, resolving a long-standing organizational ambiguity, or eliminating a redundant page that multiple other pages linked to -- create a decision record page in `wiki/decisions/` with `trigger_type: merge` and `affected_pages` listing both original page IDs and the new merged page ID. Add the new decision record to `wiki/index.md` under Decisions. Commit the decision record as part of this same commit. **Skip for trivial cleanup merges** (e.g., merging a stub into its parent when the stub has no unique claims). See Section 11.4, Tier 1.
+7a. **Decision record (inline -- Tier 1):** If this merge represents a significant structural choice -- combining two established pages, resolving a long-standing organizational ambiguity, or eliminating a redundant page that multiple other pages linked to -- create a decision record page in `wiki-cloud/decisions/` with `trigger_type: merge` and `affected_pages` listing both original page IDs and the new merged page ID. Add the new decision record to `wiki-cloud/index.md` under Decisions. Commit the decision record as part of this same commit. **Skip for trivial cleanup merges** (e.g., merging a stub into its parent when the stub has no unique claims). See Section 11.4, Tier 1.
 
 **SUPERSEDE** -- Mark a page or claim as replaced by newer information.
 
@@ -745,14 +749,14 @@ For the full incremental update policy governing how new claims integrate with e
 2. Set `status: superseded` on the old page.
 3. Add a note at the top of the old page body: `> This page has been superseded by [[New Page Title]].`
 4. On the new page, set `supersedes` to the old page's ID.
-5. Update `wiki/index.md`: move the old page to "Archived" section or remove from active listings.
+5. Update `wiki-cloud/index.md`: move the old page to "Archived" section or remove from active listings.
 6. Log: `"SUPERSEDE <old_page> -> <new_page>: <rationale>"`
-6a. **Decision record (inline -- Tier 1):** If this supersession replaces a key page or represents a significant editorial judgment -- the new page substantially reframes the concept, or the superseded page was widely linked -- create a decision record page in `wiki/decisions/` with `trigger_type: reframing` (if the new page reframes the concept) or `trigger_type: merge` (if consolidating). Set `affected_pages` to include both old and new page IDs. Add to `wiki/index.md` under Decisions. Commit as part of this same commit. **Skip for routine stale-claim supersessions** (e.g., updating a fact to a newer version without reframing). See Section 11.4, Tier 1.
+6a. **Decision record (inline -- Tier 1):** If this supersession replaces a key page or represents a significant editorial judgment -- the new page substantially reframes the concept, or the superseded page was widely linked -- create a decision record page in `wiki-cloud/decisions/` with `trigger_type: reframing` (if the new page reframes the concept) or `trigger_type: merge` (if consolidating). Set `affected_pages` to include both old and new page IDs. Add to `wiki-cloud/index.md` under Decisions. Commit as part of this same commit. **Skip for routine stale-claim supersessions** (e.g., updating a fact to a newer version without reframing). See Section 11.4, Tier 1.
 
 **ARCHIVE** -- Move outdated content out of active wiki.
 
 1. Set `status: archived` on the page.
-2. Remove the page from `wiki/index.md` active listings (move to an "Archived" section if one exists).
+2. Remove the page from `wiki-cloud/index.md` active listings (move to an "Archived" section if one exists).
 3. The page remains in its directory -- do NOT delete or move files.
 4. Log: `"ARCHIVE <page_id>: <rationale>"`
 
@@ -762,13 +766,13 @@ The LLM proposes operations. Before applying any operation, it MUST validate:
 
 1. **Target exists:** For UPDATE, SUPERSEDE, and ARCHIVE, the target page must exist.
 2. **Both pages exist and are distinct:** For MERGE, both source pages must exist and must not be the same page.
-3. **Provenance resolves:** All `[prov:...]` references in new content must resolve to known source IDs in `wiki/sources/`.
+3. **Provenance resolves:** All `[prov:...]` references in new content must resolve to known source IDs in `wiki-cloud/sources/`.
 4. **Frontmatter is valid:** All required base fields are present and correctly typed (see Section 5 validation checklist).
 5. **Privacy is respected:** No `local_only` content is included in operations that will be sent to cloud APIs.
 
 If validation fails, the LLM MUST NOT apply the operation. Instead, log the validation failure and report it to the user.
 
-Every operation MUST be logged in `wiki/log.md` with: timestamp, operation type, affected page(s), and rationale. See Section 12 for log format.
+Every operation MUST be logged in `wiki-cloud/log.md` with: timestamp, operation type, affected page(s), and rationale. See Section 12 for log format.
 
 #### Deterministic Enforcement
 
@@ -830,8 +834,8 @@ Determine the source type before processing.
 
 Compare the new source against current wiki state.
 
-- **Input:** Source document + current wiki state (via `wiki/index.md`).
-- **Process:** Read `wiki/index.md` to identify existing pages on related topics. Read the TL;DR and Key Facts of those related pages. Determine what the new source adds that the wiki does not already cover.
+- **Input:** Source document + current wiki state (via `wiki-cloud/index.md`).
+- **Process:** Read `wiki-cloud/index.md` to identify existing pages on related topics. Read the TL;DR and Key Facts of those related pages. Determine what the new source adds that the wiki does not already cover.
 - **Output:** A mental model of new vs. existing knowledge. This is not a file -- it is the LLM's internal understanding of the delta.
 
 ### Pass 2: Extract
@@ -840,7 +844,7 @@ Pull structured knowledge from the source.
 
 - **Input:** Source document + type classification from Pass 0.
 - **Process:** Apply type-appropriate extraction. Papers get abstract, methodology, results, and conclusions. Transcripts get timestamped claims. Journal entries get reflections and decisions. Extract claims, entities, and relationships, each with a provenance locator (`[prov:source_id#locator]`).
-- **Output:** A source summary page created in `wiki/sources/<source_id>.md` with full frontmatter (including `path`, `content_hash`, `ingested_at`, `source_type`) and all extracted claims with provenance.
+- **Output:** A source summary page created in `wiki-cloud/sources/<source_id>.md` with full frontmatter (including `path`, `content_hash`, `ingested_at`, `source_type`) and all extracted claims with provenance.
 
 #### Claim Granularity Rules
 
@@ -890,7 +894,7 @@ Verify consistency after merge.
 
 - **Input:** All pages modified or created during this ingest.
 - **Checks:**
-  - All new `[prov:...]` markers resolve to valid source IDs in `wiki/sources/`.
+  - All new `[prov:...]` markers resolve to valid source IDs in `wiki-cloud/sources/`.
   - All new wikilinks point to existing pages or are intentional red links.
   - Frontmatter is complete and valid on all modified pages (Section 5 checklist).
   - No contradictions between new claims and existing claims on the same topic.
@@ -922,21 +926,21 @@ Commit:   ingest(<source-slug>): <one-line summary>
 1. User places source document in `sources/YYYY/YYYY-MM/YYYY-MM-DD-slug/` (bundle with `source.md` + assets) or `sources/YYYY/YYYY-MM/YYYY-MM-DD-slug.md` (single file).
 2. LLM reads the source document completely.
 3. **Classify** (Pipeline Pass 0): Determine source type -- article, paper, transcript, journal entry, data file, or image-heavy.
-4. **Diff** (Pipeline Pass 1): Read `wiki/index.md`, identify related existing pages, read their TL;DR and Key Facts sections. Determine what this source adds that the wiki does not already cover.
-5. **Extract** (Pipeline Pass 2): Extract claims with provenance locators, applying the claim granularity rules from Section 10 Pass 2 based on the source type classified in step 3. Create source summary page at `wiki/sources/<source_id>.md` with full frontmatter including `path`, `content_hash`, `ingested_at`, and `source_type`.
+4. **Diff** (Pipeline Pass 1): Read `wiki-cloud/index.md`, identify related existing pages, read their TL;DR and Key Facts sections. Determine what this source adds that the wiki does not already cover.
+5. **Extract** (Pipeline Pass 2): Extract claims with provenance locators, applying the claim granularity rules from Section 10 Pass 2 based on the source type classified in step 3. Create source summary page at `wiki-cloud/sources/<source_id>.md` with full frontmatter including `path`, `content_hash`, `ingested_at`, and `source_type`.
 6. **Merge** (Pipeline Pass 3): Update or create entity/concept/overview pages using UPDATE operations (Section 9) and the append-then-synthesize policy (Section 10 Pass 3). Generate wikilinks on first mention. MERGE pages if the source reveals duplicates.
    - 6a. After merge is complete, update the source summary page's compilation tracking fields:
      - Set `compilation_status` to `compiled` if all extracted claims were merged into topic pages, or `partial` if some claims were deferred.
      - Set `compiled_against_hash` to the current `content_hash` value.
      - Set `compiled_targets` to the list of wiki page IDs that received claims from this source (page IDs only, not paths).
 7. **Lint** (Pipeline Pass 4): Verify all provenance references resolve, wikilinks are valid, frontmatter is complete on all modified pages.
-8. Update `wiki/index.md` with new and modified pages.
-9. Append entry to `wiki/log.md`: `## [YYYY-MM-DD] ingest | <source title>` with affected pages and rationale.
+8. Update `wiki-cloud/index.md` with new and modified pages.
+9. Append entry to `wiki-cloud/log.md`: `## [YYYY-MM-DD] ingest | <source title>` with affected pages and rationale.
 10. Commit: `ingest(<source-slug>): <one-line summary>`
 
 **Abort conditions:**
 
-- Source is unreadable or corrupted. Log failure in `wiki/log.md`, do NOT create partial wiki pages.
+- Source is unreadable or corrupted. Log failure in `wiki-cloud/log.md`, do NOT create partial wiki pages.
 - Source duplicates an already-ingested source (check `content_hash` against existing source summary pages). Log the duplicate detection, do NOT re-ingest.
 - Privacy classification cannot be determined. Default to `local_only` and log the classification gap.
 
@@ -951,15 +955,15 @@ Commit:   query(<topic>): <one-line summary>
 
 **Steps:**
 
-1. **Search** -- Read `wiki/index.md` to find pages relevant to the question. Optionally use `bin/search.sh` to identify candidates.
+1. **Search** -- Read `wiki-cloud/index.md` to find pages relevant to the question. Optionally use `bin/search.sh` to identify candidates.
 2. **Shallow read** -- Read TL;DR and Key Facts sections of relevant pages (progressive disclosure -- shallow first).
 3. **Deep read** -- Read Detail sections only where shallow content is insufficient to answer the question.
 4. **Synthesize** -- Compose answer with citations to specific wiki pages and inline provenance markers.
 5. **Write-back decision** -- Determine whether the answer should be written back to the wiki (see Write-Back Rules below).
 6. **Delta compilation** -- Check for uncompiled or stale sources relevant to this query (see Delta Compilation below).
 7. **Apply write-back** -- If write-back is triggered, apply using structured operations (Section 9). Run `bin/validate-op.sh` before applying each operation.
-8. Update `wiki/index.md` if new pages were created or existing pages were significantly modified.
-9. Append entry to `wiki/log.md` (see Query Log Entry Format below).
+8. Update `wiki-cloud/index.md` if new pages were created or existing pages were significantly modified.
+9. Append entry to `wiki-cloud/log.md` (see Query Log Entry Format below).
 10. Commit (only if wiki was modified): `query(<topic>): <one-line summary>`
 
 #### Write-Back Rules
@@ -1008,7 +1012,7 @@ Before or during answer synthesis, check whether relevant sources have uncompile
 
 #### Query Log Entry Format
 
-Append to `wiki/log.md`:
+Append to `wiki-cloud/log.md`:
 
 ```markdown
 ## [YYYY-MM-DD] query | <question summary>
@@ -1025,19 +1029,19 @@ The write-back decision MUST be logged -- structured and terse, stating which tr
 
 **Abort conditions:**
 
-- No relevant pages exist AND no sources exist on the topic. Inform the user that the wiki has no information on this topic rather than hallucinating an answer. Log the knowledge gap in `wiki/log.md` so the lint workflow can track it.
+- No relevant pages exist AND no sources exist on the topic. Inform the user that the wiki has no information on this topic rather than hallucinating an answer. Log the knowledge gap in `wiki-cloud/log.md` so the lint workflow can track it.
 
 #### Worked Example
 
 **Question:** "What <OVERVIEW_NAME> are related to <CONCEPT_NAME_2>?"
 
-1. **Search:** `bin/search.sh "<concept-slug-2>"` returns matching concept and overview pages under `wiki/concepts/`.
+1. **Search:** `bin/search.sh "<concept-slug-2>"` returns matching concept and overview pages under `wiki-cloud/concepts/`.
 2. **Shallow read:** Read TL;DR of all three pages. `<concept-slug-2>.md` covers the core item. `<overview-slug>.md` lists item families. `<concept-slug>.md` frames the item within the broader concept.
 3. **Deep read:** Read Detail section of `<overview-slug>.md` to find family relationships.
 4. **Synthesize:** Answer cites all three pages with provenance markers.
 5. **Write-back decision:** The answer connects `<concept-slug-2>` to specific families in a way not explicitly articulated in any single page. Trigger: "new connection between existing pages." Decision: UPDATE the relevant concept page to add a new subsection.
 6. **Delta compilation:** Check sources. `<source-slug>.md` has `compilation_status: compiled`. No delta needed.
-7. **Apply:** Run `bin/validate-op.sh UPDATE wiki/concepts/<page>.md` -> PASS. Apply UPDATE using append-then-synthesize policy.
+7. **Apply:** Run `bin/validate-op.sh UPDATE wiki-cloud/concepts/<page>.md` -> PASS. Apply UPDATE using append-then-synthesize policy.
 8. **Index:** No new pages created, but `<concept-slug-2>.md` summary in index updated to reflect new subsection.
 9. **Log:**
    ```
@@ -1056,7 +1060,7 @@ See: examples/kahneman/concepts/loss-aversion.md for a concrete filled-in instan
 
 ```
 Trigger:  User requests a health check, or periodically after several ingests
-Inputs:   wiki/ directory (all pages)
+Inputs:   wiki-cloud/ directory (all pages)
 Outputs:  Structured findings report, optionally fixed pages, updated log
 Commit:   lint(<scope>): <one-line summary>
 ```
@@ -1114,9 +1118,9 @@ Placement rules (strict):
 
 1. **Requires `--strict`.** `--staged` is a no-op without `--strict` (no provenance enforcement; standard categories run as usual). The pre-commit hook always passes both flags together.
 2. **Diff source:** `git diff --cached --name-only --diff-filter=A` (status-A entries in the staged index). Files are read from the WORKING TREE, not from staged blobs — pre-commit hooks fire after `git add`, so working-tree content matches the index for the typical add-then-commit flow. If you `git add foo.md && echo extra >> foo.md && git commit`, the gate sees the dirty version (which already contains the staged content); known caveat, not a bug.
-3. **Scope:** D-10 (new-page provenance) ONLY. Pages staged as status-A under `wiki/{entities,concepts,overviews,comparisons}/` must contain at least one `[prov:` marker. D-08 (DR-match for added inferred/tentative claims) stays CI-only — not enforced at commit time.
+3. **Scope:** D-10 (new-page provenance) ONLY. Pages staged as status-A under `wiki-cloud/{entities,concepts,overviews,comparisons}/` must contain at least one `[prov:` marker. D-08 (DR-match for added inferred/tentative claims) stays CI-only — not enforced at commit time.
 4. **Exemption ordering** (first match wins):
-   1. Path NOT under `wiki/{entities,concepts,overviews,comparisons}/` — not gated.
+   1. Path NOT under `wiki-cloud/{entities,concepts,overviews,comparisons}/` — not gated.
    2. Path under `examples/` anywhere in the tree — not gated (path-prefix exemption, mirrors `EXCLUDE_DIRS` for full-lint).
    3. Frontmatter `type: source` — not gated (source pages are themselves the provenance anchors).
    4. Frontmatter `type: decision` — not gated (decision records are the gating mechanism, can't gate on themselves).
@@ -1131,9 +1135,9 @@ Placement rules (strict):
 
 **Steps:**
 
-1. Read `wiki/index.md` for full page inventory. Build resolution map: for each wiki page, collect filename, id, title, and aliases (case-insensitive matching).
+1. Read `wiki-cloud/index.md` for full page inventory. Build resolution map: for each wiki page, collect filename, id, title, and aliases (case-insensitive matching).
 2. **YAML frontmatter validation:** Parse all page frontmatter, check required fields, validate enum values against Section 5 schema. Severity: error for parse failures or missing required fields.
-3. **Provenance validation:** Verify all `[prov:]` references resolve to known source IDs in `wiki/sources/`. Verify locator syntax. Severity: error for broken refs.
+3. **Provenance validation:** Verify all `[prov:]` references resolve to known source IDs in `wiki-cloud/sources/`. Verify locator syntax. Severity: error for broken refs.
 4. **Orphan detection:** Find pages with no inbound wikilinks from other wiki pages (using resolution map for alias-aware, case-insensitive matching). Exclude index.md, log.md, lint-report.md. Severity: warning. Report-only.
 5. **Missing cross-references:** Identify pages sharing 2+ domains AND 2+ tags that lack mutual wikilinks. Only flag for active pages (not archived/superseded). Severity: warning. Report-only.
 6. **Stale claims:** Compute staleness using domain decay rate table (Section 6), epistemic modifier, and hash override. Date fallback chain: `checked_at` -> `ingested_at` -> `updated_at`. Severity: warning. Auto-fix: add/update `[epistemic:: stale]` markers per Staleness Auto-Fix Rules.
@@ -1146,17 +1150,17 @@ Placement rules (strict):
     - **Unrepresented sources (DRFT-01):** Walk `sources/` directory for `.md` files, check each has a corresponding wiki source summary page (matching the `path` field in source page frontmatter). Severity: warning.
     - **Missing source files (DRFT-02):** For each source summary page, verify the raw source file at the `path` frontmatter field exists on disk. Severity: error.
     - **Content-hash drift:** Recompute SHA-256 of the raw source file, compare against `content_hash` in source summary frontmatter. If mismatch: report finding (severity: warning). When `--fix` is passed, auto-fix `compilation_status` to `stale` on the affected source page. See Section 10 compilation status transitions.
-    - **Index coverage:** Verify every wiki page (excluding index.md, log.md, and maintenance/ pages) has a wikilink entry in `wiki/index.md`. Severity: warning.
-    - **Obsidian vault awareness (DRFT-03):** Verify `.obsidian/` directory exists (info if missing). Check for non-markdown files in `wiki/` subdirectories (severity: info).
-13. Compile findings into `wiki/maintenance/lint-report.md` organized by severity then category. Findings are grouped with category subsections (e.g., `### Drift` under `## Warnings`). Include total counts and per-category breakdowns.
-14. Append entry to `wiki/log.md`: `## [YYYY-MM-DD] lint | <scope>` with summary of findings counts and auto-fixes applied.
+    - **Index coverage:** Verify every wiki page (excluding index.md, log.md, and maintenance/ pages) has a wikilink entry in `wiki-cloud/index.md`. Severity: warning.
+    - **Obsidian vault awareness (DRFT-03):** Verify `.obsidian/` directory exists (info if missing). Check for non-markdown files in `wiki-cloud/` subdirectories (severity: info).
+13. Compile findings into `wiki-cloud/maintenance/lint-report.md` organized by severity then category. Findings are grouped with category subsections (e.g., `### Drift` under `## Warnings`). Include total counts and per-category breakdowns.
+14. Append entry to `wiki-cloud/log.md`: `## [YYYY-MM-DD] lint | <scope>` with summary of findings counts and auto-fixes applied.
 15. Commit: `lint(<scope>): <one-line summary of findings and fixes>`
 
 **Categories** (valid values for `--category` filter): `orphan`, `crossref`, `stale`, `contradiction`, `gap`, `provenance`, `yaml`, `drift`, `duplicate`.
 
 **Abort conditions:**
 
-- Wiki is empty (no pages beyond `index.md` and `log.md`). Report that the wiki is empty and skip the lint. Log this in `wiki/log.md`.
+- Wiki is empty (no pages beyond `index.md` and `log.md`). Report that the wiki is empty and skip the lint. Log this in `wiki-cloud/log.md`.
 
 ### 11.4 Reflect Workflow
 
@@ -1165,7 +1169,7 @@ The reflect workflow creates decision records (see Section 4.6) that capture why
 ```
 Trigger:  After structural operations, on workflow recommendation, or periodically
 Inputs:   Recent changes (from log.md and git history), reflect checkpoint state
-Outputs:  Decision record page(s) in wiki/decisions/, updated index/log, advanced checkpoint
+Outputs:  Decision record page(s) in wiki-cloud/decisions/, updated index/log, advanced checkpoint
 Commit:   reflect(<scope>): <one-line summary>
 ```
 
@@ -1187,44 +1191,44 @@ Signals that trigger recommendations:
 - Novel synthesis frames created during query compilation (new overview page creates a novel organizing principle)
 - Accumulated structural drift detected during lint (3+ related drift findings suggest a systemic issue)
 
-This message is appended to the workflow's log entry in `wiki/log.md`. It is NOT an automatic action. The agent or human decides whether to act on it in a subsequent reflect pass or immediately.
+This message is appended to the workflow's log entry in `wiki-cloud/log.md`. It is NOT an automatic action. The agent or human decides whether to act on it in a subsequent reflect pass or immediately.
 
 **Tier 3 -- Manual/periodic reflect:** A safety-net pass that scans recent activity and backfills missed decision records. Run periodically (e.g., after several ingests or a batch of structural changes) or when the operator suspects structural decisions went unrecorded.
 
 #### Reflect Checkpoint
 
-The reflect checkpoint lives at `wiki/maintenance/reflect-state.md`. It tracks where the last reflect pass ended so subsequent passes resume from the correct position, even when a pass produces no decision records.
+The reflect checkpoint lives at `wiki-cloud/maintenance/reflect-state.md`. It tracks where the last reflect pass ended so subsequent passes resume from the correct position, even when a pass produces no decision records.
 
 Fields (in frontmatter):
 - `last_reflect_log_entry`: The full heading line of the last log entry scanned (e.g., `"## [2026-04-14] lint | wiki health check"`)
 - `last_reflect_commit`: The short SHA of the last git commit inspected (e.g., `"abc1234"`)
 - `last_reflect_at`: ISO 8601 date of the last reflect pass (e.g., `2026-04-14`)
 
-`wiki/maintenance/` is a control-plane directory. Files here (lint-report.md, reflect-state.md) are NOT listed in wiki/index.md -- they are infrastructure, not content.
+`wiki-cloud/maintenance/` is a control-plane directory. Files here (lint-report.md, reflect-state.md) are NOT listed in wiki-cloud/index.md -- they are infrastructure, not content.
 
 #### Periodic Reflect Procedure (Tier 3)
 
-1. Read the reflect checkpoint from `wiki/maintenance/reflect-state.md`.
-2. Scan `wiki/log.md` for entries after `last_reflect_log_entry`. Identify:
+1. Read the reflect checkpoint from `wiki-cloud/maintenance/reflect-state.md`.
+2. Scan `wiki-cloud/log.md` for entries after `last_reflect_log_entry`. Identify:
    - Structural operations: MERGE, SUPERSEDE, ARCHIVE entries
    - Schema changes: entries referencing AGENTS.md modifications
    - Workflow recommendations: lines matching `reflect recommended: [trigger_type] -- [reason]`
 3. Inspect `git log --oneline` for commits after `last_reflect_commit`. Look for structural file changes: new/deleted/renamed pages, template modifications, AGENTS.md updates, directory reorganizations. **Deduplication rule:** If both log.md and git show the same event, use the log.md entry as the primary trigger (it has intent). Git-only changes (no log entry) indicate unrecorded structural work and should be investigated.
 4. For each identified structural change that lacks a corresponding decision record:
-   a. Create a decision record page in `wiki/decisions/` using the decision template (Section 4.6).
+   a. Create a decision record page in `wiki-cloud/decisions/` using the decision template (Section 4.6).
    b. Set `trigger_type` to the most appropriate value from the six allowed types.
    c. Set `affected_pages` to the IDs of pages touched by the change.
    d. Fill all 7 required sections with real content (not placeholders). The "Why" section must state what framing was adopted and what it replaced. "Alternatives Considered" must list at least one alternative.
    e. Add the decision record ID to `decision_history` on each affected page's frontmatter (only when meaningful per D-05).
-5. Update `wiki/index.md` with new decision record entries under the Decisions category.
-6. Append entry to `wiki/log.md`: `## [YYYY-MM-DD] reflect | <scope>` with a summary of how many decision records were created, or "no structural changes detected" if none.
+5. Update `wiki-cloud/index.md` with new decision record entries under the Decisions category.
+6. Append entry to `wiki-cloud/log.md`: `## [YYYY-MM-DD] reflect | <scope>` with a summary of how many decision records were created, or "no structural changes detected" if none.
 7. Advance the reflect checkpoint: update `last_reflect_log_entry` to the most recent log entry heading, `last_reflect_commit` to current HEAD short SHA, `last_reflect_at` to today's date. **A reflect run that produces no decision records still advances the checkpoint.**
 8. Commit: `reflect(<scope>): <one-line summary>`
 
 #### Abort Conditions
 
 - No structural changes detected since the last checkpoint AND no pending workflow recommendations. Advance the checkpoint (step 7) and skip record creation. Log: `## [YYYY-MM-DD] reflect | no structural changes detected`.
-- Log entry for a structural operation already has a corresponding decision record in `wiki/decisions/` (check by date + scope match). Skip that event -- already recorded.
+- Log entry for a structural operation already has a corresponding decision record in `wiki-cloud/decisions/` (check by date + scope match). Skip that event -- already recorded.
 
 #### Unifying Principle
 
@@ -1414,7 +1418,7 @@ full lifecycle walkthrough.
 
 ### 11.6 Release Workflow (Orphan-Branch Publish)
 
-Template releases use an orphan-branch workflow that publishes a neutralized snapshot of the repo without the creator's personal `wiki/` content. See `docs/reference/release.md` for the full runbook.
+Template releases use an orphan-branch workflow that publishes a neutralized snapshot of the repo without the creator's personal `wiki-cloud/` content. See `docs/reference/release.md` for the full runbook.
 
 ### 11.7 Audit Workflow
 
@@ -1423,32 +1427,32 @@ The Audit is a **review-only** diagnostic workflow. It is NOT a fifth top-level 
 ```
 Trigger:  Operator runs bin/audit-claims.sh on-demand; OR a non-binding
           "audit recommended" note surfaces during a lint run.
-Inputs:   wiki/ pages with [prov:] claims + the raw sources at their path:.
-Outputs:  wiki/maintenance/audit-report.md (+ lint-compatible JSON), advanced
-          wiki/maintenance/audit-state.md checkpoint. NO wiki page is mutated.
+Inputs:   wiki-cloud/ + wiki-local/ pages with [prov:] claims + the raw sources at their path:.
+Outputs:  wiki-local/maintenance/audit-report.md (+ lint-compatible JSON), advanced
+          wiki-local/maintenance/audit-state.md checkpoint. NO wiki page is mutated.
 Commit:   N/A by default (the audit writes only control-plane artifacts; the
           operator commits the report if they wish to track it).
 ```
 
-**What it is.** `bin/audit-claims.sh` is a source-grounded, review-only audit. It samples high-risk claims, resolves each `[prov:source_id#locator]` to the cited passage in the **raw** source file at the source page's `path:` (never the source summary's `## Extracted Claims` -- that would be circular), and emits a verdict per claim: `supports` / `weak` / `contradicts` / `insufficient`, plus the operational verdicts `insufficient-locator` (no passage extractable -- e.g. a `#p` locator against an unmarked source per the Section 6 page-marker convention), `skipped-privacy` (withheld for privacy), and `skipped-nontext` (`#img`). Findings extend Lint's `{severity, category, path, message}` tuple with `verdict`, `line`, `source_id`, `locator`, and `rationale`, and are written to `wiki/maintenance/audit-report.md` (the pattern-twin of `lint-report.md`), grouped by verdict. The audit NEVER mutates a wiki page, never gates by default (no `error` severity -- `contradicts` maps to `warning`, the rest to `info`), and runs on-demand.
+**What it is.** `bin/audit-claims.sh` is a source-grounded, review-only audit. It samples high-risk claims, resolves each `[prov:source_id#locator]` to the cited passage in the **raw** source file at the source page's `path:` (never the source summary's `## Extracted Claims` -- that would be circular), and emits a verdict per claim: `supports` / `weak` / `contradicts` / `insufficient`, plus the operational verdicts `insufficient-locator` (no passage extractable -- e.g. a `#p` locator against an unmarked source per the Section 6 page-marker convention), `skipped-privacy` (withheld for privacy), and `skipped-nontext` (`#img`). Findings extend Lint's `{severity, category, path, message}` tuple with `verdict`, `line`, `source_id`, `locator`, and `rationale`, and are written to `wiki-local/maintenance/audit-report.md` (the pattern-twin of `lint-report.md`), grouped by verdict. The audit NEVER mutates a wiki page, never gates by default (no `error` severity -- `contradicts` maps to `warning`, the rest to `info`), and runs on-demand.
 
 **Cadence.** The primary path is operator-invoked (`bin/audit-claims.sh`). Additionally, the Lint workflow MAY emit a non-binding `audit recommended: <reason>` note (the Section 11.4 Tier-2 recommendation pattern) when high-risk-claim counts cross a threshold -- Lint already computes the stale / epistemic / orphan signals, so it is the cheapest host. This note is **informational only**: it does not run the audit, and the audit is never a CI gate in v1.
 
-**Privacy (the load-bearing FAITH-04 contract).** The audit resolves each claim's **effective claim privacy** via the Section 13 precedence -- the STRICTEST of {claim-page privacy, source-summary privacy, raw-source privacy, enclosing-directory signal, fail-closed `local_only` default}. This is NOT "source privacy" alone: the worklist payload carries the wiki page's own claim text, so a `privacy: local_only` page citing a `cloud_safe` source must still be withheld. Effective-`local_only` claims are withheld (their claim text AND the resolved passage) from BOTH the verifier subprocess AND the `--emit-worklist` stdout -- the partition gates every passage-bearing egress surface, not just the subprocess. Withheld claims emit a `skipped-privacy` verdict; on a primarily-local vault, a high `skipped-privacy` count is acceptable, expected UX (it satisfies FAITH-04 without forcing a local-model dependency), not a failure to pad around.
+**Privacy (the load-bearing FAITH-04 contract).** The audit resolves each claim's **effective claim privacy** via the §13 structural predicate: a claim is effective-`local_only` iff its page OR any contributing source-summary lives under `wiki-local/`. This is NOT "source privacy" alone: the worklist payload carries the wiki page's own claim text, so a page under `wiki-local/` citing a `wiki-cloud/` source must still be withheld. Effective-`local_only` claims are withheld (their claim text AND the resolved passage) from BOTH the verifier subprocess AND the `--emit-worklist` stdout -- the partition gates every passage-bearing egress surface, not just the subprocess. Withheld claims emit a `skipped-privacy` verdict; on a primarily-local vault, a high `skipped-privacy` count is acceptable, expected UX (it satisfies FAITH-04 without forcing a local-model dependency), not a failure to pad around.
 
-On the cloud-facing `--emit-worklist` stdout, a withheld claim's `skipped-privacy` metadata (`source_id` / `path` / `locator`) is redacted to a bare aggregate count; full per-record detail is written only to the `privacy: local_only` `audit-report.md`. This keeps even the existence-metadata of local-only claims off the cloud-facing surface.
+On the cloud-facing `--emit-worklist` stdout, a withheld claim's `skipped-privacy` metadata (`source_id` / `path` / `locator`) is redacted to a bare aggregate count; full per-record detail is written only to the local-control-plane `audit-report.md` under `wiki-local/maintenance/`. This keeps even the existence-metadata of local-only claims off the cloud-facing surface.
 
-**Verifier-locality model.** Every `--verifier <cmd>` is treated as cloud / egress **by default**. The audit NEVER infers a verifier's locality from its command -- locality is an operator assertion via a flag, never a guess. A `local_only` passage is admitted to a verifier ONLY via an explicit `--allow-local` flag (with `--local-verifier <cmd>` documented as sugar for `--verifier <cmd> --allow-local`). The script enforces this mechanically; the docs must never describe a weaker "local verifier auto-detected" behavior.
+**Verifier-locality model.** Every `--verifier <cmd>` is treated as cloud / egress **by default**. The audit NEVER infers a verifier's locality from its command -- locality is an operator assertion via a flag, never a guess. An effective-`local_only` passage (from a page or source under `wiki-local/`) is admitted to a verifier ONLY via an explicit `--allow-local` flag (with `--local-verifier <cmd>` documented as sugar for `--verifier <cmd> --allow-local`). The script enforces this mechanically; the docs must never describe a weaker "local verifier auto-detected" behavior.
 
 **The contradicts → marker handoff (D-10).** The audit stays strictly report-only. A human or agent MAY, as a SEPARATE explicit operation, add an `[epistemic:: tentative]` or a `[contradiction:source_a#locator vs source_b#locator]` marker (Section 6) to a claim with a confirmed `contradicts` verdict, then sync `has_contradictions` per the Lint mechanics (Section 11.3). This is **never automatic** -- the audit produces a finding; a subsequent human-approved decision promotes it to a marker.
 
-**Checkpoint.** `wiki/maintenance/audit-state.md` (frontmatter `last_audit_commit`, `last_audit_at`, `last_sample_size`) mirrors `reflect-state.md`. It is control-plane (not listed in `wiki/index.md`) and advances even on a no-finding run.
+**Checkpoint.** `wiki-local/maintenance/audit-state.md` (frontmatter `last_audit_commit`, `last_audit_at`, `last_sample_size`) mirrors `reflect-state.md`. It is control-plane (not listed in `wiki-cloud/index.md`) and advances even on a no-finding run.
 
 ## 12. Index and Log
 
 ### index.md (Content Index)
 
-- Lives at `wiki/index.md`.
+- Lives at `wiki-cloud/index.md`.
 - Organized by page type: Entities, Concepts, Sources, Comparisons, Overviews, Decisions.
 - Each entry follows the format: `- [[Page Title]] -- <one-line summary> (<epistemic_status>, <updated_at>)`
 - Updated on every ingest and every query that creates or modifies pages.
@@ -1458,7 +1462,7 @@ On the cloud-facing `--emit-worklist` stdout, a withheld claim's `skipped-privac
 
 ### log.md (Activity Log)
 
-- Lives at `wiki/log.md`.
+- Lives at `wiki-cloud/log.md`.
 - Chronological, newest entries at the bottom (append-only).
 - Entry format:
 
@@ -1470,7 +1474,7 @@ On the cloud-facing `--emit-worklist` stdout, a withheld claim's `skipped-privac
 
 - Valid operation types: workflow-level (`ingest`, `query`, `lint`, `reflect`) and structured operations (`UPDATE`, `MERGE`, `SUPERSEDE`, `ARCHIVE`). Structured operations use the extended format below.
 - Each entry includes: what was done, which pages were affected, and a brief rationale.
-- The log is parseable with: `grep "^## \[" wiki/log.md | tail -5`
+- The log is parseable with: `grep "^## \[" wiki-cloud/log.md | tail -5`
 - Structural reasoning and decision analysis belong in decision record pages (reflect workflow, Section 11.4), NOT in the log. The log records WHAT happened; decision records explain WHY.
 
 #### Structured Operation Log Entries
@@ -1517,47 +1521,7 @@ See: examples/kahneman/concepts/prospect-theory.md for concrete filled-in instan
 
 ## 13. Privacy Routing
 
-All content in the wiki system has a privacy classification that determines whether it may be sent to cloud LLM APIs. The system uses fail-closed semantics: when in doubt, the answer is `local_only`. It is better to under-share than to accidentally send private content to a cloud API.
-
-### Privacy Tiers
-
-- **`local_only`** -- NEVER sent to cloud LLM APIs. Processed only by local models or local tooling.
-- **`cloud_safe`** -- May be sent to cloud LLM APIs for processing.
-
-### Three-Level Precedence
-
-Privacy classification is resolved using a three-level precedence hierarchy (most specific wins):
-
-1. **Explicit `privacy` field in item frontmatter** -- This is the authoritative declaration. If present, it is always respected.
-2. **Enclosing directory default** -- Provides operational convenience. Directories like `sources/local-only/` imply `local_only`; directories like `sources/cloud-safe/` imply `cloud_safe`.
-3. **System default: `local_only`** -- If neither frontmatter nor directory provides a signal, the item is classified as `local_only` (fail-closed).
-
-### Conflict Resolution
-
-If the frontmatter and directory disagree, the **stricter** setting wins. Since `local_only` is always stricter than `cloud_safe`, any conflict resolves to `local_only`. This ensures that an item explicitly marked `local_only` cannot be overridden by a permissive directory, and a restrictive directory cannot be overridden by a permissive frontmatter field.
-
-### Privacy Decision Table
-
-| # | Frontmatter `privacy` | Directory               | Result       | Why                                                    |
-|---|----------------------|-------------------------|-------------|--------------------------------------------------------|
-| 1 | `cloud_safe`         | `sources/cloud-safe/`   | `cloud_safe` | Both agree: cloud_safe                                 |
-| 2 | `local_only`         | `sources/cloud-safe/`   | `local_only` | Frontmatter is stricter, stricter wins                 |
-| 3 | `cloud_safe`         | `sources/local-only/`   | `local_only` | Directory is stricter, stricter wins                   |
-| 4 | (not set)            | `sources/cloud-safe/`   | `cloud_safe` | No frontmatter, directory provides signal              |
-| 5 | (not set)            | `sources/2026/2026-04/` | `local_only` | No frontmatter, no privacy directory signal, system default |
-| 6 | (not set)            | (no directory signal)   | `local_only` | Fail-closed: unknown = local_only                      |
-| 7 | `local_only`         | (no directory signal)   | `local_only` | Explicit local_only confirmed                          |
-
-### Rules for LLM Agents
-
-1. The LLM MUST check privacy classification before sending any content to a cloud API.
-2. If classification cannot be determined, treat as `local_only`.
-3. Never send `local_only` content to cloud LLM APIs under any circumstances.
-4. When creating wiki pages, set the `privacy` field in frontmatter based on the sources used.
-
-### Wiki Page Privacy Inheritance
-
-When a wiki page cites sources with mixed privacy tiers (e.g., one `local_only` source and one `cloud_safe` source), the wiki page inherits `local_only` -- the strictest tier among its contributing sources. A page is only `cloud_safe` if ALL of its contributing sources are `cloud_safe`.
+Vault tier is structural: `wiki-cloud/` is the cloud-safe tier; `wiki-local/` is the local-only tier. Cloud sessions MUST NOT read `wiki-local/` — the directory boundary is the enforcement mechanism, not a per-turn rule. See `docs/reference/privacy-model.md` for the full asymmetric model, enforcement options (deny-profile vs. separate-repo), honest fail-direction table, and the `sources-local/` forward reference for future local raw sources.
 
 ## 14. Scaling Boundaries
 
@@ -1569,7 +1533,7 @@ These tiers are additive. Each builds on the previous rather than replacing it.
 
 This is the starting configuration. Everything is markdown files and YAML frontmatter.
 
-- **Navigation:** `wiki/index.md` is the primary navigation mechanism. The LLM reads it to find pages.
+- **Navigation:** `wiki-cloud/index.md` is the primary navigation mechanism. The LLM reads it to find pages.
 - **Lint:** Full lint scans all pages in the wiki.
 - **Agent behavior:** Read the full index, scan all pages during lint.
 - **Approximate capacity:** Up to ~100-200 wiki pages, ~50-100 ingested sources.
@@ -1580,7 +1544,7 @@ This is the starting configuration. Everything is markdown files and YAML frontm
 
 When the single index becomes unwieldy (approximately a few hundred wiki pages).
 
-- **Change:** Split `wiki/index.md` into per-type or per-domain sub-indexes: `wiki/index-entities.md`, `wiki/index-concepts.md`, `wiki/index-sources.md`, etc. The main `wiki/index.md` becomes a meta-index pointing to sub-indexes.
+- **Change:** Split `wiki-cloud/index.md` into per-type or per-domain sub-indexes: `wiki-cloud/index-entities.md`, `wiki-cloud/index-concepts.md`, `wiki-cloud/index-sources.md`, etc. The main `wiki-cloud/index.md` becomes a meta-index pointing to sub-indexes.
 - **Agent behavior:** Read the meta-index to determine which sub-index is relevant, then read only that sub-index.
 - **Approximate capacity:** Up to ~500-1000 wiki pages.
 - **Pain points at limit:** Even sub-indexes become large. Cross-type queries require reading multiple sub-indexes. The meta-index itself grows.
@@ -1613,7 +1577,7 @@ When provenance queries, search, or concurrency become awkward in pure markdown.
 ### Obsidian (Primary Human Interface)
 
 - **Graph View:** Visualize the wiki's link structure. All intra-wiki links use piped form `[[id|Title]]` — the `id` target resolves reliably in Obsidian (filename/path only), and the `title` displays in reading view.
-- **Dataview plugin:** Query frontmatter fields with TABLE/LIST/TASK syntax. All frontmatter fields defined in Section 5 are queryable. Example: `TABLE summary, epistemic_status FROM "wiki/entities" WHERE status = "active"`.
+- **Dataview plugin:** Query frontmatter fields with TABLE/LIST/TASK syntax. All frontmatter fields defined in Section 5 are queryable. Example: `TABLE summary, epistemic_status FROM "wiki-cloud/entities" WHERE status = "active"`.
 - **Properties:** Obsidian 1.4+ supports typed frontmatter editing. All base fields render as editable properties in the sidebar.
 - **Aliases:** The `aliases` frontmatter field is OPTIONAL — useful for Quick Switcher / autocomplete and as display text in piped links `[[file|Alias]]`, but NOT used for bare `[[X]]` resolution (filename/path only).
 - **Backlinks:** Obsidian's backlinks panel shows all pages that link to the current page, complementing the `## Related Pages` section.
@@ -1623,7 +1587,7 @@ When provenance queries, search, or concurrency become awkward in pure markdown.
 - All changes are tracked in git with conventional commits (Section 3).
 - History provides a full audit trail of wiki evolution.
 - Branching is available for experimental restructuring (e.g., major domain reorganization).
-- The activity log (`wiki/log.md`) complements git history with human-readable operation summaries.
+- The activity log (`wiki-cloud/log.md`) complements git history with human-readable operation summaries.
 
 ### Optional Future Tools (Not Required for v1)
 
@@ -1645,7 +1609,7 @@ See `docs/reference/commit-examples.md` for representative commit messages per w
 
 A compact summary of the most critical rules for fast LLM scanning:
 
-1. **Read `wiki/index.md` first, always.** This is the entry point for all wiki operations.
+1. **Read `wiki-cloud/index.md` first, always.** This is the entry point for all wiki operations.
 2. **TL;DR and Key Facts before Detail.** Read shallow sections first; drill into Detail only when needed.
 3. **`[[id|Exact Title]]` on first mention only.** Piped form only — target = page `id`, display = exact canonical `title`. No bare `[[Title]]` links. No repeated links. No wikilinks in frontmatter.
 4. **`[prov:source_id#locator]` for every factual claim.** Every claim needs provenance. No exceptions.

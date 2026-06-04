@@ -52,18 +52,21 @@ jobs:
         run: exit 1
 
   privacy-leak:
-    # CI-07: bin/check-privacy.sh scans PUBLIC_PATHS frontmatter for privacy: local_only.
-    # wiki/** is excluded (valid user content per AGENTS.md §13).
+    # CI-07: bin/check-privacy.sh scans PUBLIC_PATHS for wiki-local/ path leaks.
+    # Phase 15 structural model: wiki-cloud/ is public tier; wiki-local/ is local-only.
+    # Also runs bin/check-sources-cloud-safe.sh to assert raw sources/ is cloud-safe-only.
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
-      - name: Install PyYAML
-        run: pip install pyyaml
-      - name: Privacy-leak guard (CI-07)
+      - name: Install PyYAML + ruamel.yaml
+        run: pip install pyyaml ruamel.yaml
+      - name: Privacy-leak guard (CI-07, structural path guard)
         run: bash bin/check-privacy.sh
+      - name: Raw-sources cloud-safe guard (PRIV-03, fail-closed)
+        run: bash bin/check-sources-cloud-safe.sh
 
   strict:
     # CI-06: --strict quality ratchet.

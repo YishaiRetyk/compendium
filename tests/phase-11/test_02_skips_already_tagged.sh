@@ -26,18 +26,18 @@ if ! bash "$TMP/.brownfield/migrations/02-provenance-bootstrap.sh" --apply >/dev
 fi
 
 # No double-tagging: no line should have two epistemic markers
-if grep -rnE '\[epistemic::.*\].*\[epistemic::' "$TMP/wiki/" 2>/dev/null; then
+if grep -rnE '\[epistemic::.*\].*\[epistemic::' "$TMP/wiki-cloud/" 2>/dev/null; then
     echo "FAIL: double-tagging detected (02 re-processed already-tagged bullets)" >&2
     exit 1
 fi
 
 # The fixture's pages shouldn't have changed at all (all bullets were
 # already tagged).
-dirty=$(cd "$TMP" && git status --porcelain -- 'wiki/')
+dirty=$(cd "$TMP" && git status --porcelain -- 'wiki-cloud/')
 if [ -n "$dirty" ]; then
     echo "FAIL: already-tagged-vault was mutated by 02 --apply (should be no-op):" >&2
     echo "$dirty" >&2
-    (cd "$TMP" && git diff -- 'wiki/') >&2
+    (cd "$TMP" && git diff -- 'wiki-cloud/') >&2
     exit 1
 fi
 

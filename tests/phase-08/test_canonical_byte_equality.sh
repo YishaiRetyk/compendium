@@ -56,12 +56,12 @@ if got != expected:
 "
 
 # 4. Decision record exists at deterministic path
-assert_file_exists "$WORK/wiki/decisions/dr-2026-04-16-initial-setup.md"
+assert_file_exists "$WORK/wiki-cloud/decisions/dr-2026-04-16-initial-setup.md"
 
-# 5. wiki/index.md edited with exactly one ## Decisions heading
-assert_file_exists "$WORK/wiki/index.md"
-assert_grep '^## Decisions$' "$WORK/wiki/index.md" "Decisions subsection in index.md"
-[ "$(grep -c '^## Decisions$' "$WORK/wiki/index.md")" -eq 1 ] || { echo "FAIL: expected exactly one ## Decisions heading"; exit 1; }
+# 5. wiki-cloud/index.md edited with exactly one ## Decisions heading
+assert_file_exists "$WORK/wiki-cloud/index.md"
+assert_grep '^## Decisions$' "$WORK/wiki-cloud/index.md" "Decisions subsection in index.md"
+[ "$(grep -c '^## Decisions$' "$WORK/wiki-cloud/index.md")" -eq 1 ] || { echo "FAIL: expected exactly one ## Decisions heading"; exit 1; }
 
 echo "PASS: MANUAL-06 byte-equality"
 exit 0

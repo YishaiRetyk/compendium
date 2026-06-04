@@ -12,7 +12,6 @@ tags: []
 domains: []
 supersedes:
 superseded_by:
-privacy:
 aliases:
   - {{title}}
 path:

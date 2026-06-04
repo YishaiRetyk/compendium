@@ -18,7 +18,7 @@ git clone -q "$REPO_ROOT" "$TMP"
 
 # Stage a greenfield concept page with no [prov:] -- normally blocked by the
 # hook, but --no-verify must bypass it.
-write_page "$TMP" "wiki/concepts/foo.md" <<'EOF'
+write_page "$TMP" "wiki-cloud/concepts/foo.md" <<'EOF'
 ---
 id: foo
 title: "Foo"
@@ -41,7 +41,7 @@ knowledge_domain: ""
 
 No-verify smoke test body without [prov:] markers; --no-verify must bypass.
 EOF
-(cd "$TMP" && git add wiki/concepts/foo.md)
+(cd "$TMP" && git add wiki-cloud/concepts/foo.md)
 
 set +e
 (cd "$TMP" && git -c core.hooksPath=.githooks -c commit.gpgsign=false \

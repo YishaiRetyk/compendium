@@ -3,27 +3,27 @@ id: daniel-kahneman
 title: Daniel Kahneman
 type: entity
 status: active
-summary: "Israeli-American psychologist who won the Nobel Prize in Economics for research on judgment and decision-making"
+summary: "Israeli-American psychologist who won the Nobel Prize in Economics for research
+  on judgment and decision-making"
 created_at: 2026-04-09
 updated_at: 2026-04-10
 sources:
-  - src-2026-04-09-thinking-fast-and-slow-part1
-  - src-2026-04-10-kahneman-prospect-theory
+- src-2026-04-09-thinking-fast-and-slow-part1
+- src-2026-04-10-kahneman-prospect-theory
 epistemic_status: sourced
 tags:
-  - psychologist
-  - behavioral-economics
-  - nobel-laureate
+- psychologist
+- behavioral-economics
+- nobel-laureate
 domains:
-  - psychology
-  - economics
-supersedes:
-superseded_by:
-privacy: cloud_safe
+- psychology
+- economics
+supersedes: null
+superseded_by: null
 aliases:
-  - "Kahneman"
-  - "Daniel Kahneman"
-  - "daniel-kahneman"
+- "Kahneman"
+- "Daniel Kahneman"
+- "daniel-kahneman"
 has_contradictions: false
 knowledge_domain: biography
 ---

@@ -19,11 +19,11 @@ FAILED=0
 EXCLUDED=(
   ".planning"
   ".brownfield"
-  "wiki/entities"
-  "wiki/concepts"
-  "wiki/comparisons"
-  "wiki/overviews"
-  "wiki/sources"
+  "wiki-cloud/entities"
+  "wiki-cloud/concepts"
+  "wiki-cloud/comparisons"
+  "wiki-cloud/overviews"
+  "wiki-cloud/sources"
 )
 for p in "${EXCLUDED[@]}"; do
     if ! echo "$OUT" | grep -q "EXCLUDES: $p"; then

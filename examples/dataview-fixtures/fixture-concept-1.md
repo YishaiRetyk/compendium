@@ -9,15 +9,14 @@ updated_at: 2026-04-01
 sources: []
 epistemic_status: sourced
 tags:
-  - tag-y
+- tag-y
 domains:
-  - alpha
-supersedes:
-superseded_by:
-privacy: cloud_safe
+- alpha
+supersedes: null
+superseded_by: null
 aliases:
-  - "Fixture Concept One"
-  - fixture-concept-1
+- "Fixture Concept One"
+- fixture-concept-1
 has_contradictions: false
 knowledge_domain: alpha
 example: true

@@ -22,7 +22,7 @@ Operations:
 Checks performed (5 mechanical checks per AGENTS.md section 9):
   [1/5] Target page(s) exist
   [2/5] YAML frontmatter parses and satisfies schema (enum values, required fields)
-  [3/5] Provenance references resolve to known source IDs in wiki/sources/
+  [3/5] Provenance references resolve to known source IDs in wiki-cloud/sources/
   [4/5] Privacy flags respected (inheritance: strictest source tier wins)
   [5/5] MERGE-specific: both pages exist and are distinct
 
@@ -130,8 +130,8 @@ check_provenance() {
         return 0
     fi
     while IFS= read -r src_id; do
-        if [ ! -f "wiki/sources/${src_id}.md" ]; then
-            echo "FAIL: Provenance reference '${src_id}' does not resolve to wiki/sources/${src_id}.md" >&2
+        if [ ! -f "wiki-cloud/sources/${src_id}.md" ]; then
+            echo "FAIL: Provenance reference '${src_id}' does not resolve to wiki-cloud/sources/${src_id}.md" >&2
             failed=1
         fi
     done <<< "$src_ids"
@@ -177,7 +177,7 @@ if page_privacy not in ('local_only', 'cloud_safe'):
 sources = fm.get('sources', []) or []
 local_sources = []
 for src_id in sources:
-    src_path = f'wiki/sources/{src_id}.md'
+    src_path = f'wiki-cloud/sources/{src_id}.md'
     if os.path.exists(src_path):
         src_content = open(src_path).read()
         if src_content.startswith('---'):

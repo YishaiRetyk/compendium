@@ -3,26 +3,27 @@ id: prospect-theory
 title: Prospect Theory
 type: concept
 status: active
-summary: "Kahneman and Tversky's decision-theoretic framework in which people evaluate outcomes as gains or losses relative to a reference point, with asymmetric weighting and distorted probabilities."
+summary: "Kahneman and Tversky's decision-theoretic framework in which people evaluate
+  outcomes as gains or losses relative to a reference point, with asymmetric weighting
+  and distorted probabilities."
 created_at: 2026-04-10
 updated_at: 2026-04-10
 sources:
-  - src-2026-04-10-kahneman-prospect-theory
+- src-2026-04-10-kahneman-prospect-theory
 epistemic_status: sourced
 tags:
-  - behavioral-economics
-  - decision-theory
-  - psychology
+- behavioral-economics
+- decision-theory
+- psychology
 domains:
-  - psychology
-  - economics
-supersedes:
-superseded_by:
-privacy: cloud_safe
+- psychology
+- economics
+supersedes: null
+superseded_by: null
 aliases:
-  - "Prospect Theory (Kahneman-Tversky)"
-  - "Prospect Theory"
-  - "prospect-theory"
+- "Prospect Theory (Kahneman-Tversky)"
+- "Prospect Theory"
+- "prospect-theory"
 has_contradictions: false
 knowledge_domain: science
 ---

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# WGATE-02 / D-20 scenario 1: greenfield wiki/concepts/foo.md, status A,
+# WGATE-02 / D-20 scenario 1: greenfield wiki-cloud/concepts/foo.md, status A,
 # zero [prov:] markers -> bin/lint.sh --strict --staged --category provenance
 # exits 1.
 set -euo pipefail
@@ -9,7 +9,7 @@ source "$SCRIPT_DIR/lib.sh"
 REPO="$(make_bare_repo)"
 trap 'cleanup_fixture_repo "$REPO"' EXIT
 
-write_page "$REPO" "wiki/concepts/foo.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/concepts/foo.md" <<'EOF'
 ---
 id: foo
 title: "Foo"
@@ -32,10 +32,10 @@ knowledge_domain: ""
 
 Foo concept body without any provenance markers.
 EOF
-(cd "$REPO" && git add wiki/concepts/foo.md)
+(cd "$REPO" && git add wiki-cloud/concepts/foo.md)
 
 set +e
-(cd "$REPO" && bash "$REPO_ROOT/bin/lint.sh" --strict --staged --category provenance "$REPO/wiki/" >/tmp/wgate-out.$$ 2>/tmp/wgate-err.$$)
+(cd "$REPO" && bash "$REPO_ROOT/bin/lint.sh" --strict --staged --category provenance "$REPO/wiki-cloud/" >/tmp/wgate-out.$$ 2>/tmp/wgate-err.$$)
 rc=$?
 set -e
 

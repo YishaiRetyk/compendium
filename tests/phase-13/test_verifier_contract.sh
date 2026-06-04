@@ -9,7 +9,7 @@ source "$SCRIPT_DIR/lib.sh"
 
 make_fixture() {
     local REPO="$1"
-    write_page "$REPO" "wiki/sources/src-c.md" <<'EOF'
+    write_page "$REPO" "wiki-cloud/sources/src-c.md" <<'EOF'
 ---
 id: src-c
 title: "C"
@@ -28,7 +28,7 @@ EOF
 
 ROUNDTRIP_PASSAGE content.
 EOF
-    write_page "$REPO" "wiki/concepts/c.md" <<'EOF'
+    write_page "$REPO" "wiki-cloud/concepts/c.md" <<'EOF'
 ---
 id: cc
 title: "Cc"

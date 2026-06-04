@@ -132,7 +132,7 @@ if [ "$SUBCOMMAND" = "bootstrap" ]; then
 
     # Detect the repo root for source-summary path resolution (D-15 Codex fix #7).
     # Falls back to BS_ROOT when no .git is found — safe because D-15 source
-    # hashing only fires on `wiki/sources/*.md` pages which are only touched
+    # hashing only fires on `wiki-cloud/sources/*.md` pages which are only touched
     # inside the scanned root anyway.
     BROWNFIELD_REPO_ROOT="$BS_ROOT"
     _probe="$BS_ROOT"
@@ -266,7 +266,7 @@ def _any_match(patterns, rel):
 pending_writes = []  # list of dicts: {path, rel, fm, body, raw_yaml, merged, collisions, warnings, source_hash_update}
 skipped = []         # list of dicts: {rel, parse_error, suggestion}
 already_bootstrapped = 0  # D-10 sentinel-skip count
-orphan_sources = []  # list of rel paths in sources/ with no wiki/sources/ summary
+orphan_sources = []  # list of rel paths in sources/ with no wiki-cloud/sources/ summary
 
 bf_exclude, bf_negate = _load_brownfield_ignore(ROOT)
 
@@ -362,7 +362,7 @@ for dirpath, dirnames, filenames in os.walk(ROOT, followlinks=False):
         })
 
 # ---------------------------------------------------------------------------
-# D-15 source-file hashing: update content_hash on existing wiki/sources/*.md
+# D-15 source-file hashing: update content_hash on existing wiki-cloud/sources/*.md
 # summary pages using the repo root (not --root) as the resolution base.
 # ---------------------------------------------------------------------------
 
@@ -380,7 +380,7 @@ def _hash_raw_source(abs_raw_path):
 referenced_source_paths = set()
 
 for pending in pending_writes:
-    if '/wiki/sources/' not in '/' + pending['rel']:
+    if '/wiki-cloud/sources/' not in '/' + pending['rel']:
         continue
     merged = pending['merged']
     if 'path' not in merged:
@@ -414,7 +414,7 @@ if os.path.isdir(sources_dir):
             orphan_sources.append(rel_raw)
 
 # ---------------------------------------------------------------------------
-# BRWN-04 skeletons: create wiki/index.md and wiki/log.md if absent.
+# BRWN-04 skeletons: create wiki-cloud/index.md and wiki-cloud/log.md if absent.
 # Skeleton creation is mechanical (BRWN-04) and runs under --apply only.
 # ---------------------------------------------------------------------------
 
@@ -489,7 +489,7 @@ with open(report_path, 'w', encoding='utf-8') as rf:
     if orphan_sources:
         for o in sorted(orphan_sources):
             rf.write(
-                f"- `{o}` — raw source has no corresponding `wiki/sources/*.md` summary page. "
+                f"- `{o}` — raw source has no corresponding `wiki-cloud/sources/*.md` summary page. "
                 "Should a source summary be created (handoff to Phase 11 `suggest/01-page-typing.sh`)?\n"
             )
     else:
@@ -992,8 +992,8 @@ for abs_path, rel, fm, body in pages_data:
             fm_slug = t
 
     # Heading slug: prefer directory hint (unambiguous when the page lives
-    # under wiki/concepts/, wiki/entities/, etc.); fall back to body-based
-    # shape detection for flat vaults that don't use the wiki/<type>/ layout.
+    # under wiki-cloud/concepts/, wiki-cloud/entities/, etc.); fall back to body-based
+    # shape detection for flat vaults that don't use the wiki-cloud/<type>/ layout.
     h_from_dir = dir_label_hint(rel)
     h_from_body = heading_slug(body or '')
     if h_from_dir:
@@ -1621,7 +1621,7 @@ for cluster_dec in pending:
             continue
         elif c == 'o':
             sys.stderr.write("Enter comma-separated page paths to override, then label.\n")
-            sys.stderr.write("  example: wiki/concepts/foo.md, wiki/concepts/bar.md\n")
+            sys.stderr.write("  example: wiki-cloud/concepts/foo.md, wiki-cloud/concepts/bar.md\n")
             paths_raw = prompt("paths: ")
             if paths_raw is _EOF_SENTINEL:
                 _eof_abort = True
@@ -1815,7 +1815,7 @@ for cand_name, script_name in CANDIDATE_TO_SCRIPT.items():
         )
 
 # ===== Lint wrapper (D-13) =====
-# Point WIKI_ROOT at <vault-root>/wiki/ if it exists; otherwise at the vault
+# Point WIKI_ROOT at <vault-root>/wiki-cloud/ if it exists; otherwise at the vault
 # root itself (so fixtures/vaults that look like wiki directories still lint).
 wiki_dir = os.path.join(ROOT, 'wiki')
 if not os.path.isdir(wiki_dir):

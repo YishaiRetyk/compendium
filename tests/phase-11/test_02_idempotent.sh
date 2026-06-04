@@ -28,9 +28,9 @@ fi
 
 bash "$TMP/.brownfield/migrations/02-provenance-bootstrap.sh" --apply >/dev/null 2>&1
 
-dirty=$(cd "$TMP" && git status --porcelain -- 'wiki/')
+dirty=$(cd "$TMP" && git status --porcelain -- 'wiki-cloud/')
 if [ -n "$dirty" ]; then
-    echo "FAIL: second 02 --apply was not idempotent — wiki/ changed:" >&2
+    echo "FAIL: second 02 --apply was not idempotent — wiki-cloud/ changed:" >&2
     echo "$dirty" >&2
     exit 1
 fi

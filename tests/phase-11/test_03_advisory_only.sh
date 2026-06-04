@@ -32,9 +32,9 @@ assert_file_exists "$REPORT"
 assert_grep "^## Cross-link candidates" "$REPORT"
 
 # NO vault mutations
-dirty=$(cd "$TMP" && git status --porcelain -- 'wiki/')
+dirty=$(cd "$TMP" && git status --porcelain -- 'wiki-cloud/')
 if [ -n "$dirty" ]; then
-    echo "FAIL: 03 mutated wiki/ (advisory-only contract violated):" >&2
+    echo "FAIL: 03 mutated wiki-cloud/ (advisory-only contract violated):" >&2
     echo "$dirty" >&2
     exit 1
 fi
@@ -45,9 +45,9 @@ set +e
 bash "$TMP/.brownfield/migrations/03-cross-link-inference.sh" --apply >/dev/null 2>&1
 ec=$?
 set -e
-dirty=$(cd "$TMP" && git status --porcelain -- 'wiki/')
+dirty=$(cd "$TMP" && git status --porcelain -- 'wiki-cloud/')
 if [ -n "$dirty" ]; then
-    echo "FAIL: 03 --apply mutated wiki/ (advisory-only contract violated):" >&2
+    echo "FAIL: 03 --apply mutated wiki-cloud/ (advisory-only contract violated):" >&2
     echo "$dirty" >&2
     exit 1
 fi

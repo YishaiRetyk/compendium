@@ -3,28 +3,28 @@ id: cognitive-biases
 title: Cognitive Biases
 type: concept
 status: active
-summary: "Systematic patterns of deviation from rationality in judgment, first cataloged by Kahneman and Tversky"
+summary: "Systematic patterns of deviation from rationality in judgment, first cataloged
+  by Kahneman and Tversky"
 created_at: 2026-04-09
 updated_at: 2026-04-10
 sources:
-  - src-2026-04-09-thinking-fast-and-slow-part1
-  - src-2026-04-10-kahneman-prospect-theory
+- src-2026-04-09-thinking-fast-and-slow-part1
+- src-2026-04-10-kahneman-prospect-theory
 epistemic_status: mixed
 tags:
-  - psychology
-  - heuristics
-  - decision-making
+- psychology
+- heuristics
+- decision-making
 domains:
-  - psychology
-  - behavioral-science
-supersedes:
-superseded_by:
-privacy: cloud_safe
+- psychology
+- behavioral-science
+supersedes: null
+superseded_by: null
 aliases:
-  - "Cognitive Bias"
-  - "Heuristic Biases"
-  - "Cognitive Biases"
-  - "cognitive-biases"
+- "Cognitive Bias"
+- "Heuristic Biases"
+- "Cognitive Biases"
+- "cognitive-biases"
 has_contradictions: false
 knowledge_domain: science
 ---

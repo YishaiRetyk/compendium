@@ -18,20 +18,20 @@ Every contribution (new source, page update, schema amendment) follows the **bra
 Three required checks run on every PR (branch protection rule):
 
 - `lint` — `bin/lint.sh --ci --format json` + GitHub annotations. Structural findings (`yaml`, `orphan`, `crossref`, `provenance`) block merge; `stale`, `gap`, `contradiction` surface as warnings.
-- `privacy-leak` — `bin/check-privacy.sh` scans public paths (`examples/`, `docs/`, `AGENTS.md`, `CLAUDE.md`, `README.md`, `.github/`) for `privacy: local_only` frontmatter. Leaks block merge. `wiki/**` is exempt (valid user content).
+- `privacy-leak` — `bin/check-privacy.sh` scans public paths (`examples/`, `docs/`, `AGENTS.md`, `CLAUDE.md`, `README.md`, `.github/`) for `privacy: local_only` frontmatter. Leaks block merge. `wiki-cloud/**` is exempt (valid user content).
 - `strict` — `bin/lint.sh --strict` on ready-for-review PRs. Fails on new `[inferred]` / `[tentative]` claims without a matching decision record, and on new entity/concept/overview/comparison pages with zero `[prov:` markers. Draft PRs skip this check.
 
 See [docs/reference/ci.md](docs/reference/ci.md) for the full severity policy, JSON schema, multi-provider equivalents, escape-hatch markers, and `--require-version` pinning.
 
 ### Local pre-commit gate
 
-Run `bash bin/install-hooks.sh` once per clone to activate the AGENTS.md ↔ CLAUDE.md sync check and the local wiki write-gate (Phase 12.2). The gate blocks new staged pages under `wiki/{entities,concepts,overviews,comparisons}/` that contain zero `[prov:]` markers; bypass with `git commit --no-verify` (rare, document the reason in the commit message). See [docs/reference/ci.md](docs/reference/ci.md) and [AGENTS.md §11.3](AGENTS.md) for the full contract (exemption ordering, exit codes, --staged-requires-strict).
+Run `bash bin/install-hooks.sh` once per clone to activate the AGENTS.md ↔ CLAUDE.md sync check and the local wiki write-gate (Phase 12.2). The gate blocks new staged pages under `wiki-cloud/{entities,concepts,overviews,comparisons}/` that contain zero `[prov:]` markers; bypass with `git commit --no-verify` (rare, document the reason in the commit message). See [docs/reference/ci.md](docs/reference/ci.md) and [AGENTS.md §11.3](AGENTS.md) for the full contract (exemption ordering, exit codes, --staged-requires-strict).
 
 ## Attribution
 
 **Git commit authorship is the source of truth** (COLAB-05). The `Author:` field on your commit is the canonical record of who produced the change. Squash-merging erases authorship granularity — we recommend merge commits for ingest PRs (documented, not enforced).
 
-The optional `contributor:: @github-handle` Dataview inline field in `wiki/log.md` is a **convenience index** for filtering log history by contributor:
+The optional `contributor:: @github-handle` Dataview inline field in `wiki-cloud/log.md` is a **convenience index** for filtering log history by contributor:
 
 ```
 bin/search.sh --contributor @octocat
@@ -53,25 +53,25 @@ your.email@example.com  ->  @your-github-handle
 
 ## Privacy
 
-See [PRIVACY.md](PRIVACY.md) for the `local_only` / `cloud_safe` tiers. The `privacy-leak` CI job fails any PR that puts `privacy: local_only` frontmatter in public paths. `local_only` is valid inside `wiki/**` — it is your user content and never reaches cloud LLM APIs per AGENTS.md §13.
+See [PRIVACY.md](PRIVACY.md) for the `local_only` / `cloud_safe` tiers. The `privacy-leak` CI job fails any PR that puts `privacy: local_only` frontmatter in public paths. `local_only` is valid inside `wiki-cloud/**` — it is your user content and never reaches cloud LLM APIs per AGENTS.md §13.
 
 ## Merge conflicts
 
 The wiki has two write-heavy hotspots where concurrent PRs conflict. Here are the canonical resolution recipes.
 
-### `wiki/log.md` (append-only activity log)
+### `wiki-cloud/log.md` (append-only activity log)
 
 Log entries are timestamped (`## [YYYY-MM-DD] ingest | ...`). Conflicts happen when two branches both append entries.
 
 **Resolution — keep both sides, sort by timestamp:**
 
 ```bash
-git checkout main -- wiki/log.md           # start from main's version
-git checkout your-branch -- wiki/log.md    # merge-check your changes back
+git checkout main -- wiki-cloud/log.md           # start from main's version
+git checkout your-branch -- wiki-cloud/log.md    # merge-check your changes back
 # In your editor: paste both sides' entries; sort by the `## [YYYY-MM-DD]`
 # header so chronological order is preserved.
-bash bin/lint.sh wiki/                     # validate
-git add wiki/log.md
+bash bin/lint.sh wiki-cloud/                     # validate
+git add wiki-cloud/log.md
 git commit -m "resolve log.md conflict"
 ```
 
@@ -80,28 +80,28 @@ git commit -m "resolve log.md conflict"
 ```gitattributes
 # Add this to .gitattributes LOCALLY (not committed by default).
 # Git will union-merge append-only conflicts in log.md automatically.
-wiki/log.md merge=union
+wiki-cloud/log.md merge=union
 ```
 
 We deliberately do NOT commit this as a default `.gitattributes` line. `merge=union` changes git behavior globally for the repo; contributors who haven't read this doc would be surprised. Opt in per-clone if you find yourself resolving log.md conflicts regularly.
 
-### `wiki/index.md` (category listings)
+### `wiki-cloud/index.md` (category listings)
 
 Index entries are organized by page type (Entities, Concepts, Sources, Comparisons, Overviews, Decisions). Conflicts happen when two branches both add entries under the same category.
 
 **Resolution — keep both, alphabetize within category, re-run lint:**
 
 ```bash
-git checkout main -- wiki/index.md
-git checkout your-branch -- wiki/index.md
+git checkout main -- wiki-cloud/index.md
+git checkout your-branch -- wiki-cloud/index.md
 # In your editor: merge both sides' entries within each category header.
 # Alphabetize the entries under each `## Category` header.
-bash bin/lint.sh wiki/                     # confirms no broken links
-git add wiki/index.md
+bash bin/lint.sh wiki-cloud/                     # confirms no broken links
+git add wiki-cloud/index.md
 git commit -m "resolve index.md conflict"
 ```
 
-`merge=union` is NOT recommended for `wiki/index.md` — it would collide headers and produce duplicate category sections.
+`merge=union` is NOT recommended for `wiki-cloud/index.md` — it would collide headers and produce duplicate category sections.
 
 ## Lint severity tiers
 

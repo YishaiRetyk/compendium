@@ -10,7 +10,7 @@ REPO="$(make_bare_repo)"
 trap 'cleanup_fixture_repo "$REPO"' EXIT
 SEED="$(cd "$REPO" && git rev-parse HEAD)"
 
-write_page "$REPO" "wiki/sources/src-w.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/sources/src-w.md" <<'EOF'
 ---
 id: src-w
 title: "W"
@@ -29,7 +29,7 @@ write_page "$REPO" "sources/2026/2026-04/w/source.md" <<'EOF'
 
 ARGTEST_PASSAGE content.
 EOF
-write_page "$REPO" "wiki/concepts/w.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/concepts/w.md" <<'EOF'
 ---
 id: wc
 title: "Wc"

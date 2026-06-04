@@ -25,10 +25,10 @@ if ! bash "$TMP/.brownfield/migrations/01-page-typing.sh" >/dev/null 2>&1; then
     exit 1
 fi
 
-# Vault wiki/ must be untouched
-dirty=$(cd "$TMP" && git status --porcelain -- 'wiki/')
+# Vault wiki-cloud/ must be untouched
+dirty=$(cd "$TMP" && git status --porcelain -- 'wiki-cloud/')
 if [ -n "$dirty" ]; then
-    echo "FAIL: 01-page-typing.sh dry-run mutated wiki/:" >&2
+    echo "FAIL: 01-page-typing.sh dry-run mutated wiki-cloud/:" >&2
     echo "$dirty" >&2
     exit 1
 fi

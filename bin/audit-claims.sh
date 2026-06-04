@@ -153,7 +153,8 @@ from privacy_resolve import resolve_source_privacy, resolve_effective_claim_priv
 # ----------------------------------------------------------------------------
 
 REPO_ROOT = os.path.abspath(os.environ.get('AUDIT_REPO_ROOT', os.getcwd()))
-WIKI_DIR = os.path.join(REPO_ROOT, 'wiki')
+WIKI_DIR = os.path.join(REPO_ROOT, 'wiki-cloud')
+LOCAL_MAINT = os.path.join(REPO_ROOT, 'wiki-local', 'maintenance')
 SAMPLE = int(os.environ.get('AUDIT_SAMPLE', '20') or '20')
 SELECT = [s.strip() for s in os.environ.get('AUDIT_SELECT', '').split(',') if s.strip()]
 FORMAT = os.environ.get('AUDIT_FORMAT', 'report')
@@ -224,9 +225,12 @@ def parse_frontmatter_str(content):
 all_pages = []      # (path, fm, body, error)
 source_pages = []   # (path, fm, body)
 
-if os.path.isdir(WIKI_DIR):
-    for root, dirs, files in os.walk(WIKI_DIR):
-        rel_root = os.path.relpath(root, WIKI_DIR)
+# Walk both wiki-cloud/ and wiki-local/ (two-tier page universe, Phase 15 §13 structural model)
+for tier_dir in [WIKI_DIR, os.path.join(REPO_ROOT, 'wiki-local')]:
+    if not os.path.isdir(tier_dir):
+        continue
+    for root, dirs, files in os.walk(tier_dir):
+        rel_root = os.path.relpath(root, tier_dir)
         if rel_root.split(os.sep)[0] in EXCLUDE_DIRS:
             continue
         for fname in sorted(files):
@@ -243,11 +247,15 @@ if os.path.isdir(WIKI_DIR):
             if fm and fm.get('type') == 'source':
                 source_pages.append((fpath, fm, body))
 
-# source_registry: source_id -> source fm  (the D-11 resolution anchor)
+# source_registry: source_id -> {'fm': sfm, 'summary_rel_path': rel}
+# Stores summary page repo-relative path so FAITH-04 can key off source tier (review HIGH #2/#3).
 source_registry = {}
+source_summary_path = {}  # source_id -> summary repo-relative path
 for sp, sfm, sbody in source_pages:
     if sfm and 'id' in sfm:
-        source_registry[sfm['id']] = sfm
+        rel = os.path.relpath(sp, REPO_ROOT)
+        source_registry[sfm['id']] = {'fm': sfm, 'summary_rel_path': rel}
+        source_summary_path[sfm['id']] = rel
 
 
 # ----------------------------------------------------------------------------
@@ -459,7 +467,10 @@ def resolve_locator(raw_source_text, locator):
 def read_raw_source(source_id):
     """Resolve source_id -> raw file at path:. Returns (raw_text|None, reason).
     Guards path traversal (T-13-04): a `..`-escaping path is rejected, never opened."""
-    sfm = source_registry.get(source_id)
+    entry = source_registry.get(source_id)
+    if not entry:
+        return None, 'no-registry'
+    sfm = entry['fm'] if isinstance(entry, dict) else entry  # compat
     if not sfm or 'path' not in sfm:
         return None, 'no-registry'
     rel = sfm['path']
@@ -500,10 +511,10 @@ def claim_tuples_for_page(fpath, body):
 
 def git_diff_changed_pages(base_ref):
     """Copied git-diff subprocess shape (lint.sh strict_added_epistemic_claims).
-    Returns set of changed wiki/ file paths (repo-relative)."""
+    Returns set of changed wiki-cloud/ + wiki-local/ file paths (repo-relative)."""
     try:
         result = subprocess.run(
-            ['git', 'diff', '--name-only', f'{base_ref}...HEAD', '--', 'wiki/'],
+            ['git', 'diff', '--name-only', f'{base_ref}...HEAD', '--', 'wiki-cloud/', 'wiki-local/'],
             cwd=REPO_ROOT, check=True, capture_output=True, text=True,
         )
     except (subprocess.CalledProcessError, FileNotFoundError):
@@ -523,7 +534,8 @@ for fpath, fm, body, err in all_pages:
 
 # --- stale-source set (rank 1): claims whose source_id has hash drift. ---
 drifted_sources = set()
-for src_id, sfm in source_registry.items():
+for src_id, entry in source_registry.items():
+    sfm = entry['fm'] if isinstance(entry, dict) else entry
     content_hash = sfm.get('content_hash', '')
     compiled_hash = sfm.get('compiled_against_hash', '')
     comp_status = sfm.get('compilation_status', '')
@@ -535,7 +547,7 @@ recency_pages = set()
 base_ref = SINCE
 if not base_ref:
     # checkpoint lookup
-    state_path = os.path.join(WIKI_DIR, 'maintenance', 'audit-state.md')
+    state_path = os.path.join(LOCAL_MAINT, 'audit-state.md')
     if os.path.exists(state_path):
         sfm, _, _ = parse_frontmatter(state_path)
         if isinstance(sfm, dict) and sfm.get('last_audit_commit'):
@@ -710,7 +722,7 @@ def run_verifier(verifier_cmd, claim_text, passage, support_type):
 findings.append({
     'severity': 'info',
     'category': 'faithfulness',
-    'path': 'wiki/maintenance/audit-report.md',
+    'path': 'wiki-local/maintenance/audit-report.md',
     'line': 0,
     'source_id': '',
     'locator': '',
@@ -736,14 +748,16 @@ for rank, (rel, line, sid, loc, line_text, fm), hits in capped:
                     f'no passage extractable for {sid}{loc}')
         continue
 
-    # --- THE single privacy chokepoint (REVIEW HIGH-A): gate on EFFECTIVE claim
-    #     privacy = strictest of {claim-page, source-summary, raw-source, dir,
-    #     default}, NOT source privacy alone. Parse the RAW source's frontmatter
-    #     (already-open file; no new egress) and fold it in. ---
-    sfm = source_registry.get(sid)
-    raw_source_fm, _, _ = parse_frontmatter_str(raw_text)
+    # --- THE single privacy chokepoint (FAITH-04 / Phase 15 structural predicate):
+    #     A claim is effective-local_only iff its page OR any contributing source-summary
+    #     lives under wiki-local/. The collapsed resolver keys off the SUMMARY PAGE PATH
+    #     (not the raw sources/ path -- raw sources/ is cloud-safe-only by structural rule).
+    #     Collapsed from the §13 three-level precedence ladder in Phase 15. ---
+    entry = source_registry.get(sid)
+    sfm = entry['fm'] if isinstance(entry, dict) and 'fm' in entry else entry
+    summary_path = source_summary_path.get(sid, '')
     effective_priv = resolve_effective_claim_privacy(
-        fm, rel, sfm, raw_source_fm, (sfm or {}).get('path', ''))
+        fm, rel, sfm, None, summary_path)
 
     # Locality is the AUDIT_ALLOW_LOCAL flag, never inferred from the command
     # string. local_only-effective claims are admitted ONLY when --allow-local
@@ -753,15 +767,15 @@ for rank, (rel, line, sid, loc, line_text, fm), hits in capped:
         # gate for BOTH egress surfaces). REVIEW HIGH-C: also redact the per-claim
         # metadata (source_id/path/line/locator/rationale -- private slugs,
         # T-13-21) from cloud-facing stdout. The full per-record detail lands ONLY
-        # in the privacy: local_only audit-report.md via add_finding below.
+        # in the local-control-plane audit-report.md (wiki-local/maintenance/) via add_finding below.
         add_finding('skipped-privacy', rel, line, sid, loc,
                     f'local_only-effective claim withheld (no --allow-local)')
         redacted_skip_count += 1
         continue
 
     # Admitted (cloud_safe-effective, OR local_only with --allow-local). The
-    # worklist carries the passage + claim text (the egress surface). `privacy`
-    # is the EFFECTIVE claim privacy (strictest-wins), not source-summary privacy.
+    # worklist carries the passage + claim text (the egress surface). effective_priv
+    # is the structural claim privacy (wiki-local/ path-prefix predicate).
     # support_type is the third [prov:] field when present (PROV_RE group 3).
     support_type = ''
     mprov = PROV_RE.search(line_text)
@@ -831,8 +845,8 @@ def head_sha():
 
 
 def write_checkpoint():
-    """D-15: advances even on a no-finding run. privacy: local_only (HIGH-B)."""
-    maint = os.path.join(WIKI_DIR, 'maintenance')
+    """D-15: advances even on a no-finding run. Under wiki-local/maintenance/ (structural local-only)."""
+    maint = LOCAL_MAINT
     os.makedirs(maint, exist_ok=True)
     state_path = os.path.join(maint, 'audit-state.md')
     created_at = str(date.today())
@@ -860,7 +874,6 @@ tags:
 domains: []
 supersedes:
 superseded_by:
-privacy: local_only
 aliases:
   - Audit State
 has_contradictions: false
@@ -873,7 +886,7 @@ last_sample_size: {SAMPLE}
 # Audit State
 
 Checkpoint for `bin/audit-claims.sh`. Control-plane only; not listed in
-`wiki/index.md`. Advances on every run, including no-finding runs (D-15).
+`wiki-cloud/index.md`. Advances on every run, including no-finding runs (D-15).
 """
     with open(state_path, 'w', encoding='utf-8') as f:
         f.write(content)
@@ -881,8 +894,8 @@ Checkpoint for `bin/audit-claims.sh`. Control-plane only; not listed in
 
 def write_report():
     """audit-report.md -- pattern-twin of lint-report.md, grouped by verdict.
-    privacy: local_only (NOT cloud_safe -- REVIEW HIGH-B)."""
-    maint = os.path.join(WIKI_DIR, 'maintenance')
+    Under wiki-local/maintenance/ (structural local-only, NOT cloud tier)."""
+    maint = LOCAL_MAINT
     os.makedirs(maint, exist_ok=True)
     report_path = os.path.join(maint, 'audit-report.md')
     created_at = str(date.today())
@@ -933,7 +946,6 @@ tags:
 domains: []
 supersedes:
 superseded_by:
-privacy: local_only
 aliases:
   - Audit Report
 has_contradictions: false
@@ -978,7 +990,7 @@ else:
     write_report()
     write_checkpoint()
     print(f"Audit complete. Selected {len(capped)}, skipped {skipped_count}.", file=sys.stderr)
-    print("Report: wiki/maintenance/audit-report.md", file=sys.stderr)
+    print("Report: wiki-local/maintenance/audit-report.md", file=sys.stderr)
 
 sys.exit(0)
 PYEOF

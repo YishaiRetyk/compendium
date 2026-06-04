@@ -14,9 +14,9 @@ pushd "$FIXTURE" >/dev/null
 setup_git_author "$FIXTURE" "Alice" "alice@example.com"
 setup_git_author "$FIXTURE" "Bob" "bob@example.com"
 
-# Seed wiki/log.md with contributor:: @bob (who is NOT in the map — only alice is mapped)
-mkdir -p wiki wiki/decisions
-cat > wiki/log.md <<'LOG'
+# Seed wiki-cloud/log.md with contributor:: @bob (who is NOT in the map — only alice is mapped)
+mkdir -p wiki wiki-cloud/decisions
+cat > wiki-cloud/log.md <<'LOG'
 # Log
 
 ## [2026-04-16] ingest | test
@@ -26,12 +26,12 @@ contributor:: @bob
 Some rationale.
 LOG
 
-# Seed a minimal wiki/index.md so lint has structure
-echo "# Index" > wiki/index.md
+# Seed a minimal wiki-cloud/index.md so lint has structure
+echo "# Index" > wiki-cloud/index.md
 
 git add . && git -c commit.gpgsign=false commit -q -m "seed log"
 
-LINT_REPO_ROOT="$FIXTURE" bash "$REPO_ROOT/bin/lint.sh" --category contributor --format json wiki/ > /tmp/ctrb.json 2>/dev/null || true
+LINT_REPO_ROOT="$FIXTURE" bash "$REPO_ROOT/bin/lint.sh" --category contributor --format json wiki-cloud/ > /tmp/ctrb.json 2>/dev/null || true
 # Expect at least one contributor warning for @bob (no mapping)
 if ! assert_json_has_finding /tmp/ctrb.json contributor warning; then
     echo "FAIL: expected contributor warning for @bob" >&2
@@ -43,7 +43,7 @@ fi
 echo "bob@example.com  ->  @bob" >> .git-author-map.txt
 git add . && git -c commit.gpgsign=false commit -q -m "map bob"
 
-LINT_REPO_ROOT="$FIXTURE" bash "$REPO_ROOT/bin/lint.sh" --category contributor --format json wiki/ > /tmp/ctrb2.json 2>/dev/null || true
+LINT_REPO_ROOT="$FIXTURE" bash "$REPO_ROOT/bin/lint.sh" --category contributor --format json wiki-cloud/ > /tmp/ctrb2.json 2>/dev/null || true
 python3 - <<'PYEOF'
 import json, sys
 data = json.load(open('/tmp/ctrb2.json'))
@@ -62,9 +62,9 @@ trap - EXIT
 FIXTURE2="$(make_fixture_repo contributor-single)"
 trap 'cleanup_fixture_repo "$FIXTURE2"' EXIT
 pushd "$FIXTURE2" >/dev/null
-mkdir -p wiki wiki/decisions
-echo "# Index" > wiki/index.md
-cat > wiki/log.md <<'LOG'
+mkdir -p wiki wiki-cloud/decisions
+echo "# Index" > wiki-cloud/index.md
+cat > wiki-cloud/log.md <<'LOG'
 # Log
 
 ## [2026-04-16] ingest | test
@@ -75,7 +75,7 @@ Body.
 LOG
 git add . && git -c commit.gpgsign=false commit -q -m "seed single-author log"
 
-LINT_REPO_ROOT="$FIXTURE2" bash "$REPO_ROOT/bin/lint.sh" --category contributor --format json wiki/ > /tmp/ctrb3.json 2>/dev/null || true
+LINT_REPO_ROOT="$FIXTURE2" bash "$REPO_ROOT/bin/lint.sh" --category contributor --format json wiki-cloud/ > /tmp/ctrb3.json 2>/dev/null || true
 python3 - <<'PYEOF'
 import json, sys
 data = json.load(open('/tmp/ctrb3.json'))

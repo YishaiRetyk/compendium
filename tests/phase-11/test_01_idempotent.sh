@@ -33,9 +33,9 @@ fi
 # Second apply
 bash "$TMP/.brownfield/migrations/01-page-typing.sh" --apply >/dev/null 2>&1
 
-dirty=$(cd "$TMP" && git status --porcelain -- 'wiki/')
+dirty=$(cd "$TMP" && git status --porcelain -- 'wiki-cloud/')
 if [ -n "$dirty" ]; then
-    echo "FAIL: second --apply was not idempotent — wiki/ changed:" >&2
+    echo "FAIL: second --apply was not idempotent — wiki-cloud/ changed:" >&2
     echo "$dirty" >&2
     exit 1
 fi

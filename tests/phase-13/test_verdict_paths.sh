@@ -9,7 +9,7 @@ run_one() {
     local verdict="$1" expected_sev="$2"
     local REPO; REPO="$(make_bare_repo)"
     local SEED; SEED="$(cd "$REPO" && git rev-parse HEAD)"
-    write_page "$REPO" "wiki/sources/src-v.md" <<'EOF'
+    write_page "$REPO" "wiki-cloud/sources/src-v.md" <<'EOF'
 ---
 id: src-v
 title: "V"
@@ -28,7 +28,7 @@ EOF
 
 VERDICT_PASSAGE content.
 EOF
-    write_page "$REPO" "wiki/concepts/v.md" <<'EOF'
+    write_page "$REPO" "wiki-cloud/concepts/v.md" <<'EOF'
 ---
 id: vc
 title: "Vc"

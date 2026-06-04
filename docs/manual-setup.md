@@ -140,7 +140,7 @@ YAML
 
 Replace the date and answer values to match your edits. For the `template_sha` field, you can resolve it via `git log -1 --format=%H schema/AGENTS.template.md` and substitute the result in place of `<unresolved>`.
 
-## Section 8: Write the Initial Decision Record + Update wiki/index.md
+## Section 8: Write the Initial Decision Record + Update wiki-cloud/index.md
 
 Both of these are self-contained; no wizard invocation required.
 
@@ -161,8 +161,8 @@ TEMPLATE_SHA="<unresolved>"
 WIZARD_VERSION="1.1.0"
 GENERATED_AT="2026-04-16T00:00:00Z"
 
-mkdir -p wiki/decisions
-cat > "wiki/decisions/dr-${TODAY}-initial-setup.md" <<EOF
+mkdir -p wiki-cloud/decisions
+cat > "wiki-cloud/decisions/dr-${TODAY}-initial-setup.md" <<EOF
 ---
 id: dr-${TODAY}-initial-setup
 title: "Initial Wizard Setup -- ${PRIMARY_DOMAIN}"
@@ -209,7 +209,7 @@ The schema requires an initial structural decision record per AGENTS.md §4.6 wh
 
 ## Consequences
 
-AGENTS.md and CLAUDE.md are now personalized and byte-identical. \`.wizard-answers.yaml\` is the machine-authoritative source of the answer set. \`wiki/index.md\` has a \`## Decisions\` subsection with a wikilink back to this record.
+AGENTS.md and CLAUDE.md are now personalized and byte-identical. \`.wizard-answers.yaml\` is the machine-authoritative source of the answer set. \`wiki-cloud/index.md\` has a \`## Decisions\` subsection with a wikilink back to this record.
 
 ## Affected Pages
 
@@ -223,7 +223,7 @@ None (this is an inaugural/infrastructure record per AGENTS.md §4.6; affected_p
 EOF
 ```
 
-### 8b. Append to wiki/index.md (inline snippet)
+### 8b. Append to wiki-cloud/index.md (inline snippet)
 
 ```bash
 # Append a Decisions subsection + wikilink entry. Idempotent: re-running this
@@ -232,13 +232,13 @@ TODAY="2026-04-16"
 PRIMARY_DOMAIN="personal-knowledge"
 ENTRY="- [[dr-${TODAY}-initial-setup|Initial Wizard Setup -- ${PRIMARY_DOMAIN}]] -- Wizard-driven template personalization (wiki-infrastructure, ${TODAY})"
 
-if ! grep -qF "${ENTRY}" wiki/index.md; then
-  if ! grep -qE '^## Decisions$' wiki/index.md; then
-    printf '\n\n## Decisions\n\n%s\n' "${ENTRY}" >> wiki/index.md
+if ! grep -qF "${ENTRY}" wiki-cloud/index.md; then
+  if ! grep -qE '^## Decisions$' wiki-cloud/index.md; then
+    printf '\n\n## Decisions\n\n%s\n' "${ENTRY}" >> wiki-cloud/index.md
   else
     # Existing section — append to it (the wizard would insert at section end;
     # plain append here works because the section is typically last)
-    printf '%s\n' "${ENTRY}" >> wiki/index.md
+    printf '%s\n' "${ENTRY}" >> wiki-cloud/index.md
   fi
 fi
 ```
@@ -275,8 +275,8 @@ The wizard writes (and you have now reproduced, manually) these 5 files:
 1. `AGENTS.md` — rendered from `schema/AGENTS.template.md` with 4 placeholder substitutions (Sections 2–5 OR the `sed` pipeline in the pre-step).
 2. `CLAUDE.md` — byte-identical copy of AGENTS.md, written via `bash bin/sync-claude.sh` (Section 9).
 3. `.wizard-answers.yaml` (Section 7).
-4. `wiki/decisions/dr-<TODAY>-initial-setup.md` — the deterministic decision record per AGENTS.md §4.6 (Section 8a).
-5. `wiki/index.md` — appended `## Decisions` subsection with wikilink to the new decision record (Section 8b).
+4. `wiki-cloud/decisions/dr-<TODAY>-initial-setup.md` — the deterministic decision record per AGENTS.md §4.6 (Section 8a).
+5. `wiki-cloud/index.md` — appended `## Decisions` subsection with wikilink to the new decision record (Section 8b).
 
 ## Section 13: Pointers
 

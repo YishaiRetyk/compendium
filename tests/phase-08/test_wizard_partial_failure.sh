@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # tests/phase-08/test_wizard_partial_failure.sh -- review concern #8:
 # Simulates a mid-init failure and verifies the staging-dir pattern leaves
-# repo-root untouched. Induction: pre-populate wiki/index.md with TWO
+# repo-root untouched. Induction: pre-populate wiki-cloud/index.md with TWO
 # `## Decisions` headings so the duplicate-header guard fires during
 # staging validation (AFTER AGENTS.md / CLAUDE.md are rendered into staging
 # but BEFORE the atomic promote to repo root).
@@ -18,14 +18,14 @@ echo "TEST: staging-dir recovery -- partial failure leaves repo-root untouched (
 # Build a minimal fake repo skeleton so we can run the wizard in real-run
 # mode (no --render-to) without polluting the real REPO_ROOT.
 WORK="$(mktemp_repo)"
-mkdir -p "$WORK/bin" "$WORK/schema" "$WORK/wiki/decisions"
+mkdir -p "$WORK/bin" "$WORK/schema" "$WORK/wiki-cloud/decisions"
 cp "$REPO_ROOT/bin/init-wizard.sh" "$WORK/bin/init-wizard.sh"
 cp "$REPO_ROOT/bin/sync-claude.sh" "$WORK/bin/sync-claude.sh"
 cp "$REPO_ROOT/schema/AGENTS.template.md" "$WORK/schema/AGENTS.template.md"
 chmod +x "$WORK/bin/init-wizard.sh" "$WORK/bin/sync-claude.sh"
 
-# Induce mid-init failure: wiki/index.md with TWO `## Decisions` headings.
-cat >"$WORK/wiki/index.md" <<'EOF'
+# Induce mid-init failure: wiki-cloud/index.md with TWO `## Decisions` headings.
+cat >"$WORK/wiki-cloud/index.md" <<'EOF'
 ---
 id: index
 title: Index
@@ -93,10 +93,10 @@ if [ -f "$WORK/.wizard-answers.yaml" ]; then
     exit 1
 fi
 
-# wiki/decisions/ should remain empty (no dr-*-initial-setup.md written).
-if ls "$WORK/wiki/decisions/"dr-*-initial-setup.md 2>/dev/null | grep -q .; then
-    echo "ASSERT FAIL: wiki/decisions/dr-*-initial-setup.md written despite staging-dir recovery" >&2
-    ls "$WORK/wiki/decisions/" >&2
+# wiki-cloud/decisions/ should remain empty (no dr-*-initial-setup.md written).
+if ls "$WORK/wiki-cloud/decisions/"dr-*-initial-setup.md 2>/dev/null | grep -q .; then
+    echo "ASSERT FAIL: wiki-cloud/decisions/dr-*-initial-setup.md written despite staging-dir recovery" >&2
+    ls "$WORK/wiki-cloud/decisions/" >&2
     exit 1
 fi
 

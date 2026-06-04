@@ -7,7 +7,7 @@ source "$SCRIPT_DIR/lib.sh"
 REPO="$(make_bare_repo)"
 trap 'cleanup_fixture_repo "$REPO"' EXIT
 
-write_page "$REPO" "wiki/sources/src-r.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/sources/src-r.md" <<'EOF'
 ---
 id: src-r
 title: "R"
@@ -28,7 +28,7 @@ Body text.
 EOF
 
 # Commit a baseline page (this is the "since" point).
-write_page "$REPO" "wiki/concepts/old.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/concepts/old.md" <<'EOF'
 ---
 id: old
 title: "Old"
@@ -41,7 +41,7 @@ EOF
 BASE="$(cd "$REPO" && git rev-parse HEAD)"
 
 # Now add a NEW page and commit it -- this is the recently-modified delta.
-write_page "$REPO" "wiki/concepts/fresh.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/concepts/fresh.md" <<'EOF'
 ---
 id: fresh
 title: "Fresh"

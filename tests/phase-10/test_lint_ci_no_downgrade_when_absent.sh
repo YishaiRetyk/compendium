@@ -10,11 +10,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib.sh"
 
 tmp="$(mktemp -d -t phase10-lint-ci-nodg-XXXXXX)"
-mkdir -p "$tmp/wiki/concepts" "$tmp/wiki/sources"
+mkdir -p "$tmp/wiki-cloud/concepts" "$tmp/wiki-cloud/sources"
 
 # Author a page with the same yaml-error shape (type: "") but NO
 # bootstrap_stage frontmatter.
-cat > "$tmp/wiki/concepts/greenfield-broken.md" <<'EOF'
+cat > "$tmp/wiki-cloud/concepts/greenfield-broken.md" <<'EOF'
 ---
 id: greenfield-broken
 title: "Greenfield Broken"
@@ -38,8 +38,8 @@ knowledge_domain: ""
 Body. No bootstrap_stage → must retain full error severity under --ci.
 EOF
 
-printf '# Index\n[[Greenfield Broken]]\n' > "$tmp/wiki/index.md"
-printf '# Log\n' > "$tmp/wiki/log.md"
+printf '# Index\n[[Greenfield Broken]]\n' > "$tmp/wiki-cloud/index.md"
+printf '# Log\n' > "$tmp/wiki-cloud/log.md"
 
 json="$(bash "$REPO_ROOT/bin/lint.sh" --ci --format json "$tmp/wiki" 2>/dev/null || true)"
 

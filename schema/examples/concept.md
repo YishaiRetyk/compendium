@@ -3,25 +3,25 @@ id: attention-mechanism
 title: Attention Mechanism
 type: concept
 status: active
-summary: "A neural network component that allows models to focus on relevant parts of the input sequence."
+summary: "A neural network component that allows models to focus on relevant parts
+  of the input sequence."
 created_at: 2026-04-08
 updated_at: 2026-04-08
 sources:
-  - src-2026-03-15-vaswani-attention
-  - src-2026-04-01-bahdanau-alignment
+- src-2026-03-15-vaswani-attention
+- src-2026-04-01-bahdanau-alignment
 epistemic_status: sourced
 tags:
-  - machine-learning
-  - transformers
-  - deep-learning
+- machine-learning
+- transformers
+- deep-learning
 domains:
-  - ai-research
-supersedes:
-superseded_by:
-privacy: cloud_safe
+- ai-research
+supersedes: null
+superseded_by: null
 aliases:
-  - Attention
-  - Self-Attention
+- Attention
+- Self-Attention
 example: true
 ---
 

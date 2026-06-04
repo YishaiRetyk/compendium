@@ -3,22 +3,22 @@ id: geoffrey-hinton
 title: Geoffrey Hinton
 type: entity
 status: active
-summary: "British-Canadian computer scientist, pioneer of deep learning and neural networks."
+summary: "British-Canadian computer scientist, pioneer of deep learning and neural
+  networks."
 created_at: 2026-04-08
 updated_at: 2026-04-08
 sources:
-  - src-2026-03-20-hinton-interview
+- src-2026-03-20-hinton-interview
 epistemic_status: sourced
 tags:
-  - researcher
-  - deep-learning
+- researcher
+- deep-learning
 domains:
-  - ai-research
-supersedes:
-superseded_by:
-privacy: cloud_safe
+- ai-research
+supersedes: null
+superseded_by: null
 aliases:
-  - Geoff Hinton
+- Geoff Hinton
 example: true
 ---
 

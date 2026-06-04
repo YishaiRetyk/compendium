@@ -3,26 +3,27 @@ id: src-2026-04-10-kahneman-prospect-theory
 title: "Prospect Theory and Loss Aversion: Kahneman's Revolution in Decision Science"
 type: source
 status: active
-summary: "Magazine-style overview article on Kahneman and Tversky's prospect theory, covering loss aversion, reference dependence, probability weighting, and applied domains from finance to public policy."
+summary: "Magazine-style overview article on Kahneman and Tversky's prospect theory,
+  covering loss aversion, reference dependence, probability weighting, and applied
+  domains from finance to public policy."
 created_at: 2026-04-10
 updated_at: 2026-04-10
 sources: []
 epistemic_status: sourced
 tags:
-  - psychology
-  - behavioral-economics
-  - prospect-theory
-  - loss-aversion
+- psychology
+- behavioral-economics
+- prospect-theory
+- loss-aversion
 domains:
-  - psychology
-  - economics
-supersedes:
-superseded_by:
-privacy: cloud_safe
+- psychology
+- economics
+supersedes: null
+superseded_by: null
 aliases:
-  - "Kahneman Prospect Theory Article"
-  - "Prospect Theory and Loss Aversion: Kahneman's Revolution in Decision Science"
-  - "src-2026-04-10-kahneman-prospect-theory"
+- "Kahneman Prospect Theory Article"
+- "Prospect Theory and Loss Aversion: Kahneman's Revolution in Decision Science"
+- "src-2026-04-10-kahneman-prospect-theory"
 has_contradictions: false
 knowledge_domain: science
 path: sources/2026/2026-04/2026-04-10-kahneman-prospect-theory/source.md
@@ -33,12 +34,12 @@ source_type: article
 compilation_status: compiled
 compiled_against_hash: "sha256:3dc81e24f5873bfc3d010d52ba63d754f3f0eae090e0d0671784b4704bcd2b3c"
 compiled_targets:
-  - daniel-kahneman
-  - cognitive-biases
-  - system-1-vs-system-2
-  - decision-making
-  - prospect-theory
-  - loss-aversion
+- daniel-kahneman
+- cognitive-biases
+- system-1-vs-system-2
+- decision-making
+- prospect-theory
+- loss-aversion
 ---
 
 ## TL;DR

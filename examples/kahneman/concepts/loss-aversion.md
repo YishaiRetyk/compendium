@@ -3,25 +3,26 @@ id: loss-aversion
 title: Loss Aversion
 type: concept
 status: active
-summary: "The finding that losses are weighted roughly twice as heavily as equivalent gains -- the asymmetric core of prospect theory and the source of several downstream biases."
+summary: "The finding that losses are weighted roughly twice as heavily as equivalent
+  gains -- the asymmetric core of prospect theory and the source of several downstream
+  biases."
 created_at: 2026-04-10
 updated_at: 2026-04-10
 sources:
-  - src-2026-04-10-kahneman-prospect-theory
+- src-2026-04-10-kahneman-prospect-theory
 epistemic_status: sourced
 tags:
-  - behavioral-economics
-  - decision-theory
-  - psychology
+- behavioral-economics
+- decision-theory
+- psychology
 domains:
-  - psychology
-  - economics
-supersedes:
-superseded_by:
-privacy: cloud_safe
+- psychology
+- economics
+supersedes: null
+superseded_by: null
 aliases:
-  - "Loss-Aversion"
-  - "Loss Aversion"
+- "Loss-Aversion"
+- "Loss Aversion"
 has_contradictions: false
 knowledge_domain: science
 ---

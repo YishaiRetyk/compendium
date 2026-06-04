@@ -5,7 +5,7 @@
 #
 # --suggest-denylist mode is DETERMINISTIC (REVIEWS.md HIGH #3):
 #   Input sources (in order):
-#     1. wiki/** pages with `privacy: local_only` frontmatter under $ROOT
+#     1. wiki-local/**/*.md pages under $ROOT (local-only tier by directory)
 #     2. .planning/notes/**/*.md under $ROOT (creator personal notes)
 #     3. Git history of known-deleted local_only paths via
 #        `git log --all -p -- <paths>` (only when $ROOT is inside a git repo)
@@ -44,7 +44,7 @@ Options:
   --help, -h              Show this help
 
 Suggest-mode input sources (deterministic):
-  1. wiki/**/*.md with `privacy: local_only`
+  1. wiki-local/**/*.md (local-only tier by directory; Phase 15 structural model)
   2. .planning/notes/**/*.md
   3. git log --all -p -- <known-deleted local_only paths>
   4. .gitignore creator-specific patterns (only with --include-gitignore)
@@ -91,7 +91,7 @@ done
 [ -z "$DENYLIST" ] && DENYLIST="$ROOT/$DENYLIST_DEFAULT"
 
 # Public control-plane paths scanned (D-06). examples/ is explicitly excluded.
-PUBLIC_PATHS=(AGENTS.md CLAUDE.md README.md PRIVACY.md docs .github wiki bin)
+PUBLIC_PATHS=(AGENTS.md CLAUDE.md README.md PRIVACY.md docs .github wiki-cloud bin)
 
 export CN_ROOT="$ROOT"
 export CN_SUGGEST="$SUGGEST"
@@ -260,12 +260,14 @@ def parse_frontmatter(text):
     return text[3:end].strip()
 
 def source_local_only_wiki():
-    # (1) wiki pages with privacy: local_only
+    # (1) wiki-local/ pages -- ALL pages under wiki-local/ are local-only
+    # by structural tier (Phase 15: directory is the classifier, not frontmatter).
+    # Phase 15: frontmatter field is stripped; directory IS the classifier.
     results = {}  # path -> token set
-    wiki_dir = os.path.join(ROOT, "wiki")
-    if not os.path.isdir(wiki_dir):
+    wiki_local_dir = os.path.join(ROOT, "wiki-local")
+    if not os.path.isdir(wiki_local_dir):
         return results
-    for dirpath, _, filenames in os.walk(wiki_dir):
+    for dirpath, _, filenames in os.walk(wiki_local_dir):
         for fn in filenames:
             if not fn.endswith(".md"):
                 continue
@@ -275,11 +277,9 @@ def source_local_only_wiki():
                     text = f.read()
             except OSError:
                 continue
-            fm = parse_frontmatter(text)
-            if fm and re.search(r"^privacy:\s*local_only\b", fm, re.M):
-                rel = os.path.relpath(p, ROOT)
-                # Tokenize full text (body carries the personal terms).
-                results[rel] = tokenize(text)
+            rel = os.path.relpath(p, ROOT)
+            # Tokenize full text (body carries the personal terms).
+            results[rel] = tokenize(text)
     return results
 
 def source_planning_notes():

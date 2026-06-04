@@ -47,7 +47,7 @@ cleanup_fixture_repo() {
 
 # write_page <repo> <relpath>
 # Reads body from stdin (heredoc), creates parent dirs, writes to "$repo/$relpath".
-# Used to build fixtures inline: BOTH the wiki/sources/<id>.md summary AND the raw
+# Used to build fixtures inline: BOTH the wiki-cloud/sources/<id>.md summary AND the raw
 # sources/**/source.md file (self-contained fixtures -- see fixtures/README.md).
 write_page() {
     local repo="$1" relpath="$2"

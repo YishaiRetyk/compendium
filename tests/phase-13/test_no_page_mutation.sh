@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # FAITH-03 / SC-5: no wiki entity/concept/etc. page is mutated by a run.
-# Only wiki/maintenance/audit-*.md may be written.
+# Only wiki-cloud/maintenance/audit-*.md may be written.
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib.sh"
@@ -8,7 +8,7 @@ source "$SCRIPT_DIR/lib.sh"
 REPO="$(make_bare_repo)"
 trap 'cleanup_fixture_repo "$REPO"' EXIT
 
-write_page "$REPO" "wiki/sources/src-m.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/sources/src-m.md" <<'EOF'
 ---
 id: src-m
 title: "M"
@@ -27,7 +27,7 @@ write_page "$REPO" "sources/2026/2026-04/m/source.md" <<'EOF'
 
 Body text.
 EOF
-write_page "$REPO" "wiki/concepts/m.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/concepts/m.md" <<'EOF'
 ---
 id: m
 title: "M"
@@ -45,8 +45,8 @@ rc=$?
 set -e
 assert_exit_code 0 "$rc" "no-mutation run" || exit 1
 
-# git status: only wiki/maintenance/ (and wiki/log.md if any) may be dirty.
-changed="$(cd "$REPO" && git status --porcelain -- 'wiki/concepts' 'wiki/sources' 'wiki/entities' 'wiki/overviews' 'wiki/comparisons')"
+# git status: only wiki-cloud/maintenance/ (and wiki-cloud/log.md if any) may be dirty.
+changed="$(cd "$REPO" && git status --porcelain -- 'wiki-cloud/concepts' 'wiki-cloud/sources' 'wiki-cloud/entities' 'wiki-cloud/overviews' 'wiki-cloud/comparisons')"
 if [ -n "$changed" ]; then
     echo "FAIL: audit mutated a wiki content page:" >&2
     echo "$changed" >&2; exit 1

@@ -16,7 +16,7 @@ trap 'cleanup_fixture_repo "$REPO"' EXIT
 SEED="$(cd "$REPO" && git rev-parse HEAD)"
 
 # cloud_safe source
-write_page "$REPO" "wiki/sources/src-fc-cloud.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/sources/src-fc-cloud.md" <<'EOF'
 ---
 id: src-fc-cloud
 title: "FCcloud"
@@ -27,7 +27,6 @@ content_hash: "sha256:aaaa"
 compiled_against_hash: "sha256:aaaa"
 ingested_at: 2026-04-15
 source_type: paper
-privacy: cloud_safe
 ---
 EOF
 write_page "$REPO" "sources/2026/2026-04/fccloud/source.md" <<'EOF'
@@ -36,8 +35,8 @@ write_page "$REPO" "sources/2026/2026-04/fccloud/source.md" <<'EOF'
 FC_CLOUD_PASSAGE content.
 EOF
 
-# local_only source
-write_page "$REPO" "wiki/sources/src-fc-local.md" <<'EOF'
+# local_only source (structural: summary under wiki-local/sources/)
+write_page "$REPO" "wiki-local/sources/src-fc-local.md" <<'EOF'
 ---
 id: src-fc-local
 title: "FClocal"
@@ -48,7 +47,6 @@ content_hash: "sha256:bbbb"
 compiled_against_hash: "sha256:bbbb"
 ingested_at: 2026-04-15
 source_type: paper
-privacy: local_only
 ---
 EOF
 write_page "$REPO" "sources/2026/2026-04/fclocal/source.md" <<'EOF'
@@ -58,37 +56,34 @@ FC_LOCAL_SOURCE_PASSAGE content.
 EOF
 
 # (a) cloud page + cloud source
-write_page "$REPO" "wiki/concepts/fca.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/concepts/fca.md" <<'EOF'
 ---
 id: fca
 title: "FCa"
 type: concept
 status: active
-privacy: cloud_safe
 ---
 FC_A_CLAIM here [prov:src-fc-cloud#sec:introduction|direct|2026-04-15]
 EOF
 
 # (b) cloud page + local source
-write_page "$REPO" "wiki/concepts/fcb.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/concepts/fcb.md" <<'EOF'
 ---
 id: fcb
 title: "FCb"
 type: concept
 status: active
-privacy: cloud_safe
 ---
 FC_B_CLAIM here [prov:src-fc-local#sec:introduction|direct|2026-04-15]
 EOF
 
-# (c) local page + cloud source (HIGH-A)
-write_page "$REPO" "wiki/concepts/fcc.md" <<'EOF'
+# (c) local page + cloud source (HIGH-A) (structural: page under wiki-local/concepts/)
+write_page "$REPO" "wiki-local/concepts/fcc.md" <<'EOF'
 ---
 id: fcc
 title: "FCc"
 type: concept
 status: active
-privacy: local_only
 ---
 FC_C_CLAIM here [prov:src-fc-cloud#sec:introduction|direct|2026-04-15]
 EOF

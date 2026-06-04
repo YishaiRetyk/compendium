@@ -1,29 +1,31 @@
 #!/usr/bin/env bash
-# REVIEW HIGH-A: a privacy: local_only wiki PAGE citing a cloud_safe source has
-# its CLAIM withheld (FAITH-04 governs local_only CLAIMS, not only source
-# passages). The page/source carry a DISTINCTIVE sentinel slug; absent --allow-local
-# the claim text, passage marker, AND metadata slugs are ABSENT from cloud-facing
-# worklist stdout (HIGH-C). WITH --allow-local they appear. Also unit-asserts the
-# resolver directly.
+# Phase 15 structural claim-page privacy test (rewritten from per-page frontmatter to path-prefix).
+# FAITH-04: a wiki PAGE under wiki-local/ citing a cloud_safe source summary has its
+# CLAIM withheld (FAITH-04 governs local_only claims by PAGE TIER, not frontmatter field).
+# Also unit-asserts the collapsed resolver directly using the path-prefix contract.
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib.sh"
 
-# Direct resolver unit assertion (HIGH-A row).
+# Direct resolver unit assertion (structural path-prefix contract, Phase 15).
 python3 - "$REPO_ROOT" <<'PY'
 import sys
 sys.path.insert(0, sys.argv[1] + '/bin/lib')
 from privacy_resolve import resolve_effective_claim_privacy as e
-assert e({'privacy':'local_only'}, 'wiki/concepts/x.md', {'privacy':'cloud_safe'}, None, 'sources/2026/x.md') == 'local_only', 'local page + cloud source -> local_only'
-print('OK')
+
+# A page under wiki-local/ -> local_only (regardless of source tier)
+assert e(None, 'wiki-local/concepts/x.md', None, None, 'wiki-cloud/sources/src-cloud.md') == 'local_only', \
+    'wiki-local/ page + wiki-cloud/ source summary -> local_only'
+
+print('OK: structural resolver contract verified')
 PY
 
 REPO="$(make_bare_repo)"
 trap 'cleanup_fixture_repo "$REPO"' EXIT
 SEED="$(cd "$REPO" && git rev-parse HEAD)"
 
-# cloud_safe SOURCE with a distinctive sentinel slug in id/path.
-write_page "$REPO" "wiki/sources/src-cpsentinel.md" <<'EOF'
+# cloud_safe SOURCE SUMMARY under wiki-cloud/sources/ with a distinctive sentinel slug.
+write_page "$REPO" "wiki-cloud/sources/src-cpsentinel.md" <<'EOF'
 ---
 id: src-cpsentinel
 title: "CPSentinel"
@@ -34,7 +36,6 @@ content_hash: "sha256:aaaa"
 compiled_against_hash: "sha256:aaaa"
 ingested_at: 2026-04-15
 source_type: paper
-privacy: cloud_safe
 ---
 EOF
 write_page "$REPO" "sources/2026/2026-04/cpsentinel/source.md" <<'EOF'
@@ -43,14 +44,14 @@ write_page "$REPO" "sources/2026/2026-04/cpsentinel/source.md" <<'EOF'
 CLAIMPAGE_PASSAGE_MARKER content.
 EOF
 
-# local_only PAGE citing the cloud_safe source, distinctive sentinel path.
-write_page "$REPO" "wiki/concepts/cppagesentinel.md" <<'EOF'
+# LOCAL-tier PAGE under wiki-local/concepts/ (structural local-only by directory).
+# No privacy: frontmatter field (stripped in Phase 15).
+write_page "$REPO" "wiki-local/concepts/cppagesentinel.md" <<'EOF'
 ---
 id: cppagesentinel
 title: "CPPageSentinel"
 type: concept
 status: active
-privacy: local_only
 ---
 CLAIMPAGE_CLAIM_MARKER claim [prov:src-cpsentinel#sec:cppagesentinelsec|direct|2026-04-15]
 EOF
@@ -64,11 +65,11 @@ rc=$?; set -e
 assert_exit_code 0 "$rc" "claim-page no-allow-local emit" || { echo "$wl1" >&2; exit 1; }
 
 if printf '%s' "$wl1" | grep -q 'CLAIMPAGE_CLAIM_MARKER'; then
-    echo "FAIL: local PAGE claim text leaked (HIGH-A)" >&2; echo "$wl1" >&2; exit 1; fi
+    echo "FAIL: wiki-local/ PAGE claim text leaked (FAITH-04 breach)" >&2; echo "$wl1" >&2; exit 1; fi
 if printf '%s' "$wl1" | grep -q 'CLAIMPAGE_PASSAGE_MARKER'; then
-    echo "FAIL: passage leaked for a local PAGE's claim (HIGH-A)" >&2; echo "$wl1" >&2; exit 1; fi
+    echo "FAIL: passage leaked for a wiki-local/ PAGE's claim (FAITH-04 breach)" >&2; echo "$wl1" >&2; exit 1; fi
 if printf '%s' "$wl1" | grep -q 'cppagesentinel'; then
-    echo "FAIL: local PAGE source_id/path/locator slug leaked (HIGH-A + HIGH-C)" >&2; echo "$wl1" >&2; exit 1; fi
+    echo "FAIL: wiki-local/ PAGE source_id/path/locator slug leaked (HIGH-C)" >&2; echo "$wl1" >&2; exit 1; fi
 printf '%s' "$wl1" | python3 -c 'import json,sys; d=json.load(sys.stdin); assert any(r.get("verdict")=="skipped-privacy" and r.get("redacted") is True for r in d), "no redacted record"' || { echo "FAIL: no redacted skipped-privacy record" >&2; echo "$wl1" >&2; exit 1; }
 
 # WITH --allow-local: marker + metadata appear.
@@ -76,7 +77,7 @@ set +e
 wl2="$(cd "$REPO" && AUDIT_REPO_ROOT="$REPO" bash "$REPO_ROOT/bin/audit-claims.sh" --emit-worklist --allow-local --since "$SEED" --format json 2>/dev/null)"
 rc=$?; set -e
 assert_exit_code 0 "$rc" "claim-page allow-local emit" || { echo "$wl2" >&2; exit 1; }
-printf '%s' "$wl2" | grep -q 'CLAIMPAGE_PASSAGE_MARKER' || { echo "FAIL: --allow-local did not admit the local PAGE's claim" >&2; echo "$wl2" >&2; exit 1; }
-printf '%s' "$wl2" | grep -q 'cppagesentinel' || { echo "FAIL: --allow-local did not admit the local PAGE metadata" >&2; echo "$wl2" >&2; exit 1; }
+printf '%s' "$wl2" | grep -q 'CLAIMPAGE_PASSAGE_MARKER' || { echo "FAIL: --allow-local did not admit the wiki-local/ PAGE's claim" >&2; echo "$wl2" >&2; exit 1; }
+printf '%s' "$wl2" | grep -q 'cppagesentinel' || { echo "FAIL: --allow-local did not admit the wiki-local/ PAGE metadata" >&2; echo "$wl2" >&2; exit 1; }
 
-echo "PASS: local_only PAGE citing a cloud_safe source has its CLAIM withheld (HIGH-A) + metadata redacted (HIGH-C)"
+echo "PASS: wiki-local/ tier PAGE citing a wiki-cloud/ source has its CLAIM withheld (FAITH-04 structural)"

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # test_kahneman_readme.sh — Phase 07 Plan 02
 # Asserts examples/kahneman/README.md conforms to NEUT-05 requirements
-# and wiki/decisions/dr-2026-04-15-kahneman-to-examples.md conforms to AGENTS.md §4.6 canonical schema.
+# and wiki-cloud/decisions/dr-2026-04-15-kahneman-to-examples.md conforms to AGENTS.md §4.6 canonical schema.
 set -euo pipefail
 
 PASS=0
@@ -28,10 +28,10 @@ for s in \
 done
 
 if grep -q '^example: true' "$README"; then pass "README frontmatter example: true"; else fail "README missing example: true"; fi
-if grep -q '^privacy: cloud_safe' "$README"; then pass "README frontmatter privacy: cloud_safe"; else fail "README missing privacy: cloud_safe"; fi
+if ! grep -q '^privacy:' "$README"; then pass "README frontmatter has no privacy: field (Phase 15: field stripped)"; else fail "README still has privacy: field (should be stripped)"; fi
 
 # Decision record canonical schema.
-DR=wiki/decisions/dr-2026-04-15-kahneman-to-examples.md
+DR=wiki-cloud/decisions/dr-2026-04-15-kahneman-to-examples.md
 if [ -f "$DR" ]; then pass "decision record exists"; else fail "decision record missing"; exit 1; fi
 
 for k in '^type: decision' '^status: active' '^trigger_type: schema-update' '^epistemic_status: sourced' '^created_at: 2026-04-15' '^updated_at: 2026-04-15' '^affected_pages:'; do

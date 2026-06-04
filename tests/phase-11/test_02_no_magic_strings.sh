@@ -25,7 +25,7 @@ if ! bash "$TMP/.brownfield/migrations/02-provenance-bootstrap.sh" --apply >/dev
     exit 1
 fi
 
-if grep -rnE '\[prov:bootstrap\]|\[epistemic:: imported\]|\[epistemic:: bootstrapped\]' "$TMP/wiki/" 2>/dev/null; then
+if grep -rnE '\[prov:bootstrap\]|\[epistemic:: imported\]|\[epistemic:: bootstrapped\]' "$TMP/wiki-cloud/" 2>/dev/null; then
     echo "FAIL: forbidden magic strings introduced by 02 (BRWN-15 contract violated)" >&2
     exit 1
 fi

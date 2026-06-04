@@ -3,7 +3,7 @@
 # fire the gate; exit 0) OR short-errors with a usage hint (exit 1). Both are
 # acceptable per D-05 -- the test accepts either.
 #
-# Recommended assertion: stage a wiki/concepts/foo.md with zero [prov:],
+# Recommended assertion: stage a wiki-cloud/concepts/foo.md with zero [prov:],
 # run --staged WITHOUT --strict, assert that the gate did NOT fire (exit 0).
 # That is the no-op-without-strict contract.
 set -euo pipefail
@@ -13,7 +13,7 @@ source "$SCRIPT_DIR/lib.sh"
 REPO="$(make_bare_repo)"
 trap 'cleanup_fixture_repo "$REPO"' EXIT
 
-write_page "$REPO" "wiki/concepts/foo.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/concepts/foo.md" <<'EOF'
 ---
 id: foo
 title: "Foo"
@@ -36,10 +36,10 @@ knowledge_domain: ""
 
 Body without [prov:] markers; --staged without --strict must not fire the gate.
 EOF
-(cd "$REPO" && git add wiki/concepts/foo.md)
+(cd "$REPO" && git add wiki-cloud/concepts/foo.md)
 
 set +e
-(cd "$REPO" && bash "$REPO_ROOT/bin/lint.sh" --staged --category provenance "$REPO/wiki/" >/tmp/wgate-out.$$ 2>/tmp/wgate-err.$$)
+(cd "$REPO" && bash "$REPO_ROOT/bin/lint.sh" --staged --category provenance "$REPO/wiki-cloud/" >/tmp/wgate-out.$$ 2>/tmp/wgate-err.$$)
 rc=$?
 set -e
 

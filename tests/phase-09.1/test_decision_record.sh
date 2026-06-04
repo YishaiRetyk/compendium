@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# I-12: wiki/decisions/dr-2026-04-16-progressive-disclosure-extraction.md exists with
+# I-12: wiki-cloud/decisions/dr-2026-04-16-progressive-disclosure-extraction.md exists with
 # trigger_type: schema-update, affected_pages: [], and all 7 required sections
 # (TL;DR, Decision, Why, Alternatives Considered, Consequences, Affected Pages, Sources).
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib.sh"
 
-DR="$REPO_ROOT/wiki/decisions/dr-2026-04-16-progressive-disclosure-extraction.md"
+DR="$REPO_ROOT/wiki-cloud/decisions/dr-2026-04-16-progressive-disclosure-extraction.md"
 test -f "$DR" || { echo "FAIL: $DR missing" >&2; exit 1; }
 
 # Frontmatter: type, trigger_type, affected_pages
@@ -72,4 +72,4 @@ if len(bullets) < 1:
     sys.exit("FAIL: DR ## Alternatives Considered must list >=1 alternative (AGENTS.md §4.6 requirement)")
 PYEOF
 
-echo "PASS: wiki/decisions/dr-2026-04-16-progressive-disclosure-extraction.md valid"
+echo "PASS: wiki-cloud/decisions/dr-2026-04-16-progressive-disclosure-extraction.md valid"

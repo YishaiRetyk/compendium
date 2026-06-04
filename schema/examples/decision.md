@@ -3,17 +3,18 @@ id: dr-2026-04-14-phase6-decision-type
 title: "Introduce Decision Record Page Type"
 type: decision
 status: active
-summary: "Decision records are a dedicated page type (type: decision) with their own template, directory (wiki/decisions/), and index category, rather than overloading the overview type."
+summary: "Decision records are a dedicated page type (type: decision) with their own
+  template, directory (wiki/decisions/), and index category, rather than overloading
+  the overview type."
 created_at: 2026-04-14
 updated_at: 2026-04-14
 sources: []
 epistemic_status: sourced
 tags:
-  - meta
-  - schema
+- meta
+- schema
 domains:
-  - wiki-infrastructure
-privacy: cloud_safe
+- wiki-infrastructure
 knowledge_domain: software
 trigger_type: schema-update
 affected_pages: []

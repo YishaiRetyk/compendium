@@ -10,11 +10,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib.sh"
 
 tmp="$(mktemp -d -t phase10-lint-ci-dg-XXXXXX)"
-mkdir -p "$tmp/wiki/concepts" "$tmp/wiki/sources"
+mkdir -p "$tmp/wiki-cloud/concepts" "$tmp/wiki-cloud/sources"
 # Copy the bootstrapped-old.md fixture (has type: "" → yaml error).
-cp "$REPO_ROOT/tests/phase-10/fixtures/bootstrapped-vault/wiki/concepts/bootstrapped-old.md" "$tmp/wiki/concepts/"
-printf '# Index\n[[Old Bootstrapped Page]]\n' > "$tmp/wiki/index.md"
-printf '# Log\n' > "$tmp/wiki/log.md"
+cp "$REPO_ROOT/tests/phase-10/fixtures/bootstrapped-vault/wiki-cloud/concepts/bootstrapped-old.md" "$tmp/wiki-cloud/concepts/"
+printf '# Index\n[[Old Bootstrapped Page]]\n' > "$tmp/wiki-cloud/index.md"
+printf '# Log\n' > "$tmp/wiki-cloud/log.md"
 
 json="$(bash "$REPO_ROOT/bin/lint.sh" --ci --format json "$tmp/wiki" 2>/dev/null || true)"
 

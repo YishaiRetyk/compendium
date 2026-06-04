@@ -3,21 +3,21 @@ id: fixture-source-2
 title: Fixture Source Two
 type: source
 status: active
-summary: "Synthetic active source-summary fixture in domain alpha for the sources-by-domain query."
+summary: "Synthetic active source-summary fixture in domain alpha for the sources-by-domain
+  query."
 created_at: 2026-04-01
 updated_at: 2026-04-01
 sources: []
 epistemic_status: sourced
 tags:
-  - tag-y
+- tag-y
 domains:
-  - alpha
-supersedes:
-superseded_by:
-privacy: cloud_safe
+- alpha
+supersedes: null
+superseded_by: null
 aliases:
-  - "Fixture Source Two"
-  - fixture-source-2
+- "Fixture Source Two"
+- fixture-source-2
 has_contradictions: false
 knowledge_domain: alpha
 example: true

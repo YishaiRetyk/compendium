@@ -30,10 +30,10 @@ echo "$S16" | grep -q 'reflect(q1-review): restructure AI safety domain' \
 
 # I-9: Appendix C preserved verbatim. R7 review consensus: use grep -F fixed-string matches
 # (no regex metachars) to pin the EXACT literal text from AGENTS.md §16. Brittle regex-based
-# greps (e.g. 'Read .wiki/index\.md. first, always') risked false positives/negatives because
+# greps (e.g. 'Read .wiki-cloud/index\.md. first, always') risked false positives/negatives because
 # the literal text includes backticks and asterisks that regex treats as metachars.
-grep -F -q '**Read `wiki/index.md` first, always.**' "$A" \
-    || { echo "FAIL: §16 Appendix C rule 1 ('Read wiki/index.md first, always.') missing or modified" >&2; exit 1; }
+grep -F -q '**Read `wiki-cloud/index.md` first, always.**' "$A" \
+    || { echo "FAIL: §16 Appendix C rule 1 ('Read wiki-cloud/index.md first, always.') missing or modified" >&2; exit 1; }
 grep -F -q '**Operations: UPDATE, MERGE, SUPERSEDE, ARCHIVE.**' "$A" \
     || { echo "FAIL: §16 Appendix C rule 9 ('Operations: UPDATE, MERGE, SUPERSEDE, ARCHIVE.') missing or modified" >&2; exit 1; }
 grep -F -q 'See Section 3 "What Agents Must NOT Do"' "$A" \

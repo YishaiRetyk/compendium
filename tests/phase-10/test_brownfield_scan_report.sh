@@ -3,7 +3,7 @@
 # Asserts:
 #   - `scan --root <tmp>` writes .brownfield/REPORT.md
 #   - REPORT.md has all three scan sections (Inventory, Excluded, Needs human judgment)
-#   - Inventory table includes wiki/entities/SomeEntity.md
+#   - Inventory table includes wiki/entities/SomeEntity.md (brownfield fixture has old wiki/ layout)
 #   - .obsidian/workspace.json NOT in Inventory
 #   - non-.brownfield fixture files are UNCHANGED (SHA-256 before/after)
 set -euo pipefail

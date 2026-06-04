@@ -3,24 +3,24 @@ id: deep-learning
 title: Deep Learning
 type: overview
 status: active
-summary: "High-level overview of deep learning: history, key architectures, and current state."
+summary: "High-level overview of deep learning: history, key architectures, and current
+  state."
 created_at: 2026-04-08
 updated_at: 2026-04-08
 sources:
-  - src-2026-03-15-vaswani-attention
-  - src-2026-03-20-hinton-interview
-  - src-2026-04-02-lstm-survey
+- src-2026-03-15-vaswani-attention
+- src-2026-03-20-hinton-interview
+- src-2026-04-02-lstm-survey
 epistemic_status: sourced
 tags:
-  - machine-learning
-  - neural-networks
+- machine-learning
+- neural-networks
 domains:
-  - ai-research
-supersedes:
-superseded_by:
-privacy: cloud_safe
+- ai-research
+supersedes: null
+superseded_by: null
 aliases:
-  - DL
+- DL
 example: true
 ---
 

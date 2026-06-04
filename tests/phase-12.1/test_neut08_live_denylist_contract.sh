@@ -47,7 +47,7 @@ echo "anchor term: $ANCHOR"
 FIX=$(mktemp -d)
 trap 'rm -rf "$FIX"' EXIT
 mkdir -p "$FIX/wiki" "$FIX/docs"
-printf '# Test fixture\nThis page contains the term %s for leak testing.\n' "$ANCHOR" > "$FIX/wiki/leak.md"
+printf '# Test fixture\nThis page contains the term %s for leak testing.\n' "$ANCHOR" > "$FIX/wiki-cloud/leak.md"
 
 # 4. Positive case: gate must fire (exit 2 + grep -F hit on anchor).
 #    grep -qF (fixed-string) is mandatory because future curated anchors
@@ -67,7 +67,7 @@ echo "PASS positive: gate fires on '$ANCHOR'"
 #    (literal-substring semantics). NOT sed — sed is regex-based and would
 #    corrupt substitution semantics for any anchor containing regex metachars
 #    (HIGH #1 fix from REVIEWS.md).
-python3 - "$ANCHOR" "$FIX/wiki/leak.md" <<'PY'
+python3 - "$ANCHOR" "$FIX/wiki-cloud/leak.md" <<'PY'
 import sys
 anchor, path = sys.argv[1], sys.argv[2]
 text = open(path, encoding="utf-8").read()

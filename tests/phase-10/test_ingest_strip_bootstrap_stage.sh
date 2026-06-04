@@ -19,7 +19,7 @@ git -c commit.gpgsign=false -c user.email='fixture@example.com' -c user.name='Fi
     commit --allow-empty -q -m 'fixture seed'
 
 mkdir -p inbox
-cp "$REPO_ROOT/tests/phase-10/fixtures/bootstrapped-vault/wiki/entities/ingest-target.md" inbox/source.md
+cp "$REPO_ROOT/tests/phase-10/fixtures/bootstrapped-vault/wiki-cloud/entities/ingest-target.md" inbox/source.md
 
 # Run ingest and capture stderr.
 stderr_out="$(bash "$REPO_ROOT/bin/ingest.sh" inbox/source.md 2>&1 >/dev/null || true)"

@@ -14,7 +14,7 @@ pushd "$FIXTURE" >/dev/null
 # Pin origin/main at a PRE-claim state, then re-add the marker+claim on feature.
 git branch pre-claim
 python3 - <<'PYEOF'
-p = "wiki/concepts/attention.md"
+p = "wiki-cloud/concepts/attention.md"
 text = open(p).read().splitlines()
 # Remove the marker AND the epistemic line so main is "pre-PR"
 kept = [ln for ln in text if ('lint:expect-inferred' not in ln and 'epistemic:: inferred' not in ln)]
@@ -23,21 +23,21 @@ PYEOF
 git add -A && git -c commit.gpgsign=false commit -q -m "main: remove marker+claim"
 seed_origin_main_ref "$FIXTURE"
 git checkout -q -b feature
-git checkout pre-claim -- wiki/concepts/attention.md  # restore marker+claim
+git checkout pre-claim -- wiki-cloud/concepts/attention.md  # restore marker+claim
 git add -A && git -c commit.gpgsign=false commit -q -m "feature: re-add marker+claim"
 
 # 1. Marker directly above claim → exempt (D-09)
-bash "$REPO_ROOT/bin/lint.sh" --strict wiki/ >/dev/null 2>&1 \
+bash "$REPO_ROOT/bin/lint.sh" --strict wiki-cloud/ >/dev/null 2>&1 \
     || { echo "FAIL: marker on line above claim should exempt (D-09)" >&2; popd >/dev/null; exit 1; }
 
 # 1b. Exempted claim surfaces as skip-count info finding in JSON mode
-bash "$REPO_ROOT/bin/lint.sh" --strict --format json wiki/ > /tmp/eh.json 2>/dev/null || true
+bash "$REPO_ROOT/bin/lint.sh" --strict --format json wiki-cloud/ > /tmp/eh.json 2>/dev/null || true
 assert_json_has_finding /tmp/eh.json skip-count info \
     || { echo "FAIL: exempted claim should emit skip-count info finding" >&2; popd >/dev/null; exit 1; }
 
 # 2. Blank line between marker and claim → invalidates
 python3 - <<'PYEOF'
-p = "wiki/concepts/attention.md"
+p = "wiki-cloud/concepts/attention.md"
 text = open(p).read().splitlines()
 for i, line in enumerate(text):
     if line.startswith('<!-- lint:expect-inferred'):
@@ -47,16 +47,16 @@ open(p, 'w').write('\n'.join(text) + '\n')
 PYEOF
 git add . && git -c commit.gpgsign=false commit -q -m "insert blank line"
 
-if bash "$REPO_ROOT/bin/lint.sh" --strict wiki/ >/dev/null 2>&1; then
+if bash "$REPO_ROOT/bin/lint.sh" --strict wiki-cloud/ >/dev/null 2>&1; then
     echo "FAIL: blank line between marker and claim should invalidate exemption" >&2
     popd >/dev/null; exit 1
 fi
 
 # 3. Restore & corrupt id match
 git reset --hard HEAD~1 >/dev/null 2>&1
-sed -i 's/id=attention/id=wrong-id/' wiki/concepts/attention.md
+sed -i 's/id=attention/id=wrong-id/' wiki-cloud/concepts/attention.md
 git add . && git -c commit.gpgsign=false commit -q -m "corrupt id"
-if bash "$REPO_ROOT/bin/lint.sh" --strict wiki/ >/dev/null 2>&1; then
+if bash "$REPO_ROOT/bin/lint.sh" --strict wiki-cloud/ >/dev/null 2>&1; then
     echo "FAIL: marker id mismatch should invalidate exemption" >&2
     popd >/dev/null; exit 1
 fi

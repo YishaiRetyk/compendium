@@ -12,12 +12,12 @@ DOC="$REPO_ROOT/docs/manual-setup.md"
 assert_file_exists "$DOC" "docs/manual-setup.md must exist (MANUAL-05)"
 
 # All 5 wizard-written files must be mentioned
-for pattern in 'AGENTS\.md' 'CLAUDE\.md' '\.wizard-answers\.yaml' 'wiki/decisions/' 'wiki/index\.md'; do
+for pattern in 'AGENTS\.md' 'CLAUDE\.md' '\.wizard-answers\.yaml' 'wiki-cloud/decisions/' 'wiki-cloud/index\.md'; do
     if ! grep -qE "$pattern" "$DOC"; then
         echo "ASSERT FAIL: manual-setup.md missing file-touch entry matching '$pattern'" >&2
         exit 1
     fi
 done
 
-echo "PASS: manual-setup.md lists all 5 wizard-touched files (AGENTS.md, CLAUDE.md, .wizard-answers.yaml, wiki/decisions/, wiki/index.md) (MANUAL-05)"
+echo "PASS: manual-setup.md lists all 5 wizard-touched files (AGENTS.md, CLAUDE.md, .wizard-answers.yaml, wiki-cloud/decisions/, wiki-cloud/index.md) (MANUAL-05)"
 exit 0

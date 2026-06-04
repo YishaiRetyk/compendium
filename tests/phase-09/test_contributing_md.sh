@@ -22,10 +22,10 @@ grep -q "contributor::" "$C" \
     || { echo "FAIL: CONTRIBUTING.md missing contributor:: documentation" >&2; exit 1; }
 
 # Merge-conflict recipes
-grep -q "wiki/log\.md" "$C" \
-    || { echo "FAIL: CONTRIBUTING.md missing wiki/log.md conflict recipe" >&2; exit 1; }
-grep -q "wiki/index\.md" "$C" \
-    || { echo "FAIL: CONTRIBUTING.md missing wiki/index.md conflict recipe" >&2; exit 1; }
+grep -q "wiki-cloud/log\.md" "$C" \
+    || { echo "FAIL: CONTRIBUTING.md missing wiki-cloud/log.md conflict recipe" >&2; exit 1; }
+grep -q "wiki-cloud/index\.md" "$C" \
+    || { echo "FAIL: CONTRIBUTING.md missing wiki-cloud/index.md conflict recipe" >&2; exit 1; }
 grep -qi "sort.*timestamp\|by timestamp\|chronological" "$C" \
     || { echo "FAIL: log.md recipe missing sort-by-timestamp rule" >&2; exit 1; }
 grep -qi "alphabetize" "$C" \

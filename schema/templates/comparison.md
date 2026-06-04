@@ -1,19 +1,18 @@
 ---
-id:
-title:
+id: null
+title: null
 type: comparison
 status: active
 summary: ""
-created_at:
-updated_at:
+created_at: null
+updated_at: null
 sources: []
-epistemic_status:
+epistemic_status: null
 tags: []
 domains: []
-supersedes:
-superseded_by:
-privacy:
-aliases:
+supersedes: null
+superseded_by: null
+aliases: null
   # Optional: genuine alternate names for Quick Switcher / autocomplete (not needed for link resolution)
 ---
 

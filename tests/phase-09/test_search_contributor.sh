@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# COLAB-07: --contributor filters wiki/log.md; accepts @handle or bare.
+# COLAB-07: --contributor filters wiki-cloud/log.md; accepts @handle or bare.
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib.sh"
@@ -10,9 +10,9 @@ trap 'rm -rf "$TMP"' EXIT
 
 mkdir -p "$TMP/wiki"
 # search.sh resolves WIKI_INDEX; seed an empty index
-echo "# Index" > "$TMP/wiki/index.md"
+echo "# Index" > "$TMP/wiki-cloud/index.md"
 
-cat > "$TMP/wiki/log.md" <<'LOG'
+cat > "$TMP/wiki-cloud/log.md" <<'LOG'
 # Activity Log
 
 ## [2026-04-16] ingest | alice-work

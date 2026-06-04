@@ -26,15 +26,15 @@ if grep -q "not yet implemented" stderr.txt 2>/dev/null; then
 fi
 rm -f stderr.txt
 
-dirty=$(cd "$TMP" && git status --porcelain -- 'wiki/')
+dirty=$(cd "$TMP" && git status --porcelain -- 'wiki-cloud/')
 if [ -n "$dirty" ]; then
-    echo "FAIL: verify (no --promote) mutated wiki/ (read-only contract violated):" >&2
+    echo "FAIL: verify (no --promote) mutated wiki-cloud/ (read-only contract violated):" >&2
     echo "$dirty" >&2
     exit 1
 fi
 
 # No page should have been flipped from bootstrapped -> verified.
-if grep -r -q '^bootstrap_stage: verified' "$TMP/wiki/"; then
+if grep -r -q '^bootstrap_stage: verified' "$TMP/wiki-cloud/"; then
     echo "FAIL: verify (no --promote) flipped bootstrap_stage to verified" >&2
     exit 1
 fi

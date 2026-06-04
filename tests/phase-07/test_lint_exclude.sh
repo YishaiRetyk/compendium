@@ -16,7 +16,7 @@ FIXTURE_ROOT="tests/phase-07/fixtures/lint-exclude"
 
 # Run lint against the fixture tree via WIKI_ROOT override.
 # t1: examples/sample.md under fixture root MUST NOT appear as a finding (dir excluded).
-# t2: wiki/marked.md (with example: true) MUST NOT appear as a finding (per-file skip).
+# t2: wiki-cloud/marked.md (with example: true) MUST NOT appear as a finding (per-file skip).
 OUT=$(WIKI_ROOT="$FIXTURE_ROOT" bash bin/lint.sh --dry-run 2>&1 || true)
 
 if ! echo "$OUT" | grep -q 'examples/sample.md'; then
@@ -27,12 +27,12 @@ else
   echo "$OUT" | grep 'examples/sample.md' | head -5
 fi
 
-if ! echo "$OUT" | grep -q 'wiki/marked.md'; then
-  pass "t2: wiki/marked.md not linted (example: true frontmatter suppresses)"
+if ! echo "$OUT" | grep -q 'wiki-cloud/marked.md'; then
+  pass "t2: wiki-cloud/marked.md not linted (example: true frontmatter suppresses)"
 else
-  fail "t2: wiki/marked.md appeared in lint output"
+  fail "t2: wiki-cloud/marked.md appeared in lint output"
   echo "--- output ---"
-  echo "$OUT" | grep 'wiki/marked.md' | head -5
+  echo "$OUT" | grep 'wiki-cloud/marked.md' | head -5
 fi
 
 # t3: informational — test harness doesn't assert normal.md IS linted (structural assertion only).

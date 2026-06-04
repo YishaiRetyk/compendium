@@ -49,9 +49,9 @@ REPORT="$TMP/.brownfield/REPORT.md"
 assert_file_exists "$REPORT"
 assert_grep "^## Privacy review" "$REPORT"
 
-dirty=$(cd "$TMP" && git status --porcelain -- 'wiki/')
+dirty=$(cd "$TMP" && git status --porcelain -- 'wiki-cloud/')
 if [ -n "$dirty" ]; then
-    echo "FAIL: 04 mutated wiki/ (advisory-only contract violated):" >&2
+    echo "FAIL: 04 mutated wiki-cloud/ (advisory-only contract violated):" >&2
     echo "$dirty" >&2
     exit 1
 fi

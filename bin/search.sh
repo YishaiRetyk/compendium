@@ -9,7 +9,7 @@
 # See usage() for full documentation.
 set -euo pipefail
 
-WIKI_INDEX="wiki/index.md"
+WIKI_INDEX="wiki-cloud/index.md"
 WIKI_DIR="wiki"
 
 usage() {
@@ -22,9 +22,9 @@ Search wiki pages by keyword with deterministic output per mode.
 Modes:
   Default                 Index lookup with TL;DR snippets
   --paths-only            Output file paths only (no headers, no TL;DR)
-  --fulltext              Also search wiki/ body text (default: index-only)
+  --fulltext              Also search wiki-cloud/ body text (default: index-only)
   --query "Q"             Generate an LLM-ready prompt from a question
-  --contributor <handle>  Filter wiki/log.md entries by contributor @handle.
+  --contributor <handle>  Filter wiki-cloud/log.md entries by contributor @handle.
                           Accepts both @octocat and octocat (leading @ optional).
 
 Options:
@@ -33,11 +33,11 @@ Options:
 Output Contracts:
   Default mode:
     === Search Results ===
-    wiki/<subdir>/<slug>.md -- <TL;DR first line>
+    wiki-cloud/<subdir>/<slug>.md -- <TL;DR first line>
     === N result(s) ===
 
   --paths-only mode:
-    wiki/<subdir>/<slug>.md
+    wiki-cloud/<subdir>/<slug>.md
     (bare paths, one per line, no headers)
 
   --query mode:

@@ -10,7 +10,7 @@
 #
 # Test stages:
 #   (a) introduce CLAUDE.md drift (delete a line)
-#   (b) stage a wiki/concepts/foo.md greenfield page with no [prov:]
+#   (b) stage a wiki-cloud/concepts/foo.md greenfield page with no [prov:]
 #   (c) commit via `git -c core.hooksPath=.githooks commit ...` and assert
 #       exit 1 with sync-claude message (sync runs first)
 #   (d) re-run commit (sync-claude is now clean) and assert exit 1 with
@@ -31,7 +31,7 @@ git clone -q "$REPO_ROOT" "$TMP"
 # Setup: pre-commit a source page so stage (e)'s [prov:] reference resolves
 # under the regular `--category provenance` broken-ref check. This is fixture
 # setup, not under test, so --no-verify is appropriate.
-write_page "$TMP" "wiki/sources/src-2026-04-15-x.md" <<'EOF'
+write_page "$TMP" "wiki-cloud/sources/src-2026-04-15-x.md" <<'EOF'
 ---
 id: src-2026-04-15-x
 title: "X (test source)"
@@ -59,7 +59,7 @@ compilation_status: compiled
 
 Test source.
 EOF
-(cd "$TMP" && git add wiki/sources/src-2026-04-15-x.md && \
+(cd "$TMP" && git add wiki-cloud/sources/src-2026-04-15-x.md && \
     git -c commit.gpgsign=false commit --no-verify -q -m "fixture: add source page")
 
 # Stage (a): introduce CLAUDE.md drift by deleting a line.
@@ -69,7 +69,7 @@ if [ -f "$TMP/CLAUDE.md" ]; then
 fi
 
 # Stage (b): write a greenfield concept page with no [prov:].
-write_page "$TMP" "wiki/concepts/foo.md" <<'EOF'
+write_page "$TMP" "wiki-cloud/concepts/foo.md" <<'EOF'
 ---
 id: foo
 title: "Foo"
@@ -92,7 +92,7 @@ knowledge_domain: ""
 
 Hook-ordering test body without provenance markers.
 EOF
-(cd "$TMP" && git add CLAUDE.md wiki/concepts/foo.md 2>/dev/null || git add wiki/concepts/foo.md)
+(cd "$TMP" && git add CLAUDE.md wiki-cloud/concepts/foo.md 2>/dev/null || git add wiki-cloud/concepts/foo.md)
 
 # Stage (c): commit via the live hook -- sync-claude must fire first and exit 1.
 set +e
@@ -136,7 +136,7 @@ fi
 
 # Stage (e): fix the page by adding a [prov:] marker; commit must succeed.
 # (Source page src-2026-04-15-x was pre-committed in fixture setup above.)
-write_page "$TMP" "wiki/concepts/foo.md" <<'EOF'
+write_page "$TMP" "wiki-cloud/concepts/foo.md" <<'EOF'
 ---
 id: foo
 title: "Foo"
@@ -160,7 +160,7 @@ knowledge_domain: ""
 
 Hook-ordering test body with provenance [prov:src-2026-04-15-x#sec:y|direct|2026-05-04] backing the claim.
 EOF
-(cd "$TMP" && git add wiki/concepts/foo.md)
+(cd "$TMP" && git add wiki-cloud/concepts/foo.md)
 
 set +e
 (cd "$TMP" && git -c core.hooksPath=.githooks -c commit.gpgsign=false \

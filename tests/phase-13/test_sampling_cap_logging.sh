@@ -8,7 +8,7 @@ source "$SCRIPT_DIR/lib.sh"
 REPO="$(make_bare_repo)"
 trap 'cleanup_fixture_repo "$REPO"' EXIT
 
-write_page "$REPO" "wiki/sources/src-c.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/sources/src-c.md" <<'EOF'
 ---
 id: src-c
 title: "C"
@@ -29,7 +29,7 @@ Body text.
 EOF
 
 # A page with 5 inferred claims; cap at --sample 2 -> selected=2 skipped=3.
-write_page "$REPO" "wiki/concepts/many.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/concepts/many.md" <<'EOF'
 ---
 id: many
 title: "Many"

@@ -3,28 +3,28 @@ id: decision-making
 title: Decision Making
 type: overview
 status: active
-summary: "Overview of how humans make choices under uncertainty, shaped by cognitive biases and dual-process thinking"
+summary: "Overview of how humans make choices under uncertainty, shaped by cognitive
+  biases and dual-process thinking"
 created_at: 2026-04-09
 updated_at: 2026-04-12
 sources:
-  - src-2026-04-09-thinking-fast-and-slow-part1
-  - src-2026-04-10-kahneman-prospect-theory
+- src-2026-04-09-thinking-fast-and-slow-part1
+- src-2026-04-10-kahneman-prospect-theory
 epistemic_status: mixed
 tags:
-  - psychology
-  - rationality
-  - judgment
+- psychology
+- rationality
+- judgment
 domains:
-  - psychology
-  - behavioral-science
-  - economics
-supersedes:
-superseded_by:
-privacy: cloud_safe
+- psychology
+- behavioral-science
+- economics
+supersedes: null
+superseded_by: null
 aliases:
-  - "Decision-Making"
-  - "Judgment and Decision Making"
-  - "Decision Making"
+- "Decision-Making"
+- "Judgment and Decision Making"
+- "Decision Making"
 has_contradictions: false
 knowledge_domain: science
 ---

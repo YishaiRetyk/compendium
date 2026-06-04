@@ -10,7 +10,7 @@ trap 'cleanup_fixture_repo "$REPO"' EXIT
 SEED="$(cd "$REPO" && git rev-parse HEAD)"
 
 # cloud_safe source
-write_page "$REPO" "wiki/sources/src-cloud.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/sources/src-cloud.md" <<'EOF'
 ---
 id: src-cloud
 title: "Cloud"
@@ -30,8 +30,8 @@ write_page "$REPO" "sources/2026/2026-04/cloud/source.md" <<'EOF'
 CLOUD_PASSAGE_MARKER content.
 EOF
 
-# local_only source
-write_page "$REPO" "wiki/sources/src-local.md" <<'EOF'
+# local_only source (structural: summary under wiki-local/sources/)
+write_page "$REPO" "wiki-local/sources/src-local.md" <<'EOF'
 ---
 id: src-local
 title: "Local"
@@ -42,7 +42,6 @@ content_hash: "sha256:bbbb"
 compiled_against_hash: "sha256:bbbb"
 ingested_at: 2026-04-15
 source_type: paper
-privacy: local_only
 ---
 EOF
 write_page "$REPO" "sources/2026/2026-04/local/source.md" <<'EOF'
@@ -51,17 +50,16 @@ write_page "$REPO" "sources/2026/2026-04/local/source.md" <<'EOF'
 LOCAL_PASSAGE_MARKER secret content.
 EOF
 
-write_page "$REPO" "wiki/concepts/cloudclaim.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/concepts/cloudclaim.md" <<'EOF'
 ---
 id: cloudclaim
 title: "CloudClaim"
 type: concept
 status: active
-privacy: cloud_safe
 ---
 Cloud claim [prov:src-cloud#sec:introduction|direct|2026-04-15]
 EOF
-write_page "$REPO" "wiki/concepts/localclaim.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/concepts/localclaim.md" <<'EOF'
 ---
 id: localclaim
 title: "LocalClaim"

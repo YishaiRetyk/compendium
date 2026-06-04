@@ -8,7 +8,7 @@ REPO="$(make_bare_repo)"
 trap 'cleanup_fixture_repo "$REPO"' EXIT
 
 # A wiki with NO auditable claims (no [prov:] anywhere) -> no findings.
-write_page "$REPO" "wiki/concepts/empty.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/concepts/empty.md" <<'EOF'
 ---
 id: empty
 title: "Empty"
@@ -26,7 +26,7 @@ rc=$?
 set -e
 assert_exit_code 0 "$rc" "no-finding run" || exit 1
 
-state="$REPO/wiki/maintenance/audit-state.md"
+state="$REPO/wiki-local/maintenance/audit-state.md"
 if [ ! -f "$state" ]; then
     echo "FAIL: audit-state.md was not written on a no-finding run" >&2; exit 1
 fi

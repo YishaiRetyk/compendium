@@ -412,7 +412,7 @@ Tell your LLM agent:
 
   Follow the Ingest Workflow in AGENTS.md section 11.1.
 
-=== Log Entry Template (append to wiki/log.md) ===
+=== Log Entry Template (append to wiki-cloud/log.md) ===
 
 ## [${TODAY}] ingest | <source title>
 

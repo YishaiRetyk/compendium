@@ -22,13 +22,13 @@ fi
 
 # Leave decisions.yaml in its suggest state (some/all clusters pending).
 # Now pretend pages have been typed (write type: concept directly).
-for p in "$TMP"/wiki/concepts/*.md; do
+for p in "$TMP"/wiki-cloud/concepts/*.md; do
     sed -i 's/^type: ""$/type: concept/' "$p"
 done
-for p in "$TMP"/wiki/entities/*.md; do
+for p in "$TMP"/wiki-cloud/entities/*.md; do
     sed -i 's/^type: ""$/type: entity/' "$p"
 done
-for p in "$TMP"/wiki/overviews/*.md; do
+for p in "$TMP"/wiki-cloud/overviews/*.md; do
     sed -i 's/^type: ""$/type: overview/' "$p"
 done
 
@@ -55,7 +55,7 @@ fi
 
 # At least one page that lives in a pending cluster should remain
 # bootstrapped (NOT verified).
-unpromoted=$(grep -r -c '^bootstrap_stage: bootstrapped' "$TMP/wiki/" 2>/dev/null | awk -F: '{s+=$2} END {print s+0}')
+unpromoted=$(grep -r -c '^bootstrap_stage: bootstrapped' "$TMP/wiki-cloud/" 2>/dev/null | awk -F: '{s+=$2} END {print s+0}')
 if [ "$unpromoted" -lt "1" ]; then
     echo "FAIL: all pages promoted despite pending clusters in decisions.yaml (gate 5 not enforced)" >&2
     exit 1

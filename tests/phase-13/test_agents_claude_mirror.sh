@@ -33,10 +33,12 @@ grep -qiE 'cloud.*default|never infer|treated as cloud' "$AGENTS" \
 grep -qi 'emit-worklist' "$AGENTS"      || fail "AGENTS.md missing partitioned --emit-worklist egress"
 
 # 3. Effective claim privacy (MEDIUM 13-04), NOT bare "source privacy".
+# Phase 15: the strictest-of ladder was replaced by the structural wiki-local/ predicate.
 grep -qi 'effective claim privacy' "$AGENTS" \
     || fail "AGENTS.md privacy prose must say 'effective claim privacy' (not bare 'source privacy')"
-grep -qiE 'strictest of|raw-source' "$AGENTS" \
-    || fail "AGENTS.md missing the strictest-of {claim-page/source-summary/raw-source/...} set"
+# Phase 15: 'wiki-local/' path-prefix predicate replaces 'strictest of {raw-source/...}'
+grep -qiE 'wiki-local|source-summary' "$AGENTS" \
+    || fail "AGENTS.md missing Phase 15 structural predicate prose (wiki-local/ or source-summary tier)"
 
 # 4. Four-operation framing preserved (Audit is NOT a 5th operation).
 grep -qi 'four operations' "$AGENTS"    || fail "AGENTS.md no longer says 'four operations'"

@@ -3,21 +3,21 @@ id: fixture-concept-2
 title: Fixture Concept Two
 type: concept
 status: stale
-summary: "Synthetic stale concept fixture in domain beta for the stale-pages LIST query."
+summary: "Synthetic stale concept fixture in domain beta for the stale-pages LIST
+  query."
 created_at: 2026-04-01
 updated_at: 2026-04-01
 sources: []
 epistemic_status: stale
 tags:
-  - tag-z
+- tag-z
 domains:
-  - beta
-supersedes:
-superseded_by:
-privacy: cloud_safe
+- beta
+supersedes: null
+superseded_by: null
 aliases:
-  - "Fixture Concept Two"
-  - fixture-concept-2
+- "Fixture Concept Two"
+- fixture-concept-2
 has_contradictions: false
 knowledge_domain: beta
 example: true

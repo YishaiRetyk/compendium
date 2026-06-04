@@ -15,16 +15,16 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib.sh"
 
 tmp="$(mktemp -d -t phase10-lint-bf-XXXXXX)"
-mkdir -p "$tmp/wiki/concepts" "$tmp/wiki/sources" "$tmp/wiki/maintenance"
-cp "$REPO_ROOT/tests/phase-10/fixtures/bootstrapped-vault/wiki/concepts/bootstrapped-old.md"   "$tmp/wiki/concepts/"
-cp "$REPO_ROOT/tests/phase-10/fixtures/bootstrapped-vault/wiki/concepts/bootstrapped-fresh.md" "$tmp/wiki/concepts/"
+mkdir -p "$tmp/wiki-cloud/concepts" "$tmp/wiki-cloud/sources" "$tmp/wiki-cloud/maintenance"
+cp "$REPO_ROOT/tests/phase-10/fixtures/bootstrapped-vault/wiki-cloud/concepts/bootstrapped-old.md"   "$tmp/wiki-cloud/concepts/"
+cp "$REPO_ROOT/tests/phase-10/fixtures/bootstrapped-vault/wiki-cloud/concepts/bootstrapped-fresh.md" "$tmp/wiki-cloud/concepts/"
 
 # Rewrite the fresh fixture's bootstrap_date to "today" so the test stays
 # stable regardless of when it runs.
 TODAY="$(date -u +%Y-%m-%d)"
 python3 -c "
 import sys, re
-p = '$tmp/wiki/concepts/bootstrapped-fresh.md'
+p = '$tmp/wiki-cloud/concepts/bootstrapped-fresh.md'
 c = open(p).read()
 c = re.sub(r'^bootstrap_date:.*$', 'bootstrap_date: $TODAY', c, count=1, flags=re.MULTILINE)
 c = re.sub(r'^created_at:.*$',    'created_at: $TODAY',    c, count=1, flags=re.MULTILINE)
@@ -33,8 +33,8 @@ open(p,'w').write(c)
 "
 
 # Minimal wiki index + log so lint has no structural complaints unrelated to brownfield.
-printf '# Index\n' > "$tmp/wiki/index.md"
-printf '# Log\n'   > "$tmp/wiki/log.md"
+printf '# Index\n' > "$tmp/wiki-cloud/index.md"
+printf '# Log\n'   > "$tmp/wiki-cloud/log.md"
 
 out="$(bash "$REPO_ROOT/bin/lint.sh" --dry-run --category brownfield "$tmp/wiki" 2>&1 || true)"
 

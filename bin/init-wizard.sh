@@ -7,14 +7,15 @@
 # against schema/AGENTS.template.md, --dry-run unified diff (D-18),
 # --render-to <dir> (CI/testing-only) mode, idempotency guard (D-03 / D-04),
 # plus: staging-dir render + atomic promote, .wizard-answers.yaml, initial
-# decision record, AGENTS.md->CLAUDE.md sync, wiki/index.md Decisions
+# decision record, AGENTS.md->CLAUDE.md sync, wiki-cloud/index.md Decisions
+# Note: wiki-local/ is created lazily (D-06); interactive privacy-tier prompt deferred to Phase D (WIZ).
 # subsection edit (3 guardrails: idempotency, duplicate-header, malformed),
 # and template_sha resolution chain (env > git-lookup > <unresolved>).
 #
 # Modes:
 #   (default)               Interactive. Prompts for 6 answers; writes 5
 #                           artifacts (AGENTS.md, CLAUDE.md, .wizard-answers.yaml,
-#                           wiki/decisions/dr-<TODAY>-initial-setup.md, wiki/index.md)
+#                           wiki-cloud/decisions/dr-<TODAY>-initial-setup.md, wiki-cloud/index.md)
 #                           to repo root via staging-dir + atomic promote.
 #   --answers-file <path>   Non-interactive YAML answers; fails with summary on
 #                           validation errors.
@@ -71,7 +72,7 @@ Usage: bin/init-wizard.sh [--answers-file <path>] [--dry-run] [--render-to <dir>
 Modes:
   (default)               Interactive. Prompts for 6 answers, writes AGENTS.md, CLAUDE.md,
                           .wizard-answers.yaml, an initial decision record, and updates
-                          wiki/index.md at repo root (5 artifacts, atomic promote).
+                          wiki-cloud/index.md at repo root (5 artifacts, atomic promote).
   --answers-file <path>   Non-interactive. Reads answers from YAML file, validates all
                           fields up front, exits non-zero with summary on validation errors.
   --dry-run               Preview-only. Renders all files and prints unified diff per file
@@ -768,7 +769,7 @@ None. This is an inaugural infrastructure record.
 
 
 # ---------------------------------------------------------------------------
-# update_index_md: narrow helper that edits wiki/index.md.
+# update_index_md: narrow helper that edits wiki-cloud/index.md.
 #
 # Guardrails:
 #   1. Idempotency: skip if the exact wikilink entry already present.
@@ -781,14 +782,14 @@ def update_index_md(index_path, today, primary_domain):
     p = pathlib.Path(index_path)
     if not p.exists():
         raise RuntimeError(
-            f"wiki/index.md missing/malformed at {index_path} -- copy from template or run "
+            f"wiki-cloud/index.md missing/malformed at {index_path} -- copy from template or run "
             "`bin/init-wizard.sh --dry-run` to inspect"
         )
     try:
         content = p.read_text(encoding="utf-8")
     except OSError as exc:
         raise RuntimeError(
-            f"wiki/index.md missing/malformed at {index_path}: {exc} -- copy from template or run "
+            f"wiki-cloud/index.md missing/malformed at {index_path}: {exc} -- copy from template or run "
             "`bin/init-wizard.sh --dry-run` to inspect"
         )
 
@@ -805,7 +806,7 @@ def update_index_md(index_path, today, primary_domain):
     decisions_headers = re.findall(r"(?m)^## Decisions\s*$", content)
     if len(decisions_headers) > 1:
         raise RuntimeError(
-            f"wiki/index.md has {len(decisions_headers)} `## Decisions` headings -- "
+            f"wiki-cloud/index.md has {len(decisions_headers)} `## Decisions` headings -- "
             "please resolve manually (expected 0 or 1)."
         )
 
@@ -857,7 +858,7 @@ def _render_all_five(stage, source_index_path):
 
     Args:
         stage: pathlib.Path to the staging directory.
-        source_index_path: pathlib.Path to the wiki/index.md to read-and-update.
+        source_index_path: pathlib.Path to the wiki-cloud/index.md to read-and-update.
     """
     agents = render_agents_md()
     atomic_write(stage / "AGENTS.md", agents)
@@ -869,12 +870,12 @@ def _render_all_five(stage, source_index_path):
 
     atomic_write(stage / ".wizard-answers.yaml", render_answers_yaml())
 
-    decision_rel = pathlib.Path("wiki") / "decisions" / f"dr-{TODAY}-initial-setup.md"
+    decision_rel = pathlib.Path("wiki-cloud") / "decisions" / f"dr-{TODAY}-initial-setup.md"
     atomic_write(stage / decision_rel, render_decision_record())
 
-    # wiki/index.md: read source, call helper, write result.
+    # wiki-cloud/index.md: read source, call helper, write result.
     updated_index = update_index_md(source_index_path, TODAY, PRIMARY_DOMAIN)
-    atomic_write(stage / "wiki" / "index.md", updated_index)
+    atomic_write(stage / "wiki-cloud" / "index.md", updated_index)
 
 
 # ---------------------------------------------------------------------------
@@ -886,8 +887,8 @@ def _validate_staging(stage):
         stage / "AGENTS.md",
         stage / "CLAUDE.md",
         stage / ".wizard-answers.yaml",
-        stage / "wiki" / "decisions" / f"dr-{TODAY}-initial-setup.md",
-        stage / "wiki" / "index.md",
+        stage / "wiki-cloud" / "decisions" / f"dr-{TODAY}-initial-setup.md",
+        stage / "wiki-cloud" / "index.md",
     ]
     for p in required:
         if not p.exists():
@@ -899,11 +900,11 @@ def _validate_staging(stage):
         if leftover:
             raise RuntimeError(f"leftover placeholders in staged {p}: {leftover}")
 
-    staged_index = (stage / "wiki" / "index.md").read_text(encoding="utf-8")
+    staged_index = (stage / "wiki-cloud" / "index.md").read_text(encoding="utf-8")
     decisions_headers = re.findall(r"(?m)^## Decisions\s*$", staged_index)
     if len(decisions_headers) > 1:
         raise RuntimeError(
-            f"staged wiki/index.md has {len(decisions_headers)} `## Decisions` headings -- "
+            f"staged wiki-cloud/index.md has {len(decisions_headers)} `## Decisions` headings -- "
             "please resolve manually (expected exactly 1)."
         )
 
@@ -918,8 +919,8 @@ def _promote_staging_to_repo_root(stage):
         pathlib.Path("AGENTS.md"),
         pathlib.Path("CLAUDE.md"),
         pathlib.Path(".wizard-answers.yaml"),
-        pathlib.Path("wiki") / "decisions" / f"dr-{TODAY}-initial-setup.md",
-        pathlib.Path("wiki") / "index.md",
+        pathlib.Path("wiki-cloud") / "decisions" / f"dr-{TODAY}-initial-setup.md",
+        pathlib.Path("wiki-cloud") / "index.md",
     ]
     repo = pathlib.Path(REPO_ROOT)
     for rel in relpaths:
@@ -969,24 +970,24 @@ if DRY_RUN:
     old = target.read_text(encoding="utf-8") if target.exists() else ""
     _diff(".wizard-answers.yaml", old, answers_yaml)
 
-    # 4. wiki/decisions/dr-<TODAY>-initial-setup.md
-    decision_rel = f"wiki/decisions/dr-{TODAY}-initial-setup.md"
+    # 4. wiki-cloud/decisions/dr-<TODAY>-initial-setup.md
+    decision_rel = f"wiki-cloud/decisions/dr-{TODAY}-initial-setup.md"
     decision = render_decision_record()
     target = repo / decision_rel
     old = target.read_text(encoding="utf-8") if target.exists() else ""
     _diff(decision_rel, old, decision)
 
-    # 5. wiki/index.md (diff against existing)
-    index_path = repo / "wiki" / "index.md"
+    # 5. wiki-cloud/index.md (diff against existing)
+    index_path = repo / "wiki-cloud" / "index.md"
     if index_path.exists():
         try:
             new_index = update_index_md(str(index_path), TODAY, PRIMARY_DOMAIN)
             old = index_path.read_text(encoding="utf-8")
-            _diff("wiki/index.md", old, new_index)
+            _diff("wiki-cloud/index.md", old, new_index)
         except RuntimeError as exc:
-            print(f"WARN: wiki/index.md preview skipped: {exc}", file=sys.stderr)
+            print(f"WARN: wiki-cloud/index.md preview skipped: {exc}", file=sys.stderr)
     else:
-        print(f"WARN: wiki/index.md not found at {index_path}; skipping diff preview.", file=sys.stderr)
+        print(f"WARN: wiki-cloud/index.md not found at {index_path}; skipping diff preview.", file=sys.stderr)
 
     # Stash AGENTS.md for any downstream summary consumer (back-compat).
     with open(RENDER_TMP, "w", encoding="utf-8", newline="\n") as f:
@@ -1001,17 +1002,17 @@ if RENDER_TO:
     target_root = pathlib.Path(RENDER_TO)
     target_root.mkdir(parents=True, exist_ok=True)
 
-    # source index: if target_root/wiki/index.md exists, use it; else fall back
-    # to repo's existing wiki/index.md.
-    target_index = target_root / "wiki" / "index.md"
-    repo_index = pathlib.Path(REPO_ROOT) / "wiki" / "index.md"
+    # source index: if target_root/wiki-cloud/index.md exists, use it; else fall back
+    # to repo's existing wiki-cloud/index.md.
+    target_index = target_root / "wiki-cloud" / "index.md"
+    repo_index = pathlib.Path(REPO_ROOT) / "wiki-cloud" / "index.md"
     if target_index.exists():
         source_index_path = str(target_index)
     elif repo_index.exists():
         source_index_path = str(repo_index)
     else:
         print(
-            f"ERROR: wiki/index.md not found in either --render-to target ({target_index}) "
+            f"ERROR: wiki-cloud/index.md not found in either --render-to target ({target_index}) "
             f"or repo root ({repo_index})",
             file=sys.stderr,
         )
@@ -1036,10 +1037,10 @@ repo = pathlib.Path(REPO_ROOT)
 stage = pathlib.Path(tempfile.mkdtemp(dir=str(repo), prefix=".wizard-stage-"))
 rc = 0
 try:
-    repo_index = repo / "wiki" / "index.md"
+    repo_index = repo / "wiki-cloud" / "index.md"
     if not repo_index.exists():
         raise RuntimeError(
-            f"wiki/index.md missing at {repo_index} -- copy from template or run "
+            f"wiki-cloud/index.md missing at {repo_index} -- copy from template or run "
             "`bin/init-wizard.sh --dry-run` to inspect"
         )
     _render_all_five(stage, str(repo_index))
@@ -1118,8 +1119,8 @@ if [ "$DRY_RUN" -eq 0 ]; then
     agents_path="$target_root/AGENTS.md"
     claude_path="$target_root/CLAUDE.md"
     answers_path="$target_root/.wizard-answers.yaml"
-    decision_path="$target_root/wiki/decisions/dr-${TODAY_FOR_SUMMARY}-initial-setup.md"
-    index_path="$target_root/wiki/index.md"
+    decision_path="$target_root/wiki-cloud/decisions/dr-${TODAY_FOR_SUMMARY}-initial-setup.md"
+    index_path="$target_root/wiki-cloud/index.md"
 
     cat <<EOF
 Wrote (${mode_label}):

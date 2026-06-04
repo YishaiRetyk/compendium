@@ -3,24 +3,24 @@ id: src-2026-04-09-thinking-fast-and-slow-part1
 title: "Kahneman - Thinking, Fast and Slow Part 1"
 type: source
 status: active
-summary: "Part 1 of Kahneman's synthesis of decades of research on judgment, heuristics, and cognitive biases"
+summary: "Part 1 of Kahneman's synthesis of decades of research on judgment, heuristics,
+  and cognitive biases"
 created_at: 2026-04-09
 updated_at: 2026-04-09
 sources: []
 epistemic_status: sourced
 tags:
-  - psychology
-  - behavioral-economics
-  - heuristics
+- psychology
+- behavioral-economics
+- heuristics
 domains:
-  - psychology
-supersedes:
-superseded_by:
-privacy: cloud_safe
+- psychology
+supersedes: null
+superseded_by: null
 aliases:
-  - "Thinking Fast and Slow Part 1"
-  - "Kahneman - Thinking, Fast and Slow Part 1"
-  - "src-2026-04-09-thinking-fast-and-slow-part1"
+- "Thinking Fast and Slow Part 1"
+- "Kahneman - Thinking, Fast and Slow Part 1"
+- "src-2026-04-09-thinking-fast-and-slow-part1"
 has_contradictions: false
 knowledge_domain: science
 path: sources/2026/2026-04/2026-04-09-thinking-fast-and-slow-part1/source.md
@@ -31,10 +31,10 @@ source_type: book-chapter
 compilation_status: compiled
 compiled_against_hash: "sha256:db640860c05b118bf595ad60cd4918a21abe80b7b0f50441feea6ab0da9ecbda"
 compiled_targets:
-  - daniel-kahneman
-  - cognitive-biases
-  - system-1-vs-system-2
-  - decision-making
+- daniel-kahneman
+- cognitive-biases
+- system-1-vs-system-2
+- decision-making
 ---
 
 ## TL;DR

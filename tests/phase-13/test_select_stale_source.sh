@@ -7,7 +7,7 @@ source "$SCRIPT_DIR/lib.sh"
 REPO="$(make_bare_repo)"
 trap 'cleanup_fixture_repo "$REPO"' EXIT
 
-write_page "$REPO" "wiki/sources/src-stale.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/sources/src-stale.md" <<'EOF'
 ---
 id: src-stale
 title: "Stale Source"
@@ -28,7 +28,7 @@ write_page "$REPO" "sources/2026/2026-04/stale/source.md" <<'EOF'
 A paragraph that drifted.
 EOF
 
-write_page "$REPO" "wiki/concepts/drifted.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/concepts/drifted.md" <<'EOF'
 ---
 id: drifted
 title: "Drifted"

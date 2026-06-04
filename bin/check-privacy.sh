@@ -1,41 +1,48 @@
 #!/usr/bin/env bash
-# bin/check-privacy.sh -- CI-07 privacy-leak guard.
-# Scans YAML frontmatter under PUBLIC_PATHS for `privacy: local_only`.
-# Pattern-twin of bin/check-neutrality.sh (Phase 7 NEUT-06).
+# bin/check-privacy.sh -- Phase 15 structural privacy PATH guard (CI-07, re-keyed).
 #
-# Rationale: `local_only` is a valid user-content tier inside `wiki/**`
-# (AGENTS.md §13). This guard prevents it from LEAKING into public-facing
-# surfaces that ship in the template repo. Changing PUBLIC_PATHS requires
-# a PR -- the correct review loop for scope changes.
+# PURPOSE: Detect wiki-local/ PATH leaks into public-facing surfaces (docs/, examples/,
+# AGENTS.md, CLAUDE.md, README.md, etc.). This is a PATH/release-allowlist guard, NOT
+# a content-equivalence scanner -- it catches cases where a file's path contains
+# 'wiki-local/' within a PUBLIC_PATH tree. Content-term leaks belong to bin/check-neutrality.sh.
+#
+# LIMITATION (Phase 15 MEDIUM #2): This guard catches docs/wiki-local/... paths but NOT
+# arbitrary local content pasted into docs/private.md without a wiki-local/ path component.
+# The content-leak surface is covered by check-neutrality.sh (term-scan of wiki-local/ tokens
+# against public paths). Do NOT over-promise: check-privacy is a path/release guard only.
 #
 # Full-tree scan (D-13) -- no diff-only mode. Catches pre-existing leaks.
-# Frontmatter-only (D-14) -- prose mentions in body text are not flagged.
 #
 # Exit codes:
-#   0  clean -- no leaks
+#   0  clean -- no wiki-local/ paths in public surfaces
 #   1  script failure (missing python3, bad args)
-#   2  privacy-leak found
+#   2  wiki-local/ path found in a PUBLIC_PATH (leak detected)
 set -euo pipefail
 
 usage() {
     cat <<'EOF'
 Usage: bin/check-privacy.sh [OPTIONS]
 
-Scans public control-plane paths for `privacy: local_only` frontmatter leaks.
+Phase 15 structural privacy PATH guard.
+Scans PUBLIC_PATHS for files whose path contains 'wiki-local/'
+(i.e., wiki-local/ content copied into a public-facing surface).
+
+This is a PATH guard (not a content-equivalence scanner).
+Content-term leaks are covered by bin/check-neutrality.sh.
 
 Options:
   --root DIR              Scan root (default: PWD)
   --format text|json      Output format (default: text; json -> stdout array)
   --help, -h              Show this help
 
-Scope (D-15):
+Scope:
   PUBLIC_PATHS scanned: examples/, docs/, AGENTS.md, CLAUDE.md, README.md, PRIVACY.md, .github/
-  EXPLICITLY EXCLUDED:  wiki/** (local_only is valid user content per AGENTS.md §13)
+  TRIGGER:              Any file whose path component contains 'wiki-local/'
 
 Exit codes:
   0  clean
   1  script failure
-  2  privacy-leak found
+  2  wiki-local/ path found in public surface (leak)
 EOF
 }
 
@@ -64,37 +71,29 @@ while [ "$#" -gt 0 ]; do
     esac
 done
 
-# D-15: hardcoded PUBLIC_PATHS. wiki/** EXCLUDED.
-# PRIVACY.md included (Gemini LOW review fix, 2026-04-16) -- parity with bin/check-neutrality.sh;
-# PRIVACY.md exists at repo root as a top-level public doc.
+# PUBLIC_PATHS: files/dirs that ship in the public release template.
 # Changing this array requires a PR (intentional review lever).
 PUBLIC_PATHS=(examples docs AGENTS.md CLAUDE.md README.md PRIVACY.md .github)
 
-# Export env for python3 heredoc (no jq dependency, consistent with Phase 7/8 pattern)
+# Export env for python3 heredoc (no jq dependency)
 export CP_ROOT="$ROOT"
 export CP_FORMAT="$FORMAT"
 export CP_PUBLIC_PATHS="$(IFS=:; echo "${PUBLIC_PATHS[*]}")"
 
 set +e
 python3 - <<'PYEOF'
-import os, re, sys, json
+import os, sys, json
 
 ROOT = os.path.abspath(os.environ['CP_ROOT'])
 FORMAT = os.environ.get('CP_FORMAT', 'text')
 PUBLIC_PATHS = os.environ['CP_PUBLIC_PATHS'].split(':')
 
-# D-14: match `privacy: local_only` ONLY within `^---...^---` frontmatter block
-PRIVACY_LOCAL_ONLY_RE = re.compile(r'^privacy:\s*local_only\s*$', re.M)
+WIKI_LOCAL_TOKEN = 'wiki-local'
 
-def parse_frontmatter_block(text):
-    """Return frontmatter text between first two `^---` markers, or None."""
-    if not text.startswith('---'):
-        return None
-    # Find closing `---` on its own line
-    m = re.search(r'\n---\s*$|\n---\s*\n', text, re.M)
-    if not m:
-        return None
-    return text[3:m.start()]
+def path_contains_wiki_local(rel_path):
+    """Return True iff the relative path contains a 'wiki-local' path component."""
+    parts = rel_path.replace('\\', '/').split('/')
+    return WIKI_LOCAL_TOKEN in parts
 
 def scan():
     hits = []
@@ -104,40 +103,26 @@ def scan():
             continue
         targets = []
         if os.path.isfile(full):
-            if full.endswith('.md'):
-                targets.append(full)
+            targets.append(full)
         else:
             for dirpath, dirnames, files in os.walk(full):
-                # Prune common junk
                 dirnames[:] = [d for d in dirnames if d not in ('.git', 'node_modules')]
                 for fn in files:
-                    if fn.endswith('.md'):
-                        targets.append(os.path.join(dirpath, fn))
+                    targets.append(os.path.join(dirpath, fn))
         for t in targets:
-            try:
-                content = open(t, encoding='utf-8', errors='replace').read()
-            except OSError:
-                continue
-            fm = parse_frontmatter_block(content)
-            if fm is None:
-                continue
-            m = PRIVACY_LOCAL_ONLY_RE.search(fm)
-            if not m:
-                continue
-            # Compute line number within frontmatter block (add 1 for opening ---, +1 for 1-indexed)
-            line_within_fm = fm[:m.start()].count('\n') + 1
-            abs_line = line_within_fm + 1  # +1 for opening `---` line
-            hits.append({
-                'path': os.path.relpath(t, ROOT),
-                'line': abs_line,
-                'message': 'privacy: local_only in public path (CI-07)',
-            })
-    hits.sort(key=lambda h: (h['path'], h['line']))
+            rel_path = os.path.relpath(t, ROOT)
+            if path_contains_wiki_local(rel_path):
+                hits.append({
+                    'path': rel_path,
+                    'line': 0,
+                    'message': f"wiki-local/ path component found in public surface '{rel}' (structural privacy leak, CI-07)",
+                })
+    hits.sort(key=lambda h: h['path'])
     if FORMAT == 'json':
         print(json.dumps(hits, indent=2))
     else:
         for h in hits:
-            print(f"{h['path']}:{h['line']}: privacy: local_only leaked into public path", file=sys.stderr)
+            print(f"{h['path']}: wiki-local/ content in public path (structural privacy leak)", file=sys.stderr)
     sys.exit(2 if hits else 0)
 
 scan()

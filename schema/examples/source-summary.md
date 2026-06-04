@@ -3,22 +3,22 @@ id: src-2026-03-15-vaswani-attention
 title: "Vaswani et al. - Attention Is All You Need"
 type: source
 status: active
-summary: "Seminal paper introducing the Transformer architecture based entirely on attention mechanisms."
+summary: "Seminal paper introducing the Transformer architecture based entirely on
+  attention mechanisms."
 created_at: 2026-04-08
 updated_at: 2026-04-08
 sources: []
 epistemic_status: sourced
 tags:
-  - transformers
-  - attention
-  - deep-learning
+- transformers
+- attention
+- deep-learning
 domains:
-  - ai-research
-supersedes:
-superseded_by:
-privacy: cloud_safe
+- ai-research
+supersedes: null
+superseded_by: null
 aliases:
-  - Attention Is All You Need
+- Attention Is All You Need
 path: sources/2026/2026-03/2026-03-15-vaswani-attention/source.md
 url: "https://arxiv.org/abs/1706.03762"
 content_hash: "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"

@@ -11,7 +11,7 @@ source "$SCRIPT_DIR/lib.sh"
 REPO="$(make_bare_repo)"
 trap 'cleanup_fixture_repo "$REPO"' EXIT
 
-write_page "$REPO" "wiki/sources/src-loc.md" <<'EOF'
+write_page "$REPO" "wiki-local/sources/src-loc.md" <<'EOF'
 ---
 id: src-loc
 title: "Loc"
@@ -22,7 +22,6 @@ content_hash: "sha256:aaaa"
 compiled_against_hash: "sha256:aaaa"
 ingested_at: 2026-04-15
 source_type: paper
-privacy: local_only
 ---
 EOF
 write_page "$REPO" "sources/2026/2026-04/loc/source.md" <<'EOF'
@@ -31,13 +30,12 @@ write_page "$REPO" "sources/2026/2026-04/loc/source.md" <<'EOF'
 SECRET_PASSAGE content.
 EOF
 
-write_page "$REPO" "wiki/concepts/lc.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/concepts/lc.md" <<'EOF'
 ---
 id: lc
 title: "LC"
 type: concept
 status: active
-privacy: cloud_safe
 ---
 A claim [prov:src-loc#sec:introduction|direct|2026-04-15]
 EOF

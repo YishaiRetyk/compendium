@@ -13,22 +13,22 @@ trap 'cleanup_fixture_repo "$FIXTURE"' EXIT
 # delta to populate it may arrive independently. We provide minimal content
 # here so --format json exercises the emit branch even if the fixture is bare.
 mkdir -p "$FIXTURE/wiki"
-cat > "$FIXTURE/wiki/index.md" <<'IDX'
+cat > "$FIXTURE/wiki-cloud/index.md" <<'IDX'
 # Index
 
 ## Concepts
 
 IDX
-cat > "$FIXTURE/wiki/log.md" <<'LOG'
+cat > "$FIXTURE/wiki-cloud/log.md" <<'LOG'
 # Activity Log
 LOG
 
 pushd "$FIXTURE" >/dev/null
 
 # Ensure no stale report before the run
-[ -f wiki/maintenance/lint-report.md ] && rm wiki/maintenance/lint-report.md
+[ -f wiki-cloud/maintenance/lint-report.md ] && rm wiki-cloud/maintenance/lint-report.md
 
-OUT="$(bash "$REPO_ROOT/bin/lint.sh" --format json wiki/ 2>/dev/null)"
+OUT="$(bash "$REPO_ROOT/bin/lint.sh" --format json wiki-cloud/ 2>/dev/null)"
 
 # Write output to a temp file so python can read it cleanly (avoids shell-quoting hell)
 JSON_TMP="$(mktemp)"
@@ -57,7 +57,7 @@ print("PASS: JSON shape valid (line omitted when unknown, not null)")
 PYEOF
 
 # D-03: no lint-report.md written in JSON mode
-if [ -f wiki/maintenance/lint-report.md ]; then
+if [ -f wiki-cloud/maintenance/lint-report.md ]; then
     echo "FAIL: --format json must not write lint-report.md (D-03)" >&2
     popd >/dev/null
     exit 1

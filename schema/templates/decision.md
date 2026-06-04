@@ -1,23 +1,22 @@
 ---
-id:
-title:
+id: null
+title: null
 type: decision
 status: active
 summary: ""
-created_at:
-updated_at:
+created_at: null
+updated_at: null
 sources: []
 epistemic_status: sourced
 tags: []
 domains: []
-supersedes:
-superseded_by:
-privacy: cloud_safe
-aliases:
+supersedes: null
+superseded_by: null
+aliases: null
   # Optional: genuine alternate names for Quick Switcher / autocomplete (not needed for link resolution)
 has_contradictions: false
 knowledge_domain: ""
-trigger_type:
+trigger_type: null
 affected_pages: []
 ---
 

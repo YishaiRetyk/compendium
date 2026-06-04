@@ -1,72 +1,126 @@
 # Privacy Model
 
-> Reference documentation for the privacy routing model: the `local_only` / `cloud_safe` tiers, the three-level precedence hierarchy, fail-closed conflict resolution, wiki-page privacy inheritance, and CI enforcement.
+> Reference documentation for the Phase 15 asymmetric two-directory privacy model: `wiki-cloud/` (cloud-safe tier) + `wiki-local/` (local-only tier), enforcement options, fail-direction table, and the `sources-local/` forward reference.
 
 ## TL;DR
 
-Every item in the wiki system carries a privacy classification that decides whether it may be sent to a cloud LLM API. The system is **fail-closed**: when classification is uncertain, the answer is `local_only`. It is always better to under-share than to accidentally send private content to a cloud API.
+Privacy is **structural** in this wiki system: the directory a page lives in determines its privacy tier. There is no per-page `privacy` frontmatter field — it was removed in Phase 15 (see `wiki-cloud/decisions/dr-2026-06-04-privacy-asymmetric-two-dir.md`).
 
-> **Source of truth:** The authoritative privacy specification lives in [AGENTS.md §13](../../AGENTS.md). This page reproduces it for ergonomic reference — including the §13 decision table verbatim — and adds CI-enforcement pointers. If you find a discrepancy, §13 wins and this page is the bug.
+- **`wiki-cloud/`** — cloud-safe tier. Cloud sessions (Claude Code, Codex, etc.) may read this tier freely.
+- **`wiki-local/`** — local-only tier. Cloud sessions MUST NOT read this tier.
 
-## Privacy tiers
+> **Source of truth:** AGENTS.md §13 (one-line pointer). This page is the full reference for the asymmetric model, enforcement options, fail-direction table, and forward references.
 
-- **`local_only`** — NEVER sent to cloud LLM APIs. Processed only by local models or local tooling.
-- **`cloud_safe`** — May be sent to cloud LLM APIs for processing.
+## The Asymmetric Two-Directory Model
 
-## Three-level precedence
+### One-Way Permeability
 
-Privacy classification resolves through a three-level precedence hierarchy (most specific wins):
+The two tiers are **asymmetrically permeable**:
 
-1. **Explicit `privacy` field in item frontmatter** — the authoritative declaration. If present, it is always respected.
-2. **Enclosing directory default** — operational convenience. Directories like `sources/local-only/` imply `local_only`; `sources/cloud-safe/` implies `cloud_safe`.
-3. **System default: `local_only`** — if neither frontmatter nor directory provides a signal, the item is `local_only` (fail-closed).
+- Local sessions (your own machine, local model) may read **both** tiers.
+- Cloud sessions MUST NOT read `wiki-local/`.
 
-## Conflict resolution
+**The forbidden direction:** `local → cloud` (leaking `wiki-local/` content to a cloud API).
+**The permitted direction:** `cloud → local` does not apply (cloud sessions simply cannot access `wiki-local/`).
 
-If the frontmatter and directory disagree, the **stricter** setting wins. Because `local_only` is always stricter than `cloud_safe`, any conflict resolves to `local_only`. An item explicitly marked `local_only` cannot be loosened by a permissive directory, and a restrictive directory cannot be loosened by a permissive frontmatter field.
+### Structural Classifier
 
-## Privacy decision table
+Page tier is determined entirely by directory:
 
-This table is reproduced verbatim from AGENTS.md §13 (it is already neutral):
+| Directory | Tier | Who can read |
+|-----------|------|--------------|
+| `wiki-cloud/**` | cloud-safe | Cloud sessions + local sessions |
+| `wiki-local/**` | local-only | Local sessions only |
 
-| # | Frontmatter `privacy` | Directory               | Result       | Why                                                    |
-|---|----------------------|-------------------------|-------------|--------------------------------------------------------|
-| 1 | `cloud_safe`         | `sources/cloud-safe/`   | `cloud_safe` | Both agree: cloud_safe                                 |
-| 2 | `local_only`         | `sources/cloud-safe/`   | `local_only` | Frontmatter is stricter, stricter wins                 |
-| 3 | `cloud_safe`         | `sources/local-only/`   | `local_only` | Directory is stricter, stricter wins                   |
-| 4 | (not set)            | `sources/cloud-safe/`   | `cloud_safe` | No frontmatter, directory provides signal              |
-| 5 | (not set)            | `sources/2026/2026-04/` | `local_only` | No frontmatter, no privacy directory signal, system default |
-| 6 | (not set)            | (no directory signal)   | `local_only` | Fail-closed: unknown = local_only                      |
-| 7 | `local_only`         | (no directory signal)   | `local_only` | Explicit local_only confirmed                          |
+There is no per-page override. A page is local because it lives under `wiki-local/`.
 
-## Wiki page privacy inheritance
+### Raw Sources Rule
 
-When a wiki page cites sources with mixed privacy tiers, the page inherits the **strictest** tier among its contributing sources. A page is only `cloud_safe` if ALL of its contributing sources are `cloud_safe`. This is a mechanical check, not a judgment call: if any contributing source is `local_only`, the write-back target is `local_only`.
+`sources/` is **cloud-safe-only**. Raw source files under `sources/` may be read by cloud sessions during ingest. A source that must be local lives as its **source-summary page under `wiki-local/sources/`** — the FAITH-04 resolver (`bin/lib/privacy_resolve.py`) keys off the summary page tier, not the raw `sources/` path.
 
-This is enforced at operation time. `bin/validate-op.sh` (AGENTS.md §9) refuses an `UPDATE` that would fold `local_only`-derived content into a `cloud_safe` page — either create a separate `local_only` page for the sensitive synthesis, or change the existing page to `local_only`.
+The **`bin/check-sources-cloud-safe.sh`** guard (CI-wired) asserts this invariant: it exits non-zero if any raw source under `sources/` carries `privacy: local_only` frontmatter or if a `sources/local-only/` directory exists. This is a fail-closed migration + CI guard: a future adopter who adds a sensitive raw source triggers CI failure, forcing them onto the `sources-local/` structural tier (described below) rather than silently leaking.
 
-## Rules for LLM agents
+### Forward Reference: `sources-local/` Tier
 
-1. Check privacy classification BEFORE sending any content to a cloud API.
-2. If classification cannot be determined, treat as `local_only`.
-3. Never send `local_only` content to cloud LLM APIs under any circumstances.
-4. When creating wiki pages, set `privacy` based on the strictest contributing source.
+When a vault accumulates real local raw content (e.g., sensitive PDFs), the correct structural pattern is a **separate `sources-local/` directory** (or a nested git repo for the fail-closed pattern below). This deferred tier:
 
-The same fail-closed precedence governs the claim-faithfulness audit and any agent-parity run that seeds a cloud subprocess: a fail-closed seed guard requires every seeded source to declare `privacy: cloud_safe` and aborts otherwise (see [agent-parity.md](agent-parity.md)).
+- Lives outside `sources/` (which is cloud-safe-only by structural rule).
+- Has its source-summary pages under `wiki-local/sources/`.
+- Is documented here and will be scaffolded in Phase D (WIZ) when the interactive privacy-tier wizard prompt is implemented.
 
-## CI enforcement
+Today's creator vault has zero local raw sources (code-verified at Phase 15). The `bin/check-sources-cloud-safe.sh` guard protects the forward trust model.
 
-`bin/check-privacy.sh` is a standalone gate (the pattern-twin of `bin/check-neutrality.sh`) that scans YAML frontmatter under **public paths** for `privacy: local_only`. The public paths are hardcoded: `examples/`, `docs/`, `AGENTS.md`, `CLAUDE.md`, `README.md`, `.github/`. The `wiki/**` tree is explicitly EXCLUDED — `local_only` is valid user content there.
+## Enforcement Options
 
-**Exit codes:** `0` clean, `1` script failure, `2` privacy-leak found (stderr carries `path:line:` entries).
+### Option 1: Cloud-Settings Deny-Profile (Convenience, FAIL-OPEN)
 
-In CI, `bin/check-privacy.sh` runs as the `privacy-leak` job — a required status check that fails any PR introducing `privacy: local_only` frontmatter into a public path. See [ci.md](ci.md) for the full CI surface and the `--ci` severity policy.
+`.claude/settings.cloud.json` — a cloud-scoped settings file applied via `--settings .claude/settings.cloud.json` — can contain:
 
-## See also
+```json
+{
+  "permissions": {
+    "deny": ["Read(./wiki-local/**)"]
+  }
+}
+```
 
-- [AGENTS.md](../../AGENTS.md) — §13 privacy routing (the source of truth).
-- [ci.md](ci.md) — the `privacy-leak` CI job and `bin/check-privacy.sh` exit codes.
-- [schema-tour.md](schema-tour.md) — the `privacy` frontmatter field in the broader schema.
+**Honest label: CONVENIENCE / FAIL-OPEN (single-clone, low-stakes work only).**
+
+This approach has two critical limitations:
+1. A cloud session launched **without** the `--settings` flag inherits the permissive default and CAN read `wiki-local/`.
+2. The `Read` deny blocks the `Read` tool only; `cat`, `grep`, or `python -c open(...)` via Bash may bypass it depending on Claude Code version.
+
+**Use when:** You want a soft guard for casual cloud sessions on a machine you control, and your `wiki-local/` content is low-sensitivity (e.g., audit control-plane files with no real personal content).
+
+### Option 2: Separate-Repo (Fail-Closed Guarantee)
+
+For real sensitive content, `wiki-local/` becomes **its own git repo** — a nested repo inside the vault root, gitignored by the parent:
+
+```
+compendium/          <- parent repo (wiki-cloud/, schema/, bin/, etc.)
+compendium/wiki-local/   <- nested local repo (gitignored by parent)
+```
+
+**Why this is fail-closed:**
+- The local repo has its own private remote (not pushed to GitHub or any cloud host).
+- A cloud clone of the parent repo contains no `wiki-local/` objects — `git show HEAD:wiki-local/…` finds nothing.
+- Obsidian still sees one unified vault (the nested repo lives inside the vault root), so graph view + piped links work across both tiers (D-14 preservation).
+- The `§11.6` orphan-branch release neutralization already excludes both `wiki-cloud/` and `wiki-local/` creator content.
+
+**Use when:** You have real secrets or sensitive personal content in `wiki-local/`.
+
+## Fail-Direction Table
+
+| Control | Fails Which Way | Notes |
+|---------|----------------|-------|
+| Cloud deny-profile (`--settings`) | FAIL-OPEN | Requires flag at launch; Bash tool may bypass `Read` deny |
+| Separate-repo gitignore | FAIL-CLOSED | Object-level isolation; no git objects in parent history |
+| `wiki-local/` directory boundary | FAIL-OPEN for git access | `git show HEAD:wiki-local/…` works on a shared-history clone |
+| `bin/check-sources-cloud-safe.sh` | FAIL-CLOSED (migration gate) | CI-wired; blocks future non-cloud-safe raw sources |
+
+**Rule: real private content → fail-closed path (separate-repo).**
+The deny-profile is a convenience guard for low-stakes single-clone workflows only.
+
+## FAITH-04 Effective-Claim Privacy
+
+The audit workflow (`bin/audit-claims.sh`) uses a structural predicate for claim privacy:
+
+> A claim is effective-`local_only` iff its wiki page **OR** any contributing source-summary lives under `wiki-local/`.
+
+This is the collapsed predicate (Phase 15), replacing the previous §13 three-level precedence ladder. The raw `sources/` path is NEVER the privacy signal — only the source-SUMMARY page tier matters.
+
+## CI Enforcement
+
+| Guard | Location | What it checks |
+|-------|----------|---------------|
+| `bin/check-privacy.sh` | CI `privacy-leak` job | wiki-local/ path component under PUBLIC_PATHS (structural PATH guard) |
+| `bin/check-sources-cloud-safe.sh` | CI `privacy-leak` job | raw sources/ is cloud-safe-only (fail-closed, PRIV-03) |
+| `bin/check-neutrality.sh` | CI `neutrality` job | personal terms from wiki-local/ NOT in public-facing docs (content scan) |
+
+## See Also
+
+- [AGENTS.md](../../AGENTS.md) — §13 privacy routing (one-line pointer to here).
+- `wiki-cloud/decisions/dr-2026-06-04-privacy-asymmetric-two-dir.md` — execution-time DR recording the three weighed options.
+- [ci.md](ci.md) — the `privacy-leak` CI job and exit codes.
 - [../../PRIVACY.md](../../PRIVACY.md) — the user-facing privacy posture.
-- [../README.md](../README.md)
 - [index.md](index.md)

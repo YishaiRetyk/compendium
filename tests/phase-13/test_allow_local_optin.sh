@@ -9,7 +9,7 @@ REPO="$(make_bare_repo)"
 trap 'cleanup_fixture_repo "$REPO"' EXIT
 SEED="$(cd "$REPO" && git rev-parse HEAD)"
 
-write_page "$REPO" "wiki/sources/src-al.md" <<'EOF'
+write_page "$REPO" "wiki-local/sources/src-al.md" <<'EOF'
 ---
 id: src-al
 title: "AL"
@@ -20,7 +20,6 @@ content_hash: "sha256:aaaa"
 compiled_against_hash: "sha256:aaaa"
 ingested_at: 2026-04-15
 source_type: paper
-privacy: local_only
 ---
 EOF
 write_page "$REPO" "sources/2026/2026-04/al/source.md" <<'EOF'
@@ -29,13 +28,12 @@ write_page "$REPO" "sources/2026/2026-04/al/source.md" <<'EOF'
 LOCAL_INTRO content.
 EOF
 
-write_page "$REPO" "wiki/concepts/al.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/concepts/al.md" <<'EOF'
 ---
 id: alc
 title: "ALc"
 type: concept
 status: active
-privacy: cloud_safe
 ---
 A claim [prov:src-al#sec:introduction|direct|2026-04-15]
 EOF

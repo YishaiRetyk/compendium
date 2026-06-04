@@ -9,7 +9,7 @@ REPO="$(make_bare_repo)"
 trap 'cleanup_fixture_repo "$REPO"' EXIT
 
 # Summary points at a path: whose raw file is NOT on disk.
-write_page "$REPO" "wiki/sources/src-mr.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/sources/src-mr.md" <<'EOF'
 ---
 id: src-mr
 title: "MR"
@@ -25,7 +25,7 @@ privacy: cloud_safe
 EOF
 # (no raw file written)
 
-write_page "$REPO" "wiki/concepts/mr.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/concepts/mr.md" <<'EOF'
 ---
 id: mr
 title: "MR"

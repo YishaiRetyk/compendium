@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # test_kahneman_moved.sh — Phase 07 Plan 02
-# Asserts Kahneman cluster relocated to examples/; wiki/ content dirs kahneman-free;
-# local_only creator content and wiki/maintenance/ deleted; wikilinks resolve.
+# Asserts Kahneman cluster relocated to examples/; wiki-cloud/ content dirs kahneman-free;
+# local_only creator content and wiki-cloud/maintenance/ deleted; wikilinks resolve.
 set -euo pipefail
 
 PASS=0
@@ -27,19 +27,19 @@ for f in \
   if [ -f "$f" ]; then pass "exists: $f"; else fail "missing: $f"; fi
 done
 
-# 2. Scoped Kahneman-string check on wiki/ content dirs (not decisions/, not maintenance/).
+# 2. Scoped Kahneman-string check on wiki-cloud/ content dirs (not decisions/, not maintenance/).
 KAHN_RE='kahneman|prospect-theory|loss-aversion|cognitive-biases|system-1-vs-system-2|decision-making|thinking-fast'
 HITS=""
-for d in wiki/entities wiki/concepts wiki/comparisons wiki/overviews wiki/sources; do
+for d in wiki-cloud/entities wiki-cloud/concepts wiki-cloud/comparisons wiki-cloud/overviews wiki-cloud/sources; do
   if [ -d "$d" ]; then
     m=$(find "$d" -name '*.md' -print0 2>/dev/null | xargs -0 -r grep -lEi "$KAHN_RE" 2>/dev/null || true)
     if [ -n "$m" ]; then HITS="$HITS $m"; fi
   fi
 done
 if [ -z "$HITS" ]; then
-  pass "no Kahneman strings in wiki/ content dirs"
+  pass "no Kahneman strings in wiki-cloud/ content dirs"
 else
-  fail "Kahneman strings found in wiki/ content dirs:$HITS"
+  fail "Kahneman strings found in wiki-cloud/ content dirs:$HITS"
 fi
 
 # 3. In-cluster wikilinks resolve.
@@ -62,12 +62,16 @@ else fail "some in-cluster wikilinks unresolved"
 fi
 
 # 4. local_only personal content deleted.
-for f in wiki/overviews/personal-decision-patterns.md wiki/sources/src-2026-04-10-personal-decision-journal.md; do
+for f in wiki-cloud/overviews/personal-decision-patterns.md wiki-cloud/sources/src-2026-04-10-personal-decision-journal.md; do
   if [ ! -e "$f" ]; then pass "deleted: $f"; else fail "still exists (must be deleted): $f"; fi
 done
 
-# 5. wiki/maintenance/ directory does not exist.
-if [ ! -d wiki/maintenance ]; then pass "wiki/maintenance/ removed"; else fail "wiki/maintenance/ still exists"; fi
+# 5. wiki-cloud/maintenance/ may exist (it holds lint-report.md per Phase 15 design);
+# assert audit control-plane files are NOT in wiki-cloud/maintenance/ (they're in wiki-local/).
+for audit_file in wiki-cloud/maintenance/audit-report.md wiki-cloud/maintenance/audit-state.md; do
+  if [ ! -e "$audit_file" ]; then pass "audit file correctly absent from cloud tier: $audit_file"
+  else fail "audit file should be in wiki-local/maintenance/, not wiki-cloud/: $audit_file"; fi
+done
 
 echo
 echo "test_kahneman_moved: $PASS pass / $FAIL fail"

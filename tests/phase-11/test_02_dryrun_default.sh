@@ -24,9 +24,9 @@ if ! bash "$TMP/.brownfield/migrations/02-provenance-bootstrap.sh" >/dev/null 2>
     exit 1
 fi
 
-dirty=$(cd "$TMP" && git status --porcelain -- 'wiki/')
+dirty=$(cd "$TMP" && git status --porcelain -- 'wiki-cloud/')
 if [ -n "$dirty" ]; then
-    echo "FAIL: 02 dry-run mutated wiki/:" >&2
+    echo "FAIL: 02 dry-run mutated wiki-cloud/:" >&2
     echo "$dirty" >&2
     exit 1
 fi

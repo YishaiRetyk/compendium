@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # tests/phase-08/test_wizard_decision_record.sh -- WZRD-10: initial decision
-# record at wiki/decisions/dr-<TODAY>-initial-setup.md conforms to AGENTS.md
+# record at wiki-cloud/decisions/dr-<TODAY>-initial-setup.md conforms to AGENTS.md
 # §4.6 -- type=decision, trigger_type=schema-update, affected_pages=[],
 # all 7 required sections present, no leftover {{...}} placeholders.
 set -euo pipefail
@@ -19,7 +19,7 @@ WORK="$(mktemp_repo)"
 WIZARD_GENERATED_AT=2026-04-16T12:00:00Z WIZARD_TEMPLATE_SHA=fixed-sha \
     bash "$WIZARD" --answers-file "$CANONICAL_ANSWERS" --render-to "$WORK" >/dev/null
 
-DR="$WORK/wiki/decisions/dr-2026-04-16-initial-setup.md"
+DR="$WORK/wiki-cloud/decisions/dr-2026-04-16-initial-setup.md"
 assert_file_exists "$DR" "decision record must exist at dr-<TODAY>-initial-setup.md"
 
 # Frontmatter fields.

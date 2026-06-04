@@ -7,7 +7,7 @@ source "$SCRIPT_DIR/lib.sh"
 REPO="$(make_bare_repo)"
 trap 'cleanup_fixture_repo "$REPO"' EXIT
 
-write_page "$REPO" "wiki/sources/src-e.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/sources/src-e.md" <<'EOF'
 ---
 id: src-e
 title: "E"
@@ -28,7 +28,7 @@ write_page "$REPO" "sources/2026/2026-04/e/source.md" <<'EOF'
 Body text.
 EOF
 
-write_page "$REPO" "wiki/concepts/epi.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/concepts/epi.md" <<'EOF'
 ---
 id: epi
 title: "Epi"

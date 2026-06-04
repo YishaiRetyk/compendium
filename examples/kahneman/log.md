@@ -9,10 +9,9 @@ updated_at: 2026-04-15
 sources: []
 epistemic_status: sourced
 tags:
-  - meta
-  - operations
+- meta
+- operations
 domains: []
-privacy: cloud_safe
 example: true
 ---
 

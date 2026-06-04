@@ -8,7 +8,7 @@ source "$SCRIPT_DIR/lib.sh"
 REPO="$(make_bare_repo)"
 trap 'cleanup_fixture_repo "$REPO"' EXIT
 
-write_page "$REPO" "wiki/sources/src-pu.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/sources/src-pu.md" <<'EOF'
 ---
 id: src-pu
 title: "PU"
@@ -29,7 +29,7 @@ WHOLE_DOC_MARKER paragraph one.
 Another paragraph two.
 EOF
 
-write_page "$REPO" "wiki/concepts/pu.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/concepts/pu.md" <<'EOF'
 ---
 id: pu
 title: "PU"

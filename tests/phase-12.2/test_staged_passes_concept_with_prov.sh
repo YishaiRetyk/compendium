@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# WGATE-02 / D-20 scenario 2: greenfield wiki/concepts/foo.md with at least
+# WGATE-02 / D-20 scenario 2: greenfield wiki-cloud/concepts/foo.md with at least
 # one [prov:src#sec:x] marker -> bin/lint.sh --strict --staged --category
 # provenance exits 0.
 set -euo pipefail
@@ -9,7 +9,7 @@ source "$SCRIPT_DIR/lib.sh"
 REPO="$(make_bare_repo)"
 trap 'cleanup_fixture_repo "$REPO"' EXIT
 
-write_page "$REPO" "wiki/concepts/foo.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/concepts/foo.md" <<'EOF'
 ---
 id: foo
 title: "Foo"
@@ -35,9 +35,9 @@ Foo concept body with provenance [prov:src-2026-04-15-x#sec:intro|direct|2026-05
 EOF
 
 # Source page is added in a prior commit so the existing provenance-ref check
-# (which resolves source_id against wiki/sources/) finds the referenced source.
+# (which resolves source_id against wiki-cloud/sources/) finds the referenced source.
 # This is independent of the --staged new-page-provenance check under test.
-write_page "$REPO" "wiki/sources/src-2026-04-15-x.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/sources/src-2026-04-15-x.md" <<'EOF'
 ---
 id: src-2026-04-15-x
 title: "X (test source)"
@@ -65,12 +65,12 @@ compilation_status: compiled
 
 Test source.
 EOF
-(cd "$REPO" && git add wiki/sources/src-2026-04-15-x.md && \
+(cd "$REPO" && git add wiki-cloud/sources/src-2026-04-15-x.md && \
     git -c commit.gpgsign=false commit -q -m "add source page (committed before staged page)")
-(cd "$REPO" && git add wiki/concepts/foo.md)
+(cd "$REPO" && git add wiki-cloud/concepts/foo.md)
 
 set +e
-(cd "$REPO" && bash "$REPO_ROOT/bin/lint.sh" --strict --staged --category provenance "$REPO/wiki/" >/tmp/wgate-out.$$ 2>/tmp/wgate-err.$$)
+(cd "$REPO" && bash "$REPO_ROOT/bin/lint.sh" --strict --staged --category provenance "$REPO/wiki-cloud/" >/tmp/wgate-out.$$ 2>/tmp/wgate-err.$$)
 rc=$?
 set -e
 

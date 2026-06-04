@@ -3,21 +3,21 @@ id: rnns-vs-transformers
 title: "RNNs vs Transformers"
 type: comparison
 status: active
-summary: "Comparison of recurrent neural networks and Transformer architectures for sequence modeling."
+summary: "Comparison of recurrent neural networks and Transformer architectures for
+  sequence modeling."
 created_at: 2026-04-08
 updated_at: 2026-04-08
 sources:
-  - src-2026-03-15-vaswani-attention
-  - src-2026-04-02-lstm-survey
+- src-2026-03-15-vaswani-attention
+- src-2026-04-02-lstm-survey
 epistemic_status: sourced
 tags:
-  - architecture-comparison
-  - deep-learning
+- architecture-comparison
+- deep-learning
 domains:
-  - ai-research
-supersedes:
-superseded_by:
-privacy: cloud_safe
+- ai-research
+supersedes: null
+superseded_by: null
 aliases: []
 example: true
 ---

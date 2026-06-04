@@ -9,15 +9,14 @@ updated_at: 2026-04-01
 sources: []
 epistemic_status: sourced
 tags:
-  - tag-x
+- tag-x
 domains:
-  - alpha
-supersedes:
-superseded_by:
-privacy: cloud_safe
+- alpha
+supersedes: null
+superseded_by: null
 aliases:
-  - "Fixture Entity One"
-  - fixture-entity-1
+- "Fixture Entity One"
+- fixture-entity-1
 has_contradictions: false
 knowledge_domain: alpha
 example: true

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # bin/lint.sh -- Wiki health-check CLI helper (AGENTS.md section 11.3).
 # Detects orphan pages, missing cross-references, stale claims, contradictions,
-# knowledge gaps, and structural issues. Produces wiki/maintenance/lint-report.md.
+# knowledge gaps, and structural issues. Produces wiki-cloud/maintenance/lint-report.md.
 #
 # Zero LLM/API calls. Deterministic, file-based checks only.
 # Requires: python3 with PyYAML.
@@ -17,7 +17,7 @@ usage() {
 Usage: bin/lint.sh [OPTIONS] [wiki-directory]
 
 Wiki health-check that detects structural issues and stale claims.
-Produces wiki/maintenance/lint-report.md and prints a compact summary.
+Produces wiki-cloud/maintenance/lint-report.md and prints a compact summary.
 
 Options:
   --help, -h          Show this help message
@@ -34,7 +34,7 @@ Options:
                       (minimum-version semantics, semver tuple compare)
   --format text|json  Output format (default: text). JSON writes a `[{severity,
                       category, path, message, line?}, ...]` array to stdout
-                      and does NOT write wiki/maintenance/lint-report.md.
+                      and does NOT write wiki-cloud/maintenance/lint-report.md.
   --ci                CI mode: apply severity remap (yaml/orphan/crossref/
                       provenance -> error; stale/gap/contradiction/drift/
                       contributor -> warning; autofix/skip-count -> info),
@@ -73,7 +73,7 @@ Options:
                              .githooks/pre-commit per AGENTS.md section 11.3.
 
 Arguments:
-  [wiki-directory]    Path to wiki directory (default: wiki/)
+  [wiki-directory]    Path to wiki directory (default: wiki-cloud/)
 
 Exit codes:
   0  Script ran successfully (even if error-level findings exist)
@@ -83,7 +83,7 @@ Examples:
   bin/lint.sh                      # Full lint, write report
   bin/lint.sh --dry-run            # Full lint, no report written
   bin/lint.sh --category orphan    # Only orphan detection
-  bin/lint.sh --fix wiki/          # Full lint with auto-fixes
+  bin/lint.sh --fix wiki-cloud/          # Full lint with auto-fixes
 EOF
 }
 
@@ -91,7 +91,7 @@ EOF
 # Argument parsing
 # ---------------------------------------------------------------------------
 
-WIKI_DIR="${WIKI_ROOT:-wiki/}"
+WIKI_DIR="${WIKI_ROOT:-wiki-cloud/}"
 DRY_RUN=0
 FIX=0
 CATEGORY="all"
@@ -372,13 +372,12 @@ EPISTEMIC_MODIFIERS = {
 VALID_TYPES = {'entity', 'concept', 'source', 'comparison', 'overview', 'decision'}
 VALID_STATUS = {'active', 'stale', 'superseded', 'archived'}
 VALID_EPISTEMIC = {'sourced', 'mixed', 'tentative', 'stale'}
-VALID_PRIVACY = {'local_only', 'cloud_safe'}
 VALID_COMPILATION = {'pending', 'partial', 'compiled', 'stale'}
 
 BASE_FIELDS = [
     'id', 'title', 'type', 'status', 'summary', 'created_at', 'updated_at',
     'sources', 'epistemic_status', 'tags', 'domains', 'supersedes',
-    'superseded_by', 'privacy', 'aliases', 'has_contradictions', 'knowledge_domain',
+    'superseded_by', 'aliases', 'has_contradictions', 'knowledge_domain',
 ]
 
 SOURCE_EXTRA_FIELDS = ['path', 'content_hash', 'ingested_at', 'source_type', 'compilation_status']
@@ -501,7 +500,7 @@ def has_origin_main():
 
 
 def strict_added_epistemic_claims(base_ref='origin/main'):
-    """D-08 (PR-diff scope): parse `git diff origin/main...HEAD -- wiki/` and
+    """D-08 (PR-diff scope): parse `git diff origin/main...HEAD -- wiki-cloud/` and
        return a list of (path, line_no, kind) tuples for EACH line ADDED by
        the PR that contains [epistemic:: inferred] or [epistemic:: tentative].
 
@@ -514,7 +513,7 @@ def strict_added_epistemic_claims(base_ref='origin/main'):
        Ignores the `+++` file-header line (diff metadata, not content)."""
     try:
         result = subprocess.run(
-            ['git', 'diff', '--unified=0', f'{base_ref}...HEAD', '--', 'wiki/'],
+            ['git', 'diff', '--unified=0', f'{base_ref}...HEAD', '--', 'wiki-cloud/'],
             cwd=REPO_ROOT, check=True, capture_output=True, text=True,
         )
     except (subprocess.CalledProcessError, FileNotFoundError):
@@ -566,7 +565,7 @@ def strict_added_epistemic_claims(base_ref='origin/main'):
 
 def strict_new_pages(base_ref='origin/main'):
     """D-10: return list of git-diff status-A .md paths under
-       wiki/{entities,concepts,overviews,comparisons}/*.md."""
+       wiki-cloud/{entities,concepts,overviews,comparisons}/*.md."""
     try:
         result = subprocess.run(
             ['git', 'diff', '--name-status', f'{base_ref}...HEAD'],
@@ -583,7 +582,7 @@ def strict_new_pages(base_ref='origin/main'):
         if status != 'A' or not path.endswith('.md'):
             continue
         for t in ('entities', 'concepts', 'overviews', 'comparisons'):
-            if path.startswith(f'wiki/{t}/'):
+            if path.startswith(f'wiki-cloud/{t}/'):
                 paths.append(path)
                 break
     return paths
@@ -591,7 +590,7 @@ def strict_new_pages(base_ref='origin/main'):
 
 def staged_new_pages():
     """WGATE-02 / D-02: return list of git-diff status-A .md paths under
-       wiki/{entities,concepts,overviews,comparisons}/*.md, scoped to the
+       wiki-cloud/{entities,concepts,overviews,comparisons}/*.md, scoped to the
        STAGED INDEX (not origin/main...HEAD).
 
        Diff source: `git diff --cached --name-only --diff-filter=A`.
@@ -618,10 +617,10 @@ def staged_new_pages():
         if path.startswith('examples/') or '/examples/' in path:
             continue
         # D-15 (1): only the four PROVENANCE_REQUIRED_TYPES dirs reach the
-        # frontmatter check. wiki/sources/, wiki/decisions/, anything outside
-        # wiki/ are skipped at this layer.
+        # frontmatter check. wiki-cloud/sources/, wiki-cloud/decisions/, anything outside
+        # wiki-cloud/ are skipped at this layer.
         for t in ('entities', 'concepts', 'overviews', 'comparisons'):
-            if path.startswith(f'wiki/{t}/'):
+            if path.startswith(f'wiki-cloud/{t}/'):
                 paths.append(path)
                 break
     return paths
@@ -810,10 +809,10 @@ def strict_check(wiki_root):
     # 1. DR-match: scan ONLY the claims ADDED by this PR (D-08).
     added = strict_added_epistemic_claims()
     for path, line_no, kind in added:
-        # path is repo-relative (e.g., 'wiki/concepts/attention.md'). Skip examples/ and decisions/.
+        # path is repo-relative (e.g., 'wiki-cloud/concepts/attention.md'). Skip examples/ and decisions/.
         if path.startswith('examples/') or '/examples/' in path:
             continue
-        if path.startswith('wiki/decisions/'):
+        if path.startswith('wiki-cloud/decisions/'):
             # Decision records themselves can contain epistemic markers in their prose;
             # they ARE the gating mechanism and must not gate on themselves.
             continue
@@ -829,7 +828,7 @@ def strict_check(wiki_root):
             continue
         add_finding('error', 'strict', path,
                     f"line {line_no}: [{kind}] claim added by this PR without matching decision record "
-                    f"(add wiki/decisions/*.md with type:decision, affected_pages: [{page_id}], "
+                    f"(add wiki-cloud/decisions/*.md with type:decision, affected_pages: [{page_id}], "
                     f"or add <!-- lint:expect-{kind} id={page_id} reason=\"...\" --> above)")
 
     # 2. New-page provenance: for each git-diff status A wiki page under PROVENANCE_REQUIRED_TYPES
@@ -945,7 +944,7 @@ def git_author_emails(root):
 
 
 def contributor_check(wiki_root, repo_root):
-    """COLAB-08 / D-22: for each `contributor:: @handle` in wiki/log.md,
+    """COLAB-08 / D-22: for each `contributor:: @handle` in wiki-cloud/log.md,
        verify handle's email (via .git-author-map.txt reverse lookup)
        appears in git log --all --format='%ae'. Short-circuit when
        single-author (D-20).
@@ -1062,8 +1061,6 @@ if should_run('yaml'):
             add_finding('error', 'yaml', rel, f"Invalid status: '{fm['status']}'")
         if 'epistemic_status' in fm and fm['epistemic_status'] not in VALID_EPISTEMIC:
             add_finding('error', 'yaml', rel, f"Invalid epistemic_status: '{fm['epistemic_status']}'")
-        if 'privacy' in fm and fm['privacy'] not in VALID_PRIVACY:
-            add_finding('error', 'yaml', rel, f"Invalid privacy: '{fm['privacy']}'")
 
         # Source-specific fields
         if fm.get('type') == 'source':
@@ -2147,7 +2144,7 @@ if should_run('drift') or should_run('all'):
                         pass
 
     # --- Index coverage (D-11) ---
-    # Check that every wiki page has a wikilink in wiki/index.md
+    # Check that every wiki page has a wikilink in wiki-cloud/index.md
     print("  Check 10d: Index coverage gaps...", file=sys.stderr)
     index_path = os.path.join(wiki_dir, 'index.md')
     if os.path.exists(index_path):
@@ -2166,7 +2163,7 @@ if should_run('drift') or should_run('all'):
                 page_title.lower() not in index_content):
                 rel = os.path.relpath(page_path)
                 add_finding('warning', 'drift', rel,
-                            f'Page not listed in wiki/index.md: {page_id}')
+                            f'Page not listed in wiki-cloud/index.md: {page_id}')
 
     # --- DRFT-03: Obsidian vault awareness ---
     # EXTERNAL: prefix marks drift findings originating from external-state
@@ -2178,7 +2175,7 @@ if should_run('drift') or should_run('all'):
     if not os.path.isdir(obsidian_dir):
         add_finding('info', 'drift', '.obsidian/',
                     'EXTERNAL: No .obsidian/ directory found -- Obsidian vault may not be configured')
-    # Check for non-.md files in wiki/ subdirectories (unexpected binaries)
+    # Check for non-.md files in wiki-cloud/ subdirectories (unexpected binaries)
     for root, dirs, files in os.walk(wiki_dir):
         # Skip maintenance/ directory (may contain non-standard files)
         if 'maintenance' in root:
@@ -2188,7 +2185,7 @@ if should_run('drift') or should_run('all'):
                 fpath = os.path.join(root, fname)
                 rel = os.path.relpath(fpath)
                 add_finding('info', 'drift', rel,
-                            'EXTERNAL: Non-markdown file in wiki/ (may cause Obsidian issues)')
+                            'EXTERNAL: Non-markdown file in wiki-cloud/ (may cause Obsidian issues)')
 
     # --- DRFT-04: Orphaned operation artifacts (log <-> git drift) ---
     # An operation (query/ingest) that finishes its file edits but skips its
@@ -2431,7 +2428,6 @@ tags:
 domains: []
 supersedes:
 superseded_by:
-privacy: cloud_safe
 aliases:
   - Lint Report
 has_contradictions: false
@@ -2457,10 +2453,10 @@ knowledge_domain: ""
     with open(report_path, 'w', encoding='utf-8') as f:
         f.write(report_content)
 
-    # Append log entry to wiki/log.md
+    # Append log entry to wiki-cloud/log.md
     log_path = os.path.join(wiki_dir, 'log.md')
     if os.path.exists(log_path):
-        log_entry = f"\n## [{today_str}] lint | wiki health check\n\nfindings: {total} total ({error_count} errors, {warning_count} warnings, {info_count} info)\nauto_fixes: {autofix_applied} applied\nreport: wiki/maintenance/lint-report.md\n"
+        log_entry = f"\n## [{today_str}] lint | wiki-cloud health check\n\nfindings: {total} total ({error_count} errors, {warning_count} warnings, {info_count} info)\nauto_fixes: {autofix_applied} applied\nreport: wiki-cloud/maintenance/lint-report.md\n"
         with open(log_path, 'a', encoding='utf-8') as f:
             f.write(log_entry)
 
@@ -2469,7 +2465,7 @@ knowledge_domain: ""
 # ---------------------------------------------------------------------------
 
 autofix_msg = f"{autofix_applied} applied" if (do_fix and not dry_run) else "none -- use --fix to apply"
-report_msg = "wiki/maintenance/lint-report.md" if not dry_run else "(dry-run, no report written)"
+report_msg = "wiki-cloud/maintenance/lint-report.md" if not dry_run else "(dry-run, no report written)"
 
 print(f"""
 === Wiki Lint Results ===

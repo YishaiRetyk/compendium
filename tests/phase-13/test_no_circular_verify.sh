@@ -10,7 +10,7 @@ REPO="$(make_bare_repo)"
 trap 'cleanup_fixture_repo "$REPO"' EXIT
 
 # Summary body deliberately contains DIVERGENT text under ## Extracted Claims.
-write_page "$REPO" "wiki/sources/src-cv.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/sources/src-cv.md" <<'EOF'
 ---
 id: src-cv
 title: "CV"
@@ -38,7 +38,7 @@ write_page "$REPO" "sources/2026/2026-04/cv/source.md" <<'EOF'
 RAW_TRUTH_TEXT is the only correct resolution target.
 EOF
 
-write_page "$REPO" "wiki/concepts/cv.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/concepts/cv.md" <<'EOF'
 ---
 id: cv
 title: "CV"

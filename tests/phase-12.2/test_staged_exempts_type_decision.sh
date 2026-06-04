@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# WGATE-02 / D-20 scenario 5: new wiki/decisions/dr-2026-05-04-test.md with
+# WGATE-02 / D-20 scenario 5: new wiki-cloud/decisions/dr-2026-05-04-test.md with
 # type: decision and zero [prov:] markers -> exempt; bin/lint.sh --strict
 # --staged --category provenance exits 0.
 #
-# Note: wiki/decisions/ is NOT one of the four PROVENANCE_REQUIRED_TYPES dirs,
+# Note: wiki-cloud/decisions/ is NOT one of the four PROVENANCE_REQUIRED_TYPES dirs,
 # so this scenario also confirms the path-prefix gate runs before the
 # type-frontmatter gate (D-15 ordering).
 set -euo pipefail
@@ -13,7 +13,7 @@ source "$SCRIPT_DIR/lib.sh"
 REPO="$(make_bare_repo)"
 trap 'cleanup_fixture_repo "$REPO"' EXIT
 
-write_page "$REPO" "wiki/decisions/dr-2026-05-04-test.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/decisions/dr-2026-05-04-test.md" <<'EOF'
 ---
 id: dr-2026-05-04-test
 title: "Test Decision Record"
@@ -64,10 +64,10 @@ None.
 
 None.
 EOF
-(cd "$REPO" && git add wiki/decisions/dr-2026-05-04-test.md)
+(cd "$REPO" && git add wiki-cloud/decisions/dr-2026-05-04-test.md)
 
 set +e
-(cd "$REPO" && bash "$REPO_ROOT/bin/lint.sh" --strict --staged --category provenance "$REPO/wiki/" >/tmp/wgate-out.$$ 2>/tmp/wgate-err.$$)
+(cd "$REPO" && bash "$REPO_ROOT/bin/lint.sh" --strict --staged --category provenance "$REPO/wiki-cloud/" >/tmp/wgate-out.$$ 2>/tmp/wgate-err.$$)
 rc=$?
 set -e
 

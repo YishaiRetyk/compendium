@@ -9,15 +9,14 @@ updated_at: 2026-04-01
 sources: []
 epistemic_status: sourced
 tags:
-  - tag-z
+- tag-z
 domains:
-  - beta
-supersedes:
-superseded_by:
-privacy: cloud_safe
+- beta
+supersedes: null
+superseded_by: null
 aliases:
-  - "Fixture Entity Three"
-  - fixture-entity-3
+- "Fixture Entity Three"
+- fixture-entity-3
 has_contradictions: false
 knowledge_domain: beta
 example: true

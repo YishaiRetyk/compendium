@@ -7,7 +7,7 @@ source "$SCRIPT_DIR/lib.sh"
 REPO="$(make_bare_repo)"
 trap 'cleanup_fixture_repo "$REPO"' EXIT
 
-write_page "$REPO" "wiki/sources/src-f.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/sources/src-f.md" <<'EOF'
 ---
 id: src-f
 title: "F"
@@ -28,7 +28,7 @@ Body text.
 EOF
 
 # Hub page with a claim; two other pages link to it (fanout = 2).
-write_page "$REPO" "wiki/concepts/hub.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/concepts/hub.md" <<'EOF'
 ---
 id: hub
 title: "Hub"
@@ -37,7 +37,7 @@ status: active
 ---
 A hub claim [prov:src-f#sec:introduction|direct|2026-04-15]
 EOF
-write_page "$REPO" "wiki/concepts/linker-a.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/concepts/linker-a.md" <<'EOF'
 ---
 id: linker-a
 title: "Linker A"
@@ -46,7 +46,7 @@ status: active
 ---
 See the [[Hub]] for details. No prov here.
 EOF
-write_page "$REPO" "wiki/concepts/linker-b.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/concepts/linker-b.md" <<'EOF'
 ---
 id: linker-b
 title: "Linker B"

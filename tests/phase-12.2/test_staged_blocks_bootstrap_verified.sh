@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# WGATE-02 / D-20 scenario 8: new wiki/concepts/foo.md with
+# WGATE-02 / D-20 scenario 8: new wiki-cloud/concepts/foo.md with
 # bootstrap_stage: verified frontmatter and zero [prov:] markers ->
 # NOT exempt (D-12: verified is first-class wiki content);
 # bin/lint.sh --strict --staged --category provenance exits 1.
@@ -10,7 +10,7 @@ source "$SCRIPT_DIR/lib.sh"
 REPO="$(make_bare_repo)"
 trap 'cleanup_fixture_repo "$REPO"' EXIT
 
-write_page "$REPO" "wiki/concepts/foo.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/concepts/foo.md" <<'EOF'
 ---
 id: foo
 title: "Foo (verified)"
@@ -35,10 +35,10 @@ bootstrap_date: 2026-05-04
 
 Verified-stage concept body with no provenance markers; NOT exempt -- gate must fire.
 EOF
-(cd "$REPO" && git add wiki/concepts/foo.md)
+(cd "$REPO" && git add wiki-cloud/concepts/foo.md)
 
 set +e
-(cd "$REPO" && bash "$REPO_ROOT/bin/lint.sh" --strict --staged --category provenance "$REPO/wiki/" >/tmp/wgate-out.$$ 2>/tmp/wgate-err.$$)
+(cd "$REPO" && bash "$REPO_ROOT/bin/lint.sh" --strict --staged --category provenance "$REPO/wiki-cloud/" >/tmp/wgate-out.$$ 2>/tmp/wgate-err.$$)
 rc=$?
 set -e
 

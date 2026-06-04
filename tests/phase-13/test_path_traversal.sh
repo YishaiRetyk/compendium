@@ -15,7 +15,7 @@ printf 'TRAVERSAL_SECRET_TEXT\n' > "$SECRET_DIR/secret.md"
 
 # Source page path: escapes the repo via ../ to reach the secret.
 ESCAPE_REL="../$(basename "$SECRET_DIR")/secret.md"
-write_page "$REPO" "wiki/sources/src-tr.md" <<EOF
+write_page "$REPO" "wiki-cloud/sources/src-tr.md" <<EOF
 ---
 id: src-tr
 title: "TR"
@@ -30,7 +30,7 @@ privacy: cloud_safe
 ---
 EOF
 
-write_page "$REPO" "wiki/concepts/tr.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/concepts/tr.md" <<'EOF'
 ---
 id: tr
 title: "TR"

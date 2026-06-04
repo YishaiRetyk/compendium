@@ -7,7 +7,7 @@ source "$SCRIPT_DIR/lib.sh"
 REPO="$(make_bare_repo)"
 trap 'cleanup_fixture_repo "$REPO"' EXIT
 
-write_page "$REPO" "wiki/sources/src-pm.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/sources/src-pm.md" <<'EOF'
 ---
 id: src-pm
 title: "PM"
@@ -32,7 +32,7 @@ PAGE8_MARKER target content.
 PAGE9_MARKER content.
 EOF
 
-write_page "$REPO" "wiki/concepts/pm.md" <<'EOF'
+write_page "$REPO" "wiki-cloud/concepts/pm.md" <<'EOF'
 ---
 id: pmpage
 title: "PMpage"
