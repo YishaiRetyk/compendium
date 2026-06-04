@@ -101,6 +101,17 @@ Architecture relocates existing text; this adds behavior. v1.3-ish or standalone
 - 999.5 (External Source Drift) is promoted — design the repo SHA-drift alongside it.
 - A slide/demo-heavy video surfaces the multimodal frame-capture need (would reopen the `video`-type Q).
 
+## Unification (Source Ingestion cluster)
+
+This seed and `[[research-report-ingest]]` are **co-instances of one "source-type extension" pattern** —
+same surfaces (§5 enum, §10 Pass 0, §6 locators, §11.1 ingest, 999.5 drift, `support_type` defaults).
+Per the 2026-06-04 unification decision: **unify the *design*, not the *deliverable*.** A future "Source
+Ingestion" milestone designs the extension *contract* once (the 5-dimension recipe + primary/secondary
+axis — this seed's two candidates are *primary* instances), then ships per-type implementations
+independently. **`research-report-ingest` (secondary, LOCKED) ships first; repo and video here stay
+separable and open** so the ready one doesn't wait on the undecided ones. See
+`.planning/notes/2026-05-31-milestone-grouping-proposal.md` → "Source Ingestion".
+
 ## Related artifacts
 
 - Primary-vs-secondary contrast: `.planning/seeds/research-report-ingest.md`

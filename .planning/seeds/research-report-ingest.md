@@ -95,6 +95,16 @@ Surface when ANY becomes true:
 - Lint/query gap-suggestions are routinely answered by external deep research and the manual
   copy-paste-without-provenance friction appears.
 
+## Unification (Source Ingestion cluster)
+
+This seed and `[[primary-source-type-extensions]]` (repos, videos) are **co-instances of one
+"source-type extension" pattern** — same surfaces (§5 enum, §10 Pass 0, §6 locators, §11.1 ingest,
+999.5 drift, `support_type` defaults). Per the 2026-06-04 unification decision: **unify the *design*,
+not the *deliverable*.** A future "Source Ingestion" milestone designs the extension *contract* once
+(the 5-dimension recipe + primary/secondary axis), then ships per-type implementations independently.
+**This seed is the LOCKED reference *secondary* instance and ships first — it does NOT wait on the open
+repo/video work.** See `.planning/notes/2026-05-31-milestone-grouping-proposal.md` → "Source Ingestion".
+
 ## Related artifacts
 
 - Binding role-division + source-of-truth framing: `.planning/notes/2026-04-24-openbrain-vs-compendium-critique.md`

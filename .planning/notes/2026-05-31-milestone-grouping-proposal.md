@@ -36,6 +36,21 @@ From the `agent-memory-interface` seed:
 
 **Shared prerequisite:** 4.2 and v1.3's 3.4 both need §14 Tier 4 — whichever milestone reaches Tier 4 first pays that cost for both.
 
+### Source Ingestion — new source/output capabilities  [framework-first; mostly prioritization-gated; added 2026-06-04]
+
+A cluster of "extend what the wiki can ingest/emit" seeds. The unifying insight (2026-06-04 discussion): `research-report-ingest` + `primary-source-type-extensions` (repos, videos) are **instances of one pattern** — they touch the same surfaces (§5 `source_type` enum, §10 Pass-0 classify, §6 Locator Types, §11.1 ingest, drift→999.5, `support_type`/epistemic defaults). So **unify the *design*, not the *deliverable*:**
+
+- **SI.1 — Source-type extension contract** (the unification, framework-first): formalize the 5-dimension add-a-type recipe (acquisition / locator / extraction granularity / drift / epistemic default) + the **primary-vs-secondary axis** (primary→`direct`, secondary→`derived`). `research-report-ingest` (LOCKED design) is the reference *secondary* instance; existing article/paper/transcript types retro-fit as *primary* instances.
+- **SI.2 — research-report** (`research-report-ingest`, design LOCKED) — ships first; ready now.
+- **SI.3 — repository** (`primary-source-type-extensions`, OPEN) — new `#path:file:L`/`#commit:` locators + commit-SHA drift; pairs with 999.5 (v1.3 item 3.3).
+- **SI.4 — video/YouTube** (`primary-source-type-extensions`, OPEN) — leaning transcript sub-case; acquisition is the friction.
+
+**Per-type deliverables stay separable** — design once (SI.1), ship each on its own trigger so the ready one (research-report) doesn't wait on the open ones. This is the same "touch the shared surface once, ship independently" logic as v1.2's wizard fold-in.
+
+**NOT in this cluster:** `synthesized-diagram-output` is *output*, not a source — it belongs with the typed-edges / wiki-quality cluster (graph-as-view-with-edge-provenance), not source ingestion.
+
+**Gating:** prioritization-gated (build when you want the types; the creator has active intent for all three). SI.3's drift portion shares machinery with v1.3's 3.3 (999.5) — sequence them adjacently if both land.
+
 ### Standing / unscheduled
 - **999.6 (Observed GTD patterns)** — trigger-gated on 2 months real usage; documents what emerged, by definition un-schedulable. No milestone number.
 
@@ -50,7 +65,7 @@ v1.2 is prioritization-gated and ready, so it can be formalized via `/gsd-new-mi
 - **Later, on trigger:** promote `wiki-quality-heuristics` / `agent-memory-interface` seeds when their gates fire; lexical dedup anytime via `/gsd-quick`.
 
 ## Related artifacts
-- Seeds: `agent-memory-interface.md`, `wiki-quality-heuristics.md`, `llm-drafted-domain-scaffold.md`, `workflows-operations-to-skills.md`
+- Seeds: `agent-memory-interface.md`, `wiki-quality-heuristics.md`, `llm-drafted-domain-scaffold.md`, `workflows-operations-to-skills.md`, `research-report-ingest.md` (Source Ingestion), `primary-source-type-extensions.md` (Source Ingestion), `synthesized-diagram-output.md` (output — NOT source ingestion)
 - Live backlog: ROADMAP.md §Backlog 999.3–999.6
 - Comparison lineage: `.planning/notes/2026-05-31-neo4j-graph-tools-comparison.md`
 - v1.2 design substance: `.planning/phases/999.4-v1-2-schema-architecture-progressive-disclosure-refactor/CONTEXT-NOTES.md`
