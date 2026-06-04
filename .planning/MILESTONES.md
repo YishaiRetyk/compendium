@@ -1,5 +1,33 @@
 # Milestones
 
+## v1.1.1 Graph Integrity (Shipped: 2026-06-04)
+
+**Phases completed:** 1 phase (Phase 14: Graph Link Resolution), 3 plans
+**Requirements:** 10/10 LINK requirements complete (`bin/requirements-sync.sh --require-complete` exits 0)
+**Timeline:** 2026-06-02 → 2026-06-03 (~2 days, 75 commits since v1.1)
+
+**Delivered:** A connected Obsidian graph — the schema now tells the truth about link resolution and the data is remediated to match.
+
+**Key accomplishments:**
+
+- **Premise correction (the headline):** The original Phase 14 self-alias approach was executed, then proven false at the LINK-10 human-verify gate — Obsidian resolves `[[X]]` by **filename/path ONLY**, never via `title` or `aliases` (confirmed for v1.12.7). Phase 14 was re-planned around the correct approach. Wrong-premise artifacts quarantined under `14-graph-link-resolution/_superseded-premise/`.
+- **Convention + schema (LINK-01..03):** `CLAUDE.md`/`AGENTS.md` §3/§5/§8/§15/§16 corrected to mandate **uniform piped links** `[[id|Title]]` (target = page `id` = filename, always resolves; display = canonical title); the false self-alias invariant removed (`aliases` reverts to optional); superseding decision record `dr-2026-06-03-uniform-piped-links` supersedes the wrong-premise DR; `schema/AGENTS.template.md` + 12 templates mirrored; AGENTS.md kept byte-identical to CLAUDE.md.
+- **Lint enforcement (LINK-04..06):** `bin/lint.sh` `linkres` re-pointed to validate intra-wiki link *targets* (bare `[[X]]` and unknown-`id` targets are errors; knowledge-gap red links stay `gap`/info); `--fix` rewrites bare → piped for unique matches; `orphan` reconciled to resolve by `id`/filename only; shared `mask_markdown()` helper (LINT_VERSION 1.6.0); regression tests added.
+- **Data remediation (LINK-07..10):** All `wiki/` + `examples/` body links rewritten to piped form; variant reconciliation dissolved (plural/parens/casing live in cosmetic display text); orphan count 19→0; `domain-driven-design` now has 18 inbound links; connected graph human-verified in Obsidian.
+
+**Known deferred items (acknowledged at close):**
+
+- 1 pending todo `phase-14-lint-mask-fence-edge-cases` — WR-02/03 fence-edge-case hardening for lint markdown masking; in `.planning/todos/pending/`, promote via `/gsd-quick`. Recorded in STATE.md Deferred Items.
+- 4 audit-flagged quick tasks (`260415-fvc`, `260415-gzu`, `260501-g5n`, `260602-d6a`) are all complete (each has a SUMMARY.md; flagged only by an unparseable status field) — no action.
+- Backlog Phases 999.3–999.6 and v1.2-deferred items carry forward from the v1.1 close (see below).
+
+**Archives:**
+
+- `milestones/v1.1.1-ROADMAP.md`
+- `milestones/v1.1.1-REQUIREMENTS.md`
+
+---
+
 ## v1.1 Shareability (Shipped: 2026-06-02)
 
 **Phases completed:** 15 phase directories (Phases 7–13.2), 52 plans

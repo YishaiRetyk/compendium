@@ -91,6 +91,43 @@ A shareable starter kit: neutral public template (Phase 7), two-track wizard/man
 
 ---
 
+## Milestone: v1.1.1 — Graph Integrity
+
+**Shipped:** 2026-06-04
+**Phases:** 1 (Phase 14) | **Plans:** 3
+
+### What Was Built
+
+A correctness patch making the Obsidian graph actually connect: the **uniform piped-link convention** `[[id|Title]]` in §8/§5 + 12 templates, a re-pointed `bin/lint.sh` `linkres` check that validates link *targets* (with `--fix` bare→piped) plus an alias-free `orphan` check (LINT_VERSION 1.6.0), and full remediation of `wiki/` + `examples/` body links. Orphan count 19→0; connected graph human-verified in Obsidian.
+
+### What Worked
+
+- **The human-verify gate caught a false premise before it shipped as "done."** The milestone was planned around self-aliases; the LINK-10 human-verify step proved Obsidian ignores `aliases` for `[[X]]` resolution. The gate did exactly its job — it stopped a plausible-but-wrong approach.
+- **Re-plan over patch.** Rather than bolt a fix onto the wrong-premise work, Phase 14 was re-planned from scratch with the prior artifacts quarantined under `_superseded-premise/` — keeping the false trail visible without letting it pollute the live plan.
+- **A superseding decision record** (`dr-2026-06-03-uniform-piped-links`) captured both the corrected reality and the rejected alternatives, so the reversal is legible to future readers.
+
+### What Was Inefficient
+
+- The original premise (`filename + aliases`) was never validated against Obsidian's actual behavior before a full phase was planned and executed against it — a cheap upfront check (or reading the Obsidian docs / forum on alias resolution) would have avoided the executed-then-discarded first attempt.
+- Cosmetic drift slipped through: the requirements checkboxes were flipped to `[x]` but the traceability table was left at `Pending` (caught and fixed at this close).
+
+### Patterns Established
+
+- **Uniform piped links `[[id|Title]]`** as the single intra-wiki link form — target = `id` (always resolves), display = canonical title. Dissolves the entire class of plural/parens/casing variant-reconciliation problems (display text is cosmetic).
+- `linkres` validates link *targets*; `duplicate` (shipped v1.1) detects near-dup *pages* — orthogonal checks.
+
+### Key Lessons
+
+- **Validate the load-bearing premise of a milestone before planning against it**, especially when it's a claim about third-party tool behavior. A 10-minute check would have saved a phase.
+- A human-verify success criterion on the *observable outcome* (does the graph connect in Obsidian?) is worth more than any number of mechanical checks against an assumed mechanism.
+
+### Cost Observations
+
+- Model mix: predominantly Opus, driven inline (single-phase patch; no subagent fan-out needed).
+- Notable: ~2 calendar days, 75 commits — high commit density for a small phase, reflecting the execute → invalidate → re-plan → re-execute cycle.
+
+---
+
 ## Cross-Milestone Trends
 
 (To be populated as additional milestones ship.)
@@ -110,6 +147,8 @@ A shareable starter kit: neutral public template (Phase 7), two-track wizard/man
 | Version | Name | Shipped | Phases | Plans | Days |
 |---------|------|---------|--------|-------|------|
 | v1.0 | LLM Wiki Compiler MVP | 2026-04-15 | 6 | 24 | 9 |
+| v1.1 | Shareability | 2026-06-02 | 15 | 52 | ~48 |
+| v1.1.1 | Graph Integrity | 2026-06-04 | 1 | 3 | ~2 |
 
 ### Recurring Patterns
 

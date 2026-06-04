@@ -8,21 +8,15 @@ A personal knowledge management system where LLM agents incrementally build and 
 
 The wiki is a persistent, compounding artifact — cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested. Knowledge accumulates rather than being re-derived.
 
-## Current Milestone: v1.1.1 Graph Integrity
+## Current State
 
-**Goal:** Make the wiki's Obsidian graph actually connect. The "Obsidian-first" premise is silently broken: Obsidian resolves `[[X]]` by **filename + `aliases`**, never by the `title` frontmatter — but pages are named by slug (`id == filename`) and linked by spaced `[[Title]]` that isn't in `aliases`, so 31 of 49 wiki pages render as graph orphans. Fix the defect at all three layers — correct the convention, enforce it mechanically, and remediate existing `wiki/` + `examples/` data — so the graph connects and stays connected as new pages are ingested.
+**Shipped:** v1.1.1 Graph Integrity (2026-06-04) — the Obsidian graph now actually connects. The milestone's start premise was **proven false mid-flight** (Obsidian resolves `[[X]]` by **filename/path ONLY** — never by `title`, never by `aliases`; confirmed for v1.12.7) and re-planned around the correct fix: **uniform piped links `[[id|Title]]`** (target = page `id` = filename, always resolves; display = canonical title). §8/§5 + 12 templates corrected, self-alias invariant removed, superseding DR `dr-2026-06-03-uniform-piped-links`; `bin/lint.sh` `linkres` re-pointed to validate link *targets* + `--fix` bare→piped + alias-free `orphan` (LINT_VERSION 1.6.0); all `wiki/` + `examples/` body links rewritten to piped form. Orphan count 19→0; connected graph human-verified in Obsidian. LINK-01..10 Complete.
 
-**Type:** Patch milestone (correctness fix to shipped v1.1). Sequenced **before** the v1.2 schema progressive-disclosure refactor (backlog 999.4), which it de-risks by correcting §8 in place first.
+**Cumulative:** v1.0 MVP (Phases 1–6, shipped 2026-04-15) + v1.1 Shareability (Phases 7–13.2, shipped 2026-06-02) + v1.1.1 Graph Integrity (Phase 14, shipped 2026-06-04). 58 plans total across 3 milestones.
 
-**Target outcomes:**
+**Next milestone (planning):** The leading candidate is **v1.2 Schema Architecture** (backlog 999.4) — reduce `AGENTS.md`/`CLAUDE.md` from ~1,412 lines to a 500–700 line core by extracting procedural workflows, schema reference tables, and validation checklists into `schema/reference/*.md` + `schema/workflows/*.md`, preserving the markdown-authoritative architecture. v1.1.1 de-risked this by correcting §8 in place first. Other backlog: 999.3 (template placeholder system), 999.5 (external source drift detection), 999.6 (observed GTD review patterns). Start with `/gsd-new-milestone`.
 
-- **Correct convention** — `CLAUDE.md` §8 states the real resolution rule (filename + aliases, not `title`) and mandates the self-alias invariant (every page's `aliases` includes its `title` and `id` slug); §5 checklist + page templates updated; `AGENTS.md` stays byte-identical; a decision record captures the reality.
-- **Mechanical enforcement** — a new `bin/lint.sh` Obsidian-accurate link-resolution check flags unreachable page titles and should-resolve-but-mismatched body links (distinct from intentional knowledge-gap red links), with `--fix` to auto-backfill the self-alias; the existing `orphan` check is reconciled so it no longer masks the problem.
-- **Data remediation** — all `wiki/` and `examples/` pages carry self-aliases; link-text variants (plural/parens/casing) reconciled; the resolution check exits 0 and the graph visibly connects in Obsidian.
-
-**Audience:** Same as v1.1 — technically comfortable early adopters who browse the compiled vault in Obsidian. This makes the shipped "Obsidian-first" promise true.
-
-**Deferred to backlog:** Obsidian plugin distribution, one-command installer (`curl|bash`), hosted docs site, brownfield `--apply` mode, and the v1.2 schema progressive-disclosure refactor (999.4) — all sequenced after this patch.
+**Deferred to backlog:** Obsidian plugin distribution, one-command installer (`curl|bash`), hosted docs site, brownfield `--apply` mode — all carried forward.
 
 ## Requirements
 
@@ -138,6 +132,8 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
+*Last updated: 2026-06-04 after v1.1.1 Graph Integrity milestone — SHIPPED + ARCHIVED. Single phase (14 — Graph Link Resolution, 3/3 plans) complete; 10/10 LINK requirements Complete (`bin/requirements-sync.sh --require-complete` exits 0). Archived to `.planning/milestones/v1.1.1-*`; ROADMAP collapsed (Backlog preserved); `REQUIREMENTS.md` removed for a fresh next-milestone; git tag `v1.1.1`. Corrected a stale STATE/PROJECT pointer to a non-existent "Phase 999.1" (that brownfield work shipped in v1.1 Phases 10–11; the backlog entry is SUPERSEDED). Deferred at close: 1 Phase-14 todo (`phase-14-lint-mask-fence-edge-cases`, WR-02/03) + 4 audit-flagged-but-complete quick tasks (see STATE.md Deferred Items). Next: `/gsd-new-milestone` (leading candidate: v1.2 Schema Architecture, backlog 999.4).*
+
 *Last updated: 2026-06-03 — Phase 14 (Graph Link Resolution) complete, closing milestone v1.1.1 Graph Integrity. The milestone-start premise below was PROVEN FALSE mid-flight (Obsidian resolves `[[X]]` by filename/path ONLY — never by `aliases` — intentional design, confirmed for v1.12.7); caught at the LINK-10 human-verify gate. Re-planned to the corrected approach — **uniform piped links `[[id|Title]]`**: §8/§5 + 12 templates corrected, self-alias invariant removed, superseding DR `dr-2026-06-03-uniform-piped-links`; `bin/lint.sh` `linkres` re-pointed to validate link targets + `--fix` bare→piped + alias-free `orphan` + shared `mask_markdown` (LINT_VERSION 1.6.0); all `wiki/`+`examples/` body links rewritten to piped form; orphan count 19→0, exemplar `domain-driven-design` 18 inbound links; graph human-verified connected in Obsidian. Verifier 10/10; phase-09 tests 30/30 (incl. T14 masking guard). Post-merge integration fixes: masked the provenance + gap scans (review WR-01/WR-04). Deferred: lint mask fence edge-cases (WR-02/03, todo). LINK-01..10 Complete. Next: Phase 999.1 brownfield-vault-initialization.*
 
 *Last updated: 2026-06-02 — Milestone v1.1.1 Graph Integrity started. Patch milestone correcting the Obsidian wikilink-resolution defect (Obsidian resolves `[[X]]` by filename + `aliases`, not `title`; 31/49 wiki pages render as graph orphans). Single phase (14 — Graph Link Resolution), ~3 plans in 2 waves: convention + DR ‖ lint enforcement (`linkres` + `--fix`); then data remediation across `wiki/` + `examples/`. Sequenced before the v1.2 schema refactor (999.4). Requirements LINK-01..10.*

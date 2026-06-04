@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.1.1
 milestone_name: Graph Integrity
-status: ready_to_plan
-stopped_at: Phase 14 complete (3/3) — ready to discuss Phase 999.1
-last_updated: 2026-06-03T17:28:01.485Z
-last_activity: 2026-06-03
+status: Awaiting next milestone
+stopped_at: Phase 14 context re-gathered (piped-link approach; premise corrected)
+last_updated: "2026-06-04T05:50:26.455Z"
+last_activity: 2026-06-04 — Milestone v1.1.1 completed and archived
 progress:
-  total_phases: 8
+  total_phases: 1
   completed_phases: 1
   total_plans: 3
-  completed_plans: 58
-  percent: 13
+  completed_plans: 3
+  percent: 100
 ---
 
 # Project State
@@ -34,29 +34,19 @@ Items acknowledged and deferred at the v1.1 milestone close (2026-06-02):
 | v1.2-deferred | Obsidian plugin distribution; one-command installer; hosted docs site; brownfield `--apply` mode | Deferred to v1.2 per PROJECT.md |
 | tech-debt | Pre-existing (per superseded 2026-04-30 audit): 3 unsummarized Kahneman raw sources (DRFT-01); brownfield WR-*/IN-* nits; Phase 11 human-UAT visual items; lint `[[Page Title]]` red-link false-positives | Non-blocking |
 
+Items acknowledged and deferred at the v1.1.1 milestone close (2026-06-03):
+
+| Category | Item | Status |
+|----------|------|--------|
+| todo | `phase-14-lint-mask-fence-edge-cases` — WR-02/03 fence-edge-case hardening for lint markdown masking | Deferred from Phase 14; in `.planning/todos/pending/`. Promote via `/gsd-quick`. |
+| quick_task (DONE) | 4 quick tasks flagged by audit-open as status `missing` (`260415-fvc`, `260415-gzu`, `260501-g5n`, `260602-d6a`) | All complete — each has a SUMMARY.md; flagged only due to unparseable status field. 260501-g5n & 260602-d6a already noted delivered at v1.1 close. No action. |
+
 ## Current Position
 
-Phase: 999.1
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-06-03
-
-**RESOLVED (Phase 14 complete, 2026-06-03):** The milestone's original self-alias premise was proven
-false — Obsidian resolves `[[X]]` by **filename/path ONLY**, never by `aliases` (intentional design,
-confirmed for v1.12.7; caught at the LINK-10 human-verify gate). Phase 14 was re-planned and shipped
-the corrected approach — **uniform piped links `[[id|Title]]`** (target = page `id` = filename →
-always resolves; display = canonical title): §8/§5 + 12 templates corrected, self-alias invariant
-removed, superseding DR `dr-2026-06-03-uniform-piped-links`; `bin/lint.sh` `linkres` re-pointed to
-validate link targets + `--fix` bare→piped + alias-free `orphan` + shared `mask_markdown`
-(LINT_VERSION 1.6.0); all `wiki/` + `examples/` body links rewritten to piped form. Result: orphan
-count 19→0, exemplar `domain-driven-design` has 18 inbound links, graph human-verified connected in
-Obsidian. Verifier 10/10; LINK-01..10 Complete. Post-merge fixes masked the provenance + gap scans
-(review WR-01/WR-04); fence-edge-case hardening deferred (WR-02/03, `.planning/todos/pending/`).
-Kept side cleanup: 11 abandoned `.claude/worktrees/` dirs removed; `.obsidian/app.json`
-`userIgnoreFilters` excludes non-vault dirs.
-Sources: https://obsidian.md/help/aliases ; https://forum.obsidian.md/t/wikilink-resolution-does-not-honor-frontmatter-aliases-1-12-7/113902
-
-Next: Phase 999.1 brownfield-vault-initialization — `/gsd-discuss-phase 999.1` (recommended) or `/gsd-plan-phase 999.1`.
+Phase: Milestone v1.1.1 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-06-04 — Milestone v1.1.1 completed and archived
 
 ## v1.1 Shareability — Archived 2026-06-02
 
@@ -377,3 +367,7 @@ Recent decisions affecting current work:
 Last session: 2026-06-03T17:12:14.057Z
 Stopped at: Phase 14 context re-gathered (piped-link approach; premise corrected)
 Resume file: None
+
+## Operator Next Steps
+
+- Start the next milestone with /gsd-new-milestone
