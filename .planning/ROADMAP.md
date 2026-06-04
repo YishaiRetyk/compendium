@@ -70,11 +70,13 @@ Full phase details: [milestones/v1.1.1-ROADMAP.md](milestones/v1.1.1-ROADMAP.md)
   3. A concrete enforcement artifact exists — a `settings.json` `deny`-read entry and/or a two-session split runbook — so enforcement is structural, not a remembered rule.
   4. All tooling (`bin/check-privacy.sh`, `bin/lint.sh` privacy checks, `bin/audit-claims.sh` FAITH-04 resolution, CI privacy-leak job) operates on the structural model without behavioral regression.
   5. Decision record `wiki/decisions/dr-YYYY-MM-DD-privacy-asymmetric-two-dir.md` (`trigger_type: schema-update`) is authored, recording the three options and why asymmetric won; §13's resident obligation is confirmed reduced to a one-line structural pointer.
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
 
-- [ ] 15-01: TBD
+- [ ] 15-00-PLAN.md — Wave 0 RED test scaffold (lib.sh + 9 test_*.sh covering PRIV-01..07)
+- [ ] 15-01-PLAN.md — Lockstep migration: route+strip wiki/→wiki-cloud/+wiki-local/, rewrite §2/§3/§5/§8/§13, re-key paths, author DR (ONE commit, D-02)
+- [ ] 15-02-PLAN.md — Enforcement + tooling re-key: D-09 cloud→local link check, check-privacy/privacy_resolve/audit re-key, settings.cloud.json deny-profile + honest fail-direction docs
 
 ### Phase 16: Reference Extraction
 **Goal**: Every static reference section (page-type definitions, frontmatter schema, provenance syntax, wikilink conventions, privacy model, scaling, tooling) lives in its own standalone markdown file under `schema/reference/` or `docs/reference/`, with the core replaced by routing stubs; §16 is deleted.
