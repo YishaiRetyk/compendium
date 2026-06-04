@@ -43,9 +43,13 @@ created: 2026-06-04
 | 15-PRIV-02 | TBD | 1 | PRIV-02 | — | §13 contains asymmetric language; 7-row table absent; per-page precedence narrative gone | unit (grep schema) | `bash tests/phase-15/test_schema_13_rewritten.sh` | ❌ W0 | ⬜ pending |
 | 15-PRIV-03 | TBD | 2 | PRIV-03 | T-15-leak | `.claude/settings.cloud.json` exists with `deny: Read(./wiki-local/**)`; verification test pins Read/Bash/git-show fail-direction | smoke + behavioral | `bash tests/phase-15/test_cloud_deny_profile.sh` | ❌ W0 | ⬜ pending |
 | 15-PRIV-04 | TBD | 1 | PRIV-04 | — | No `privacy:` key in any page frontmatter; §5 base block + checklist item #5 removed | unit | `bash tests/phase-15/test_privacy_field_stripped.sh` | ❌ W0 | ⬜ pending |
-| 15-PRIV-05a | TBD | 2 | PRIV-05 | T-15-leak | cloud→local link = `error` in lint | unit | `bash tests/phase-15/test_lint_xtier_link.sh` | ❌ W0 | ⬜ pending |
-| 15-PRIV-05b | TBD | 2 | PRIV-05 | T-15-leak | check-privacy re-keyed (no `wiki-local/` in PUBLIC_PATHS/release) | unit | `bash tests/phase-15/test_check_privacy_rekey.sh` | ❌ W0 | ⬜ pending |
-| 15-PRIV-05c | TBD | 2 | PRIV-05 | — | audit FAITH-04 predicate collapse — no regression | regression | `bash tests/phase-13/*` (audit suite) re-run green | ✅ exists | ⬜ pending |
+| 15-PRIV-05a | 02 | 2 | PRIV-05 | T-15-05 | cloud→local link = `error` in lint (NET-NEW additive D-09, two-root discovery) | unit | `bash tests/phase-15/test_lint_xtier_link.sh` | ❌ W0 | ⬜ pending |
+| 15-PRIV-05b | 01 | 1 | PRIV-05 | T-15-leak-3 | check-privacy re-keyed structural (path guard) — PREDICATE moved to Plan 01 security-atomic commit (review HIGH #6) | unit | `bash tests/phase-15/test_check_privacy_rekey.sh` | ❌ W0 | ⬜ pending |
+| 15-PRIV-05c | 01 | 1 | PRIV-05 | T-15-06 | audit FAITH-04 predicate collapse + source-summary-path fix — no regression (review HIGH #2/#3, in Plan 01) | regression | `bash tests/phase-13/*` (audit suite) re-run green | ✅ exists | ⬜ pending |
+| 15-PRIV-05d | 01 | 1 | PRIV-05 | T-15-leak-4 | check-neutrality leak-source predicate re-keyed (W1 tripwire) — in Plan 01 security-atomic commit (review HIGH #6) | unit | `bash tests/phase-15/test_neutrality_leak_source_rekey.sh` | ❌ W0 | ⬜ pending |
+| 15-PRIV-05e | 01 | 1 | PRIV-05 | T-15-08 | structural resolver: source-derived-local survives (review HIGH #2) | unit | `bash tests/phase-15/test_resolver_structural.sh` | ❌ W0 | ⬜ pending |
+| 15-PRIV-04b | 01 | 1 | PRIV-04 | T-15-09 | generated audit/lint maintenance templates emit no privacy: (review HIGH #4) | unit | `bash tests/phase-15/test_generated_frontmatter_clean.sh` | ❌ W0 | ⬜ pending |
+| 15-PRIV-04c | 01 | 1 | PRIV-04 | T-15-02 | bin/lint.sh BASE_FIELDS + VALID_PRIVACY enum drop privacy (review HIGH #5) | unit | `bash tests/phase-15/test_lint_required_field_dropped.sh` | ❌ W0 | ⬜ pending |
 | 15-PRIV-06 | TBD | 3 | PRIV-06 | — | DR at `wiki-cloud/decisions/dr-*-privacy-asymmetric-two-dir.md`, `trigger_type: schema-update`, records 3 options | unit | `bash tests/phase-15/test_decision_record.sh` | ❌ W0 (mirror phase-09.1 exists) | ⬜ pending |
 | 15-PRIV-07 | TBD | 1 | PRIV-07 | — | core §13 = one-line pointer; no precedence/inheritance machinery in core | unit | `bash tests/phase-15/test_priv_resident_reduced.sh` | ❌ W0 | ⬜ pending |
 | 15-XEQ | TBD | 1 | (cross) | — | `CLAUDE.md` ≡ `AGENTS.md` byte-equal; wizard regen byte-equal to canonical fixture | unit | `bash bin/sync-claude.sh --check`; `bash tests/phase-08/test_canonical_byte_equality.sh` | ✅ exists | ⬜ pending |
@@ -65,7 +69,11 @@ created: 2026-06-04
 - [ ] `tests/phase-15/test_lint_xtier_link.sh` + `test_check_privacy_rekey.sh` — PRIV-05
 - [ ] `tests/phase-15/test_decision_record.sh` — PRIV-06 (mirror `tests/phase-09.1/test_decision_record.sh`)
 - [ ] `tests/phase-15/test_priv_resident_reduced.sh` — PRIV-07
-- [ ] **Fixture update task:** ~40 prior-phase `test_*.sh` files asserting `wiki/` paths must be updated to `wiki-cloud/` IN the lockstep commit (else the regression suite goes red — this is itself a validation gate, not optional cleanup)
+- [ ] `tests/phase-15/test_neutrality_leak_source_rekey.sh` — PRIV-05 W1 tripwire (RED in Wave 0 per review MEDIUM #1; moved here from the original Plan 02)
+- [ ] `tests/phase-15/test_resolver_structural.sh` — PRIV-05 source-tier-privacy gate (review HIGH #2)
+- [ ] `tests/phase-15/test_generated_frontmatter_clean.sh` — PRIV-04 generated-template gate (review HIGH #4)
+- [ ] `tests/phase-15/test_lint_required_field_dropped.sh` — PRIV-04 lint-required-field gate (review HIGH #5)
+- [ ] **Fixture update task (manifest-driven, review HIGH #7):** 94 prior-phase `test_*.sh` files across ALL 9 phase dirs (NOT ~40) referencing `wiki/` are classified per-occurrence (cloud page → `wiki-cloud/`; audit control-plane → `wiki-local/maintenance/`; legacy resolver test → rewritten in Plan 01 Task 5; git-history literal → unchanged) and re-keyed IN the lockstep commit (else the regression suite goes red — this is itself a validation gate, not optional cleanup)
 
 ---
 
