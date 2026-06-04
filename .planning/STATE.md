@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Schema Architecture
-status: ready_to_plan
-stopped_at: Phase 15 complete (3/3) — ready to discuss Phase 999.1
-last_updated: 2026-06-04T17:10:32.710Z
-last_activity: 2026-06-04
+status: planning
+stopped_at: Phase 16 context gathered
+last_updated: "2026-06-04T19:02:46.693Z"
+last_activity: 2026-06-04 -- Phase 15 complete (3/3 plans, verification passed; PRIV-04/07 wizard-template gap closed inline)
 progress:
   total_phases: 11
   completed_phases: 1
   total_plans: 3
-  completed_plans: 61
+  completed_plans: 3
   percent: 9
 ---
 
@@ -377,9 +377,9 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-06-04T15:15:17.823Z
-Stopped at: Completed 15-02-PLAN.md
-Resume file: None
+Last session: 2026-06-04T19:02:46.683Z
+Stopped at: Phase 16 context gathered
+Resume file: .planning/phases/16-reference-extraction/16-CONTEXT.md
 
 ## Operator Next Steps
 
