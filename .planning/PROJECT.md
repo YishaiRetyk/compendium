@@ -14,9 +14,23 @@ The wiki is a persistent, compounding artifact — cross-references are already 
 
 **Cumulative:** v1.0 MVP (Phases 1–6, shipped 2026-04-15) + v1.1 Shareability (Phases 7–13.2, shipped 2026-06-02) + v1.1.1 Graph Integrity (Phase 14, shipped 2026-06-04). 58 plans total across 3 milestones.
 
-**Next milestone (planning):** The leading candidate is **v1.2 Schema Architecture** (backlog 999.4) — reduce `AGENTS.md`/`CLAUDE.md` from ~1,412 lines to a 500–700 line core by extracting procedural workflows, schema reference tables, and validation checklists into `schema/reference/*.md` + `schema/workflows/*.md`, preserving the markdown-authoritative architecture. v1.1.1 de-risked this by correcting §8 in place first. Other backlog: 999.3 (template placeholder system), 999.5 (external source drift detection), 999.6 (observed GTD review patterns). Start with `/gsd-new-milestone`.
+**Active milestone:** **v1.2 Schema Architecture** (started 2026-06-04, promoted from backlog 999.4) — see the dedicated section below. Other backlog: 999.3 (template placeholder system, partially folded as deferred Phase D/`WIZ`), 999.5 (external source drift detection), 999.6 (observed GTD review patterns).
 
 **Deferred to backlog:** Obsidian plugin distribution, one-command installer (`curl|bash`), hosted docs site, brownfield `--apply` mode — all carried forward.
+
+## Current Milestone: v1.2 Schema Architecture
+
+**Goal:** Apply the project's own §7 progressive-disclosure principle to its own spec — reduce the always-loaded `AGENTS.md`/`CLAUDE.md` (now **1,689 lines**) to a resident core of only what genuinely belongs in every-turn context, decided by an **inclusion test** (ambient / unscriptable-AND-unacceptable-miss-cost / dispatch), not a line target. The ~145-line core is an expected *output*, not a goal. Everything else extracts into `schema/reference/*.md` + `schema/workflows/*.md`, preserving a markdown-authoritative, harness-portable architecture.
+
+**Target features (committed: Phase 0 + A + B + C):**
+- **Phase 0 — Privacy Architecture (`PRIV`, gates A):** replace per-page §13 privacy with a per-vault **asymmetric two-directory** model (`wiki-cloud/` / `wiki-local/`; one-way permeability — local runs read both, cloud runs cannot read `wiki-local/`); enforcement is a harness permission (`deny`-read), not a resident agent rule. Decided/ACCEPTED 2026-06-04. Must land before §13 is extracted.
+- **Phase A — Reference Extraction (`REF`, low-risk):** §4/5/6/7/8/13 → `schema/reference/*.md`; §14/15 → `docs/reference/*.md`; delete §16; add the `IMPORTANT:`-flagged routing table; mirror stubs into `schema/AGENTS.template.md`.
+- **Phase B — Workflow Extraction (`WF`, medium-risk):** §9/10/11.1–11.7/12 → `schema/workflows/*.md` (incl. the 182-line brownfield miss); absorbs the `workflows-operations-to-skills` seed; verify core against the inclusion test.
+- **Phase C — Skills Overlay (`SKILL`, optional):** thin `.claude/skills/` routers (ingest/query/lint/reflect), pointer-only bodies; zero authoritative content.
+
+**Deferred this milestone:** Phase D — Wizard/Template fold-in (`WIZ`) — D1 conflicts with the Phase-8 minimalism decision (must be justified first); D2 is observation-gated. Promotable later via `/gsd-phase`.
+
+**Design constraints (non-negotiable, carry into every phase):** markdown-authoritative; `AGENTS.md ≡ CLAUDE.md` byte-equality (pre-commit `sync-claude --check`); wizard pipeline preserved; always-loaded safety core stays resident (provenance requirement, MUST-NOT list verbatim, write-back-mandatory, structured-op vocabulary — **privacy no longer in this list**, dissolved by Phase 0); CI gates unchanged in behavior (extraction relocates text, not logic).
 
 ## Requirements
 
@@ -132,6 +146,8 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
+*Last updated: 2026-06-04 — Milestone **v1.2 Schema Architecture** started (promoted from backlog 999.4). Goal: apply the spec's own §7 progressive-disclosure principle to itself — reduce the always-loaded `AGENTS.md`/`CLAUDE.md` (1,689 lines) to a ~145-line resident core via an inclusion test (ambient / unscriptable-unacceptable-miss / dispatch), extracting the rest into `schema/reference/*.md` + `schema/workflows/*.md`. Committed scope: Phase 0 (`PRIV`, asymmetric two-dir privacy — gates A) + Phase A (`REF`, reference extraction) + Phase B (`WF`, workflow extraction) + Phase C (`SKILL`, optional skills overlay). Phase D (`WIZ`) deferred. Research skipped (internal refactor — relocates text, not logic). Phase numbering continues from 14. Preserved `999.4-…/CONTEXT-NOTES.md` (live design source) — declined the destructive `phases.clear`. Distilled from `.planning/milestones/v1.2-MILESTONE-BRIEF.md`. Next: requirements → roadmap.*
+
 *Last updated: 2026-06-04 after v1.1.1 Graph Integrity milestone — SHIPPED + ARCHIVED. Single phase (14 — Graph Link Resolution, 3/3 plans) complete; 10/10 LINK requirements Complete (`bin/requirements-sync.sh --require-complete` exits 0). Archived to `.planning/milestones/v1.1.1-*`; ROADMAP collapsed (Backlog preserved); `REQUIREMENTS.md` removed for a fresh next-milestone; git tag `v1.1.1`. Corrected a stale STATE/PROJECT pointer to a non-existent "Phase 999.1" (that brownfield work shipped in v1.1 Phases 10–11; the backlog entry is SUPERSEDED). Deferred at close: 1 Phase-14 todo (`phase-14-lint-mask-fence-edge-cases`, WR-02/03) + 4 audit-flagged-but-complete quick tasks (see STATE.md Deferred Items). Next: `/gsd-new-milestone` (leading candidate: v1.2 Schema Architecture, backlog 999.4).*
 
 *Last updated: 2026-06-03 — Phase 14 (Graph Link Resolution) complete, closing milestone v1.1.1 Graph Integrity. The milestone-start premise below was PROVEN FALSE mid-flight (Obsidian resolves `[[X]]` by filename/path ONLY — never by `aliases` — intentional design, confirmed for v1.12.7); caught at the LINK-10 human-verify gate. Re-planned to the corrected approach — **uniform piped links `[[id|Title]]`**: §8/§5 + 12 templates corrected, self-alias invariant removed, superseding DR `dr-2026-06-03-uniform-piped-links`; `bin/lint.sh` `linkres` re-pointed to validate link targets + `--fix` bare→piped + alias-free `orphan` + shared `mask_markdown` (LINT_VERSION 1.6.0); all `wiki/`+`examples/` body links rewritten to piped form; orphan count 19→0, exemplar `domain-driven-design` 18 inbound links; graph human-verified connected in Obsidian. Verifier 10/10; phase-09 tests 30/30 (incl. T14 masking guard). Post-merge integration fixes: masked the provenance + gap scans (review WR-01/WR-04). Deferred: lint mask fence edge-cases (WR-02/03, todo). LINK-01..10 Complete. Next: Phase 999.1 brownfield-vault-initialization.*

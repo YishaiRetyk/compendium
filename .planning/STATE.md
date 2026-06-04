@@ -1,17 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.1.1
-milestone_name: Graph Integrity
-status: Awaiting next milestone
-stopped_at: Phase 14 context re-gathered (piped-link approach; premise corrected)
-last_updated: "2026-06-04T05:50:26.455Z"
-last_activity: 2026-06-04 — Milestone v1.1.1 completed and archived
+milestone: v1.2
+milestone_name: Schema Architecture
+status: planning
+last_updated: "2026-06-04T09:18:29.525Z"
+last_activity: 2026-06-04
 progress:
-  total_phases: 1
-  completed_phases: 1
-  total_plans: 3
-  completed_plans: 3
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -43,10 +42,10 @@ Items acknowledged and deferred at the v1.1.1 milestone close (2026-06-03):
 
 ## Current Position
 
-Phase: Milestone v1.1.1 complete
+Phase: Not started (defining requirements)
 Plan: —
-Status: Awaiting next milestone
-Last activity: 2026-06-04 — Milestone v1.1.1 completed and archived
+Status: Defining requirements
+Last activity: 2026-06-04 — Milestone v1.2 started
 
 ## v1.1 Shareability — Archived 2026-06-02
 
