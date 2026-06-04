@@ -10,7 +10,7 @@ Blank line between marker and claim MUST invalidate the exemption (negative case
 
 ## Contents
 
-- `wiki/concepts/attention.md` — same shape as `strict-missing-dr/` but with the escape-hatch marker on the line directly above the `[inferred]` claim (no blank line between).
+- `wiki-cloud/concepts/attention.md` — same shape as `strict-missing-dr/` but with the escape-hatch marker on the line directly above the `[inferred]` claim (no blank line between).
 
 ## Line-order discipline
 

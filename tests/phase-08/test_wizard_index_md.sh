@@ -22,7 +22,7 @@ echo "TEST: wiki-cloud/index.md update_index_md() 3-guardrail contract (Open Q1,
 echo "  [1/3] happy path: empty-index starting state"
 
 WORK="$(mktemp_repo)"
-mkdir -p "$WORK/wiki"
+mkdir -p "$WORK/wiki-cloud"
 cp "$REPO_ROOT/wiki-cloud/index.md" "$WORK/wiki-cloud/index.md"
 
 WIZARD_GENERATED_AT=2026-04-16T12:00:00Z WIZARD_TEMPLATE_SHA=fixed-sha \
@@ -41,7 +41,7 @@ assert_eq 1 "$header_count" "exactly one '## Decisions' heading after happy-path
 echo "  [2/3] idempotency: re-render with entry already present"
 
 WORK2="$(mktemp_repo)"
-mkdir -p "$WORK2/wiki"
+mkdir -p "$WORK2/wiki-cloud"
 # Pre-populate index with the starter skeleton + an already-present Decisions
 # section containing the exact wikilink entry the wizard would add.
 cat >"$WORK2/wiki-cloud/index.md" <<'EOF'
@@ -87,7 +87,7 @@ assert_eq 1 "$entry_count" "idempotent re-run must not duplicate the wikilink en
 echo "  [3/3] duplicate-header guard: 2 Decisions headings -> error"
 
 WORK3="$(mktemp_repo)"
-mkdir -p "$WORK3/wiki"
+mkdir -p "$WORK3/wiki-cloud"
 cat >"$WORK3/wiki-cloud/index.md" <<'EOF'
 ---
 id: index

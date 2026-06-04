@@ -12,7 +12,7 @@ SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 REPO_ROOT=$(cd "$SCRIPT_DIR/../.." && pwd)
 cd "$REPO_ROOT"
 
-UNEXPECTED=$(find wiki -mindepth 1 -maxdepth 1 ! -name 'index.md' ! -name 'log.md' ! -name 'decisions' -print)
+UNEXPECTED=$(find wiki-cloud -mindepth 1 -maxdepth 1 ! -name 'index.md' ! -name 'log.md' ! -name 'decisions' -print)
 if [ -z "$UNEXPECTED" ]; then
   pass "wiki-cloud/ top level clean (index.md, log.md, decisions/ only)"
 else

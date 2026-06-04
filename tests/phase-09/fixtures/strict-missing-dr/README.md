@@ -2,7 +2,7 @@
 
 **Purpose:** Strict mode — `[epistemic:: inferred]` claim with NO matching decision record.
 
-`bin/lint.sh --strict` MUST exit non-zero on this fixture: the `[inferred]` claim on `wiki/concepts/attention.md` has no corresponding `type: decision` page in `wiki/decisions/` listing `attention` in `affected_pages`.
+`bin/lint.sh --strict` MUST exit non-zero on this fixture: the `[inferred]` claim on `wiki-cloud/concepts/attention.md` has no corresponding `type: decision` page in `wiki-cloud/decisions/` listing `attention` in `affected_pages`.
 
 ## Triggers
 
@@ -10,7 +10,7 @@
 
 ## Contents
 
-- `wiki/concepts/attention.md` — concept page with one `[epistemic:: inferred]` claim and no matching decision record.
+- `wiki-cloud/concepts/attention.md` — concept page with one `[epistemic:: inferred]` claim and no matching decision record.
 
 ## Encoding discipline
 

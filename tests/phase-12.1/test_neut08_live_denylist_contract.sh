@@ -46,7 +46,7 @@ echo "anchor term: $ANCHOR"
 #    this is the Phase 12.1 critical delta vs Phase 7 N3 fixture-local denylist.
 FIX=$(mktemp -d)
 trap 'rm -rf "$FIX"' EXIT
-mkdir -p "$FIX/wiki" "$FIX/docs"
+mkdir -p "$FIX/wiki-cloud" "$FIX/docs"
 printf '# Test fixture\nThis page contains the term %s for leak testing.\n' "$ANCHOR" > "$FIX/wiki-cloud/leak.md"
 
 # 4. Positive case: gate must fire (exit 2 + grep -F hit on anchor).

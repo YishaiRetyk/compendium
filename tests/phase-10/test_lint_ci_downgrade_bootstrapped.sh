@@ -16,7 +16,7 @@ cp "$REPO_ROOT/tests/phase-10/fixtures/bootstrapped-vault/wiki-cloud/concepts/bo
 printf '# Index\n[[Old Bootstrapped Page]]\n' > "$tmp/wiki-cloud/index.md"
 printf '# Log\n' > "$tmp/wiki-cloud/log.md"
 
-json="$(bash "$REPO_ROOT/bin/lint.sh" --ci --format json "$tmp/wiki" 2>/dev/null || true)"
+json="$(bash "$REPO_ROOT/bin/lint.sh" --ci --format json "$tmp/wiki-cloud" 2>/dev/null || true)"
 
 # Use python3 to locate the finding for bootstrapped-old.md and assert
 # severity is 'info' (downgraded from the default yaml-error severity).

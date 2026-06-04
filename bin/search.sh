@@ -10,7 +10,7 @@
 set -euo pipefail
 
 WIKI_INDEX="wiki-cloud/index.md"
-WIKI_DIR="wiki"
+WIKI_DIR="wiki-cloud"
 
 usage() {
     cat <<'EOF'

@@ -12,7 +12,7 @@ trap 'cleanup_fixture_repo "$FIXTURE"' EXIT
 # the ci-lint-json fixture template ships as an empty wiki dir, and 09-01's
 # delta to populate it may arrive independently. We provide minimal content
 # here so --format json exercises the emit branch even if the fixture is bare.
-mkdir -p "$FIXTURE/wiki"
+mkdir -p "$FIXTURE/wiki-cloud"
 cat > "$FIXTURE/wiki-cloud/index.md" <<'IDX'
 # Index
 

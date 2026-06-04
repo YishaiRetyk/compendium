@@ -173,7 +173,7 @@ See: schema/examples/concept.md for a concrete filled-in instance.
 
 **Section order:** TL;DR -> Key Takeaways -> Extracted Claims -> Notes -> Source Metadata
 
-**When to use:** Every time a source is ingested, a source summary page is created in `wiki-cloud/sources/`.
+**When to use:** Every time a source is ingested, a source summary page is created in `wiki-cloud/sources/` (or `wiki-local/sources/` for local-only content).
 
 **Additional frontmatter fields** (beyond the base set):
 
@@ -1614,7 +1614,7 @@ A compact summary of the most critical rules for fast LLM scanning:
 3. **`[[id|Exact Title]]` on first mention only.** Piped form only — target = page `id`, display = exact canonical `title`. No bare `[[Title]]` links. No repeated links. No wikilinks in frontmatter.
 4. **`[prov:source_id#locator]` for every factual claim.** Every claim needs provenance. No exceptions.
 5. **One commit per logical operation.** One ingest = one commit, even if it touches many files.
-6. **Privacy default: `local_only`.** When in doubt, do not send to cloud APIs.
+6. **Privacy default: `wiki-local/` tier.** When in doubt, place content in `wiki-local/` -- do not expose to cloud sessions.
 7. **All dates: ISO 8601.** `YYYY-MM-DD` or `YYYY-MM-DDTHH:mm:ss`.
 8. **All field names: `snake_case`.** For Dataview compatibility.
 9. **Operations: UPDATE, MERGE, SUPERSEDE, ARCHIVE.** No raw file rewrites. Log every operation.

@@ -40,7 +40,7 @@ seed_origin_main_ref "$FIXTURE"
 git checkout -q feature
 
 # Sanity check: origin/main should NOT have the claim line; HEAD should.
-if git show origin/main:wiki/concepts/attention.md 2>/dev/null | grep -q 'epistemic:: inferred'; then
+if git show origin/main:wiki-cloud/concepts/attention.md 2>/dev/null | grep -q 'epistemic:: inferred'; then
     echo "FAIL: origin/main unexpectedly has the inferred claim" >&2
     popd >/dev/null; exit 1
 fi

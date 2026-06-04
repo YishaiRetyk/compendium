@@ -8,7 +8,7 @@
 
 ## Contents
 
-- `wiki/concepts/new-concept.md` — concept page whose body contains NO `[prov:` markers.
+- `wiki-cloud/concepts/new-concept.md` — concept page whose body contains NO `[prov:` markers.
 
 ## Test harness pattern
 

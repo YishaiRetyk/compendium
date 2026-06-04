@@ -16,21 +16,21 @@ bash "$REPO_ROOT/bin/brownfield.sh" scan --root "$tmp" >/dev/null 2>&1
 report="$tmp/.brownfield/REPORT.md"
 
 # SomeEntity.md → entity, high
-if ! grep -E '`wiki-cloud/entities/SomeEntity.md`.*\bentity\b.*\bhigh\b' "$report" >/dev/null; then
+if ! grep -E '`wiki/entities/SomeEntity.md`.*\bentity\b.*\bhigh\b' "$report" >/dev/null; then
     echo "FAIL: SomeEntity.md does not match 'entity high' in Inventory" >&2
     grep "SomeEntity" "$report" >&2 || true
     exit 1
 fi
 
 # some-concept.md → concept, high
-if ! grep -E '`wiki-cloud/concepts/some-concept.md`.*\bconcept\b.*\bhigh\b' "$report" >/dev/null; then
+if ! grep -E '`wiki/concepts/some-concept.md`.*\bconcept\b.*\bhigh\b' "$report" >/dev/null; then
     echo "FAIL: some-concept.md does not match 'concept high'" >&2
     grep "some-concept" "$report" >&2 || true
     exit 1
 fi
 
 # src-2026-04-01-paper.md → source, high
-if ! grep -E '`wiki-cloud/sources/src-2026-04-01-paper.md`.*\bsource\b.*\bhigh\b' "$report" >/dev/null; then
+if ! grep -E '`wiki/sources/src-2026-04-01-paper.md`.*\bsource\b.*\bhigh\b' "$report" >/dev/null; then
     echo "FAIL: src-2026-04-01-paper.md does not match 'source high'" >&2
     grep "src-2026-04-01-paper" "$report" >&2 || true
     exit 1

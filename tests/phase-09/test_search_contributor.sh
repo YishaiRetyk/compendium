@@ -8,7 +8,7 @@ source "$SCRIPT_DIR/lib.sh"
 TMP="$(mktemp -d -t srch-ctrb-XXXXXX)"
 trap 'rm -rf "$TMP"' EXIT
 
-mkdir -p "$TMP/wiki"
+mkdir -p "$TMP/wiki-cloud"
 # search.sh resolves WIKI_INDEX; seed an empty index
 echo "# Index" > "$TMP/wiki-cloud/index.md"
 

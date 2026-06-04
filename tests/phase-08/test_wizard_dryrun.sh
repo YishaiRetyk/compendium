@@ -21,13 +21,13 @@ fi
 
 STDOUT="$(bash "$WIZARD" --answers-file "$CANONICAL_ANSWERS" --dry-run)"
 
-if ! printf '%s\n' "$STDOUT" | grep -qE '^--- a/AGENTS\.md'; then
+if ! grep -qE '^--- a/AGENTS\.md' <<<"$STDOUT"; then
     echo "ASSERT FAIL: --dry-run stdout missing '--- a/AGENTS.md' header" >&2
     printf '%s\n' "$STDOUT" | head -5 >&2
     exit 1
 fi
 
-if ! printf '%s\n' "$STDOUT" | grep -qE '^\+\+\+ b/AGENTS\.md'; then
+if ! grep -qE '^\+\+\+ b/AGENTS\.md' <<<"$STDOUT"; then
     echo "ASSERT FAIL: --dry-run stdout missing '+++ b/AGENTS.md' header" >&2
     printf '%s\n' "$STDOUT" | head -5 >&2
     exit 1

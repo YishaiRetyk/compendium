@@ -8,7 +8,7 @@ FIXTURE="$(make_fixture_repo ci-lint-json)"
 trap 'cleanup_fixture_repo "$FIXTURE"' EXIT
 
 # Seed a minimal wiki skeleton
-mkdir -p "$FIXTURE/wiki"
+mkdir -p "$FIXTURE/wiki-cloud"
 cat > "$FIXTURE/wiki-cloud/index.md" <<'IDX'
 # Index
 IDX
