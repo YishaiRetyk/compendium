@@ -341,23 +341,26 @@ Note: a fully headless assertion of (1)/(2) may require `claude -p` with `--sett
 |---|-------|---------|---------------|
 | A1 | `.obsidian/plugins/dataview/main.js` `wiki/` hits are coincidental minified strings, not editable vault paths | Runtime State Inventory | LOW — leaving it alone is safe regardless; if some are real config they self-heal or are user-regenerable |
 | A2 | A headless `claude -p --settings` session can assert the Read/Bash deny in an automated test | Code Examples (verification test) | MEDIUM — if not feasible, fall back to static settings-file assertion + manual runbook (noted inline). Confirm at plan time. |
-| A3 | `bin/check-neutrality.sh`, `bin/validate-op.sh`, `bin/ingest.sh` `wiki/` refs are all simple path defaults (no logic depends on the literal string beyond pathing) | Path-Reference Inventory | LOW-MEDIUM — planner should grep each in context; mechanical rename expected, but verify no regex hardcodes `wiki/` in a way that breaks `wiki-cloud/` (e.g. `^wiki/` anchors) |
+| A3 | ~~`bin/check-neutrality.sh`, `bin/validate-op.sh`, `bin/ingest.sh` `wiki/` refs are all simple path defaults~~ **CORRECTED (W1):** `bin/check-neutrality.sh` is NOT pure-path — its `source_local_only_wiki()` carries a PREDICATE (`re.search(r"^privacy:\s*local_only\b", fm)`, line ~279) that goes DEAD after the field strip, silently dropping one of three CI-gated leak sources. `validate-op.sh`/`ingest.sh` ARE pure-path. | Path-Reference Inventory | ~~LOW-MEDIUM~~ **WAS UNDER-RATED** — the check-neutrality predicate re-key (walk `wiki-local/` by prefix, drop the regex) is owned by Plan 02 Task 2, NOT the mechanical Plan 01 re-key; planner must grep each file in context and watch for predicates, not just `^wiki/` anchors |
 | A4 | The asymmetric-link check (D-09) can reuse `linkres` rather than needing a new top-level category | Pattern 3 | LOW — both paths documented; if reuse conflicts with severity semantics, register a new category (cost: ~3 edit sites) |
 
 **Note:** The permission-model claims (deny-first precedence, Bash-file-cmd coverage, python/git-object gaps, `--settings` flag) are **VERIFIED/CITED**, not assumed — see Sources.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **check-privacy.sh: thin assertion vs fold into release.sh?**
    - What we know: the frontmatter-grep loses its target (no more `privacy` field); the real guarantee is "no `wiki-local/` in public/release paths."
    - What's unclear: whether to keep a standalone `check-privacy.sh` (re-keyed) or migrate the guarantee into `release.sh` + a lint drift check.
    - Recommendation: keep `check-privacy.sh` as a thin re-keyed guard (preserves the CI `privacy-leak` job name + branch-protection required check), AND ensure `release.sh` allowlist excludes `wiki-local/`. Belt-and-suspenders, minimal churn to CI wiring.
+   - **RESOLVED:** Plan 02 Task 2 keeps `check-privacy.sh` as a thin re-keyed structural guard (CLI surface + exit codes 0/1/2 + `privacy-leak` job name preserved) and re-confirms `bin/release.sh` allowlist excludes `wiki-local/` (belt-and-suspenders). NOT folded into release.sh.
 
 2. **Headless verification-test feasibility (A2).**
    - Recommendation: spike `claude -p --settings ./.claude/settings.cloud.json` early; if brittle, ship static-assertion + manual runbook. Either satisfies Success Criterion #3 (the artifact is concrete) and the spirit of D-12.4 (a regression tripwire exists).
+   - **RESOLVED:** Plan 02 Task 2(e) implements the A2 fallback ladder — spike the headless three-surface assertion; if brittle/non-deterministic, fall back to the static settings-shape assertion + the documented manual runbook (VALIDATION.md Manual-Only row) with a commented `# MANUAL:` block. Either path satisfies Success Criterion #3 + D-12.4.
 
 3. **New lint category vs linkres subcategory for D-09.**
    - Recommendation: prefer a new logical subcategory tag inside `linkres` findings (least registration churn, inherits `linkres`→`error` remap). Escalate to a top-level category only if reporting clarity demands it.
+   - **RESOLVED:** Plan 02 Task 1(a) uses the `linkres` subcategory (the `add_finding('error', 'linkres', ...)` path), inheriting the existing `linkres`→`error` remap with no new category registration. The top-level `xtier` category is documented as the escalation-only fallback, not taken.
 
 ## Environment Availability
 
