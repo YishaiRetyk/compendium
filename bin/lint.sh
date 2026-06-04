@@ -10,7 +10,7 @@ set -euo pipefail
 # Lint rule-set semver per CI-08 / D-26. Bump MAJOR on breaking changes
 # (removed category, changed severity semantics). MINOR on non-breaking
 # additions. PATCH on bug fixes. --require-version X.Y.Z is a minimum check.
-LINT_VERSION="1.6.0"
+LINT_VERSION="1.7.0"
 
 usage() {
     cat <<'EOF'
@@ -1903,6 +1903,72 @@ if should_run('linkres'):
         stem = os.path.splitext(os.path.basename(fpath))[0].lower()
         known_ids.add(stem)
 
+    # ---------------------------------------------------------------------------
+    # D-09 / PRIV-05: TWO-ROOT page universe + page_tier SET map.
+    # The standard all_pages walk is rooted in WIKI_DIR (wiki-cloud/ by default).
+    # To detect cloud->local links, we ALSO need to know which ids live in
+    # wiki-local/ -- otherwise a wiki-cloud/ link to a wiki-local/ target looks
+    # like an ordinary unknown id (red link), not a D-09 cross-tier error.
+    #
+    # page_tier[id] is a SET of tiers ({'cloud'}, {'local'}, or {'cloud','local'}).
+    # DUPLICATE-ID semantics (cycle-2 MEDIUM): if the SAME id exists in both tiers,
+    # page_tier[id] == {'cloud','local'} -- walk order MUST NOT change the verdict.
+    # A dual-tier id emits its own duplicate-id linkres error AND is treated as
+    # local for the D-09 check (fail-safe: flag, never hide a potential leak).
+    # ---------------------------------------------------------------------------
+    project_root_for_tier = os.path.dirname(os.path.abspath(wiki_dir.rstrip('/')))
+    wiki_local_root = os.path.join(project_root_for_tier, 'wiki-local')
+
+    # Build page_tier: seed from all_pages (these are all wiki-cloud/ pages when
+    # WIKI_DIR == wiki-cloud/). Then extend with wiki-local/ walk.
+    page_tier = {}  # id (lowercase) -> set of tiers ('cloud'|'local')
+
+    for fpath, fm, body, err in all_pages:
+        if fm is None:
+            continue
+        pid = fm.get('id', '').lower()
+        if not pid:
+            pid = os.path.splitext(os.path.basename(fpath))[0].lower()
+        if pid:
+            page_tier.setdefault(pid, set()).add('cloud')
+
+    if os.path.isdir(wiki_local_root):
+        for root2, dirs2, files2 in os.walk(wiki_local_root):
+            rel_root2 = os.path.relpath(root2, wiki_local_root)
+            if rel_root2.split(os.sep)[0] in EXCLUDE_DIRS:
+                continue
+            for fname2 in sorted(files2):
+                if not fname2.endswith('.md'):
+                    continue
+                fpath2 = os.path.join(root2, fname2)
+                fm2, _body2, _err2 = parse_frontmatter(fpath2)
+                if fm2 is None:
+                    continue
+                # Skip example: true pages in the local tree too.
+                if isinstance(fm2, dict) and fm2.get('example') is True:
+                    continue
+                pid2 = fm2.get('id', '').lower()
+                if not pid2:
+                    pid2 = os.path.splitext(fname2)[0].lower()
+                if pid2:
+                    page_tier.setdefault(pid2, set()).add('local')
+                    # Also add to known_ids so a cloud->local link resolves as
+                    # KNOWN (and then gets flagged as D-09 instead of a red gap).
+                    known_ids.add(pid2)
+                stem2 = os.path.splitext(fname2)[0].lower()
+                if stem2:
+                    page_tier.setdefault(stem2, set()).add('local')
+                    known_ids.add(stem2)
+
+    # Emit findings for duplicate ids (same id in both tiers — ambiguous + privacy hazard).
+    for dup_id, tiers in sorted(page_tier.items()):
+        if tiers == {'cloud', 'local'}:
+            # Find which files carry this id for the error message.
+            add_finding('error', 'linkres', wiki_dir,
+                        f"duplicate page id across tiers (PRIV-05/D-09): id '{dup_id}' "
+                        f"exists in both wiki-cloud/ and wiki-local/ -- cross-tier link "
+                        f"resolution is ambiguous; rename one page to a unique id")
+
     # norm_map: normalize(id|title|alias|stem) -> set of page ids. ONLY the --fix matcher
     # and the "is this a malformed target or a genuine gap?" disambiguation use it.
     # NOT the gate (gate is exact known_ids membership).
@@ -1966,10 +2032,33 @@ if should_run('linkres'):
     for rel, abs_path, raw in linkres_scan:
         masked = mask_markdown(raw)
 
+        # --- D-09 asymmetric cross-tier check (PRIV-05) ---
+        # Determine if this file is in wiki-cloud/ (the forbidden linking direction
+        # is cloud->local). Use the abs_path to identify the tier of the LINKING file.
+        linking_file_is_cloud = (
+            os.path.normpath(os.path.abspath(abs_path)).startswith(
+                os.path.normpath(os.path.abspath(os.path.join(project_root_for_tier, 'wiki-cloud')))
+            )
+        )
+
         # --- Piped links over the MASKED body ---
         for m in PIPED_LINK_RE.finditer(masked):
             target, display = m.group(1), m.group(2)
             verdict, correct_id = _classify_piped(target)
+
+            # D-09: cloud->local link check (additive; happens before the form checks).
+            # When the linking file is in wiki-cloud/ and the target id's tier-set
+            # contains 'local', this is a forbidden cross-tier link (PRIV-05/D-09).
+            # A dual-tier id (tier-set == {'cloud','local'}) is also flagged (fail-safe).
+            if linking_file_is_cloud and verdict == 'ok':
+                t_lower = target.strip().lower()
+                if 'local' in page_tier.get(t_lower, set()):
+                    add_finding('error', 'linkres', rel,
+                                f"cloud->local link forbidden (PRIV-05/D-09): "
+                                f"wiki-cloud page links to wiki-local target '{t_lower}' "
+                                f"(would break for cloud sessions + leak existence)")
+                    continue  # already emitted; skip form checks for this link
+
             if verdict == 'ok' or verdict == 'gap':
                 continue
             if '/' in target:
