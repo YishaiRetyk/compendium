@@ -36,20 +36,27 @@ From the `agent-memory-interface` seed:
 
 **Shared prerequisite:** 4.2 and v1.3's 3.4 both need §14 Tier 4 — whichever milestone reaches Tier 4 first pays that cost for both.
 
-### Source Ingestion — new source/output capabilities  [framework-first; mostly prioritization-gated; added 2026-06-04]
+### Source Ingestion — new source/output capabilities  [framework-with-first-instance; AFTER v1.2; prioritization-gated; OPEN SET; added 2026-06-04]
 
 A cluster of "extend what the wiki can ingest/emit" seeds. The unifying insight (2026-06-04 discussion): `research-report-ingest` + `primary-source-type-extensions` (repos, videos) are **instances of one pattern** — they touch the same surfaces (§5 `source_type` enum, §10 Pass-0 classify, §6 Locator Types, §11.1 ingest, drift→999.5, `support_type`/epistemic defaults). So **unify the *design*, not the *deliverable*:**
 
-- **SI.1 — Source-type extension contract** (the unification, framework-first): formalize the 5-dimension add-a-type recipe (acquisition / locator / extraction granularity / drift / epistemic default) + the **primary-vs-secondary axis** (primary→`direct`, secondary→`derived`). `research-report-ingest` (LOCKED design) is the reference *secondary* instance; existing article/paper/transcript types retro-fit as *primary* instances.
+- **SI.1 — Source-type extension contract** (the unification): formalize the 5-dimension add-a-type recipe (acquisition / locator / extraction granularity / drift / epistemic default) + the **primary-vs-secondary axis** (primary→`direct`, secondary→`derived`). Designed **with SI.2 as its worked first instance, NOT in a vacuum** (avoid premature abstraction — see Internal order). `research-report-ingest` (LOCKED) is the reference *secondary* instance; existing article/paper/transcript types retro-fit as *primary* instances.
 - **SI.2 — research-report** (`research-report-ingest`, design LOCKED) — ships first; ready now.
 - **SI.3 — repository** (`primary-source-type-extensions`, OPEN) — new `#path:file:L`/`#commit:` locators + commit-SHA drift; pairs with 999.5 (v1.3 item 3.3).
 - **SI.4 — video/YouTube** (`primary-source-type-extensions`, OPEN) — leaning transcript sub-case; acquisition is the friction.
+- **SI.n — future/discovered types (OPEN-ENDED, by design).** SI.2–4 are the *known* instances, **not a closed set.** The entire point of the SI.1 contract is to make adding a type cheap, so new candidates discovered in real use (e.g. podcasts/audio, email threads, PDFs with page markers, datasets/spreadsheets, social threads) plug in as additional instances later — gated by the decision rule: *justify a new type only if it changes acquisition / locator / extraction / drift / epistemic default; otherwise it's a sub-case of an existing type* (the book→book-chapter, video→transcript precedent). Do NOT enumerate these into the milestone now (speculative scheduling); they surface on real intent, and the contract absorbs them without re-architecture.
 
-**Per-type deliverables stay separable** — design once (SI.1), ship each on its own trigger so the ready one (research-report) doesn't wait on the open ones. This is the same "touch the shared surface once, ship independently" logic as v1.2's wizard fold-in.
+**Sequencing (decided 2026-06-04):**
+- **Insertion point: the first post-v1.2 milestone — likely the new v1.3**, ahead of observation-gated Wiki-Intelligence / Agent-Interface (which may not be warranted yet). Same logic that made v1.2 "next": SI is the only *prioritization-gated, active-intent* cluster among the post-v1.2 candidates.
+- **Hard dependency — AFTER v1.2 closes, not before/during.** SI edits the exact §5/§6/§10/§11.1 surfaces v1.2 Phases 16–17 are relocating; inserting earlier = writing into the monolith that's being torn apart (churn + the "refactor mid-flight" anti-pattern v1.2 itself was sequenced to avoid). v1.2 also *enables* SI: after extraction, adding a type is a localized edit to modular `schema/reference/*.md` + `schema/workflows/*.md` files — a far cleaner target for *and* expression of the SI.1 contract than the 1,689-line monolith.
+- **Internal order:** SI.1 designed **with** SI.2 (research-report is LOCKED → use it as the worked instance and extract the contract from it + existing types; rule-of-three satisfied honestly), then SI.3 (validates/extends; adjacent to 999.5 — a repo *is* the web-backed source 999.5 was waiting for, so SI.3 likely *triggers* 999.5 rather than waiting on it), then SI.4.
+- **Early-pull exception:** a single urgent research report can be hand-ingested pre-v1.2 as an `article`-ish source with its bibliography in a `## References` block — NO SI machinery — then formalized under the contract post-v1.2. Don't stand up the framework mid-extraction.
+
+**Per-type deliverables stay separable** — design once (SI.1), ship each on its own trigger so the ready one (research-report) doesn't wait on the open ones. Same "touch the shared surface once, ship independently" logic as v1.2's wizard fold-in.
 
 **NOT in this cluster:** `synthesized-diagram-output` is *output*, not a source — it belongs with the typed-edges / wiki-quality cluster (graph-as-view-with-edge-provenance), not source ingestion.
 
-**Gating:** prioritization-gated (build when you want the types; the creator has active intent for all three). SI.3's drift portion shares machinery with v1.3's 3.3 (999.5) — sequence them adjacently if both land.
+**Gating:** prioritization-gated (build when you want the types; the creator has active intent for all three known instances). SI.3's drift portion shares machinery with v1.3's 3.3 (999.5) — sequence them adjacently if both land.
 
 ### Standing / unscheduled
 - **999.6 (Observed GTD patterns)** — trigger-gated on 2 months real usage; documents what emerged, by definition un-schedulable. No milestone number.
