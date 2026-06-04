@@ -13,7 +13,7 @@
 
 Requirements for milestone v1.2. Each maps to exactly one roadmap phase.
 
-### Privacy Architecture (`PRIV`) — Phase 0, gates Phase A
+### Privacy Architecture (`PRIV`) — Phase 15, gates Phase 16
 
 - [ ] **PRIV-01**: Adopt the two-directory layout — `wiki-cloud/` (cloud-safe tier) and `wiki-local/` (local-only tier) — and update §2 Directory Structure accordingly. Decide migration of the existing `wiki/` tree (rename to `wiki-cloud/` for the single-tier creator vault; relocate `wiki/maintenance/audit-{report,state}.md` to the local side).
 - [ ] **PRIV-02**: Rewrite §13 from per-page precedence/inheritance to the per-vault **asymmetric** model: local-side runs (local models) may read both dirs; cloud-side runs (cloud models) MUST NOT read `wiki-local/`. State the one-way permeability rule and its rationale (local→cloud is the leak; it is the forbidden direction).
@@ -23,7 +23,7 @@ Requirements for milestone v1.2. Each maps to exactly one roadmap phase.
 - [ ] **PRIV-06**: Write the execution-time decision record `wiki/decisions/dr-YYYY-MM-DD-privacy-asymmetric-two-dir.md` (`trigger_type: schema-update`), superseding the implicit per-page §13 framing; record the three options and why asymmetric won.
 - [ ] **PRIV-07** (knock-on, feeds REF-06): Confirm §13's resident obligation is reduced to a one-line pointer in core ("vault tier is structural; cloud sessions cannot read `wiki-local/` — see `schema/reference/privacy.md`"), with the fail-closed/precedence/inheritance machinery **removed rather than relocated**.
 
-### Reference Extraction (`REF`) — Phase A
+### Reference Extraction (`REF`) — Phase 16
 
 - [ ] **REF-01**: Extract §4 page types → `schema/reference/page-types.md`; merge its section-ordering table with §7's into one resident type-roster (the **§4↔§7 dedupe**, LOCKED).
 - [ ] **REF-02**: Extract §5 frontmatter → `schema/reference/frontmatter.md`; core keeps **Option-B pointer only** (~4 lines, LOCKED). Full schema is JIT + lint-gated.
@@ -36,7 +36,7 @@ Requirements for milestone v1.2. Each maps to exactly one roadmap phase.
 - [ ] **REF-09**: Mirror every routing stub into `schema/AGENTS.template.md`; keep `AGENTS.md` byte-identical to `CLAUDE.md` (pre-commit `sync-claude --check`). **Discuss-item (Open Q7):** REF-09 covers only the existing `AGENTS.md ↔ CLAUDE.md` byte-equality — decide whether to extend `bin/sync-claude.sh` with a `--check-tree` drift guard over the *new* `schema/reference|workflows/*.md` tree now (v1.2) or defer to v1.3.
 - [ ] **REF-10**: Decision record (`trigger_type: schema-update`) for the extraction + the evolved "sole authoritative specification" framing (Open Q8 — this file is the router; linked files are authoritative for their sections).
 
-### Workflow Extraction (`WF`) — Phase B
+### Workflow Extraction (`WF`) — Phase 17
 
 - [ ] **WF-01**: Extract §9 structured ops → `schema/workflows/structured-operations.md`; core keeps vocab + `validate-op.sh` pointer + the **locked 2-line solo-op log shape**. **MUST close the solo-op commit-prefix gap (Open Q9, surfaced 2026-06-04):** the current §3 commit table defines only `ingest/query/lint/reflect/schema` prefixes — a *solo* UPDATE/MERGE/SUPERSEDE/ARCHIVE has no defined commit prefix. This is a real spec hole the extraction must fill, not just relocate.
 - [ ] **WF-02**: §10 → **diagram stays (1 line), NO `pipeline.md`** (LOCKED); fold the two substantive blocks into the relevant workflow files, delete the pass-narrative.
@@ -48,7 +48,7 @@ Requirements for milestone v1.2. Each maps to exactly one roadmap phase.
 - [ ] **WF-08**: Verify core **section-by-section against the inclusion test** (ambient / unscriptable-unacceptable-miss / dispatch). No line target gates the milestone; ~145 is an expected output, with a tripwire only to trigger re-audit on upward drift. Every resident section carries a one-line justification citing its clause.
 - [ ] **WF-09**: Manual agent-parity check — a Codex/Cursor agent given only `AGENTS.md` can ingest by following the routing table to `workflows/ingest.md`; evidence in `docs/reference/agent-parity.md`.
 
-### Skills Overlay (`SKILL`) — Phase C (optional, ship only if it doesn't slow A+B)
+### Skills Overlay (`SKILL`) — Phase 18 (optional, ship only if it doesn't slow A+B)
 
 - [ ] **SKILL-01**: Thin `.claude/skills/` wrappers for ingest/query/lint/reflect; each body ≤ 3 lines, pointer-only ("You have been invoked to {op}. Read `schema/workflows/{op}.md` and follow it verbatim."). Consider `disable-model-invocation: true`.
 - [ ] **SKILL-02**: Skills add zero authoritative content (routers only); markdown remains the source of truth. Verify no behavior is encoded in a skill that isn't in the workflow file.
@@ -76,43 +76,44 @@ Explicitly excluded for v1.2. Documented to prevent scope creep.
 
 ## Traceability
 
-Which phases cover which requirements. Phase mapping filled during roadmap creation.
+Which phases cover which requirements. Phase mapping filled during roadmap creation (2026-06-04).
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PRIV-01 | TBD | Pending |
-| PRIV-02 | TBD | Pending |
-| PRIV-03 | TBD | Pending |
-| PRIV-04 | TBD | Pending |
-| PRIV-05 | TBD | Pending |
-| PRIV-06 | TBD | Pending |
-| PRIV-07 | TBD | Pending |
-| REF-01 | TBD | Pending |
-| REF-02 | TBD | Pending |
-| REF-03 | TBD | Pending |
-| REF-04 | TBD | Pending |
-| REF-05 | TBD | Pending |
-| REF-06 | TBD | Pending |
-| REF-07 | TBD | Pending |
-| REF-08 | TBD | Pending |
-| REF-09 | TBD | Pending |
-| REF-10 | TBD | Pending |
-| WF-01 | TBD | Pending |
-| WF-02 | TBD | Pending |
-| WF-03 | TBD | Pending |
-| WF-04 | TBD | Pending |
-| WF-05 | TBD | Pending |
-| WF-06 | TBD | Pending |
-| WF-07 | TBD | Pending |
-| WF-08 | TBD | Pending |
-| WF-09 | TBD | Pending |
-| SKILL-01 | TBD | Pending |
-| SKILL-02 | TBD | Pending |
+| PRIV-01 | Phase 15 | Pending |
+| PRIV-02 | Phase 15 | Pending |
+| PRIV-03 | Phase 15 | Pending |
+| PRIV-04 | Phase 15 | Pending |
+| PRIV-05 | Phase 15 | Pending |
+| PRIV-06 | Phase 15 | Pending |
+| PRIV-07 | Phase 15 | Pending |
+| REF-01 | Phase 16 | Pending |
+| REF-02 | Phase 16 | Pending |
+| REF-03 | Phase 16 | Pending |
+| REF-04 | Phase 16 | Pending |
+| REF-05 | Phase 16 | Pending |
+| REF-06 | Phase 16 | Pending |
+| REF-07 | Phase 16 | Pending |
+| REF-08 | Phase 16 | Pending |
+| REF-09 | Phase 16 | Pending |
+| REF-10 | Phase 16 | Pending |
+| WF-01 | Phase 17 | Pending |
+| WF-02 | Phase 17 | Pending |
+| WF-03 | Phase 17 | Pending |
+| WF-04 | Phase 17 | Pending |
+| WF-05 | Phase 17 | Pending |
+| WF-06 | Phase 17 | Pending |
+| WF-07 | Phase 17 | Pending |
+| WF-08 | Phase 17 | Pending |
+| WF-09 | Phase 17 | Pending |
+| SKILL-01 | Phase 18 | Pending |
+| SKILL-02 | Phase 18 | Pending |
 
 **Coverage:**
 - v1.2 requirements: 28 total (PRIV ×7, REF ×10, WF ×9, SKILL ×2)
-- Mapped to phases: 0 (roadmapper fills)
-- Unmapped: 28 ⚠️ (resolved at roadmap creation)
+- Mapped to phases: 28 ✓
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-06-04 — distilled from `.planning/milestones/v1.2-MILESTONE-BRIEF.md` (itself a distillation of `999.4-…/CONTEXT-NOTES.md` + the 2026-06-04 design review). Scope confirmed: Phase 0+A+B+C committed; Phase D (`WIZ`) deferred.*
+*Traceability table filled: 2026-06-04 by roadmapper — PRIV→Phase 15, REF→Phase 16, WF→Phase 17, SKILL→Phase 18.*

@@ -3,10 +3,10 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Schema Architecture
 status: planning
-last_updated: "2026-06-04T09:18:29.525Z"
+last_updated: "2026-06-04"
 last_activity: 2026-06-04
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -17,10 +17,28 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-15)
+See: .planning/PROJECT.md (updated 2026-06-04)
 
 **Core value:** The wiki is a persistent, compounding artifact -- cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested.
-**Current focus:** Phase 999.1 — brownfield vault initialization
+**Current focus:** v1.2 Schema Architecture — Phase 15 (Privacy Architecture), roadmap created, ready for `/gsd-plan-phase 15`
+
+## Current Position
+
+Phase: 15 — Privacy Architecture (Not started)
+Plan: —
+Status: Roadmap created; ready to plan Phase 15
+Last activity: 2026-06-04 — v1.2 roadmap created (Phases 15–18)
+
+### v1.2 Phase Summary
+
+| Phase | Name | Requirements | Status |
+|-------|------|--------------|--------|
+| 15 | Privacy Architecture | PRIV-01..07 (7 reqs) | Not started |
+| 16 | Reference Extraction | REF-01..10 (10 reqs) | Not started — gates on Phase 15 |
+| 17 | Workflow Extraction | WF-01..09 (9 reqs) | Not started — gates on Phase 16 |
+| 18 | Skills Overlay | SKILL-01..02 (2 reqs) | Not started — gates on Phase 17 |
+
+**Total:** 28 requirements across 4 phases. 100% mapped.
 
 ## Deferred Items
 
@@ -40,12 +58,7 @@ Items acknowledged and deferred at the v1.1.1 milestone close (2026-06-03):
 | todo | `phase-14-lint-mask-fence-edge-cases` — WR-02/03 fence-edge-case hardening for lint markdown masking | Deferred from Phase 14; in `.planning/todos/pending/`. Promote via `/gsd-quick`. |
 | quick_task (DONE) | 4 quick tasks flagged by audit-open as status `missing` (`260415-fvc`, `260415-gzu`, `260501-g5n`, `260602-d6a`) | All complete — each has a SUMMARY.md; flagged only due to unparseable status field. 260501-g5n & 260602-d6a already noted delivered at v1.1 close. No action. |
 
-## Current Position
-
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-06-04 — Milestone v1.2 started
+Phase D (`WIZ`) deferred from v1.2 scope per 2026-06-04 design review — WIZ-01 blocked on resolving Phase-8 minimalism conflict; WIZ-02 observation-gated. Tracked in REQUIREMENTS.md Backlog and ROADMAP.md 999.3.
 
 ## v1.1 Shareability — Archived 2026-06-02
 
@@ -69,21 +82,9 @@ Plan 13.1-05 complete (2026-06-01): accuracy-passed the five substantial referen
 
 Plan 13.1-04 complete (2026-06-01): authored the three never-populated `docs/reference/` stubs (schema-tour, privacy-model, examples) + created new `agent-parity.md` (DEBT-02 deliverable). schema-tour.md = full §5 frontmatter + §6 provenance/claim-syntax walkthrough (page-type section orders, validation checklist, `[prov:]` grammar + locator table, `<!-- page: N -->` convention, `[epistemic::]`, decay model). privacy-model.md = §13 tiers/precedence + 7-row decision table VERBATIM + strictest-wins inheritance + `bin/check-privacy.sh` CI gate. examples.md = examples/ usage + `example: true` lint-skip + CORRECTED `.obsidianignore` (release-manifest/graph-hygiene convention, NOT Obsidian-native; real mechanism = Excluded files/`userIgnoreFilters`) + five fixture-scoped Dataview blocks with expected counts (3/2/2/2/5) + grep-vs-Dataview divergence notes; active-entities count re-derived LIVE (=3) and asserted equal. agent-parity.md = structural-equivalence rubric (page-set/types/prov-IDs/locator-targets/frontmatter; prose free) + golden inventory (1 entity, 3 concepts, 1 comparison, 1 overview, 2 sources; single-source vs prospect-theory SUBSET) + codex=cloud-egress + fail-closed seed guard + `codex exec` re-run + `pagetypes()`/`provtargets()` helpers + diff table with Codex column rendered `pending — deferred to 13.2` (blocked-on-runtime, NEVER fabricated; mirrors 13.1-VERIFICATION.md). Neutrality: path-only kahneman refs, only bare token = `prospect-theory` slug; `bash bin/check-neutrality.sh` exit 0. One deviation (Rule 3): added spaced "structural equivalence" to agent-parity TL;DR to satisfy `grep -qi`. Commits eb7b419, 8060c7d, 39e47fb. SUMMARY self-check PASSED. NOTE: index.md registration of agent-parity.md is owned by Plan 05.
 
-Plan 13.1-03 complete (2026-06-01): DEBT-01/02/04 verification execution → `13.1-VERIFICATION.md` (Phase 13 mirror). DEBT-02 agent-parity: fail-closed seed guard (CLAUDE.md §13) ran exit-0 over both scratch trees BEFORE codex egress (single mandatory egress defense; local_only personal-decision-journal never seeded); Claude-side scratch ingest of the prospect-theory source produced 4 pages whose prov-locator-target set EXACTLY matches the golden prospect-theory SUBSET (6 `#sec:` targets); lint 0/0/0 on explicit scratch path; scratch torn down by absolute path (trap + explicit rm; repo clean). Codex side BLOCKED-ON-RUNTIME: codex exec hung on stdin without `</dev/null` (fixed on retry), then bubblewrap sandbox "needs user namespaces" pathology → degenerate sed-exec loop, 0 wiki pages after ~23min → recorded honestly (NOT faked) per SAFETY-GUARD; Phase 13.2 re-runs the Codex column (not on Wave 2 critical path — Plan 04 consumes the Claude-vs-golden-subset diff). DEBT-04 genuine write-back: UPDATE `wiki/concepts/progressive-disclosure.md` citing src-2026-05-06-ralph-playbook + src-2026-05-06-anthropic-agent-skills-overview (≥2 distinct cloud_safe source_ids), validate-op UPDATE PASS (5/5), new today-dated WRITE-BACK log line (7→8), append-then-synthesize, privacy inheritance honored, lint clean, single query() commit 267d2c8. DEBT-01: render checklist + "awaiting user render" capture slot shipped (SC1 graph sub-check reframed to "isolable sub-graph"; D-09 prepared-and-await; Phase 13.2 SC2 closes). DEBT-02/04 → Complete in REQUIREMENTS.md (bullets + matrix); DEBT-01 → Pending (awaiting render). check-neutrality.sh exit 0; targeted neutrality clean (no journal body). Commits 267d2c8 (write-back), b1ba23b (VERIFICATION.md). SUMMARY self-check PASSED.
-
-Plan 13.1-02 complete (2026-06-01): `examples/dataview-fixtures/` — 10 `example: true` fixtures (4 entity / 2 concept / 2 source / 1 comparison / 1 overview) spanning statuses (8 active, 2 stale, 1 archived) and synthetic domains (alpha×5, beta×3, gamma×2). Positive-neutrality discipline: all ids `fixture-*`, synthetic alpha/beta/gamma + tag-x/y/z tokens (check-neutrality.sh PRUNES examples/, so the targeted denylist grep + positive markers are the real proof). domains/tags YAML block-lists; 2 pages carry `bootstrap_stage: bootstrapped` (entity-2, concept-1); both source fixtures carry the full source tail. Machine-consumable count matrix (Plan 04 consumes): active-entities=3, sources-by-domain-alpha=2, stale-pages=2, missing-privacy=2, pages-in-domain-alpha-active=5. Live wiki lint clean (yaml,orphan 0/0/0 — no regression); check-neutrality.sh exit 0. Commit 3eeb101. SUMMARY self-check PASSED. NOTE: examples.md documentation of the fixture counts + .obsidianignore correction is owned by Plan 04.
-
-Plan 13.1-01 complete (2026-06-01): six token-ized `schema/obsidian/{entity,concept,overview,comparison,source-summary,decision}.md` templates (Templates-core `{{title}}`/`{{date:YYYY-MM-DD}}`; zero drift vs `schema/templates/` via full-file reverse-substitution diff; decision.md asymmetry preserved) + `docs/reference/obsidian-starter.md` (OBSID-02; Setup-once, auto-fill-vs-typed, OBSID-03 scope). PRE-FLIGHT: cleared the pre-existing `check-neutrality.sh` exit-2 by adding `neutrality_exempt: true` to generated `wiki/maintenance/lint-report.md` (drift findings preserved) — every downstream plan's neutrality gate is now meaningful. OBSID-01/02/03 → complete. Commits 2bc2258, 8dd8940, bc03f95. SUMMARY self-check PASSED. NOTE: `obsidian-starter.md` index.md registration is owned by Plan 05, not this plan.
-
-Phase 13.1 context: 12 decisions in `13.1-CONTEXT.md` (4 areas). Obsidian starter = Templates-core tokens ({{date}}/{{title}}), `schema/obsidian/` templates + reference doc only, NO `.obsidian/` config mutation. Dataview verification = build `examples/dataview-fixtures/` (example: true + documented expected counts); one fixture covers fresh-starter + post-bootstrap via embedded `bootstrap_stage` pages — KNOWN TENSION: `.obsidianignore` excludes examples/ from indexing (Dataview would return 0; researcher to reconcile). Manual verification split: Claude runs DEBT-04 write-back + BOTH sides of DEBT-02 (Claude ingest + `codex exec`, CLI 0.135.0 confirmed) against `examples/kahneman/` golden, tolerance = structural equivalence; USER does only DEBT-01 Obsidian render (prepared-and-await, phase NOT blocked on GUI; 13.2 confirms). Docs: fully author 3 stubs (schema-tour/privacy-model/examples) + new `agent-parity.md`, accuracy-pass substantial docs, reconcile index; merge-conflict stays in CONTRIBUTING.md, dataview-fixtures folds into examples.md. NEUTRALITY (CLAUDE.md §3) binds all docs/templates — placeholders only, kahneman is the sole sanctioned concrete example.
-
 Phase 13 closure: 5/5 plans complete; FAITH-01..04 → Complete in REQUIREMENTS.md (bullets + traceability matrix); 13-VERIFICATION.md (plan-authored, 12.2 mirror) + 13-VERIFIER-REPORT.md (independent, PASS 6/6 SC + 4/4 REQ); tests 33/33; `bin/requirements-sync.sh --strict --phase 13` and `--require-complete --phase 13` both exit 0; code review 0 critical / 0 high (3 medium / 4 low, advisory — top item MD-01: `--format json` does not apply the `--emit-worklist` HIGH-C metadata redaction; passage text NOT leaked). Shipped: `bin/audit-claims.sh` (selectors → raw-source locator resolver → 9-key findings → privacy chokepoint → stdin-only `shlex.split` verifier dispatch), `bin/lib/privacy_resolve.py` (§13 fail-closed + strictest-wins effective-claim privacy), AGENTS/CLAUDE §6 `<!-- page: N -->` + Audit review-only workflow. Generated audit-report.md / audit-state.md stamped `privacy: local_only`.
 
 Phase 12.2 closure: 5/5 plans complete; WGATE-01..04 → Complete; verifier PASS 7/7 SC; tests 11/11.
-
-Phase 13 context: 16 decisions captured in `13-CONTEXT.md` (resolves the 5 open questions from `13-DESIGN-NOTES.md`). Verifier = contract-only (agent-in-the-loop default + documented `--verifier` hook, no bundled script); fail-closed `local_only` egress (`skipped-privacy` default, explicit local opt-in); page-marker convention shipped in v1 (optional `<!-- page: N -->` + `insufficient-locator` fallback, document-now/helper-later); sample-20 priority-ranked union; on-demand + reflect-tier cadence; human-approved `contradicts`→marker handoff. LOCKED carry-forwards: raw-source-at-`path:`, no auto-fix, no default CI gate, no SQLite, no full-vault default, zero new claim vocabulary.
-
-Phase 12.1 closure: 4/4 plans complete; NEUT-08 flipped to Complete in REQUIREMENTS.md (line 36 + matrix line 215); 12.1-VERIFICATION.md authored with verbatim D-10 evidence; bin/requirements-sync.sh --strict --phase 12.1 and --require-complete --phase 12.1 both exit 0; bin/check-neutrality.sh source unchanged across the entire phase. N=7 defense-in-depth curation: pre-committing, physical flinch, pre-mortem, pre-mortems, decision fatigue, decision-fatigue, meta-observation. First v1.1 partial-requirement closure.
 
 ## Performance Metrics
 
@@ -164,6 +165,11 @@ Phase 12.1 closure: 4/4 plans complete; NEUT-08 flipped to Complete in REQUIREME
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
+- [v1.2 Roadmap 2026-06-04] Privacy Architecture (Phase 15) gates Reference Extraction (Phase 16) — §13 must be rewritten to asymmetric two-dir form before it can be extracted; PRIV-07 feeds REF-06 directly.
+- [v1.2 Roadmap 2026-06-04] Phase D (WIZ) deferred from v1.2 scope — WIZ-01 blocked on Phase-8 minimalism conflict; WIZ-02 observation-gated; both tracked as Backlog 999.3.
+- [v1.2 Roadmap 2026-06-04] Inclusion test (ambient / unscriptable-unacceptable-miss / dispatch) governs core composition, not a line target; ~145 lines is expected output of applying the test.
+- [v1.2 Roadmap 2026-06-04] Phase numbering continues from 14 → starts at 15 (no reset).
+- [v1.2 Roadmap 2026-06-04] Phase C (Skills Overlay) committed as Phase 18 — "ship only if it doesn't slow A+B" resolved as committed scope per REQUIREMENTS.md final state.
 - [v1.1 Roadmap] 6 phases (7–12) derived from 78 v1.1 requirements (standard granularity); backlog Phase 999.1 superseded (absorbed into Phases 10–11).
 - [v1.1 Roadmap] DEBT-03 (`requirements-sync.sh`) placed in Phase 7 so all subsequent phases benefit from mechanical traceability check (retrospective lesson, pitfall m-4).
 - [v1.1 Roadmap] Phase 7 gates release via orphan-branch runbook + neutrality/denylist CI (pitfall C-1 mitigation).
@@ -342,9 +348,13 @@ Recent decisions affecting current work:
 ### Roadmap Evolution
 
 - Phase 09.1 inserted after Phase 09: Progressive Disclosure Extraction (URGENT) — extract §4 worked examples + §16 appendices from AGENTS.md/CLAUDE.md to reduce spec size while preserving §1 authority, byte-equality, wizard render, manual-setup walkthrough, and Codex agent-parity. Research backing at .planning/notes/research-progressive-disclosure-framework-comparison.md; open questions at .planning/research/questions.md; deferred workflow/operations skill extraction seeded at .planning/seeds/workflows-operations-to-skills.md.
+- v1.2 roadmap created 2026-06-04: Phases 15 (Privacy Architecture) → 16 (Reference Extraction) → 17 (Workflow Extraction) → 18 (Skills Overlay). Continued numbering from Phase 14. 28/28 requirements mapped. Phase D (WIZ) confirmed deferred.
 
 ### Blockers/Concerns
 
+- Phase 15 gates Phase 16: §13 must be in its asymmetric two-dir form before reference extraction can proceed. Do not start Phase 16 until PRIV-07 is confirmed complete.
+- Phase 16 gates Phase 17: routing table + `schema/reference/*.md` files must exist before workflow files can reference them (particularly the §6 consumer-split decay/staleness portion that folds into `workflows/lint.md`).
+- REF-09 open question: whether to extend `bin/sync-claude.sh` with `--check-tree` drift guard over the new `schema/reference|workflows/*.md` tree now (v1.2) or defer to v1.3. Decide during Phase 16 planning.
 - Phase 10 needs a YAML-lib spike during planning (ruamel.yaml vs PyYAML order-loss tradeoff); treat ruamel.yaml as the single accepted new runtime dep in Phase 10.
 - Phase 12 depends on Codex (or another non-Claude agent) being accessible; agent-parity tolerance rules need a spike before Phase 12 can green.
 - Phase 12 Obsidian/Dataview render verification may require manual checklist with screenshots if headless Obsidian automation is not available in 2026.
@@ -363,10 +373,10 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-06-03T17:12:14.057Z
-Stopped at: Phase 14 context re-gathered (piped-link approach; premise corrected)
+Last session: 2026-06-04
+Stopped at: v1.2 roadmap created (Phases 15–18, 28/28 requirements mapped)
 Resume file: None
 
 ## Operator Next Steps
 
-- Start the next milestone with /gsd-new-milestone
+- `/gsd-plan-phase 15` — Plan Phase 15 (Privacy Architecture, PRIV-01..07)

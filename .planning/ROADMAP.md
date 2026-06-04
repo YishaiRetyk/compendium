@@ -5,6 +5,7 @@
 - ✅ **v1.0 LLM Wiki Compiler MVP** — Phases 1–6 (shipped 2026-04-15) — [archive](milestones/v1.0-ROADMAP.md)
 - ✅ **v1.1 Shareability** — Phases 7–13.2 (shipped 2026-06-02) — [archive](milestones/v1.1-ROADMAP.md)
 - ✅ **v1.1.1 Graph Integrity** — Phase 14 (shipped 2026-06-04) — [archive](milestones/v1.1.1-ROADMAP.md)
+- 🚧 **v1.2 Schema Architecture** — Phases 15–18 (in progress)
 
 ## Phases
 
@@ -47,6 +48,78 @@ Full phase details: [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md)
 Full phase details: [milestones/v1.1.1-ROADMAP.md](milestones/v1.1.1-ROADMAP.md)
 
 </details>
+
+### 🚧 v1.2 Schema Architecture (In Progress)
+
+**Milestone Goal:** Apply the spec's own §7 progressive-disclosure principle to itself — reduce the always-loaded `AGENTS.md`/`CLAUDE.md` (1,689 lines) to a resident core of only what passes the inclusion test (ambient / unscriptable-AND-unacceptable-miss-cost / dispatch), extracting the rest into `schema/reference/*.md` + `schema/workflows/*.md`. The ~145-line core is an expected output of the test, not a target.
+
+- [ ] **Phase 15: Privacy Architecture** — Replace per-page §13 privacy model with the asymmetric two-directory model (`wiki-cloud/` / `wiki-local/`); enforcement becomes a harness permission. Gates Phase 16.
+- [ ] **Phase 16: Reference Extraction** — Extract §4/5/6/7/8/13 → `schema/reference/*.md`; §14/15 → `docs/reference/*.md`; §16 deleted; routing table added to core.
+- [ ] **Phase 17: Workflow Extraction** — Extract §9/10/11.1–11.7/12 → `schema/workflows/*.md`; verify core against the inclusion test; agent-parity check.
+- [ ] **Phase 18: Skills Overlay** — Thin `.claude/skills/` routers (ingest/query/lint/reflect); pointer-only bodies; zero authoritative content.
+
+## Phase Details
+
+### Phase 15: Privacy Architecture
+**Goal**: Cloud-session privacy enforcement becomes structural — enforced by directory layout and harness permissions, not by a resident agent rule the cloud model must remember each turn.
+**Depends on**: Nothing (first phase of v1.2; precondition for Phase 16 extracting §13 in its rewritten form)
+**Requirements**: PRIV-01, PRIV-02, PRIV-03, PRIV-04, PRIV-05, PRIV-06, PRIV-07
+**Success Criteria** (what must be TRUE):
+  1. `wiki-cloud/` and `wiki-local/` directories are defined in §2; the existing `wiki/` tree migration path is documented and the two audit control-plane files are correctly placed on the local side.
+  2. §13 is rewritten to describe the asymmetric per-vault model: local-model runs may read both dirs; cloud-model runs cannot read `wiki-local/`; the 7-row per-page precedence table is removed (not relocated).
+  3. A concrete enforcement artifact exists — a `settings.json` `deny`-read entry and/or a two-session split runbook — so enforcement is structural, not a remembered rule.
+  4. All tooling (`bin/check-privacy.sh`, `bin/lint.sh` privacy checks, `bin/audit-claims.sh` FAITH-04 resolution, CI privacy-leak job) operates on the structural model without behavioral regression.
+  5. Decision record `wiki/decisions/dr-YYYY-MM-DD-privacy-asymmetric-two-dir.md` (`trigger_type: schema-update`) is authored, recording the three options and why asymmetric won; §13's resident obligation is confirmed reduced to a one-line structural pointer.
+**Plans**: TBD
+
+Plans:
+
+- [ ] 15-01: TBD
+
+### Phase 16: Reference Extraction
+**Goal**: Every static reference section (page-type definitions, frontmatter schema, provenance syntax, wikilink conventions, privacy model, scaling, tooling) lives in its own standalone markdown file under `schema/reference/` or `docs/reference/`, with the core replaced by routing stubs; §16 is deleted.
+**Depends on**: Phase 15 (§13 must be rewritten to asymmetric form before it can be extracted; PRIV-07 feed REF-06)
+**Requirements**: REF-01, REF-02, REF-03, REF-04, REF-05, REF-06, REF-07, REF-08, REF-09, REF-10
+**Success Criteria** (what must be TRUE):
+  1. Every section named in the Extraction Map (§4, §5, §6, §7, §8, §13, §14, §15, §16) is either present as a standalone file at its target path or explicitly dissolved/deleted per the map; no section is silently dropped.
+  2. The `IMPORTANT:`-flagged routing table is present at the top of core, correctly mapping every extracted operation/topic to its target file — an agent given only `AGENTS.md` can find any reference material in one hop.
+  3. The v1.1.1 uniform-piped-link truth (`[[X]]` resolves by filename/path ONLY; uniform `[[id|Title]]` mandated) is carried verbatim into `schema/reference/wikilinks.md`; the §4/§7 section-ordering dedupe is in place (one merged type-roster, §7 dissolved).
+  4. `AGENTS.md` is byte-identical to `CLAUDE.md`; `schema/AGENTS.template.md` mirrors all routing stubs; `bin/sync-claude.sh --check` and `bin/init-wizard.sh --dry-run` both pass.
+  5. All CI gates are green (`lint` 3-job, `neutrality`, `setup-parity`; `check-privacy.sh`; `check-neutrality.sh`) over the new `schema/reference/*.md` tree.
+**Plans**: TBD
+
+Plans:
+
+- [ ] 16-01: TBD
+
+### Phase 17: Workflow Extraction
+**Goal**: Every procedural workflow (structured operations, ingest, query, lint, reflect, brownfield, release, audit) lives in its own standalone file under `schema/workflows/`, the resident core is verified section-by-section against the inclusion test, and a non-Claude agent can ingest using only the routing table and the extracted workflow file.
+**Depends on**: Phase 16 (routing table + `schema/reference/*.md` files must exist before workflow files can reference them; §6 consumer-split decay/staleness portion lands in `workflows/lint.md`)
+**Requirements**: WF-01, WF-02, WF-03, WF-04, WF-05, WF-06, WF-07, WF-08, WF-09
+**Success Criteria** (what must be TRUE):
+  1. Every workflow section named in the Extraction Map (§9, §10 substantive blocks, §11.1–11.7, §12) exists as a standalone file at its target path or is correctly folded/deleted per the map; the §10 pipeline diagram (1 line) and §11.2 write-back-mandatory line remain in core.
+  2. The solo structured-op commit-prefix gap (Open Q9) is closed: a defined commit prefix exists for standalone UPDATE/MERGE/SUPERSEDE/ARCHIVE operations.
+  3. The 182-line brownfield workflow (§11.5) is present in `schema/workflows/brownfield.md`; the §5 lint "source of truth for CI contracts" framing is preserved in `schema/workflows/lint.md`.
+  4. Every resident section in core carries a one-line justification citing its inclusion-test clause (ambient / unscriptable-unacceptable-miss / dispatch); the resulting core is visibly smaller than 1,689 lines with ~145 as an observable output (a tripwire re-audit fires on upward drift, not a gate).
+  5. `docs/reference/agent-parity.md` is updated with evidence that a Codex/Cursor agent given only `AGENTS.md` can ingest by following the routing table to `workflows/ingest.md`.
+**Plans**: TBD
+
+Plans:
+
+- [ ] 17-01: TBD
+
+### Phase 18: Skills Overlay
+**Goal**: Thin `.claude/skills/` routers exist for ingest, query, lint, and reflect — each a pointer-only body that invokes the corresponding extracted workflow file — adding zero authoritative content.
+**Depends on**: Phase 17 (skill bodies point to `schema/workflows/*.md` files that must exist first)
+**Requirements**: SKILL-01, SKILL-02
+**Success Criteria** (what must be TRUE):
+  1. Four skill files exist under `.claude/skills/` (ingest, query, lint, reflect); each body is at most 3 lines and contains only a pointer to its corresponding `schema/workflows/{op}.md` file.
+  2. No behavior is encoded in a skill file that is not already present in the corresponding workflow markdown file; markdown remains the sole authoritative source.
+**Plans**: TBD
+
+Plans:
+
+- [ ] 18-01: TBD
 
 ## Backlog
 
@@ -223,3 +296,7 @@ The following are intentionally deferred until real usage demands them, captured
 | 13.1. Docs Finalization + Obsidian Starter | v1.1 | 5/5 | Complete | 2026-06-01 |
 | 13.2. v1.1 Closure Verification Gate | v1.1 | 3/3 | Complete | 2026-06-02 |
 | 14. Graph Link Resolution | v1.1.1 | 3/3 | Complete    | 2026-06-03 |
+| 15. Privacy Architecture | v1.2 | 0/TBD | Not started | - |
+| 16. Reference Extraction | v1.2 | 0/TBD | Not started | - |
+| 17. Workflow Extraction | v1.2 | 0/TBD | Not started | - |
+| 18. Skills Overlay | v1.2 | 0/TBD | Not started | - |
