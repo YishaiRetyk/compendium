@@ -1,91 +1,160 @@
 ---
 phase: 16
+cycle: 2
 reviewers: [claude, codex]
-reviewed_at: 2026-06-04T23:10:00
+reviewed_at: 2026-06-04T23:40:00
 plans_reviewed: [16-00-PLAN.md, 16-01-PLAN.md, 16-02-PLAN.md, 16-03-PLAN.md, 16-04-PLAN.md]
+prior_cycle_high: 5
+current_cycle_high: 4
 ---
 
-# Cross-AI Plan Review — Phase 16: Reference Extraction
+# Cross-AI Plan Review — Phase 16: Reference Extraction (Cycle 2)
+
+**Convergence-loop cycle 2.** The plans were revised to address 5 HIGH concerns from cycle 1
+(template-mirror sequencing + broken parity tests; wizard delivery gap; 16-02 line-drift;
+now-false authority language; check-privacy.sh PUBLIC_PATHS). This review judges the CURRENT
+state and verifies every load-bearing claim against the live repo.
+
+**Verdict:** 3 of 5 cycle-1 HIGHs are fully resolved; 1 is partially resolved; the wizard-delivery
+HIGH is contested (resolved per Claude, carried-over per Codex). Reviewing the current plans
+surfaced **2 NEW HIGHs**, both verified against the live repo and both execution-blocking
+(a CI-wired byte-equality gate that goes red, and a template-parity gate that cannot pass +
+carries a safety-regression hazard). Net: **4 unresolved HIGH concerns.**
+
+---
 
 ## Claude Review
 
-I now have what I need — I verified the wizard's actual behavior, the release/privacy gates, and (critically) discovered pre-existing parity tests the plans must contend with. Here is the review.
-
----
+All findings verified against the live repo. Three are confirmed defects (one rated above the
+cycle-1 set), and the HIGH #1 residual is cleared.
 
 ### 1. Summary
 
-This is a careful, well-sequenced plan set with genuinely good seam reasoning (the §6 consumer-split, bottom-up editing, the Wave-0 neutrality pre-arming). The extraction *content* model is sound. However, the plan set has **one structural blind spot that is likely fatal as written**: it largely ignores the template-mirroring mechanics and the *existing* CI parity tests that already assert `AGENTS.md ≡ schema/AGENTS.template.md` for the very sections being extracted (§4, §5, §16). As decomposed, Waves 1–3 stub `AGENTS.md` but the template-mirror of those stubs is neither clearly owned by a plan nor sequenced to keep parity green per-commit — which means (a) three pre-existing tests go red, and (b) the wizard would render a stale, non-stubbed `AGENTS.md` for new users, defeating the phase goal at the template layer. Several focus-area concerns the requester raised are real; a couple are lower-risk than feared once you look at what the gates actually do. Net: the plan needs one more pass on template-sync ownership and test-impact before execution.
+The cycle-2 revisions land the structural fixes well: per-commit template mirroring is now owned
+by each editing plan (16-01/02/03), §6 mutation is header-anchored (no line-drift), the §16
+deletion is gated by an explicit 10-rule Appendix-C disposition table, the REF-05 verbatim truth
+is grep-gated, both PUBLIC_PATHS gaps are closed in Wave 0, and a new 16-04 Task 3 rewrites the 5
+monolith-shape parity tests with real post-extraction assertions. The CI-wired suites
+(phase-07/08) carry NO §4/§5/§16 shape assertions, so the deferred phase-09.1/phase-10
+reconciliation creates no CI-red window — the central premise of the HIGH #1 fix holds.
+**However**, verifying against the live repo surfaced a NEW HIGH: the 16-04 whole-file
+template-parity gate is both mis-designed and premised on a false starting state — the live
+template already diverges from AGENTS.md in *resident* sections, including a **missing §3
+neutrality MUST-NOT bullet** — and the gate as written cannot pass (and invites a wrong-direction
+"fix" that would strip a safety rule). Two NEW MEDIUMs (a false-negative grep guard that blocks
+§16 deletion; an authority-sweep regex that misses `sole authority`) round out the actionable set.
 
-### 2. Strengths
+### 2. Cycle-1 HIGH Disposition
 
-- **Wave 0 ordering is correct.** Arming `check-neutrality.sh` over `schema/` (Plan 16-00) *before* any `schema/reference/*.md` lands is exactly right, and isolating it as an AGENTS.md-untouched single-file commit correctly avoids firing the sync pre-commit hook.
-- **Bottom-up editing within a plan** (16-01, 16-03) is the right technique to keep earlier line anchors stable across a multi-section edit.
-- **The §6 consumer-split is well-reasoned** (concur with the routing).
-- **16-03 locating sections by header text, not line number,** is the correct discipline given upstream line drift.
-- **Per-commit gate discipline** (sync → sync --check → check-neutrality at each editing commit) is the right invariant for byte-equality.
-- **lint.md is seeded as an explicit *partial* with a Phase-17-ownership header** — the cross-phase handoff is at least acknowledged rather than silent.
+**HIGH #1 — Template-mirror sequencing + broken parity tests → RESOLVED.**
+Per-commit mirror is now explicit: 16-01 STEP B.5 (§4/§5/§7), 16-02 STEP B.5 (§6), 16-03 STEP D.5
+(§8/§13/§14/§15/§16 + §3 Red Links). 16-04 Task 3 rewrites all 5 named tests to post-extraction
+invariants that still assert something real (region-scoped `cmp`; moved content present in leaf;
+`! grep '^## 16\.'`). Verified the residual worry is unfounded: `tests/phase-07` + `tests/phase-08`
+contain no section-shape markers, so the monolith-shape tests are confined to non-CI aggregators
+exactly as the plans claim. The 08-04/09-06 relaxation precedent is correctly invoked.
 
-### 3. Concerns
+**HIGH #2 — Wizard delivery gap → RESOLVED (with minor lean).**
+16-04 STEP F.5 adds the missing post-render stub-integrity check. Actual delivery rides the
+pre-existing `bin/release.sh` ALLOWLIST (`schema` confirmed present), so files ship wholesale
+without new render logic; F.5 proves they exist in the source tree to be shipped. The named
+concern (`--dry-run` doesn't verify pointers resolve) is closed.
+*(Codex disputes — rates this carried-over HIGH; see Divergent Views.)*
 
-#### HIGH — Template mirror of the §4–§16 stubs is unowned and mis-sequenced; it breaks existing parity tests
-The phase goal says "mirror all stubs into `schema/AGENTS.template.md`," but the task decomposition only has **Plan 16-04 mirror its own 3 structural changes** (router line, routing table, §3 line). No plan clearly owns mirroring the §4/§5/§6/§8/§13 stubs and the §7/§16 *deletions* into the template. This collides with reality verified in the repo:
+**HIGH #3 — 16-02 line-drift → RESOLVED.**
+16-02 now pins the AGENTS.md mutation to a header anchor, retains absolute line numbers only as
+source-content identity, and repeats the "NEVER edit by literal line 399" warning in three places.
+Robust.
 
-- `tests/phase-09.1/test_template_parity.sh` asserts **§4 and §16 bodies are byte-identical** between `AGENTS.md` and `schema/AGENTS.template.md`, extracting §4 as `^## 4.` → `^## 5.` and §16 as `^## 16.` → EOF.
-- `tests/phase-10/test_agents_template_parity_section_5.sh` asserts the **same for §5**.
+**HIGH #4 — Now-false authority language → PARTIALLY RESOLVED.**
+16-04 STEP A.5 adds the repo-wide sweep and pre-lists the right hits. Confirmed the sweep regex
+catches lines 3, 5, 13, 87, 130. **But it misses line 38**: the §2 directory-tree comment
+`├── AGENTS.md   # This file (sole authority)`. The term set
+(`sole authoritative|sole source of truth|No other file|does NOT contain rules|does NOT contain conventions`)
+does not include the bare phrase `sole authority`, and `grep -q` confirms line 38 escapes — it is
+exactly the "now-false authority language beyond line 3" class this HIGH targets, surviving into
+shipped AGENTS.md. One-line fix, but unfixed as written.
 
-Consequences as written:
-1. After 16-01 stubs §4/§5 and deletes §7, and 16-03 deletes §16 — but the template still holds the full bodies — **all three parity tests go red.** No plan in the set runs phase-09.1 or phase-10 (16-04 only runs phase-07 + phase-08), so the breakage is silent until someone runs full CI.
-2. Even if 16-04 is *intended* to mirror everything, there is a **Wave-1→Wave-2 window** where `AGENTS.md` is stubbed but the template is not — parity is red across every intermediate commit, violating "CI gates pass unchanged in behavior."
-3. **Worse than a red test:** the wizard renders `AGENTS.md` *from the template* (`init-wizard.sh:647 render_agents_md`). If the template keeps full §4–§16, a freshly-initialized end-user repo gets the **old monolith inline AND the new reference files** — duplicated, contradictory, and the opposite of the phase goal.
+**HIGH #5 — check-privacy.sh PUBLIC_PATHS → RESOLVED.**
+16-00 Task 2 adds `schema` to line 76 + syncs the help-text scope line + re-runs
+`test_check_privacy_rekey.sh`. Closes the release-ALLOWLIST ↔ path-guard asymmetry. Verified safe
+(check-privacy is a structural path guard, not a content grep).
 
-**Fix:** Each editing plan (16-01/02/03) must mirror its own stub edits into `schema/AGENTS.template.md` **in the same commit** (template has no sync gate, so this is manual but must be per-commit, not deferred). And the set must explicitly update/retire the §4/§5/§16 assertions in phase-09.1 and phase-10 — those tests *codify* the old monolith shape and cannot survive extraction unchanged. This is the single most important gap.
+### 3. Strengths
 
-#### HIGH — Plan 16-02 appears to address `AGENTS.md` §6 by absolute line number after 16-01 already shifted the file
-16-02's description targets "§6 lines 399–553 / 555–578 / 580–602 / 604–618." But 16-01 stubs §5 (was 140 lines → ~2) and §4, deleting/shrinking content *above* §6. By the time 16-02 runs, §6 no longer lives at 399 — it has shifted up ~130+ lines. If 16-02's `AGENTS.md` edit uses those literal addresses (rather than header anchors as 16-03 explicitly does), it will cut the wrong region (now somewhere in §8/§11). The cited line numbers are fine as *content-identity* of the source material, but the plan must state — as 16-03 does — that the `AGENTS.md` mutation locates §6 by `^## 6\.` → `^## 7\.`/next-header. **Confirm 16-02 is header-anchored, not line-addressed.**
+- **Disposition tables instead of soft "audits."** The §7 dissolution table (16-01) and the
+  10-rule Appendix-C table (16-03) each map every dropped fragment to a named home with a
+  programmatic confirmation, and explicitly STOP on any miss.
+- **Direction-pinned safety guards.** The §7 STEP A.5 guard greps §3 for the 3 nav steps *before*
+  dropping the §7 duplicate — content-loss is gated, not assumed.
+- **Header-anchored edits throughout** 16-02/16-03. Line-drift class is genuinely eliminated.
+- **Verbatim-truth gates are real:** `grep -q 'filename/path ONLY'` + `grep -q 'for ALL intra-wiki'`
+  against wikilinks.md — a paraphrase fails the gate.
+- **affected_pages: [] is the correct call**, well-justified against DRFT-04 and the §4.6
+  infra-record precedent.
 
-#### MEDIUM — Routing table ships dangling pointers for ingest/query/reflect that contradict still-inline content
-16-04 inserts routing rows for `schema/workflows/{ingest,query,reflect}.md`, which do not exist until Phase 17, while the actual workflow content **remains fully inline in §11** of core (Phase 16 only seeds lint decay math). So an agent given only `AGENTS.md` reads a router row saying "go to `schema/workflows/ingest.md`," follows it, gets file-not-found — *and the content was right there in §11 the whole time*. A dangling pointer that overrides present inline content is worse than no row. Note `lint.md` is **not** in this bucket: 16-02 creates it, so its row resolves (to a partial). **Fix:** for ingest/query/reflect, either omit the rows until Phase 17 or mark them explicitly "inline in §11 until Phase 17 — do not dereference yet," visually distinct from the resolvable `lint.md`/reference rows.
+### 4. Concerns
 
-#### MEDIUM — No automated guard preserves the load-bearing v1.1.1 "filename/path ONLY" sentence
-The milestone treats "Obsidian resolves `[[X]]` by filename/path ONLY" as a verbatim truth that must survive into `wikilinks.md`. Nothing in the plan set *gates* this — survival depends entirely on author discipline during a hand-move, and a paraphrase would pass every existing test (`test_no_kahneman`, neutrality, sync all stay green on a reworded sentence). For a fact this load-bearing, add a one-line grep assertion to 16-03's verification (`grep -q 'filename/path ONLY' schema/reference/wikilinks.md`) and ideally a small phase-16 test. Same technique should guard the §3-resident MUST-NOT verbatim list if any of it migrates.
+- **HIGH — NEW — 16-04 whole-file template-parity gate is broken AND premised on a false starting
+  state, with a safety-regression hazard.** STEP E / the Task 1 `<verify>` run
+  `diff <(grep -v '{{' AGENTS.md) <(grep -v '{{' schema/AGENTS.template.md)` and require it empty.
+  Ran on the *current* files: it is non-empty by construction.
+  - (a) *One-sided placeholder filter:* core retains placeholders that STAY resident
+    (`{{AGENT_FILENAME}}` §1, `{{PRIMARY_DOMAIN}}` §2). `grep -v '{{'` strips the template's `{{`
+    lines but keeps AGENTS.md's *rendered* counterparts, so those lines always diff.
+  - (b) *Pre-existing resident drift:* the live template is genuinely **missing the §3 MUST-NOT
+    bullet** "DO NOT use real slugs, page IDs, or terms…" (diff hunk `138d138`) — a neutrality
+    safety rule present in AGENTS.md but never mirrored to the template (Phase-12.1-era drift).
+    The live diff also shows the template missing `knowledge_domain`, the asymmetric cross-tier
+    link rule, multiple `wiki-local/sources/` qualifiers, and `FROM "wiki"` vs `FROM "wiki-cloud"`.
+    §1/§2/§3 are resident in Phase 16, so these will fail STEP E.
+  - The Task 3 region-scoped `cmp` tests only compare the *extracted* stub regions and will pass,
+    masking this. As written, STEP E cannot go green; worse, an executor told "make the diff empty"
+    could resolve it in the wrong direction — deleting the §3 bullet from AGENTS.md to match the
+    deficient template — silently dropping a safety MUST-NOT. **Fix:** scope the parity check to
+    per-section stub regions, and add a separate, direction-pinned step that reconciles pre-existing
+    resident drift *into the template* (template gains the §3 bullet; AGENTS.md never loses it).
 
-#### MEDIUM — §7 dissolve and §16/Appendix-C deletion need an explicit subsection→destination map to prove no silent loss
-- **§7** contains more than the per-type ordering table: it has "Rules for LLM Agents" (read index first; TL;DR/Key Facts before Detail) and "Why This Matters." 16-01 merges *only the ordering table* and deletes the rest "no stub." Much of the agent-rule essence is duplicated in §3's "LLM Navigation Rule," so it probably survives — **but the plan should assert that mapping**, not assume it.
-- **Appendix C** is a 10-rule quick-reference. 16-03 says "audit rules 1–10 for absorption (esp. rule 6)." "Audit for absorption" is too soft for a deletion. Each rule needs a named home (rule 6→privacy.md is the only one specified) or a conscious "already covered by §X" / "intentionally dropped."
+- **MEDIUM — NEW — 16-03 Task 2 STEP C rule-6 grep is a false-negative that blocks §16 deletion.**
+  The guard `grep -q "DO NOT read .wiki-local. from a cloud session" AGENTS.md` does not match the
+  actual text ``DO NOT read `wiki-local/` from a cloud session`` — the single `.` after
+  `wiki-local` consumes the `/` but not the closing backtick, so " from a cloud session" never
+  aligns. Confirmed `grep -q` returns no match. Since STEP C says "if ANY confirmation fails, STOP —
+  do not delete §16," this halts §16 deletion on a present rule. Fix the pattern.
 
-**Fix:** add a small "disposition table" to 16-01 and 16-03 (every dissolved subsection → destination file or "dropped, rationale"). Cheap insurance against silent content loss, which is the highest-consequence failure mode of an extraction.
+- **MEDIUM — NEW — authority-sweep regex omits `sole authority` (line 38).** See HIGH #4. Add
+  `sole authority` to the term set; reconcile line 38 to router framing.
 
-#### MEDIUM — Decision record `affected_pages: [index, log]` is semantically wrong; should be `[]`
-`index.md` and `log.md` are navigation artifacts without `id`/frontmatter — they are not id-bearing wiki pages, and they can't carry the `decision_history` back-link that `affected_pages` is supposed to enable. The schema's own precedent for an infrastructure/inaugural record is **`affected_pages: []`** (Section 4.6 example `dr-2026-04-14-phase6-decision-type`; DRFT-04 even hard-excludes the `index`/`log` tokens from page-ID resolution). To the requester's sub-question: the DR should **not** list the extracted-from pages either — the extracted content lands in `schema/reference/*.md`, which are likewise not wiki pages. **Use `affected_pages: []`** and describe the extraction narratively in the body. *(Note: Codex disputes this — see Divergent Views; Codex argues index/log DO carry `id:` frontmatter and the value is schema-valid.)*
+- **LOW — NEW — content-preservation verification is shallow.** Extraction verifies 1–3 headers +
+  `min_lines`; it does not reconcile all subsections. A dropped mid-section subsection within the
+  line budget would not be caught. RESEARCH recommended a first/last-distinctive-sentence-per-section
+  check; the plans didn't adopt it as a gate.
 
-#### LOW–MEDIUM — The check-privacy.sh gap is real but lower-risk than flagged; the more useful observation is the asymmetry
-The requester flagged "HIGH: `check-privacy.sh` doesn't cover `schema/` and ships via release." Two facts lower this:
-1. `check-privacy.sh` is a **path-component guard** (`check-privacy.sh:93-96`) — it fires only if a file's *path* contains a `wiki-local/` component. The realistic leak vector for this extraction is **private terms pasted into `schema/reference/*.md` content**, which is the *neutrality* scanner's job — and Plan 16-00 closes that. The content being moved is already-public `AGENTS.md` text.
-2. `bin/release.sh` doesn't even invoke `check-privacy.sh` — its pre-flight is `check-neutrality.sh` + `sync-claude --check` + a `privacy: local_only` grep (`release.sh:160,173`). So the path guard never runs at release time regardless.
+- **LOW — NEW — 16-04 STEP F.5 scans the whole AGENTS.md**, including still-inline §9–§12, for
+  `schema|docs/reference` paths and asserts `test -f`. A pre-existing reference to a not-yet-created
+  doc would surface as a false failure. Worth scoping the grep to Phase-16-added stubs + table.
 
-So: not a HIGH content-leak. **But** there's a defensible defense-in-depth inconsistency — after 16-00, neutrality covers `schema/` while the structural path guard still doesn't, even though `schema/` is in the release ALLOWLIST (`release.sh:29`). Recommend a one-line addition of `schema` to `check-privacy.sh:76 PUBLIC_PATHS` for symmetry (and verify `tests/phase-15/test_check_privacy_rekey.sh` tolerates it). Treat as hygiene, not a blocker. *(Note: Codex rates this HIGH — see Divergent Views.)*
+- **LOW — CARRIED-OVER/RESIDUAL — phase-08 masks template drift** for the resident §3 bullet (the
+  byte-equality test compares wizard-render-vs-fixture, not render-vs-AGENTS.md). Ties into the
+  NEW HIGH. *(See Codex's NEW HIGH for the separate fixture-staleness break.)*
 
-#### LOW — Wizard does reach end users with the reference files, but nothing verifies stub pointers resolve post-render
-To the requester's wizard question: `init-wizard.sh` renders **only 5 artifacts** and does **not** copy `schema/reference/*.md`. That's fine — those files ship as static repo content (clone + `release.sh` ALLOWLIST `schema`), so end users get them via the tree, not the render. **However**, `--dry-run` only previews the 5 rendered files and checks for leftover `{{...}}` (`init-wizard.sh:935-994`); it does **not** verify that the stub pointers in the rendered `AGENTS.md` resolve to real files. 16-04's `test -f each routing target` covers only the *routing-table* targets, not the inline §4/§5/§6/§8/§13 stub pointers. So `--dry-run` is *insufficient* as a stub-integrity check. Add an explicit post-render assertion that every `schema/reference/…` and `schema/workflows/…` path referenced in rendered `AGENTS.md` exists on disk (excluding the known Phase-17 rows).
+### 5. Suggestions
 
-### 4. Suggestions (concrete)
+1. **Replace STEP E's whole-file diff** with the region-scoped `cmp` approach Task 3 already uses,
+   and add a one-time resident-drift reconciliation task that pins direction: template brought up
+   to AGENTS.md in §1/§2/§3 (add the missing §3 "DO NOT use real slugs" bullet to the template),
+   never the reverse.
+2. **Add `sole authority` to the STEP A.5 sweep** and reconcile line 38.
+3. **Fix the rule-6 grep** in 16-03 STEP C.
+4. **Add a content-preservation gate** per RESEARCH: first + last distinctive sentence per section.
+5. **Scope F.5's path grep** to the Phase-16 stub/routing-table region.
 
-1. **Make template-mirror per-commit and per-plan.** Move template stub edits into 16-01/02/03 (same commit as the `AGENTS.md` edit), not deferred to 16-04. Keep `AGENTS.md ≡ template` (modulo the 4 `{{placeholders}}`) true at every commit.
-2. **Add the parity-test updates to the plan explicitly.** phase-09.1 (§4/§16) and phase-10 (§5) encode the monolith shape; the plan must rewrite their assertions to the post-extraction reality, and 16-04 (or a new final task) must **run them** alongside phase-07/08.
-3. **Confirm 16-02 is header-anchored** for the `AGENTS.md` §6 mutation; strip the absolute line numbers from the *edit* step (keep them only as source-content provenance).
-4. **Disposition tables** for §7 and §16/Appendix-C: every dissolved subsection → file or "dropped + why."
-5. **Grep gates** for the v1.1.1 piped-link sentence and any migrated MUST-NOT verbatim text.
-6. **Routing table:** render ingest/query/reflect rows as "inline in §11 until Phase 17," visually distinct from resolvable rows; or omit until Phase 17.
-7. **DR:** `affected_pages: []`; narrate extraction in the body.
-8. **Hygiene:** add `schema` to `check-privacy.sh` PUBLIC_PATHS; add a stub-target existence assertion to 16-04.
-9. **Consider a render-equality smoke check** (`render(template, repo answers) == AGENTS.md`) as the durable guard that template and core never diverge again — this is the structural fix that makes concern #1 un-recurrable.
+### 6. Risk Assessment — MEDIUM
 
-### 5. Risk Assessment
-
-**Overall: HIGH (as written) → reducible to LOW–MEDIUM with the template-sync and test-impact fixes.**
-
-Justification: the *content* extraction is low-risk and well-reasoned, and the byte-equality discipline for AGENTS↔CLAUDE is sound. The risk concentrates in two things the plan under-specifies: (1) the template mirror is unowned/mis-sequenced and silently breaks three pre-existing parity tests *and* the wizard render path — this is not cosmetic, it corrupts what new users receive; and (2) 16-02's apparent line-addressing against an already-shifted file. Both are deterministic failures, not edge cases. They are also entirely fixable in a short re-plan pass — none require rethinking the seams. The privacy/neutrality concern the requester weighted highest is, on inspection of the actual gates, the *least* of the real risks. Fix template-sync ownership, sequence it per-commit, and reconcile the parity tests, and this becomes a clean, low-risk extraction.
+HIGH #1/#2/#3/#5 are fully resolved and HIGH #4 is 95% there (one regex term). What keeps risk at
+MEDIUM is the NEW HIGH: the final wiring plan's central template-parity gate cannot pass as written,
+rests on a verified-false assumption, and carries a concrete safety-regression path. Every finding
+is localized to verification logic / scope and fixable without rethinking the extraction design.
 
 ---
 
@@ -93,77 +162,169 @@ Justification: the *content* extraction is low-risk and well-reasoned, and the b
 
 ### Summary
 
-The plan set is directionally good, but not yet safe to execute as written. The extraction design is coherent, especially the consumer split for §6, but the tooling boundary does not yet match the new authority boundary. The biggest blockers are: `schema/` ships publicly but is not covered by `check-privacy.sh`; `init-wizard.sh` currently renders only five artifacts and does not copy `schema/reference/*`; Plan 16-02 uses original line numbers after Plan 16-01 has already shifted the file; and existing "AGENTS.md is the only rules file" language will become false unless updated broadly.
+The revised plans resolve the main extraction sequencing problems and are much stronger on
+per-commit template mirroring, content-loss disposition, and routing-table safety. However, the
+wizard delivery HIGH is still only partially handled, and there are new gate risks around the
+Phase 08 canonical wizard fixture and the proposed template parity check. I would not approve
+execution as-is until those are fixed.
+
+### Cycle-1 HIGH Disposition
+
+1. **Template-mirror sequencing + broken parity tests: FULLY RESOLVED.** Plans 16-01/02/03 require
+   the template to mirror each section's stub/deletion in the same commit; 16-04 Task 3 rewrites
+   and runs the five named phase-09.1/phase-10 tests against the post-extraction shape.
+
+2. **Wizard delivery gap: PARTIALLY RESOLVED.** 16-04 adds post-render stub-integrity checks, but
+   no plan modifies `bin/init-wizard.sh`, and `files_modified` omits it. The wizard still renders
+   only the five artifacts; the plan checks live-repo path existence, not that generated output
+   contains `schema/reference/*`, `schema/workflows/lint.md`, or the new `docs/reference/*` files.
+
+3. **16-02 line-drift: FULLY RESOLVED.** §6 mutation is header-anchored, not line-addressed.
+
+4. **Now-false authority language: PARTIALLY RESOLVED.** 16-04 Task 1 adds the AGENTS.md sweep and
+   calls out the §2 false sentence, but the command runs only over AGENTS.md (template handled
+   manually), and misses active generated fixtures unless separately added.
+
+5. **check-privacy.sh PUBLIC_PATHS: FULLY RESOLVED.** 16-00 Task 2 adds `schema` to PUBLIC_PATHS
+   and help text and verifies both check-privacy.sh and the phase-15 privacy test.
 
 ### Strengths
 
-- Good sequencing to arm `check-neutrality.sh` before adding public `schema/reference/*` files.
-- The §6 consumer split is mostly right: contradiction marker syntax belongs with provenance/inline grammar, while decay/staleness math belongs with lint.
-- Repeated `AGENTS.md` → `CLAUDE.md` sync checks are the right guard for byte equality.
-- Creating a decision record is appropriate for this structural schema change.
-- Plan 16-03 correctly switches to header-based extraction after prior edits shift line numbers.
+- Per-commit template mirroring is now owned in the plans that mutate each section.
+- The routing table cleanly separates resolvable references from Phase-17 workflow placeholders.
+- The §7 and Appendix C disposition tables are concrete enough to prevent silent deletion.
+- REF-05 is grep-gated with the exact `filename/path ONLY` and `for ALL intra-wiki` phrases.
+- The §6 consumer split keeps contradiction syntax in provenance rather than lint.
+- `affected_pages: []` for the DR is the right call given the infra-record precedent.
 
 ### Concerns
 
-- **HIGH:** `schema/` is public in releases, but `check-privacy.sh` does not scan it. Confirmed `bin/release.sh` allowlists `schema` (bin/release.sh), while `check-privacy.sh` public paths omit it (bin/check-privacy.sh:76). This is a real leak risk because `schema/wiki-local/...` or copied local-only material under `schema/` could ship.
+- **HIGH, CARRIED-OVER:** Wizard delivery is still not fixed. 16-04 F.5 validates pointer existence
+  in the source repo, but does not make wizard-generated output contain the referenced files. Add
+  an explicit `bin/init-wizard.sh` change or a documented invariant plus tests proving generated
+  projects include the reference tree.
 
-- **HIGH:** The wizard does not currently copy extracted reference files. `_render_all_five` writes only `AGENTS.md`, `CLAUDE.md`, `.wizard-answers.yaml`, one decision record, and `wiki-cloud/index.md` (bin/init-wizard.sh:853). `--dry-run` only diffs those same five artifacts. So broken or missing `schema/reference/*` targets would not be caught.
+- **HIGH, NEW:** Phase 08 will likely go red because `schema/AGENTS.template.md` changes but
+  `schema/fixtures/canonical-AGENTS.md` is not listed or regenerated. Existing phase-08 tests
+  compare rendered wizard output byte-for-byte against that fixture. Plan 16-04 says phase-08
+  passes, but the `files_modified` list omits the fixture.
 
-- **HIGH:** Plan 16-02 relies on original §6 line numbers after Plan 16-01 has already replaced §4/§5 and deleted §7. Those line numbers will be wrong unless 16-02 extracts from a saved pre-edit snapshot. Use header/sentinel extraction, or extract all source slices before mutating core.
+- **MEDIUM, NEW:** The template parity check `diff <(grep -v '{{' AGENTS.md) <(grep -v '{{' template)`
+  is not a sound comparison. Removing placeholder lines only from the template leaves the rendered
+  AGENTS.md counterpart lines in place, so this can fail even when the template is correct.
 
-- **HIGH:** The plan updates some "sole source" wording, but likely misses other now-false authority claims. Current schema rules say conventions do not live in `schema/`; Phase 16 makes that false. Grep for `sole`, `authoritative`, `No other file`, `does NOT contain rules`, and update all contradictory statements.
+- **MEDIUM, CARRIED-OVER:** The authority-language sweep is not actually repo-wide. It should cover
+  AGENTS.md, CLAUDE.md, schema/AGENTS.template.md, schema/fixtures/canonical-AGENTS.md, and public
+  docs/templates, with explicit exemptions for historical decision records.
 
-- **MEDIUM:** Mirroring `schema/AGENTS.template.md` only in 16-04 leaves several commits where `AGENTS.md` points to extracted refs but the wizard template still renders the old monolith. That is risky for bisectability and per-commit CI. Mirror template changes with each core stub commit, or make the extraction/template mirror one atomic commit.
+- **MEDIUM, NEW:** Plan 16-02 still shows an extraction example using
+  `awk '/^## 6\./{f=1} /^## 7\./{exit} f'`. After 16-01 deletes §7, that command overcaptures to
+  EOF. The mutation step is correct, but the example should be a true "next heading" extractor.
 
-- **MEDIUM:** §16 deletion and Appendix C absorption are under-specified. "Audit rules 1-10" is not enough. Require a mapping table: each appendix item goes to a destination file or has an explicit deletion rationale.
+- **MEDIUM, NEW:** Placeholder migration into extracted leaf files is ambiguous. The plans mention
+  `{{PRIMARY_DOMAIN}}` and `{{DECAY_PROFILE}}` moving with extracted content, but init-wizard.sh
+  does not render reference files. Add a no-leftover-placeholder scan over all delivered reference
+  files, or keep those examples non-personalized.
 
-- **MEDIUM:** The routing table should not contain bare links to nonexistent Phase-17 files. If `ingest.md`, `query.md`, and `reflect.md` do not exist yet, the row should say "currently resident in §11; extraction planned for Phase 17," without presenting a missing file as authoritative.
-
-- **MEDIUM:** Verbatim preservation is not strongly guarded. Add grep tests for the exact Obsidian truth: `Obsidian resolves [[X]] by filename/path ONLY`, plus the universal piped-link rule.
-
-- **MEDIUM:** Seeding `schema/workflows/lint.md` before Phase 17 is acceptable only if Phase 17 is explicitly told to expand the existing file. Otherwise it creates a merge/ownership hazard.
-
-- **LOW:** `affected_pages: [index, log]` is schema-valid because both files have `id: index` and `id: log`. Do not list AGENTS.md or extracted reference files in `affected_pages`; put those in `Sources` or `Consequences`.
+- **LOW, NEW:** scaling.md and tooling.md link to `docs/reference/index.md`; verify it exists
+  (it does) — or remove the See Also link if not.
 
 ### Suggestions
 
-- Add a Plan 16-00b: include `schema` in `check-privacy.sh` `PUBLIC_PATHS`, update its help text/docs, and add a regression test.
-- Add `check-privacy.sh` to `bin/release.sh` staged preflight, not only CI.
-- Add a Phase 16 routing test that parses all non-Phase-17 paths in the routing table and asserts `test -f`.
-- Replace `init-wizard --dry-run` verification with `init-wizard --answers-file schema/fixtures/canonical-answers.yaml --render-to /tmp/...` plus checks that all stub targets exist in the rendered/package context.
-- Add extraction integrity checks: compare source slices from the pre-extraction commit to new files, or at least grep for sentinel phrases from every moved section.
+- Add a Plan 16 task to update `bin/init-wizard.sh` so output includes the new reference/doc files,
+  or explicitly constrain wizard usage to an already-complete template checkout and test that.
+- **Regenerate and commit `schema/fixtures/canonical-AGENTS.md` after template changes.**
+- Replace the `grep -v '{{'` parity check with a rendered-template comparison or targeted
+  section-stub comparisons.
+- Use `rg` for the authority sweep across public/template surfaces with a documented exemption list.
+- Replace all `^## 7\.` extraction terminators with "next `^## [0-9]+\.` header" logic.
 
-### Risk Assessment
+### Risk Assessment: HIGH
 
-**HIGH as written.** The prose architecture is sound, but the implementation plans leave public-surface privacy coverage and wizard/reference-file delivery unresolved. Fix those tooling gaps and the risk drops to medium or low.
+The extraction design is mostly sound, but as written the plans can still leave the wizard path
+broken and Phase 08 red. Once wizard delivery, canonical fixture regeneration, and the parity diff
+check are fixed, residual risk drops to LOW-MEDIUM.
 
 ---
 
 ## Consensus Summary
 
-Both reviewers independently rate the plan set **HIGH risk as written**, while agreeing the *content/seam design is sound* and every concern is fixable in a short re-plan pass without rethinking the architecture. Several of the highest-rated concerns were independently verified against the live repo during this review (parity tests, wizard render path, line-shift hazard, check-privacy gap).
+Both reviewers agree the cycle-2 revisions are strong on the structural axes (per-commit template
+mirror ownership, header-anchored edits, disposition tables, verbatim grep gates, both PUBLIC_PATHS
+fixes). Both independently flag that the **template/fixture/wizard layer is still not
+execution-clean**, and both rate at least one NEW HIGH. Every finding was verified against the live
+repo by the orchestrator.
 
 ### Agreed Strengths
 
-- Wave-0 ordering (arm `check-neutrality.sh` over `schema/` before any extraction commit) is correct.
-- The §6 consumer-split routing (Contradiction Inline Syntax → provenance.md; decay/staleness → lint.md) is correct and well-reasoned.
-- Repeated `sync-claude --check` byte-equality discipline at each commit is the right guard.
-- Plan 16-03's switch to header-anchored (not line-number) extraction is the correct discipline.
-- Writing a schema-update decision record is appropriate.
+- Per-commit template mirroring is now owned by each editing plan (16-01/02/03) — HIGH #1 structural
+  fix landed.
+- §6 mutation is header-anchored; the line-drift class (HIGH #3) is genuinely eliminated.
+- §7 + Appendix-C disposition tables map every dropped fragment to a named home with a STOP-on-miss
+  programmatic check.
+- REF-05 verbatim truth is grep-gated (paraphrase fails).
+- check-privacy.sh PUBLIC_PATHS fix (HIGH #5) is correct and safe.
+- `affected_pages: []` is the right DR call.
 
 ### Agreed Concerns (highest priority — both reviewers)
 
-1. **[HIGH] Wizard / template-mirror delivery gap.** `init-wizard.sh` renders only 5 artifacts and does NOT copy `schema/reference/*.md`; the template mirror of the §4–§16 stubs is deferred to 16-04 (or unowned). Both flag that the template must be mirrored per-commit (not deferred) and that the wizard/template path is under-verified. **Claude additionally proved** this breaks pre-existing parity tests (`tests/phase-09.1/test_template_parity.sh` for §4/§16, `tests/phase-10/test_agents_template_parity_section_5.sh` for §5) — confirmed present in the repo; no plan runs them.
-2. **[HIGH] Plan 16-02 line-addressing after 16-01 shifts the file.** §6 no longer lives at line 399 once 16-01 collapses §4/§5 (~130+ line shift). 16-02 must extract by header anchor / pre-edit snapshot, exactly as 16-03 already does. (Confirmed: §6 header is at line 399 in the current monolith; 16-01 removes ~250 lines above it.)
-3. **[MEDIUM] Routing table dangling Phase-17 rows.** ingest/query/reflect rows point to files that don't exist while the content is still inline in §11. Mark them "inline in §11 until Phase 17 — do not dereference" or omit. Both reviewers agree `lint.md` is fine (16-02 creates it).
-4. **[MEDIUM] No automated guard for the verbatim v1.1.1 truth.** Add `grep -q 'filename/path ONLY'` (and the piped-link rule) to 16-03 verification; a paraphrase currently passes all gates.
-5. **[MEDIUM] §16/Appendix-C absorption under-specified.** "Audit rules 1–10" is too soft for a deletion; require an explicit disposition/mapping table (each rule → destination file or conscious "dropped + rationale"). Claude extends this to the §7 dissolve too.
-6. **[MEDIUM] Template-mirror timing leaves per-commit CI red windows** (bisectability + "CI gates pass unchanged in behavior" violated across the Wave-1→Wave-2 window).
+1. **[HIGH] The template-parity gate `diff <(grep -v '{{' AGENTS.md) <(grep -v '{{' template)` is
+   unsound.** Both reviewers independently flag the one-sided placeholder filter (Claude rates the
+   combined defect HIGH because the live template ALSO has pre-existing resident drift incl. a
+   missing §3 neutrality MUST-NOT bullet + a safety-regression hazard; Codex rates the comparison-logic
+   half MEDIUM). **Verified:** the live whole-file diff is non-empty by construction (placeholder
+   asymmetry + `138d138` missing §3 bullet + `knowledge_domain` line + asymmetric cross-tier link
+   rule + `wiki-local/sources/` qualifiers + `FROM "wiki"` all absent from the template). The gate
+   in 16-04 STEP E and the Task 1 `<verify>` block cannot pass as written.
 
-### Divergent Views (worth investigating)
+2. **[HIGH] Wizard / fixture delivery is not execution-clean.** Codex pins the sharpest, verified
+   form: `tests/phase-08/test_canonical_byte_equality.sh` (CI-wired) renders the wizard from
+   `schema/AGENTS.template.md` and asserts byte-equality against the committed
+   `schema/fixtures/canonical-AGENTS.md` (115 KB full monolith). The moment 16-01 mutates the
+   template, this fixture goes stale and **phase-08 goes red** — yet 16-04 Task 2 STEP D asserts
+   phase-08 must PASS, no plan lists the fixture in `files_modified`, and no plan regenerates it.
+   Claude's narrower wizard-delivery point (stub-integrity) is resolved by F.5; the fixture-staleness
+   break is separate and unaddressed.
 
-- **check-privacy.sh `schema/` gap severity.** Codex rates this **HIGH** (schema ships via release ALLOWLIST; a `wiki-local/` path under schema/ could leak). Claude rates it **LOW–MEDIUM hygiene**, arguing (a) check-privacy is only a *path-component* guard and the real extraction leak vector is *content* terms, which 16-00 already covers via neutrality; and (b) `release.sh` doesn't even invoke check-privacy.sh at release time. **Resolution path:** both agree the one-line fix (add `schema` to `check-privacy.sh:76 PUBLIC_PATHS`) is worth doing — it is cheap and removes the asymmetry — so adopt it regardless of severity framing. Disagreement is only about whether it blocks.
+3. **[HIGH-partial] Authority-language sweep misses hits.** Both: the sweep is not truly repo-wide.
+   Claude verified line 38 `# This file (sole authority)` escapes the regex term set; Codex notes the
+   command runs only over AGENTS.md and omits the canonical fixture + template + docs surfaces.
 
-- **DR `affected_pages` value.** Claude says `affected_pages: [index, log]` is **semantically wrong → use `[]`** (index/log are navigation artifacts; DRFT-04 hard-excludes the index/log tokens from page-ID resolution; §4.6 precedent for infra records is `[]`). Codex says it is **schema-valid because index.md and log.md carry `id: index`/`id: log` frontmatter** (LOW). **Resolution path:** verify whether `wiki-cloud/index.md` and `wiki-cloud/log.md` actually carry `id:` frontmatter; if they do, the value is technically valid but the DRFT-04 exclusion + §4.6 `[]` precedent still argue for `[]` as the cleaner choice. Both agree the DR should NOT list AGENTS.md or the extracted reference files in `affected_pages`.
+### Divergent Views
 
-- **Now-false authority language scope.** Codex raises an additional **HIGH** not surfaced by Claude: beyond line 3 and the §3 MUST-NOT line, grep the whole spec for `sole`, `authoritative`, `No other file`, `does NOT contain rules` and fix every now-contradictory statement (e.g., §2's "schema/ does NOT contain rules or conventions" becomes false once `schema/reference/*.md` hold authoritative rules). Claude's plan-1 framing covers the two known lines but does not call out the broader sweep. **Resolution path:** adopt Codex's grep-sweep as a required step in 16-04.
+- **Wizard delivery (cycle-1 HIGH #2) status.** Claude rates **RESOLVED** — actual delivery rides
+  the release.sh ALLOWLIST wholesale copy (verified `schema` present), and F.5 closes the named
+  stub-resolution gap. Codex rates **PARTIALLY RESOLVED / carried-over HIGH** — no init-wizard.sh
+  change and F.5 checks source-repo existence, not generated output. **Resolution path:** both agree
+  F.5 is necessary but not a delivery mechanism; the durable fix is either an init-wizard.sh change
+  or a documented+tested invariant that release ships the reference tree. Counted as one unresolved
+  HIGH given the residual ambiguity + Codex's stricter read.
+
+- **Template-parity-gate severity.** Claude HIGH (because of the compound resident-drift +
+  safety-regression hazard, repo-verified); Codex MEDIUM (comparison-logic only). **Resolution
+  path:** adopt the higher severity — the verified missing §3 neutrality bullet + the wrong-direction
+  "fix" hazard make this a HIGH, not a cosmetic gate bug.
+
+### NEW MEDIUM / LOW worth fixing in the next replan
+
+- 16-03 STEP C rule-6 grep is a false-negative (backtick-sensitive `.` pattern) that would STOP §16
+  deletion on a present rule (Claude, verified).
+- 16-02's `awk '…/^## 7\./{exit}…'` example overcaptures to EOF after §7 is deleted; use a generic
+  "next `^## [0-9]+\.`" terminator (Codex).
+- No-leftover-placeholder scan over delivered reference leaf files ({{PRIMARY_DOMAIN}},
+  {{DECAY_PROFILE}} migration) (Codex).
+- Content-preservation gate is shallow (headers + min_lines only); add first/last distinctive
+  sentence per extracted section (Claude).
+- F.5 path grep scans whole AGENTS.md incl. still-inline §9–§12; scope to Phase-16 region (Claude).
+
+### Unresolved HIGH count this cycle: 4
+
+1. **NEW** — Template-parity gate (`grep -v '{{'` whole-file diff) cannot pass + resident-drift +
+   safety-regression hazard (missing §3 neutrality bullet). [repo-verified]
+2. **NEW** — `schema/fixtures/canonical-AGENTS.md` not regenerated → CI-wired phase-08
+   byte-equality test goes red, contradicting 16-04's stated success condition. [repo-verified]
+3. **PARTIAL (carried-over #4)** — Authority-language sweep misses `sole authority` (line 38) and
+   does not cover the canonical fixture / template / docs surfaces. [repo-verified]
+4. **PARTIAL (carried-over #2)** — Wizard delivery: no init-wizard.sh change or tested
+   ship-the-reference-tree invariant; F.5 checks source-repo existence, not generated output.
+   (Contested: Claude RESOLVED, Codex carried-over HIGH.)
