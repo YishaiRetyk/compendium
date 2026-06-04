@@ -15,13 +15,13 @@ Requirements for milestone v1.2. Each maps to exactly one roadmap phase.
 
 ### Privacy Architecture (`PRIV`) — Phase 15, gates Phase 16
 
-- [ ] **PRIV-01**: Adopt the two-directory layout — `wiki-cloud/` (cloud-safe tier) and `wiki-local/` (local-only tier) — and update §2 Directory Structure accordingly. Decide migration of the existing `wiki/` tree (rename to `wiki-cloud/` for the single-tier creator vault; relocate `wiki/maintenance/audit-{report,state}.md` to the local side).
-- [ ] **PRIV-02**: Rewrite §13 from per-page precedence/inheritance to the per-vault **asymmetric** model: local-side runs (local models) may read both dirs; cloud-side runs (cloud models) MUST NOT read `wiki-local/`. State the one-way permeability rule and its rationale (local→cloud is the leak; it is the forbidden direction).
-- [ ] **PRIV-03**: Specify enforcement as a **harness permission**, not a resident agent rule — a `deny`-read on `wiki-local/` for cloud sessions (`settings.json`), and/or a documented two-clone / two-session split. Provide the concrete config artifact, not just prose.
-- [ ] **PRIV-04**: Decide the fate of the per-page `privacy` frontmatter field — removed entirely vs. retained as an optional intra-dir override. Default recommendation: **remove** (the directory is the classifier); if retained, it may only make a `wiki-cloud/` page *stricter*, never a `wiki-local/` page more permissive.
-- [ ] **PRIV-05**: Update tooling to the structural model: `bin/check-privacy.sh` (public-path leak guard now keys on `wiki-local/` rather than a frontmatter field), `bin/lint.sh` privacy-relevant checks, and `bin/audit-claims.sh` FAITH-04 effective-privacy resolution. CI privacy-leak job updated. No behavioral regression beyond the structural model swap.
-- [ ] **PRIV-06**: Write the execution-time decision record `wiki/decisions/dr-YYYY-MM-DD-privacy-asymmetric-two-dir.md` (`trigger_type: schema-update`), superseding the implicit per-page §13 framing; record the three options and why asymmetric won.
-- [ ] **PRIV-07** (knock-on, feeds REF-06): Confirm §13's resident obligation is reduced to a one-line pointer in core ("vault tier is structural; cloud sessions cannot read `wiki-local/` — see `schema/reference/privacy.md`"), with the fail-closed/precedence/inheritance machinery **removed rather than relocated**.
+- [x] **PRIV-01**: Adopt the two-directory layout — `wiki-cloud/` (cloud-safe tier) and `wiki-local/` (local-only tier) — and update §2 Directory Structure accordingly. Decide migration of the existing `wiki/` tree (rename to `wiki-cloud/` for the single-tier creator vault; relocate `wiki/maintenance/audit-{report,state}.md` to the local side).
+- [x] **PRIV-02**: Rewrite §13 from per-page precedence/inheritance to the per-vault **asymmetric** model: local-side runs (local models) may read both dirs; cloud-side runs (cloud models) MUST NOT read `wiki-local/`. State the one-way permeability rule and its rationale (local→cloud is the leak; it is the forbidden direction).
+- [x] **PRIV-03**: Specify enforcement as a **harness permission**, not a resident agent rule — a `deny`-read on `wiki-local/` for cloud sessions (`settings.json`), and/or a documented two-clone / two-session split. Provide the concrete config artifact, not just prose.
+- [x] **PRIV-04**: Decide the fate of the per-page `privacy` frontmatter field — removed entirely vs. retained as an optional intra-dir override. Default recommendation: **remove** (the directory is the classifier); if retained, it may only make a `wiki-cloud/` page *stricter*, never a `wiki-local/` page more permissive.
+- [x] **PRIV-05**: Update tooling to the structural model: `bin/check-privacy.sh` (public-path leak guard now keys on `wiki-local/` rather than a frontmatter field), `bin/lint.sh` privacy-relevant checks, and `bin/audit-claims.sh` FAITH-04 effective-privacy resolution. CI privacy-leak job updated. No behavioral regression beyond the structural model swap.
+- [x] **PRIV-06**: Write the execution-time decision record `wiki/decisions/dr-YYYY-MM-DD-privacy-asymmetric-two-dir.md` (`trigger_type: schema-update`), superseding the implicit per-page §13 framing; record the three options and why asymmetric won.
+- [x] **PRIV-07** (knock-on, feeds REF-06): Confirm §13's resident obligation is reduced to a one-line pointer in core ("vault tier is structural; cloud sessions cannot read `wiki-local/` — see `schema/reference/privacy.md`"), with the fail-closed/precedence/inheritance machinery **removed rather than relocated**.
 
 ### Reference Extraction (`REF`) — Phase 16
 
@@ -80,13 +80,13 @@ Which phases cover which requirements. Phase mapping filled during roadmap creat
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PRIV-01 | Phase 15 | Pending |
-| PRIV-02 | Phase 15 | Pending |
-| PRIV-03 | Phase 15 | Pending |
-| PRIV-04 | Phase 15 | Pending |
-| PRIV-05 | Phase 15 | Pending |
-| PRIV-06 | Phase 15 | Pending |
-| PRIV-07 | Phase 15 | Pending |
+| PRIV-01 | Phase 15 | Complete |
+| PRIV-02 | Phase 15 | Complete |
+| PRIV-03 | Phase 15 | Complete |
+| PRIV-04 | Phase 15 | Complete |
+| PRIV-05 | Phase 15 | Complete |
+| PRIV-06 | Phase 15 | Complete |
+| PRIV-07 | Phase 15 | Complete |
 | REF-01 | Phase 16 | Pending |
 | REF-02 | Phase 16 | Pending |
 | REF-03 | Phase 16 | Pending |
