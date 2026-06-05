@@ -130,11 +130,25 @@ Plans:
   4. Every resident section in core carries a one-line justification citing its inclusion-test clause (ambient / unscriptable-unacceptable-miss / dispatch); the resulting core is visibly smaller than 1,689 lines with ~145 as an observable output (a tripwire re-audit fires on upward drift, not a gate).
   5. `docs/reference/agent-parity.md` is updated with evidence that a Codex/Cursor agent given only `AGENTS.md` can ingest by following the routing table to `workflows/ingest.md`.
 
-**Plans**: TBD
+**Plans**: 4 plans (4 waves — sequential core-file editing + routing guard built last)
 
 Plans:
 
-- [ ] 17-01: TBD
+**Wave 1**
+
+- [ ] 17-01-PLAN.md — Extract §9 structured-ops → structured-operations.md; fold §10 substantive blocks → ingest.md seed; reduce core §9 (vocab + validate-op + solo-op log + D-01 commit prefix) and §10 (diagram only) (WF-01, WF-02)
+
+**Wave 2** *(blocked on Wave 1 — shares core file)*
+
+- [ ] 17-02-PLAN.md — Complete ingest.md (§11.1 procedure); extract §11.2 → query.md; reduce core §11.1/§11.2 to routing dispatch + the one write-back-mandatory line (WF-03, WF-04)
+
+**Wave 3** *(blocked on Wave 2 — shares core file; final extraction)*
+
+- [ ] 17-03-PLAN.md — Merge §11.3 lint body INTO lint.md (CI-contract framing preserved); extract §11.4/11.5/11.6/11.7 reflect/brownfield/release/audit; extract §12 → log-format.md; repoint external §N referrers; delete routing scaffold (WF-05, WF-06, WF-07)
+
+**Wave 4** *(blocked on Wave 3 — routing guard goes green only after all §N abolished; gates close)*
+
+- [ ] 17-04-PLAN.md — Build the `routing` lint category (bidirectional resolvability guard); WF-08 inclusion-audit baseline + drift info check + section justification; WF-09 agent-parity desk-check + empirical record; schema-update DR; full CI gate suite (WF-08, WF-09)
 
 ### Phase 18: Skills Overlay
 
