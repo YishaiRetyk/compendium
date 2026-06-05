@@ -21,12 +21,15 @@ if grep -qi 'kahneman' "$DOC"; then
     exit 1
 fi
 
-# At least 4 diff-fence openers (triple-backtick + "diff") — one per Section 2/3/4/5.
+# At least 2 diff-fence openers (triple-backtick + "diff") — one per Section 2/3.
+# Post-Phase-16 (reference extraction, CR-01): Sections 4 (Privacy) and 5 (Decay) no longer
+# carry a minimal-diff (they are "File to edit: None" — privacy structural per §13, decay not
+# rendered into the spec), so the diff-fence count dropped from 4 to 2.
 # Use a variable to hold the pattern so bash does not try to command-substitute the backticks.
 DIFF_FENCE_PATTERN='^```diff$'
 DIFF_FENCE_COUNT=$(grep -cE "$DIFF_FENCE_PATTERN" "$DOC" || true)
-if [ "$DIFF_FENCE_COUNT" -lt 4 ]; then
-    echo "ASSERT FAIL: expected >=4 diff-fence openers (one per Section 2/3/4/5), got $DIFF_FENCE_COUNT" >&2
+if [ "$DIFF_FENCE_COUNT" -lt 2 ]; then
+    echo "ASSERT FAIL: expected >=2 diff-fence openers (one per Section 2/3), got $DIFF_FENCE_COUNT" >&2
     exit 1
 fi
 

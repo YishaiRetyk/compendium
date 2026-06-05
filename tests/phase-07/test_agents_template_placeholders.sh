@@ -4,14 +4,18 @@
 # wizard placeholders (D-08). All illustrative tokens must use <UPPERCASE_NAME>
 # angle-bracket syntax.
 #
-# POST-EXTRACTION (Phase 16): {{PRIMARY_DOMAIN}}, {{DECAY_PROFILE}}, and
-# {{DEFAULT_PRIVACY}} were used in illustrative frontmatter yaml blocks that
-# lived in §5 (now extracted to schema/reference/frontmatter.md) and §6.
-# Only {{AGENT_FILENAME}} and {{PRIMARY_DOMAIN}} remain in the template's
-# resident sections after extraction. The approved set is now 2 placeholders.
+# POST-EXTRACTION (Phase 16): {{DEFAULT_PRIVACY}} and {{DECAY_PROFILE}} lived in
+# illustrative §5/§6 carrier lines (a `privacy_default:` frontmatter line and a
+# §6 decay sentence). Phase 16 extracted §5/§6 and DROPPED both carrier lines
+# rather than relocating them — privacy is now structural (Phase 15, §13), so the
+# privacy_default line is obsolete, and the decay profile is recorded only in
+# .wizard-answers.yaml + the initial decision record, not rendered into the spec
+# (REF-10 DR records this intentional drop). The approved placeholder set is
+# therefore EXACTLY {{AGENT_FILENAME}} and {{PRIMARY_DOMAIN}}.
 #
-# Phase 16 precedent (same as 08-04/09-06/13.1): when a successor plan
-# moves placeholder-bearing content to leaf files, the approved set shrinks.
+# This test asserts that EXACT set (not a presence subset) so that any new,
+# typo'd, or re-introduced {{...}} placeholder fails CI — bin/init-wizard.sh
+# only substitutes these two tokens, so any other is an unrenderable leftover.
 set -euo pipefail
 
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
@@ -21,32 +25,19 @@ cd "$REPO_ROOT"
 TEMPLATE=schema/AGENTS.template.md
 [ -f "$TEMPLATE" ] || { echo "FAIL: $TEMPLATE missing"; exit 1; }
 
-# Post-extraction: only {{AGENT_FILENAME}} and {{PRIMARY_DOMAIN}} remain.
-# {{DEFAULT_PRIVACY}} and {{DECAY_PROFILE}} lived in §5/§6 bodies that
-# were extracted to leaf files in Phase 16 (frontmatter.md / lint.md).
+# The exact approved set, sorted (must match bin/init-wizard.sh `subs`).
+APPROVED=$(printf '%s\n' '{{AGENT_FILENAME}}' '{{PRIMARY_DOMAIN}}' | sort -u)
 FOUND=$(grep -oE '\{\{[A-Z_]+\}\}' "$TEMPLATE" | sort -u || true)
 
-# Assert the expected remaining placeholders are present
-for ph in '{{AGENT_FILENAME}}' '{{PRIMARY_DOMAIN}}'; do
-  if ! echo "$FOUND" | grep -qF "$ph"; then
-    echo "FAIL: expected placeholder $ph not found in $TEMPLATE"
-    exit 1
-  fi
-done
-
-# Assert no unexpected placeholders (old §5/§6 ones should be gone)
-for ph in '{{DEFAULT_PRIVACY}}' '{{DECAY_PROFILE}}'; do
-  if echo "$FOUND" | grep -qF "$ph"; then
-    echo "WARN: $ph still in template after Phase 16 extraction — ok only if leaf files contain it"
-    # Not a hard failure — the leaf file is the new home; this is informational.
-  fi
-done
-
-# Assert no {{EXAMPLE_CLUSTER_REF}} variant (D-08 rejected it)
-if grep -q '{{EXAMPLE_CLUSTER_REF}}' "$TEMPLATE"; then
-  echo "FAIL: {{EXAMPLE_CLUSTER_REF}} present (D-08 rejected this placeholder)"
+if [ "$FOUND" != "$APPROVED" ]; then
+  echo "FAIL: template placeholder set does not match the approved set."
+  echo "  Approved (exact): $(echo "$APPROVED" | tr '\n' ' ')"
+  echo "  Found:            $(echo "$FOUND" | tr '\n' ' ')"
+  echo "  Any extra token (e.g. a re-introduced {{DEFAULT_PRIVACY}}/{{DECAY_PROFILE}}"
+  echo "  or a typo) is an unrenderable leftover — bin/init-wizard.sh substitutes only"
+  echo "  {{AGENT_FILENAME}} and {{PRIMARY_DOMAIN}}."
   exit 1
 fi
 
-echo "PASS: $TEMPLATE wizard placeholders consistent with post-extraction shape ({{AGENT_FILENAME}}, {{PRIMARY_DOMAIN}} remain; §5/§6 placeholders moved to leaf files)."
+echo "PASS: $TEMPLATE wizard placeholders are EXACTLY the approved set ({{AGENT_FILENAME}}, {{PRIMARY_DOMAIN}})."
 exit 0

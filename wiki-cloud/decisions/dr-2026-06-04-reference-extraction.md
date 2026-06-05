@@ -55,6 +55,7 @@ D-04 deviation from the Extraction Map's resident-remnant column: core was desig
 - Agents starting a task read AGENTS.md, find the routing table, and follow one hop to the relevant reference file — no more reading the full monolith for authoring-time reference lookup.
 - `bin/sync-claude.sh --check` (AGENTS.md ≡ CLAUDE.md) remains the byte-equality gate.
 - Phase 17 owns `schema/workflows/lint.md` full procedure; Phase 16 seeds only the decay table and staleness auto-fix rules from §6.
+- **Wizard placeholder drop (intentional):** the §5/§6 extraction removed the two carrier lines that hosted the `{{DEFAULT_PRIVACY}}` and `{{DECAY_PROFILE}}` wizard placeholders. They were NOT relocated to a leaf file (leaf files are static shared reference, not per-user rendered). The `privacy_default:` carrier is obsolete because Phase 15 made privacy structural (§13: tier = `wiki-cloud/` vs `wiki-local/`, not a frontmatter field); the decay profile remains a recorded wizard answer (in `.wizard-answers.yaml` and the initial decision record) but no longer renders into the spec body. Accordingly the approved template-placeholder set shrank to exactly `{{AGENT_FILENAME}}` and `{{PRIMARY_DOMAIN}}`; `bin/init-wizard.sh`'s two now-dead `.replace()` substitutions were removed, `docs/manual-setup.md` Sections 4–5 were converted to "no AGENTS.md edit", and `tests/phase-07/test_agents_template_placeholders.sh` was tightened to an exact-set assertion. (Found via the Phase 16 code review, CR-01; resolved as "accept drop + clean up".)
 
 ## Affected Pages
 

@@ -18,12 +18,10 @@ Or, if you prefer a one-shot pipeline using `sed` (equivalent to the copy-then-s
 sed \
   -e 's|{{AGENT_FILENAME}}|CLAUDE.md|g' \
   -e 's|{{PRIMARY_DOMAIN}}|personal-knowledge|g' \
-  -e 's|{{DEFAULT_PRIVACY}}|cloud_safe|g' \
-  -e 's|{{DECAY_PROFILE}}|default|g' \
   schema/AGENTS.template.md > AGENTS.md
 ```
 
-The `sed` pipeline applies all 4 substitutions from Sections 2–5 below in a single pass. If you use it, skip Sections 2–5's minimal-diff edits (they've already happened) and jump to Section 6. If you prefer step-by-step substitutions, proceed to Section 1.
+The `sed` pipeline applies both template substitutions ({{AGENT_FILENAME}} from Section 3, {{PRIMARY_DOMAIN}} from Section 2) in a single pass. If you use it, skip those two sections' minimal-diff edits (they've already happened) and jump to Section 6. Sections 4 (Privacy Tier) and 5 (Decay Profile) no longer edit AGENTS.md — they are recorded only in `.wizard-answers.yaml` and the decision record (see those sections). If you prefer step-by-step substitutions, proceed to Section 1.
 
 **Either way, `schema/AGENTS.template.md` stays pristine.**
 
@@ -81,16 +79,9 @@ The `sed` pipeline applies all 4 substitutions from Sections 2–5 below in a si
 
 **Wizard prompt:** `Default privacy tier [Default: local_only] (local_only, cloud_safe):`
 
-**File to edit:** `AGENTS.md` line 589.
+**File to edit:** None — recorded in `.wizard-answers.yaml` (Section 7) and the initial decision record (Section 8) only.
 
-**Minimal diff (in AGENTS.md, using cloud_safe to match the canonical fixture):**
-
-> Note: this example deviates from the prompt default (`local_only` per D-11) to match the public canonical fixture `schema/fixtures/canonical-AGENTS.md`. See `schema/fixtures/README.md` for the rationale (`bin/release.sh`'s privacy-leak regex). Hand-editors targeting the canonical byte-equality check MUST use `cloud_safe` here; hand-editors personalizing for their own private repo MAY use `local_only` and accept that their AGENTS.md will differ from the canonical fixture.
-
-```diff
--privacy_default: {{DEFAULT_PRIVACY}}     # Wizard-recorded default tier preference -- NOT a per-page field; privacy is structural (wiki-cloud/ vs wiki-local/) per §13
-+privacy_default: cloud_safe              # Wizard-recorded default tier preference -- NOT a per-page field; privacy is structural (wiki-cloud/ vs wiki-local/) per §13
-```
+> Phase 15 made privacy **structural**: the tier is the directory a page lives in (`wiki-cloud/` vs `wiki-local/`), not a per-page frontmatter field. The old `privacy_default:` template carrier line was removed in the Phase 16 reference extraction, so there is no AGENTS.md line to edit here. Your choice is still captured as an answer; it simply does not render into the spec body.
 
 **Example value used in this walkthrough:** `cloud_safe`
 
@@ -98,16 +89,11 @@ The `sed` pipeline applies all 4 substitutions from Sections 2–5 below in a si
 
 **Wizard prompt:** `Decay profile [Default: default] (software, science, biography, personal-goals, default):`
 
-**File to edit:** `AGENTS.md` line 848.
+**File to edit:** None — recorded in `.wizard-answers.yaml` (Section 7) and the initial decision record (Section 8) only.
 
-**Minimal diff (in AGENTS.md):**
+> The Phase 16 reference extraction moved the decay-rate table out of the spec body (it now lives in `schema/workflows/lint.md`) and dropped the `{{DECAY_PROFILE}}` carrier sentence. Your chosen profile is recorded as an answer but is not substituted into AGENTS.md.
 
-```diff
--The default staleness decay profile is `{{DECAY_PROFILE}}` (set by the wizard from the user's chosen decay profile name).
-+The default staleness decay profile is `default` (set by the wizard from the user's chosen decay profile name).
-```
-
-**Reference:** See AGENTS.md §6 for the full decay-rate table. The 5 profiles map to: software (180d), science (730d), biography (1825d), personal-goals (90d), default (365d).
+**Reference:** See `schema/workflows/lint.md` for the full decay-rate table. The 5 profiles map to: software (180d), science (730d), biography (1825d), personal-goals (90d), default (365d).
 
 **Example value used in this walkthrough:** `default`
 

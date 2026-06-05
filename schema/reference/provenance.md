@@ -141,7 +141,7 @@ WHERE contains(item, "[epistemic:: tentative]")
 
 ### Page-Level vs Claim-Level Epistemic Status
 
-- **Page-level:** `epistemic_status` frontmatter field (Section 5). Reflects overall page evidence quality: `sourced`, `mixed`, `tentative`, or `stale`.
+- **Page-level:** `epistemic_status` frontmatter field (`schema/reference/frontmatter.md`). Reflects overall page evidence quality: `sourced`, `mixed`, `tentative`, or `stale`.
 - **Claim-level:** Inline `[epistemic:: <status>]` in body text. Applies to individual claims within a page.
 
 A page with `epistemic_status: sourced` may contain individual `[epistemic:: inferred]` claims if the majority is directly sourced. Use `mixed` when the page has a significant proportion of non-sourced claims.

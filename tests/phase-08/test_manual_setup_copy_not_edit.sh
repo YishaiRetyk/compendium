@@ -28,10 +28,13 @@ if grep -qE '^\*\*File to edit:\*\*[[:space:]]*`?schema/AGENTS\.template\.md' "$
     exit 1
 fi
 
-# At least 4 "File to edit:" lines must reference AGENTS.md (one per Section 2/3/4/5)
+# At least 2 "File to edit:" lines must reference AGENTS.md (Sections 2 PRIMARY_DOMAIN + 3 AGENT_FILENAME).
+# Post-Phase-16 (reference extraction, CR-01): Sections 4 (Privacy) and 5 (Decay) no longer edit
+# AGENTS.md — privacy is structural (§13) and the decay profile is recorded only in
+# .wizard-answers.yaml + the decision record, so the template-substitution sections shrank to 2.
 AGENTS_EDIT_COUNT=$(grep -cE '^\*\*File to edit:\*\*[[:space:]]*`?AGENTS\.md' "$DOC" || true)
-if [ "$AGENTS_EDIT_COUNT" -lt 4 ]; then
-    echo "ASSERT FAIL: expected >=4 'File to edit: AGENTS.md' lines (Sections 2/3/4/5), got $AGENTS_EDIT_COUNT" >&2
+if [ "$AGENTS_EDIT_COUNT" -lt 2 ]; then
+    echo "ASSERT FAIL: expected >=2 'File to edit: AGENTS.md' lines (Sections 2/3), got $AGENTS_EDIT_COUNT" >&2
     exit 1
 fi
 

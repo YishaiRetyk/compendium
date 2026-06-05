@@ -651,11 +651,15 @@ def render_agents_md():
     except OSError as exc:
         raise RuntimeError(f"failed to read template {TEMPLATE_PATH}: {exc}")
 
+    # Phase 16 (reference extraction): the {{DEFAULT_PRIVACY}} and {{DECAY_PROFILE}}
+    # carrier lines were removed from schema/AGENTS.template.md when §5/§6 were
+    # extracted to leaf files. Privacy is now structural (Phase 15, §13) so there is
+    # no privacy_default line to render, and the decay profile is recorded only in
+    # .wizard-answers.yaml + the decision record (below) — not substituted into the
+    # spec. DEFAULT_PRIVACY / DECAY_PROFILE remain live answers used for those outputs.
     subs = [
         ("{{AGENT_FILENAME}}", AGENT_FILENAME),
         ("{{PRIMARY_DOMAIN}}", PRIMARY_DOMAIN),
-        ("{{DEFAULT_PRIVACY}}", DEFAULT_PRIVACY),
-        ("{{DECAY_PROFILE}}", DECAY_PROFILE),
     ]
     for token, value in subs:
         src = src.replace(token, value)

@@ -937,7 +937,7 @@ On the cloud-facing `--emit-worklist` stdout, a withheld claim's `skipped-privac
 - Organized by page type: Entities, Concepts, Sources, Comparisons, Overviews, Decisions.
 - Each entry follows the format: `- [[Page Title]] -- <one-line summary> (<epistemic_status>, <updated_at>)`
 - Updated on every ingest and every query that creates or modifies pages.
-- The LLM reads this FIRST when searching for information (per Section 3 and Section 7).
+- The LLM reads this FIRST when searching for information (per Section 3 LLM Navigation Rule).
 - Archived pages are listed separately under an "Archived" heading if any exist.
 - The index is the primary navigation mechanism for both LLMs and humans browsing the wiki.
 
