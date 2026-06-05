@@ -4,8 +4,8 @@ milestone: v1.2
 milestone_name: Schema Architecture
 status: executing
 stopped_at: Phase 16 context gathered
-last_updated: "2026-06-04T21:49:21.631Z"
-last_activity: 2026-06-04 -- Phase 16 planning complete
+last_updated: "2026-06-05T04:50:13.071Z"
+last_activity: 2026-06-05 -- Phase 16 execution started
 progress:
   total_phases: 11
   completed_phases: 1
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-04)
 
 **Core value:** The wiki is a persistent, compounding artifact -- cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested.
-**Current focus:** v1.2 Schema Architecture — Phase 15 (Privacy Architecture) complete; next is Phase 16 (Reference Extraction)
+**Current focus:** Phase 16 — reference-extraction
 
 ## Current Position
 
-Phase: 16 — Reference Extraction (Not started — gates on Phase 15, now ✓ complete)
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-06-04 -- Phase 16 planning complete
+Phase: 16 (reference-extraction) — EXECUTING
+Plan: 1 of 5
+Status: Executing Phase 16
+Last activity: 2026-06-05 -- Phase 16 execution started
 
 ### v1.2 Phase Summary
 
