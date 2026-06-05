@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Schema Architecture
-status: ready_to_plan
-stopped_at: Phase 16 complete (5/5) — ready to plan Phase 17 (Workflow Extraction)
-last_updated: 2026-06-05T06:29:56.603Z
-last_activity: 2026-06-05 -- Phase 16 (Reference Extraction) complete, verified passed
+status: planning
+stopped_at: Phase 17 context gathered
+last_updated: "2026-06-05T09:34:02.289Z"
+last_activity: 2026-06-05 -- Phase 16 complete, verified passed (CR-01/WR cleanup applied)
 progress:
   total_phases: 11
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 8
-  completed_plans: 66
-  percent: 9
+  completed_plans: 8
+  percent: 18
 ---
 
 # Project State
@@ -378,9 +378,9 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-06-04T19:02:46.683Z
-Stopped at: Phase 16 context gathered
-Resume file: .planning/phases/16-reference-extraction/16-CONTEXT.md
+Last session: 2026-06-05T09:34:02.277Z
+Stopped at: Phase 17 context gathered
+Resume file: .planning/phases/17-workflow-extraction/17-CONTEXT.md
 
 ## Operator Next Steps
 
