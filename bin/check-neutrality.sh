@@ -91,7 +91,7 @@ done
 [ -z "$DENYLIST" ] && DENYLIST="$ROOT/$DENYLIST_DEFAULT"
 
 # Public control-plane paths scanned (D-06). examples/ is explicitly excluded.
-PUBLIC_PATHS=(AGENTS.md CLAUDE.md README.md PRIVACY.md docs .github wiki-cloud bin)
+PUBLIC_PATHS=(AGENTS.md CLAUDE.md README.md PRIVACY.md docs .github wiki-cloud bin schema)
 
 export CN_ROOT="$ROOT"
 export CN_SUGGEST="$SUGGEST"
@@ -168,6 +168,16 @@ SELF_REFERENTIAL_EXEMPT = {
 # legitimate `See: examples/kahneman/...` pointers don't trip the gate.
 SANCTIONED_PATH_RE = re.compile(r"examples/kahneman[a-z0-9._/-]*", re.IGNORECASE)
 
+# Path-name exemption: the ONLY legitimately denylisted-named file that ships.
+# Its slug is the canonical id of a deeply-referenced historical decision record
+# (wikilink target in wiki-cloud/index.md; named in 3 other DRs' affected_pages;
+# referenced by the Phase-14 graph-link resolver). Renaming it cascades far beyond
+# scope, so it is exempted by exact relative path. Any OTHER denylisted filename
+# (including future schema/reference/*.md leaves) MUST fail.
+PATH_NAME_EXEMPT = {
+    "wiki-cloud/decisions/dr-2026-04-15-kahneman-to-examples.md",
+}
+
 def parse_frontmatter_block(text):
     """Return raw frontmatter string or None."""
     if not text.startswith("---"):
@@ -213,6 +223,21 @@ def scan():
             # Skip self-referential scanner paths (must describe denylist by name).
             if rel_path in SELF_REFERENTIAL_EXEMPT:
                 continue
+            # Basename path-name scan: check the file's relative path (including
+            # its filename) against the denylist so a denylisted term in a filename
+            # cannot bypass the gate. Uses separator-normalized form so slugified
+            # filenames (hyphens/underscores as word separators) match multi-word
+            # denylist terms (e.g. "personal-decision-journal" -> "personal decision journal").
+            # The SANCTIONED_PATH_RE strip is applied first to keep the policy
+            # symmetric with the content scan. PATH_NAME_EXEMPT is the only escape hatch.
+            if rel_path not in PATH_NAME_EXEMPT:
+                norm_path = SANCTIONED_PATH_RE.sub("", rel_path.replace("-", " ").replace("_", " ")).lower()
+                raw_path_lower = SANCTIONED_PATH_RE.sub("", rel_path).lower()
+                for term in terms:
+                    # Multi-word terms match the normalized (space-separated) form;
+                    # single-token terms match both normalized and raw forms.
+                    if term in norm_path or term in raw_path_lower:
+                        hits.append({"path": rel_path, "line": 0, "term": term + " (in filename)"})
             try:
                 with open(t, "r", encoding="utf-8", errors="replace") as f:
                     text = f.read()

@@ -13,6 +13,7 @@ tags:
 domains:
 - wiki-infrastructure
 knowledge_domain: software
+neutrality_exempt: true  # Append-only activity log; a historical lint narration entry legitimately names a denylisted term and AGENTS.md §12 forbids rewriting log entries. Per-file exemption per the established neutrality_exempt precedent.
 ---
 
 # Log
@@ -456,5 +457,11 @@ report: wiki-cloud/maintenance/lint-report.md
 ## [2026-06-04] lint | wiki-cloud health check
 
 findings: 62 total (0 errors, 56 warnings, 6 info)
+auto_fixes: 0 applied
+report: wiki-cloud/maintenance/lint-report.md
+
+## [2026-06-05] lint | wiki-cloud health check
+
+findings: 64 total (0 errors, 62 warnings, 2 info)
 auto_fixes: 0 applied
 report: wiki-cloud/maintenance/lint-report.md

@@ -2521,6 +2521,7 @@ aliases:
   - Lint Report
 has_contradictions: false
 knowledge_domain: ""
+neutrality_exempt: true
 ---
 
 # Lint Report
