@@ -109,7 +109,7 @@ Plans:
 
 **Wave 1** *(sequential — AGENTS.md is a shared-edit file)*
 
-- [ ] 16-01-PLAN.md — Extract §4 page-types + §5 frontmatter to schema/reference/; dissolve §7
+- [x] 16-01-PLAN.md — Extract §4 page-types + §5 frontmatter to schema/reference/; dissolve §7
 - [ ] 16-02-PLAN.md — Extract §6 with consumer-split → provenance.md + lint.md seed (decay only)
 - [ ] 16-03-PLAN.md — Extract §8 wikilinks + §13 privacy to schema/reference/; §14/§15 to docs/reference/; delete §16
 
@@ -329,6 +329,6 @@ The following are intentionally deferred until real usage demands them, captured
 | 13.2. v1.1 Closure Verification Gate | v1.1 | 3/3 | Complete | 2026-06-02 |
 | 14. Graph Link Resolution | v1.1.1 | 3/3 | Complete    | 2026-06-03 |
 | 15. Privacy Architecture | v1.2 | 3/3 | Complete    | 2026-06-04 |
-| 16. Reference Extraction | v1.2 | 1/5 | In Progress|  |
+| 16. Reference Extraction | v1.2 | 2/5 | In Progress|  |
 | 17. Workflow Extraction | v1.2 | 0/TBD | Not started | - |
 | 18. Skills Overlay | v1.2 | 0/TBD | Not started | - |
