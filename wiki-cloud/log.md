@@ -465,3 +465,28 @@ report: wiki-cloud/maintenance/lint-report.md
 findings: 64 total (0 errors, 62 warnings, 2 info)
 auto_fixes: 0 applied
 report: wiki-cloud/maintenance/lint-report.md
+
+## [2026-06-05] lint | wiki-cloud health check
+
+findings: 0 total (0 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki-cloud/maintenance/lint-report.md
+
+## [2026-06-04] schema | reference extraction (Phase 16 complete)
+
+UPDATE index: added dr-2026-06-04-reference-extraction entry
+UPDATE log: this entry
+result: §4/§5/§6/§7/§8/§13/§14/§15/§16 extracted to schema/reference/*.md + schema/workflows/lint.md (seed) + docs/reference/scaling.md + docs/reference/tooling.md; AGENTS.md routing table added; D-09 framing applied; AGENTS.template.md mirrored
+pages_affected: dr-2026-06-04-reference-extraction, index, log
+
+## [2026-06-05] lint | wiki-cloud health check
+
+findings: 63 total (18 errors, 45 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki-cloud/maintenance/lint-report.md
+
+## [2026-06-05] lint | wiki-cloud health check
+
+findings: 0 total (0 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki-cloud/maintenance/lint-report.md
