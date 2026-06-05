@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Schema Architecture
-status: executing
-stopped_at: Phase 16 context gathered
-last_updated: "2026-06-05T04:50:13.071Z"
-last_activity: 2026-06-05 -- Phase 16 execution started
+status: ready_to_plan
+stopped_at: Phase 16 complete (5/5) — ready to plan Phase 17 (Workflow Extraction)
+last_updated: 2026-06-05T06:29:56.603Z
+last_activity: 2026-06-05 -- Phase 16 (Reference Extraction) complete, verified passed
 progress:
   total_phases: 11
   completed_phases: 1
   total_plans: 8
-  completed_plans: 3
+  completed_plans: 66
   percent: 9
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-04)
 
 **Core value:** The wiki is a persistent, compounding artifact -- cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested.
-**Current focus:** Phase 16 — reference-extraction
+**Current focus:** v1.2 Schema Architecture — Phase 16 (Reference Extraction) complete; next is Phase 17 (Workflow Extraction, WF-01..09). NOTE: `gsd phase.complete` mis-advanced to backlog Phase 999.1 (superseded — absorbed into Phases 10–11); hand-corrected to Phase 17.
 
 ## Current Position
 
-Phase: 16 (reference-extraction) — EXECUTING
-Plan: 1 of 5
-Status: Executing Phase 16
-Last activity: 2026-06-05 -- Phase 16 execution started
+Phase: 17 — Workflow Extraction (Not started — gates on Phase 16, now ✓ complete)
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-06-05 -- Phase 16 complete, verified passed (CR-01/WR cleanup applied)
 
 ### v1.2 Phase Summary
 
@@ -91,7 +91,7 @@ Phase 12.2 closure: 5/5 plans complete; WGATE-01..04 → Complete; verifier PASS
 
 **Velocity:**
 
-- Total plans completed: 30
+- Total plans completed: 35
 - Average duration: -
 - Total execution time: 0 hours
 
@@ -106,6 +106,7 @@ Phase 12.2 closure: 5/5 plans complete; WGATE-01..04 → Complete; verifier PASS
 | 12 | 4 | - | - |
 | 14 | 3 | - | - |
 | 15 | 3 | - | - |
+| 16 | 5 | - | - |
 
 **Recent Trend:**
 
@@ -383,4 +384,5 @@ Resume file: .planning/phases/16-reference-extraction/16-CONTEXT.md
 
 ## Operator Next Steps
 
-- `/gsd-plan-phase 15` — Plan Phase 15 (Privacy Architecture, PRIV-01..07)
+- `/gsd-discuss-phase 17` — Discuss Phase 17 (Workflow Extraction, WF-01..09) before planning
+- `/gsd-plan-phase 17` — Plan Phase 17 directly (skip discuss)

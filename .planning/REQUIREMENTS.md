@@ -25,16 +25,16 @@ Requirements for milestone v1.2. Each maps to exactly one roadmap phase.
 
 ### Reference Extraction (`REF`) — Phase 16
 
-- [ ] **REF-01**: Extract §4 page types → `schema/reference/page-types.md`; merge its section-ordering table with §7's into one resident type-roster (the **§4↔§7 dedupe**, LOCKED).
-- [ ] **REF-02**: Extract §5 frontmatter → `schema/reference/frontmatter.md`; core keeps **Option-B pointer only** (~4 lines, LOCKED). Full schema is JIT + lint-gated.
-- [ ] **REF-03**: Extract §6 with the **consumer-split** (LOCKED): syntax/epistemics → `schema/reference/provenance.md`; decay table + staleness auto-fix → `schema/workflows/lint.md` (lint is the only consumer of the decay math). Core keeps the provenance requirement + 1 example.
-- [ ] **REF-04**: **§7 dissolves** (LOCKED) into the §4 roster (orderings) + §3 (nav rule); no standalone progressive-disclosure file.
-- [ ] **REF-05**: Extract §8 wikilinks → `schema/reference/wikilinks.md` (+ §3 Red Links). **Guard:** carry the v1.1.1 uniform-piped-link truth verbatim (`[[X]]` resolves by filename/path ONLY; uniform `[[id|Title]]` mandated).
-- [ ] **REF-06**: Extract §13 in its **Phase-0 asymmetric form** → `schema/reference/privacy.md`; the 7-row precedence table is **removed, not relocated** (depends on PRIV-02, PRIV-07).
-- [ ] **REF-07**: §14 Scaling → `docs/reference/scaling.md`; §15 Tooling → `docs/reference/tooling.md`; §16 Appendices **deleted** (already pointers).
-- [ ] **REF-08**: Add the **`IMPORTANT:`-flagged routing table** to the top of core (operation → file). This is dispatch — load-bearing for every extraction's safety (Vercel 56%-miss mitigation).
-- [ ] **REF-09**: Mirror every routing stub into `schema/AGENTS.template.md`; keep `AGENTS.md` byte-identical to `CLAUDE.md` (pre-commit `sync-claude --check`). **Discuss-item (Open Q7):** REF-09 covers only the existing `AGENTS.md ↔ CLAUDE.md` byte-equality — decide whether to extend `bin/sync-claude.sh` with a `--check-tree` drift guard over the *new* `schema/reference|workflows/*.md` tree now (v1.2) or defer to v1.3.
-- [ ] **REF-10**: Decision record (`trigger_type: schema-update`) for the extraction + the evolved "sole authoritative specification" framing (Open Q8 — this file is the router; linked files are authoritative for their sections).
+- [x] **REF-01**: Extract §4 page types → `schema/reference/page-types.md`; merge its section-ordering table with §7's into one resident type-roster (the **§4↔§7 dedupe**, LOCKED).
+- [x] **REF-02**: Extract §5 frontmatter → `schema/reference/frontmatter.md`; core keeps **Option-B pointer only** (~4 lines, LOCKED). Full schema is JIT + lint-gated.
+- [x] **REF-03**: Extract §6 with the **consumer-split** (LOCKED): syntax/epistemics → `schema/reference/provenance.md`; decay table + staleness auto-fix → `schema/workflows/lint.md` (lint is the only consumer of the decay math). Core keeps the provenance requirement + 1 example.
+- [x] **REF-04**: **§7 dissolves** (LOCKED) into the §4 roster (orderings) + §3 (nav rule); no standalone progressive-disclosure file.
+- [x] **REF-05**: Extract §8 wikilinks → `schema/reference/wikilinks.md` (+ §3 Red Links). **Guard:** carry the v1.1.1 uniform-piped-link truth verbatim (`[[X]]` resolves by filename/path ONLY; uniform `[[id|Title]]` mandated).
+- [x] **REF-06**: Extract §13 in its **Phase-0 asymmetric form** → `schema/reference/privacy.md`; the 7-row precedence table is **removed, not relocated** (depends on PRIV-02, PRIV-07).
+- [x] **REF-07**: §14 Scaling → `docs/reference/scaling.md`; §15 Tooling → `docs/reference/tooling.md`; §16 Appendices **deleted** (already pointers).
+- [x] **REF-08**: Add the **`IMPORTANT:`-flagged routing table** to the top of core (operation → file). This is dispatch — load-bearing for every extraction's safety (Vercel 56%-miss mitigation).
+- [x] **REF-09**: Mirror every routing stub into `schema/AGENTS.template.md`; keep `AGENTS.md` byte-identical to `CLAUDE.md` (pre-commit `sync-claude --check`). **Discuss-item (Open Q7):** REF-09 covers only the existing `AGENTS.md ↔ CLAUDE.md` byte-equality — decide whether to extend `bin/sync-claude.sh` with a `--check-tree` drift guard over the *new* `schema/reference|workflows/*.md` tree now (v1.2) or defer to v1.3.
+- [x] **REF-10**: Decision record (`trigger_type: schema-update`) for the extraction + the evolved "sole authoritative specification" framing (Open Q8 — this file is the router; linked files are authoritative for their sections).
 
 ### Workflow Extraction (`WF`) — Phase 17
 
@@ -87,16 +87,16 @@ Which phases cover which requirements. Phase mapping filled during roadmap creat
 | PRIV-05 | Phase 15 | Complete |
 | PRIV-06 | Phase 15 | Complete |
 | PRIV-07 | Phase 15 | Complete |
-| REF-01 | Phase 16 | Pending |
-| REF-02 | Phase 16 | Pending |
-| REF-03 | Phase 16 | Pending |
-| REF-04 | Phase 16 | Pending |
-| REF-05 | Phase 16 | Pending |
-| REF-06 | Phase 16 | Pending |
-| REF-07 | Phase 16 | Pending |
-| REF-08 | Phase 16 | Pending |
-| REF-09 | Phase 16 | Pending |
-| REF-10 | Phase 16 | Pending |
+| REF-01 | Phase 16 | Complete |
+| REF-02 | Phase 16 | Complete |
+| REF-03 | Phase 16 | Complete |
+| REF-04 | Phase 16 | Complete |
+| REF-05 | Phase 16 | Complete |
+| REF-06 | Phase 16 | Complete |
+| REF-07 | Phase 16 | Complete |
+| REF-08 | Phase 16 | Complete |
+| REF-09 | Phase 16 | Complete |
+| REF-10 | Phase 16 | Complete |
 | WF-01 | Phase 17 | Pending |
 | WF-02 | Phase 17 | Pending |
 | WF-03 | Phase 17 | Pending |
