@@ -122,7 +122,7 @@ This progressive disclosure navigation minimizes context window consumption.
 
 ### Red Links
 
-Red links (wikilinks to non-existent pages) are allowed and intentional. They signal knowledge gaps that the lint workflow tracks. Do not remove red links unless creating the target page or confirming the gap is irrelevant.
+→ See `schema/reference/wikilinks.md` (red links section).
 
 ### What Agents Must NOT Do
 
@@ -157,54 +157,7 @@ Every factual claim MUST have an inline provenance marker `[prov:source_id#locat
 
 ## 8. Wikilink and Graph Conventions
 
-### Rules
-
-1. Use `[[id|Exact Title]]` for ALL intra-wiki cross-references in page body text.
-   The target before `|` is the page `id` (= filename stem — always resolves in Obsidian
-   since Obsidian resolves `[[X]]` by **filename/path ONLY**, never by `title` and never
-   by `aliases`). The display text after `|` is the exact canonical `title`.
-2. Link on FIRST mention only per page. Subsequent mentions are plain text.
-3. ALWAYS write `[[id|Exact Title]]` — bare `[[Title]]` links are a convention error.
-   Examples: `[[attention-mechanism|Attention Mechanism]]`, `[[<entity-id>|Entity Title (Parens)]]`.
-4. The `aliases` frontmatter field is OPTIONAL — for genuine alternate names (Quick Switcher /
-   autocomplete), NOT for link resolution. Obsidian resolves `[[X]]` by **filename/path ONLY**.
-5. Red links (links to not-yet-existing page `id`s) are ALLOWED and intentional. They signal
-   knowledge gaps for the lint workflow. Write them as `[[not-yet-existing-id|Display Text]]`
-   where the `id` is the planned slug.
-6. DO NOT put wikilinks in YAML frontmatter. Use string IDs in frontmatter, wikilinks in body text.
-7. The `## Related Pages` section lists explicit wikilinks to connected pages.
-8. The `## Sources` section in page body lists human-readable source references with wikilinks to
-   source summary pages.
-9. **Asymmetric cross-tier link rule (D-09):** `wiki-local` → `wiki-cloud` links are fine (local sessions read both tiers). `wiki-cloud` → `wiki-local` links are **FORBIDDEN** -- they break for cloud sessions AND leak the existence of private pages. This rule is lint-enforced (linkres category). A `wiki-cloud/` page MUST NOT contain a wikilink whose target resolves to a `wiki-local/` page.
-
-### Bad vs. Good Wikilink Examples
-
-```
-BAD:  sources: ["[[Vaswani et al]]"]                    (wikilink in frontmatter)
-GOOD: sources: [src-2026-03-15-vaswani-attention]       (string ID in frontmatter)
-
-BAD:  [[Attention Mechanism]]                           (bare link -- does not resolve for multi-word titles)
-GOOD: [[attention-mechanism|Attention Mechanism]]       (piped: target=id, display=title)
-
-BAD:  [[attention-mechanism|attention]]                 (display text is not the exact canonical title)
-GOOD: [[attention-mechanism|Attention Mechanism]]       (display = exact title from page frontmatter)
-
-BAD:  ...[[attention-mechanism|Attention Mechanism]] uses [[attention-mechanism|Attention Mechanism]] weights...  (linked twice)
-GOOD: ...[[attention-mechanism|Attention Mechanism]] uses attention weights...  (linked once, plain after)
-
-BAD:  [[<Entity Title> (Parens)]]                       (bare link, parens title, will not resolve)
-GOOD: [[<entity-id>|Entity Title (Parens)]]             (piped: id target resolves, parens in display)
-
-BAD:  [[<Concept Titles>]]                              (bare plural link)
-GOOD: [[<concept-id>|Concept Titles]]                   (id target resolves; plural cosmetic in display)
-```
-
-### Graph View Implications
-
-- Only wikilinks in page body text appear in Obsidian's graph view. Piped links `[[id|Title]]` display the `title` in reading view while forming a graph edge to the `id` target.
-- String IDs in frontmatter do NOT create graph edges. This is intentional -- frontmatter holds structured data; body text holds navigable links.
-- First-mention linking prevents link noise. A page that mentions a concept many times creates only one graph edge, not many.
-- Red links (piped links whose `id` target does not exist yet) appear as unresolved nodes, providing a visual map of knowledge gaps.
+Use `[[id|Title]]` for ALL intra-wiki links — see `schema/reference/wikilinks.md`.
 
 ## 9. Structured Operations and Executor Model
 
@@ -1058,101 +1011,14 @@ WHERE contains(file.lists.text, "contributor:: @octocat")
 
 ## 13. Privacy Routing
 
-Vault tier is structural: `wiki-cloud/` is the cloud-safe tier; `wiki-local/` is the local-only tier. Cloud sessions MUST NOT read `wiki-local/` — the directory boundary is the enforcement mechanism, not a per-turn rule. See `docs/reference/privacy-model.md` for the full asymmetric model, enforcement options (deny-profile vs. separate-repo), honest fail-direction table, and the `sources-local/` forward reference for future local raw sources.
+→ See `schema/reference/privacy.md` for the agent-facing tier rules.
+  For the full human-facing model: `docs/reference/privacy-model.md`.
 
 ## 14. Scaling Boundaries
 
-**Important:** These are provisional heuristics, not hard boundaries. They are starting points derived from reasoning about likely pain points. Validate and adjust through actual use. The numbers below are approximate -- the real signals are behavioral (the wiki becomes awkward to use in specific ways).
-
-These tiers are additive. Each builds on the previous rather than replacing it.
-
-### Tier 1: Markdown-First Baseline (v1)
-
-This is the starting configuration. Everything is markdown files and YAML frontmatter.
-
-- **Navigation:** `wiki-cloud/index.md` is the primary navigation mechanism. The LLM reads it to find pages.
-- **Lint:** Full lint scans all pages in the wiki-cloud/ tree.
-- **Agent behavior:** Read the full index, scan all pages during lint.
-- **Approximate capacity:** Up to ~100-200 wiki pages, ~50-100 ingested sources.
-- **Pain points at limit:** `wiki-cloud/index.md` becomes slow to navigate. The LLM's context window fills up scanning the full index. Full lint takes multiple passes or minutes.
-- **Signal you are outgrowing this tier:** `wiki-cloud/index.md` exceeds ~500 lines. The LLM frequently retrieves pages irrelevant to the query because the index is too dense to scan efficiently.
-
-### Tier 2: Split Index
-
-When the single index becomes unwieldy (approximately a few hundred wiki pages).
-
-- **Change:** Split `wiki-cloud/index.md` into per-type or per-domain sub-indexes: `wiki-cloud/index-entities.md`, `wiki/index-concepts.md`, `wiki/index-sources.md`, etc. The main `wiki-cloud/index.md` becomes a meta-index pointing to sub-indexes.
-- **Agent behavior:** Read the meta-index to determine which sub-index is relevant, then read only that sub-index.
-- **Approximate capacity:** Up to ~500-1000 wiki pages.
-- **Pain points at limit:** Even sub-indexes become large. Cross-type queries require reading multiple sub-indexes. The meta-index itself grows.
-- **Signal to upgrade:** Sub-indexes exceed ~200 entries each. Cross-domain queries are slow because the LLM must read multiple sub-indexes.
-
-### Tier 3: Incremental Lint
-
-When full lint becomes too expensive to run routinely.
-
-- **Change:** Track which pages changed since the last lint (via `git diff` or `wiki-cloud/log.md` timestamps). Only lint changed pages and their direct neighbors (pages they link to or are linked from).
-- **Agent behavior:** Run `git diff --name-only <last-lint-commit>` to scope the lint to changed files. Expand scope to include pages linked to/from changed pages.
-- **Approximate capacity:** Any size where full lint is impractical.
-- **Pain points at limit:** Neighbor expansion can still be large in highly connected wikis. Deep dependency chains may be missed by incremental lint.
-- **Signal to upgrade:** Lint takes so long that you stop running it, or incremental lint misses issues that a full lint would catch.
-
-### Tier 4: DB-Backed Metadata
-
-When provenance queries, search, or concurrency become awkward in pure markdown.
-
-- **Change:** Add SQLite (or similar lightweight database) for metadata: source registry, provenance index, search index, wikilink graph. Markdown pages remain the human-facing artifact; the database is an acceleration layer.
-- **Agent behavior:** Query the database for source and provenance lookups instead of scanning markdown files. Use the database for search instead of grep.
-- **Approximate capacity:** Thousands of pages and sources.
-- **Pain points:** Requires maintaining synchronization between the database and markdown files. Adds a tooling dependency beyond plain markdown.
-- **Signal to upgrade:** Provenance validation is slow because it requires scanning many files. Search needs more than grep. Multiple agents need concurrent access to the wiki.
+→ See `docs/reference/scaling.md` for scaling tier heuristics.
 
 ## 15. Tooling and Integrations
 
-> This section is informational, not normative. It describes tools the wiki is designed to work with, but does not mandate their installation. The wiki functions as plain markdown files in a git repo regardless of tooling.
+→ See `docs/reference/tooling.md` for Obsidian, Git, and optional tooling notes.
 
-### Obsidian (Primary Human Interface)
-
-- **Graph View:** Visualize the wiki's link structure. All intra-wiki links use piped form `[[id|Title]]` — the `id` target resolves reliably in Obsidian (filename/path only), and the `title` displays in reading view.
-- **Dataview plugin:** Query frontmatter fields with TABLE/LIST/TASK syntax. All frontmatter fields defined in Section 5 are queryable. Example: `TABLE summary, epistemic_status FROM "wiki-cloud/entities" WHERE status = "active"`.
-- **Properties:** Obsidian 1.4+ supports typed frontmatter editing. All base fields render as editable properties in the sidebar.
-- **Aliases:** The `aliases` frontmatter field is OPTIONAL — useful for Quick Switcher / autocomplete and as display text in piped links `[[file|Alias]]`, but NOT used for bare `[[X]]` resolution (filename/path only).
-- **Backlinks:** Obsidian's backlinks panel shows all pages that link to the current page, complementing the `## Related Pages` section.
-
-### Git (Version Control)
-
-- All changes are tracked in git with conventional commits (Section 3).
-- History provides a full audit trail of wiki evolution.
-- Branching is available for experimental restructuring (e.g., major domain reorganization).
-- The activity log (`wiki-cloud/log.md`) complements git history with human-readable operation summaries.
-
-### Optional Future Tools (Not Required for v1)
-
-- **Local search engine** (e.g., qmd or similar): Hybrid BM25/vector search for faster query workflow when the wiki grows beyond grep's effectiveness.
-- **Obsidian Web Clipper:** Source acquisition from the web -- clip articles directly into the `sources/` directory.
-- **Marp plugin:** Generate slide decks from wiki content for presentations and reviews.
-
-## 16. Appendices and Examples
-
-### Appendix A: Dataview Query Examples
-
-See `docs/reference/dataview-queries.md` for five Dataview query patterns (active entities, sources by domain, stale pages, missing privacy classification, pages in a domain).
-
-### Appendix B: Commit Message Examples
-
-See `docs/reference/commit-examples.md` for representative commit messages per workflow type (schema/ingest/query/lint/reflect).
-
-### Appendix C: Quick Reference Card
-
-A compact summary of the most critical rules for fast LLM scanning:
-
-1. **Read `wiki-cloud/index.md` first, always.** This is the entry point for all wiki operations.
-2. **TL;DR and Key Facts before Detail.** Read shallow sections first; drill into Detail only when needed.
-3. **`[[id|Exact Title]]` on first mention only.** Piped form only — target = page `id`, display = exact canonical `title`. No bare `[[Title]]` links. No repeated links. No wikilinks in frontmatter.
-4. **`[prov:source_id#locator]` for every factual claim.** Every claim needs provenance. No exceptions.
-5. **One commit per logical operation.** One ingest = one commit, even if it touches many files.
-6. **Privacy default: `wiki-local/` tier.** When in doubt, place content in `wiki-local/` -- do not expose to cloud sessions.
-7. **All dates: ISO 8601.** `YYYY-MM-DD` or `YYYY-MM-DDTHH:mm:ss`.
-8. **All field names: `snake_case`.** For Dataview compatibility.
-9. **Operations: UPDATE, MERGE, SUPERSEDE, ARCHIVE.** No raw file rewrites. Log every operation.
-10. **See Section 3 "What Agents Must NOT Do"** for the full list of prohibitions.
