@@ -2,82 +2,153 @@
 phase: 17
 reviewers: [codex]
 reviewed_at: 2026-06-05
-review_cycle: 2
+review_cycle: 3
 plans_reviewed: [17-01-PLAN.md, 17-02-PLAN.md, 17-03-PLAN.md, 17-04-PLAN.md]
 ---
 
-# Cross-AI Plan Review — Phase 17 (Cycle 2)
+# Cross-AI Plan Review — Phase 17 (Cycle 3)
 
 > Reviewer set: Codex (independent) + orchestrator direct repo verification. Claude
 > self-review skipped for independence (orchestrated from inside Claude Code).
-> This is CYCLE 2: the plans were revised to address the 4 cycle-1 HIGH consensus
-> concerns. Every verdict below was re-checked against the revised plan text AND the
-> live repo (CLAUDE.md L-anchors, bin/lint.sh structure, check-neutrality regex).
+> This is CYCLE 3: the plans were revised (commit a2b2ca3) to resolve the 3 remaining
+> cycle-2 HIGHs by adopting ONE canonical definition of "routing reference" — the
+> routing-TABLE row (`> | … | \`path\` |` blockquote cell) is the reachability anchor;
+> core stub arrows (`→ See`) do NOT count — encoded in Plans 03 and 04, plus a
+> reciprocal log-shape note in `log-format.md` (Plan 03 Task 3). Every verdict below was
+> re-checked against the revised plan text AND the live repo (CLAUDE.md routing-table
+> row format, lint.md existing row, Plan 02/03 row-insertion strings).
 
-## Cycle-1 HIGH Resolution Audit
+## Cycle-2 HIGH Resolution Audit
 
-| # | Cycle-1 HIGH | Verdict | Evidence |
+| # | Cycle-2 HIGH | Verdict | Evidence |
 |---|--------------|---------|----------|
-| 1 | Self-contradicting §N grep + 14 unrepointed Phase-16 back-links (unified §N policy) | **RESOLVED** | All headers/footers across Plans 01–03 now use DISPATCH wording ("The AGENTS.md routing table points here" / "routing-table stub") with NO `§N` token. Plan 03 adds a NEW **Task 0** repointing all 14 Phase-16 back-links (verified: `grep -rnE '§[0-9]\|Section [0-9]' schema/` returns 14 today, Task 0 worklist enumerates every one) + a **Task 4 CORE SWEEP** converting the 4 residual resident-core refs (§1 L30/L32, §2 L67/L98 — confirmed those are the only resident survivors before §9). Binding gate is the WHOLE-FILE `! grep -qE '§[0-9]' CLAUDE.md` + `! grep -qE '\bSection [0-9]' CLAUDE.md` assertion — total-coverage, cannot pass with any survivor. Plan 04's routing rule is now "DEAD SIMPLE: any `§[0-9]`/`\bSection [0-9]` → error" with NO {1,2,3} exemption. |
-| 2 | Duplicate "Source of truth for Phase 9 / Phase 12.2 CI" string (Plan 03) | **RESOLVED** | Confirmed the phrase appears exactly 1× in CLAUDE.md today (L571). Plan 03 Task 1 PARAPHRASES the banner ("This file is the authoritative specification for the CI + local-gate contracts") and keeps the verbatim phrase ONCE in the relocated L571 body block; acceptance asserts `grep -c '...' == 1`. |
-| 3 | Two authoritative solo-op log shapes (compact core vs multi-line §12) | **PARTIALLY RESOLVED** | Plan 01 declares ONE canonical shape (multi-line in `log-format.md`) and labels the compact 2-line core form a "dispatch summary … NOT a second standard" inline in core — this resolves the core-level two-canonical contradiction. BUT Plan 01 L302 explicitly promises "Plan 03's `log-format.md` extraction adds a **reciprocal note** that the compact core shape is a summary of the canonical entry," and Plan 03 Task 3 (the log-format.md task) contains **no such instruction**. The reconciliation is half-wired: core states it, log-format.md never points back. Documentation-completeness gap, not a return of two canonical shapes — but the promised fix is incompletely specified. |
-| 4 | Plan 04 routing impl risks (destructive checkout, docs/reference known-set, exit-0 proof) | **RESOLVED** | (a) Destructive `git checkout` replaced with `mktemp -d` temp-copy negative test (Task 1 acc. L203) — verified `release.md` is untracked when Plan 04 runs, so this was a real hazard. (b) Targets resolved via `os.path.isfile(os.path.join(REPO_ROOT, target))`, no hard-coded known set (L146–150) — docs/reference/*.md no longer false-error. (c) Inverse/drift tests inspect `--format json` (L201, L313); orchestrator-confirmed only error-severity drives exit-1 (bin/lint.sh L2457/L2583), so warning/info paths correctly need JSON. (d) MEDIUMs also addressed: `remap_ci_severity(sev,cat,msg)` helper (not inline prefix), baseline-after-insertion ordering, mandatory inline justifications, `wiki-cloud/log.md` entry + validate-op, wizard dry-run in acceptance. |
+| NEW-A | Plan 03 Task 4 "exactly one routing row" assertion unsatisfiable (raw grep counted row + stub = 2) | **PARTIALLY RESOLVED** | The stub-arrow miscount is fixed: Plan 03 Task 4 now defines reachability as the blockquote routing-table row and asserts `grep -cE "^> \|.*\`schema/workflows/$f.md\` \|"` (L458/L463), which matches the real row shape `> | when | \`path\` |` and correctly excludes `→ See` stub arrows. BUT the `-eq 1` assertion is STILL unsatisfiable for `lint.md`: the live table already has `> \| Decay table / staleness auto-fix math \| \`schema/workflows/lint.md\` \|` (CLAUDE.md L46) and Plan 03 L410 ADDS a second `\| Lint workflow + CI severity/JSON contract \| \`schema/workflows/lint.md\` \|` row without instructing deletion/merge of the existing decay row → 2 rows → assertion fails for `lint`. See NEW-HIGH-C. |
+| NEW-B | Plan 04 inverse-orphan test couldn't fire (spec "table OR stub" vs test removed only row) | **RESOLVED** | Plan 04 Task 1 step 3 (L160-172) now defines reachability as the routing-table row ALONE; the negative test (L212) deletes ONLY `^> \|.*\`schema/workflows/audit.md\` \|` from the temp AGENTS.md, leaves the `→ See` stub intact, and asserts an `ORPHAN:` warning fires in `--format json`. The test now exercises exactly the intended failure mode — spec and test agree. Orchestrator-confirmed the guard matches `> \|`-prefixed cells. |
+| #3 | Plan 03 Task 3 never added the reciprocal log-shape note in `log-format.md` (Plan 01 L302 promise) | **RESOLVED** | Plan 03 Task 3 (a2b2ca3 diff) inserts the reciprocal blockquote immediately above the canonical multi-line structured-op block, and acceptance greps `dispatch summary of THIS entry`. The reconciliation is now bidirectional: core points to `log-format.md` as canonical; `log-format.md` flags the compact core form as its summary. Closes Plan 01 L302's promise. |
 
-**3 of 4 cycle-1 HIGHs FULLY RESOLVED; HIGH#3 PARTIALLY RESOLVED.**
+**2 of 3 cycle-2 HIGHs FULLY RESOLVED; NEW-A only PARTIALLY RESOLVED (the row-vs-stub
+miscount is fixed, but the lint.md double-row makes the SAME `-eq 1` assertion fail for
+a different reason).**
 
 ## Codex Review (verbatim)
 
 ```
-HIGH#1: RESOLVED — Plans 01-03 now use dispatch wording, add Task 0 for Phase-16 back-links, add a core sweep, and gate on zero §N / Section N.
-HIGH#2: RESOLVED — Plan 03 paraphrases the banner and preserves the exact `Source of truth for Phase 9 / Phase 12.2 CI` string once in the relocated body with count == 1.
-HIGH#3: PARTIALLY-RESOLVED — Plan 01 labels the compact core form as a dispatch summary, but Plan 03's log-format.md task does not actually add the promised reciprocal note, and the core still says solo ops "log … as" the compact form.
-HIGH#4: RESOLVED — Plan 04 replaces destructive checkout with temp-copy tests, resolves targets on disk, uses JSON assertions for warning/info findings, and adds remap_ci_severity().
+NEW-HIGH-A: PARTIALLY RESOLVED — raw-grep stub miscount fixed (blockquote-row regex,
+  excludes → See stubs), BUT not satisfiable for lint.md: live table has
+  "Decay table / staleness … | schema/workflows/lint.md" and Plan 03 adds a second
+  "Lint workflow + CI … | schema/workflows/lint.md" row. Once blockquote-prefixed the
+  exact-one assertion counts 2. Fix: replace the decay row with one combined lint.md row.
+NEW-HIGH-B: RESOLVED — reachability is row-only; negative test deletes only the
+  routing-table row, leaves the stub, asserts ORPHAN warning in JSON. Verifies the
+  intended failure mode.
+HIGH#3: RESOLVED — Plan 03 Task 3 inserts the reciprocal blockquote above the canonical
+  log block; acceptance greps "dispatch summary of THIS entry".
 
 NEW HIGH concerns:
-HIGH: Plan 03 Task 4's "exactly one routing row" acceptance uses global grep -c "schema/workflows/$f.md" CLAUDE.md, but core stubs also reference those paths. This makes the assertion impossible once stubs plus routing-table rows coexist.
-HIGH: Plan 04 inverse-orphan spec conflicts with its test. The implementation allows "routing table or any core stub arrow" to satisfy reachability, but the test only removes a routing-table row and expects ORPHAN; every extracted file also has a core stub arrow, so the test will not fire.
+HIGH: lint.md will have TWO routing-table rows (existing decay row + new Lint-workflow
+  row); Plan 03's exact-one assertion will count 2 and fail for lint. Replace the existing
+  decay row with one combined row; do not add a second lint.md row.
+HIGH: Added routing rows in Plans 02 and 03 are written WITHOUT the required "> "
+  blockquote prefix (e.g. "| Ingesting … | `schema/workflows/ingest.md` |"). The canonical
+  grep requires "^> \|.*`path` \|"; literal insertion would not match the assertion OR
+  Plan 04's orphan guard. Fix all row examples to include the "> " prefix.
+
+MEDIUM: Plan 03 and Plan 04 routing-reference definitions are semantically aligned but
+  not byte-identical (the brief said "encoded identically"). Copy one paragraph verbatim
+  into both, or centralize.
+LOW: the row grep searches all of CLAUDE.md, not just the routing-table block; a future
+  blockquoted table elsewhere could cause a false duplicate.
 ```
 
 ## Newly-Introduced HIGH Concerns (orchestrator-verified)
 
-Both new HIGHs share ONE root cause: **the plans are internally inconsistent about whether a core "stub arrow" (`→ See \`schema/workflows/X.md\``) counts as a routing reference.** Plan 03 treats stub arrows as SEPARATE from routing-table rows (causing a duplicate count); Plan 04 treats stub arrows AS valid routing references (breaking its orphan test). Resolving that one ambiguity fixes both.
+Both new HIGHs are localized regressions of the SAME cycle-3 fix: the new
+"count routing-TABLE rows specifically" mechanism is sound, but its two preconditions —
+(1) each path appears in exactly one routing-table row, and (2) inserted rows are
+blockquote-prefixed so the canonical grep matches — are each violated by one plan.
 
-### NEW-HIGH-A — Plan 03 Task 4 "exactly one routing row" assertion is impossible to satisfy (phase-close blocker)
+### NEW-HIGH-C — `lint.md` will carry TWO routing-table rows; Plan 03's `-eq 1` assertion fails for `lint` (phase-close blocker)
 
-After extraction, EVERY one of the 8 extracted files is referenced **twice** in core: once by its §-stub arrow and once by its routing-table row. Verified against the plan text:
-- §9 stub arrow → `schema/workflows/structured-operations.md` (Plan 01 L285) **+** routing-table row (Plan 03 L396) = 2
-- §11.1/§11.2 stub arrows → ingest.md / query.md (Plan 02 L216/L226) **+** routing rows (Plan 02 L232-233) = 2 each
-- §11.3–§11.7 stub arrows → lint/reflect/brownfield/release/audit.md (Plan 03 L382-386) **+** routing rows (Plan 03 L392-399) = 2 each
-- §12 stub arrow → `schema/reference/log-format.md` (Plan 03 L387) **+** routing row (Plan 03 L400) = 2
+The cycle-3 fix counts routing-TABLE rows specifically. But `lint.md` is referenced by
+two DISTINCT routing-table rows after Plan 03 lands:
 
-Plan 03 Task 4 acceptance (L434) asserts `[ "$(grep -c "schema/workflows/$f.md" CLAUDE.md)" -eq 1 ]` for all 8 — this counts **2** for every file, so the verify block fails for all of them. The cycle-1 "bounded-table assertion (catches accidental duplicates)" fix over-tightened into an unsatisfiable check. **Fix:** count routing-table ROWS specifically (e.g. grep for the `| … | \`schema/workflows/X.md\` |` row form, or count occurrences within the routing-table line range only), not raw path occurrences across the whole core.
+- **Existing (live today, CLAUDE.md L46):** `> | Decay table / staleness auto-fix math | \`schema/workflows/lint.md\` |` — a genuine "Resolvable references" blockquote row that predates Phase 17 (it points at the Phase-16 decay seed).
+- **New (Plan 03 L410):** `| Lint workflow + CI severity/JSON contract | \`schema/workflows/lint.md\` |` — added by Plan 03 Task 4.
 
-### NEW-HIGH-B — Plan 04 inverse-orphan test cannot fire (orphan-detection guarantee unverified)
+Plan 03 Task 4 instructs DELETING the scaffold "Where it lives NOW" block (which contains
+the L59 scaffold lint row) but says nothing about the L46 decay row in the *Resolvable
+references* table — that row survives. So after the plan, `grep -cE "^> \|.*\`schema/workflows/lint.md\` \|" CLAUDE.md`
+returns **2**, and Plan 03's own acceptance loop (L458, `for f in … lint … ; [ … -eq 1 ]`)
+**fails for `lint`**. This is the exact same `-eq 1` assertion the cycle-3 fix was meant to
+make satisfiable — it now fails for a different reason (genuine duplicate, not stub
+miscount). Verified: `grep -nE "^> \|.*schema/workflows/lint.md" CLAUDE.md` → L46 today;
+Plan 03 has no "replace/merge the decay row" instruction (`grep -i decay` in Plan 03 shows
+only body-ref conversions, no routing-row dedup). **Fix:** in Plan 03 Task 4, REPLACE the
+existing L46 decay row with one combined row (e.g. `> | Lint workflow + decay/staleness + CI severity/JSON contract | \`schema/workflows/lint.md\` |`)
+rather than adding a second; OR explicitly assert the decay row is removed. Note: Plan 04's
+orphan guard is fine with 2 rows (it only needs ≥1), so this is purely a Plan-03-assertion
+blocker — but it WILL halt the phase at Plan 03 verify.
 
-Plan 04 Task 1 step 3 (L160-162) defines reachability as satisfied by "AGENTS.md's routing table **(or any core stub arrow)**." But the inverse-orphan acceptance test (L201) only "remove a workflow file's routing row from the copied AGENTS.md" — it leaves the §-stub arrow intact. Since every extracted file ALSO has a stub arrow pointing at it, deleting only the routing row does NOT orphan it, so the `ORPHAN` finding never fires and the test asserting `confirm the ORPHAN finding is present` FAILS (or vacuously finds nothing). The test that is supposed to PROVE orphan-detection works is therefore a false-negative the suite can't catch. **Fix:** make the spec + test agree — either (a) define reachability as routing-table-row ONLY (then the test must also delete the stub arrow to truly orphan a file — but note that then a missing stub arrow becomes the orphan signal, which couples to NEW-HIGH-A's definition), or (b) keep "table OR stub" reachability and rewrite the test to remove BOTH the routing row AND the stub arrow for the target file.
+### NEW-HIGH-D — Inserted routing rows in Plans 02 & 03 lack the `> ` blockquote prefix the canonical grep (and Plan 04 guard) require
 
----
+The canonical reachability anchor is the blockquote-prefixed cell `^> \|.*\`path\` \|`.
+But every row-insertion string in Plans 02 and 03 is written WITHOUT the `> ` prefix:
+
+- Plan 02 L232-233: `| Ingesting a new source … | \`schema/workflows/ingest.md\` |` / `| Answering a question … | \`schema/workflows/query.md\` |`
+- Plan 03 L410-418: `| Lint workflow … |`, `| Reflect workflow … |`, `| Structured operations … |`, `| Brownfield … |`, `| Orphan-branch … |`, `| Claim-faithfulness … |`, `| Index / log entry formats | \`schema/reference/log-format.md\` |`
+
+The action text says "promote … INTO the 'Resolvable references' table," and that table
+lives inside the `> ` blockquote (CLAUDE.md L41-50). A faithful executor that pastes the
+literal row strings produces NON-blockquoted rows that (a) break the routing table's
+markdown blockquote rendering, (b) do NOT match Plan 03's canonical assertion
+`^> \|.*\`path\` \|` (so the `-eq 1` loop returns 0 for ingest/query/etc.), AND (c) at
+runtime are flagged ORPHAN by Plan 04's row-only orphan guard (which also matches
+`> \|`-prefixed cells, L171) — a warning storm across all 8 extracted files. The plan's
+own acceptance grep and orphan guard would catch this, but the plan instruction is
+internally inconsistent with the assertion it must satisfy. **Fix:** prefix every inserted
+row example in Plans 02 and 03 with `> ` (e.g. `> | Ingesting a new source … | \`schema/workflows/ingest.md\` |`),
+or add an explicit "insert these AS blockquote rows (prepend `> `) to match the table's
+`> `-prefixed format" instruction in both plans.
 
 ## Consensus Summary
 
-The cycle-1 revisions are largely successful: the dominant cycle-1 blocker (unified §N-abolition + Phase-16 back-link repoint) is cleanly resolved across all four plans with a binding whole-file gate, the duplicate source-of-truth string is fixed (count==1), and all four Plan-04 routing implementation risks are addressed with verified, non-destructive, JSON-asserted tests. **3 of 4 cycle-1 HIGHs are fully resolved.**
+The cycle-3 revision is conceptually correct: it picks ONE canonical definition of
+"routing reference" (the blockquote routing-table row), and that definition cleanly
+resolves cycle-2's NEW-HIGH-B (Plan 04's orphan test now fires against the right
+condition) and HIGH#3 (the reciprocal log-shape note is now present in `log-format.md`,
+making the canonical/summary reconciliation bidirectional). **2 of 3 cycle-2 HIGHs are
+fully resolved.**
 
-However, cycle 2 surfaces **3 remaining HIGHs**: cycle-1 HIGH#3 is only PARTIALLY resolved (the promised reciprocal note in `log-format.md` was never written into Plan 03 Task 3), plus **2 newly-introduced HIGHs** — both rooted in a single unresolved ambiguity about whether a core stub arrow counts as a "routing reference." That ambiguity makes Plan 03's one-routing-row acceptance unsatisfiable (NEW-HIGH-A, a phase-close blocker) and makes Plan 04's orphan-detection test unable to fire (NEW-HIGH-B).
+However, cycle 3 surfaces **3 remaining HIGHs**: cycle-2 NEW-A is only PARTIALLY resolved
+(the stub-miscount is fixed, but a genuine `lint.md` double-row makes the same `-eq 1`
+assertion fail), plus **2 newly-introduced HIGHs** rooted in unmet preconditions of the
+new row-counting mechanism — the `lint.md` duplicate row (NEW-HIGH-C, a phase-close
+blocker at Plan 03 verify) and the missing `> ` blockquote prefix on all inserted row
+examples (NEW-HIGH-D, which would also trigger a Plan-04 orphan warning storm). All three
+are localized to Plan 03 Task 4 and Plan 02 Task 3.
 
 ### Agreed Strengths
-- Unified §N policy is now encoded identically in every header, footer, body-conversion step, acceptance grep, and the routing-guard pattern (cycle-1's load-bearing fix landed cleanly).
-- Plan 03 Task 0 (repoint the 14 Phase-16 back-links) is the right prerequisite, sequenced before Plan 04's guard — verified the 14 refs exist today and the worklist covers all of them.
-- Plan 04's `remap_ci_severity(sev,cat,msg)` helper generalizes the real `matches_skip('EXTERNAL: ')` precedent (bin/lint.sh L348) — sound, testable, correctly targeted at the L2396-2398 CI-remap site.
-- Resolve-on-disk routing-target check (`os.path.isfile`) correctly avoids the docs/reference false-error class.
-- All invoked scripts exist (init-wizard.sh --dry-run, validate-op.sh, check-privacy.sh, check-neutrality.sh); examples/kahneman neutrality exemption regex confirmed at check-neutrality.sh L169.
+- The single canonical "routing-table row" definition is the right call and is encoded in
+  both Plan 03 (one-row assertion) and Plan 04 (orphan guard) — the load-bearing cycle-3 fix.
+- Plan 04's inverse-orphan test now deletes ONLY the routing-table row and leaves the stub
+  arrow intact, directly proving stub arrows do not satisfy reachability (NEW-HIGH-B closed).
+- The reciprocal log-shape note in `log-format.md` (Plan 03 Task 3) closes Plan 01 L302's
+  promise; the canonical/summary reconciliation is now bidirectional.
+- Plan 04's orphan-guard regex (`> \|`-prefixed cell match, L171) is consistent with Plan
+  03's one-row assertion regex — the two grep forms agree (this is what makes NEW-HIGH-D's
+  failure mode catchable, but also what makes the missing prefix bite both surfaces).
 
-### Agreed Concerns (highest priority — all verified)
-1. **[HIGH, NEW-A] Plan 03 Task 4 one-routing-row assertion is unsatisfiable** — counts stub-arrow + routing-row = 2 for all 8 files; phase-close blocker. Count routing-table rows specifically.
-2. **[HIGH, NEW-B] Plan 04 inverse-orphan test can't fire** — spec says "table OR stub arrow" reachable, test removes only the row; orphan-detection guarantee goes unverified. Align spec + test (delete both, or define reachability as row-only and have the test delete the stub).
-3. **[HIGH, carried #3] Plan 03 Task 3 never adds the reciprocal log-shape note** that Plan 01 L302 promises; the canonical/summary reconciliation is one-directional. Add the reciprocal pointer in `log-format.md`.
+### Agreed Concerns (highest priority — all orchestrator-verified)
+1. **[HIGH, NEW-C] `lint.md` double routing-table row** — existing decay row (CLAUDE.md L46) + new Lint-workflow row (Plan 03 L410) → Plan 03's `-eq 1` assertion fails for `lint`. Phase-close blocker. Replace/merge the decay row; don't add a second lint.md row.
+2. **[HIGH, NEW-D] Inserted rows lack the `> ` blockquote prefix** — Plans 02/03 row strings are written as `| … |` not `> | … |`; literal insertion breaks the blockquote, fails the canonical `^> \|` assertion, and trips Plan 04's orphan guard. Prefix every inserted row example with `> `.
+3. **[HIGH, carried NEW-A] Plan 03 one-row assertion still not fully satisfiable** — the stub miscount is fixed, but NEW-C (lint.md duplicate) keeps the same `-eq 1` loop failing; this carries until NEW-C lands.
 
 ### Divergent Views
-- None. Single external reviewer (Codex); every Codex verdict was independently reproduced by the orchestrator against the plan text and live repo. One orchestrator nuance on HIGH#3: the CORE-level "two canonical shapes" contradiction IS resolved by Plan 01; the residual is the missing reciprocal note in log-format.md — classified PARTIALLY RESOLVED (counts as unresolved per the cycle contract) because the originally-promised fix is incompletely specified.
+- None. Single external reviewer (Codex); every Codex verdict was independently reproduced
+  by the orchestrator against the plan text and live repo. Orchestrator nuance: cycle-2
+  NEW-A and cycle-3 NEW-C are the SAME assertion failing — NEW-A's stub-miscount cause is
+  fixed, but the lint.md duplicate (NEW-C) keeps the `-eq 1` loop red, so NEW-A is scored
+  PARTIALLY RESOLVED (counts as unresolved) and NEW-C is logged as the concrete blocker.
 
 ### Recommended next step
 Feed this review back into planning:
@@ -86,4 +157,9 @@ Feed this review back into planning:
 /gsd-plan-phase 17 --reviews
 ```
 
-All three remaining HIGHs are localized and mechanical. The load-bearing fix is to **pick one definition of "routing reference"** (recommend: the routing-TABLE row is the canonical reachability anchor; stub arrows are convenience pointers and do NOT count toward the one-row invariant) and encode it identically in Plan 03's one-row acceptance grep AND Plan 04's orphan spec+test. Then add the one-line reciprocal note to Plan 03 Task 3's log-format.md action.
+All three remaining HIGHs are localized to Plan 03 Task 4 + Plan 02 Task 3 and mechanical:
+(1) merge the two `lint.md` routing rows into one (NEW-C); (2) prefix every inserted
+routing-row example in Plans 02 and 03 with `> ` (NEW-D). Doing both makes Plan 03's
+`-eq 1` loop satisfiable for all files (closes the carried NEW-A). Secondary: copy the
+routing-reference definition paragraph verbatim into both plans (MEDIUM byte-identity) and
+optionally scope the row grep to the routing-table block (LOW).
