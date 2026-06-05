@@ -5,7 +5,7 @@ type: overview
 status: active
 summary: "Wiki health-check findings from most recent lint run."
 created_at: 2026-04-30
-updated_at: 2026-06-04
+updated_at: 2026-06-05
 sources: []
 epistemic_status: sourced
 tags:
@@ -18,19 +18,20 @@ aliases:
   - Lint Report
 has_contradictions: false
 knowledge_domain: ""
+neutrality_exempt: true
 ---
 
 # Lint Report
 
-**Last run:** 2026-06-04
-**Total findings:** 62
+**Last run:** 2026-06-05
+**Total findings:** 64
 **Auto-fixes applied:** 0
 
 ## Errors (0)
 
 (none)
 
-## Warnings (56)
+## Warnings (62)
 
 ### Contradiction
 - **wiki-cloud/concepts/progressive-disclosure.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-06-anthropic-agent-skills-best-practices and src-2026-05-06-anthropic-agent-skills-overview (agent review needed)
@@ -90,6 +91,12 @@ knowledge_domain: ""
 - **sources/2026/2026-05/2026-05-06-ralph-playbook/PROMPT_build.md** | Raw source has no wiki source summary page
 - **sources/2026/2026-05/2026-05-06-ralph-playbook/PROMPT_plan.md** | Raw source has no wiki source summary page
 - **sources/2026/2026-05/2026-05-06-ralph-playbook/references/sandbox-environments.md** | Raw source has no wiki source summary page
+- **wiki-cloud/log.md** | log.md records pages_affected 'wiki/overviews/domain-driven-design.md' but no git-tracked wiki page exists for it (orphaned operation artifact -- prior operation skipped its commit; commit the page or fix the log entry)
+- **wiki-cloud/log.md** | log.md records pages_affected 'wiki/concepts/progressive-disclosure.md' but no git-tracked wiki page exists for it (orphaned operation artifact -- prior operation skipped its commit; commit the page or fix the log entry)
+- **wiki-cloud/log.md** | log.md records pages_affected 'all wiki pages backfilled with self-aliases' but no git-tracked wiki page exists for it (orphaned operation artifact -- prior operation skipped its commit; commit the page or fix the log entry)
+- **wiki-cloud/log.md** | log.md records pages_affected '8 lint-visible kahneman pages' but no git-tracked wiki page exists for it (orphaned operation artifact -- prior operation skipped its commit; commit the page or fix the log entry)
+- **wiki-cloud/log.md** | log.md records pages_affected '10 examples/dataview-fixtures/fixture-*.md' but no git-tracked wiki page exists for it (orphaned operation artifact -- prior operation skipped its commit; commit the page or fix the log entry)
+- **wiki-cloud/log.md** | log.md records pages_affected 'all wiki/ + examples/ body links rewritten to `[[id|Title]]` form' but no git-tracked wiki page exists for it (orphaned operation artifact -- prior operation skipped its commit; commit the page or fix the log entry)
 
 ### Duplicate
 - **wiki-cloud/entities/anthropic.md** | possible duplicate of "Anthropic Financial Services" (anthropic-financial-services); same type=entity; consider MERGE (§9). Survivor by inbound-link count (8 vs 10).
@@ -97,14 +104,10 @@ knowledge_domain: ""
 - **wiki-cloud/sources/src-2026-05-06-anthropic-claude-cookbook-skills-introduction.md** | possible duplicate of "Building Custom Skills for Claude (claude-cookbooks notebook 03)" (src-2026-05-06-anthropic-claude-cookbook-skills-custom-development); same type=source; consider MERGE (§9). Survivor by inbound-link count (4 vs 5).
 
 
-## Info (6)
+## Info (2)
 
 ### Drift
-- **wiki-cloud/.obsidian/app.json** | EXTERNAL: Non-markdown file in wiki-cloud/ (may cause Obsidian issues)
-- **wiki-cloud/.obsidian/appearance.json** | EXTERNAL: Non-markdown file in wiki-cloud/ (may cause Obsidian issues)
-- **wiki-cloud/.obsidian/core-plugins.json** | EXTERNAL: Non-markdown file in wiki-cloud/ (may cause Obsidian issues)
-- **wiki-cloud/.obsidian/graph.json** | EXTERNAL: Non-markdown file in wiki-cloud/ (may cause Obsidian issues)
-- **wiki-cloud/.obsidian/workspace.json** | EXTERNAL: Non-markdown file in wiki-cloud/ (may cause Obsidian issues)
+- **.obsidian/** | EXTERNAL: No .obsidian/ directory found -- Obsidian vault may not be configured
 
 ### Gap
 - **maturity** | Sparse coverage check skipped: wiki needs 5+ domains with 3+ having 2+ sources (currently 2 domains, 1 meet threshold)

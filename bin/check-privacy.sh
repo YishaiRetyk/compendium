@@ -36,7 +36,7 @@ Options:
   --help, -h              Show this help
 
 Scope:
-  PUBLIC_PATHS scanned: examples/, docs/, AGENTS.md, CLAUDE.md, README.md, PRIVACY.md, .github/
+  PUBLIC_PATHS scanned: examples/, docs/, AGENTS.md, CLAUDE.md, README.md, PRIVACY.md, .github/, schema/
   TRIGGER:              Any file whose path component contains 'wiki-local/'
 
 Exit codes:
@@ -73,7 +73,7 @@ done
 
 # PUBLIC_PATHS: files/dirs that ship in the public release template.
 # Changing this array requires a PR (intentional review lever).
-PUBLIC_PATHS=(examples docs AGENTS.md CLAUDE.md README.md PRIVACY.md .github)
+PUBLIC_PATHS=(examples docs AGENTS.md CLAUDE.md README.md PRIVACY.md .github schema)
 
 # Export env for python3 heredoc (no jq dependency)
 export CP_ROOT="$ROOT"

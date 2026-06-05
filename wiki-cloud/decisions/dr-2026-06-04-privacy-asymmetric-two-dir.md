@@ -22,6 +22,7 @@ aliases:
 - dr-2026-06-04-privacy-asymmetric-two-dir
 has_contradictions: false
 knowledge_domain: software
+neutrality_exempt: true  # affected_pages + ## Affected Pages legitimately name the canonical DR id dr-2026-04-15-kahneman-to-examples (and other dr- ids); slugs are structurally fixed and cannot be reworded. Mirrors wiki-cloud/index.md:17 / dr-2026-04-16-progressive-disclosure-extraction.md:27 precedent.
 trigger_type: schema-update
 affected_pages:
 - index
