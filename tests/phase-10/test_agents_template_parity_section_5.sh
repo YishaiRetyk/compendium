@@ -1,16 +1,18 @@
 #!/usr/bin/env bash
 # tests/phase-10/test_agents_template_parity_section_5.sh
-# Phase 10 Plan 04 — asserts AGENTS.md §5 and schema/AGENTS.template.md §5
-# carry byte-identical bootstrap_stage + bootstrap_date rows in the
-# "### Field Descriptions" table.
+# Phase 10 Plan 04 — POST-EXTRACTION (Phase 16): asserts AGENTS.md §5 and
+# schema/AGENTS.template.md §5 carry byte-identical stub content (both are
+# now 2-line stubs pointing to schema/reference/frontmatter.md).
 #
-# Scope note: the template intentionally differs from AGENTS.md in the
-# illustrative yaml example block at the top of §5 (it embeds
-# `{{PRIMARY_DOMAIN}}` and `{{DEFAULT_PRIVACY}}` placeholders per Phase 07 D-08).
-# The field-descriptions TABLE rows, however, are byte-mirrored between the
-# two files — and that is what this test locks. Range: from `### Field
-# Descriptions` heading through the line before `### Source Summary
-# Additional Fields`.
+# The §5 field-descriptions table (incl. bootstrap_stage / bootstrap_date rows)
+# has MOVED to schema/reference/frontmatter.md in Phase 16 Plan 01. This test
+# now asserts:
+#   1. §5 stub is byte-identical between AGENTS.md and template
+#   2. The §5 stub contains the pointer to frontmatter.md
+#   3. frontmatter.md contains the bootstrap_stage and bootstrap_date rows
+#
+# Phase 08-04 / 09-06 / 13.1 / 16 precedent: when a successor plan changes
+# the shape, the prior-phase tests are relaxed to assert the NEW invariant.
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck disable=SC1091
@@ -18,15 +20,17 @@ source "$SCRIPT_DIR/lib.sh"
 
 agents="$REPO_ROOT/AGENTS.md"
 template="$REPO_ROOT/schema/AGENTS.template.md"
-[ -f "$agents" ]   || { echo "FAIL: AGENTS.md missing" >&2; exit 1; }
-[ -f "$template" ] || { echo "FAIL: schema/AGENTS.template.md missing" >&2; exit 1; }
+frontmatter="$REPO_ROOT/schema/reference/frontmatter.md"
 
-# Extract the §5 field-descriptions table via flag-based awk with sentinel
-# start/end headings.
+[ -f "$agents" ]      || { echo "FAIL: AGENTS.md missing" >&2; exit 1; }
+[ -f "$template" ]    || { echo "FAIL: schema/AGENTS.template.md missing" >&2; exit 1; }
+[ -f "$frontmatter" ] || { echo "FAIL: schema/reference/frontmatter.md missing" >&2; exit 1; }
+
+# Extract §5 stub from "## 5." to just before "## 6."
 extract_sec5() {
     awk '
-        /^### Field Descriptions/ { in_s5 = 1 }
-        in_s5 && /^### Source Summary Additional Fields/ { exit }
+        /^## 6\./ { exit }
+        /^## 5\./ { in_s5 = 1 }
         in_s5 { print }
     ' "$1"
 }
@@ -36,26 +40,31 @@ tmp_template="$(mktemp)"
 extract_sec5 "$agents"   > "$tmp_agents"
 extract_sec5 "$template" > "$tmp_template"
 
-# Sanity: both extracts non-empty + both contain the new rows.
+# ASSERTION 1: Both extracts non-empty
 [ -s "$tmp_agents" ]   || { echo "FAIL: AGENTS.md §5 extract empty" >&2; exit 1; }
 [ -s "$tmp_template" ] || { echo "FAIL: schema/AGENTS.template.md §5 extract empty" >&2; exit 1; }
-grep -qE "^\| \`bootstrap_stage\` \| enum \|" "$tmp_agents" \
-    || { echo "FAIL: bootstrap_stage row missing from AGENTS.md §5 extract" >&2; exit 1; }
-grep -qE "^\| \`bootstrap_stage\` \| enum \|" "$tmp_template" \
-    || { echo "FAIL: bootstrap_stage row missing from schema/AGENTS.template.md §5 extract" >&2; exit 1; }
-grep -qE "^\| \`bootstrap_date\` \| date \|" "$tmp_agents" \
-    || { echo "FAIL: bootstrap_date row missing from AGENTS.md §5 extract" >&2; exit 1; }
-grep -qE "^\| \`bootstrap_date\` \| date \|" "$tmp_template" \
-    || { echo "FAIL: bootstrap_date row missing from schema/AGENTS.template.md §5 extract" >&2; exit 1; }
 
-# Byte-equality assertion on the §5 extract.
+# ASSERTION 2: §5 stub contains the frontmatter.md pointer
+grep -q 'schema/reference/frontmatter.md' "$tmp_agents" \
+    || { echo "FAIL: AGENTS.md §5 stub missing 'schema/reference/frontmatter.md' pointer" >&2; exit 1; }
+grep -q 'schema/reference/frontmatter.md' "$tmp_template" \
+    || { echo "FAIL: schema/AGENTS.template.md §5 stub missing 'schema/reference/frontmatter.md' pointer" >&2; exit 1; }
+
+# ASSERTION 3: §5 stub byte-identical between AGENTS.md and template
 if ! cmp -s "$tmp_agents" "$tmp_template"; then
-    echo "FAIL: AGENTS.md §5 != schema/AGENTS.template.md §5 (byte-parity broken)" >&2
-    echo "--- diff (first 50 lines) ---" >&2
-    diff -u "$tmp_agents" "$tmp_template" | head -50 >&2 || true
+    echo "FAIL: AGENTS.md §5 stub != schema/AGENTS.template.md §5 stub (byte-parity broken)" >&2
+    echo "--- diff ---" >&2
+    diff -u "$tmp_agents" "$tmp_template" | head -30 >&2 || true
     rm -f "$tmp_agents" "$tmp_template"
     exit 1
 fi
 
 rm -f "$tmp_agents" "$tmp_template"
-echo "PASS: AGENTS.md §5 == schema/AGENTS.template.md §5 (byte-parity preserved)"
+
+# ASSERTION 4: frontmatter.md contains bootstrap_stage and bootstrap_date rows
+grep -qE "^\| \`bootstrap_stage\` \| enum \|" "$frontmatter" \
+    || { echo "FAIL: bootstrap_stage row missing from schema/reference/frontmatter.md" >&2; exit 1; }
+grep -qE "^\| \`bootstrap_date\` \| date \|" "$frontmatter" \
+    || { echo "FAIL: bootstrap_date row missing from schema/reference/frontmatter.md" >&2; exit 1; }
+
+echo "PASS: AGENTS.md §5 stub == schema/AGENTS.template.md §5 stub (byte-parity preserved); frontmatter.md has bootstrap rows"
