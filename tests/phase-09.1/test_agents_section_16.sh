@@ -1,50 +1,53 @@
 #!/usr/bin/env bash
-# I-7: AGENTS.md §16 Appendix A has pointer to docs/reference/dataview-queries.md AND
-#      the former A content (TABLE summary... Dataview block) is absent.
-# I-8: AGENTS.md §16 Appendix B has pointer to docs/reference/commit-examples.md AND
-#      the former B content (reflect(q1-review) commit example) is absent.
-# I-9: AGENTS.md §16 Appendix C retains all 10 numbered QRC rules verbatim.
+# I-7/I-8/I-9 (POST-EXTRACTION): §16 "Appendices and Examples" is DELETED from
+# AGENTS.md (Phase 16 Plan 03). The Appendix C QRC rules are absorbed into
+# their respective resident sections (§3); the Appendix A/B docs still exist on disk.
+#
+# Phase 08-04 / 09-06 / 13.1 precedent: when a successor plan changes the shape,
+# the prior-phase tests are relaxed to assert the NEW invariant.
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib.sh"
 
 A="$REPO_ROOT/AGENTS.md"
 
-# Extract just §16 body (from '## 16.' to EOF) to scope the absence-of-old-content checks.
-# Without this, the absence checks would false-fail on pre-existing inline content elsewhere
-# (e.g., the `reflect(q1-review): restructure AI safety domain` example also appears in the
-# §3 commit-conventions table at line ~99 and is unrelated to §16 Appendix B).
-S16=$(awk '/^## 16\. Appendices and Examples/{inside=1} inside==1{print}' "$A")
+# ASSERTION 1: §16 section header ABSENT (section deleted in Phase 16-03)
+! grep -q '^## 16\. Appendices' "$A" \
+    || { echo "FAIL: §16 'Appendices and Examples' header found in AGENTS.md — should be deleted (Phase 16-03)" >&2; exit 1; }
 
-# I-7: Appendix A pointer present, former content absent (§16-scoped)
-grep -q 'docs/reference/dataview-queries\.md' "$A" \
-    || { echo "FAIL: §16 missing docs/reference/dataview-queries.md pointer" >&2; exit 1; }
-echo "$S16" | grep -q 'TABLE summary, epistemic_status, updated_at' \
-    && { echo "FAIL: §16 still contains former Appendix A Dataview block" >&2; exit 1; } || true
+# ASSERTION 2: QRC rule homes survive in resident sections
+# Rule 1: read index.md first → §3 LLM Navigation Rule
+grep -q 'wiki-cloud/index.md' "$A" \
+    || { echo "FAIL: AGENTS.md §3 missing 'wiki-cloud/index.md' (QRC rule 1 home)" >&2; exit 1; }
 
-# I-8: Appendix B pointer present, former content absent (§16-scoped)
-grep -q 'docs/reference/commit-examples\.md' "$A" \
-    || { echo "FAIL: §16 missing docs/reference/commit-examples.md pointer" >&2; exit 1; }
-echo "$S16" | grep -q 'reflect(q1-review): restructure AI safety domain' \
-    && { echo "FAIL: §16 still contains former Appendix B commit example" >&2; exit 1; } || true
+# Rule 3: ISO 8601 dates → §3 Date Format
+grep -qF 'ISO 8601' "$A" \
+    || { echo "FAIL: AGENTS.md §3 missing 'ISO 8601' (QRC rule 7 home)" >&2; exit 1; }
 
-# I-9: Appendix C preserved verbatim. R7 review consensus: use grep -F fixed-string matches
-# (no regex metachars) to pin the EXACT literal text from AGENTS.md §16. Brittle regex-based
-# greps (e.g. 'Read .wiki-cloud/index\.md. first, always') risked false positives/negatives because
-# the literal text includes backticks and asterisks that regex treats as metachars.
-grep -F -q '**Read `wiki-cloud/index.md` first, always.**' "$A" \
-    || { echo "FAIL: §16 Appendix C rule 1 ('Read wiki-cloud/index.md first, always.') missing or modified" >&2; exit 1; }
-grep -F -q '**Operations: UPDATE, MERGE, SUPERSEDE, ARCHIVE.**' "$A" \
-    || { echo "FAIL: §16 Appendix C rule 9 ('Operations: UPDATE, MERGE, SUPERSEDE, ARCHIVE.') missing or modified" >&2; exit 1; }
-grep -F -q 'See Section 3 "What Agents Must NOT Do"' "$A" \
-    || { echo "FAIL: §16 Appendix C rule 10 ('See Section 3 What Agents Must NOT Do') missing or modified" >&2; exit 1; }
+# Rule 8: snake_case → §3 Frontmatter Field Names
+grep -q 'snake_case' "$A" \
+    || { echo "FAIL: AGENTS.md §3 missing 'snake_case' (QRC rule 8 home)" >&2; exit 1; }
 
-# Appendix C heading itself — line-anchored, no regex metachars in target literal
-grep -F -q '### Appendix C: Quick Reference Card' "$A" \
-    || { echo "FAIL: §16 Appendix C heading missing" >&2; exit 1; }
+# Rule 10: What Agents Must NOT Do → §3
+grep -q 'What Agents Must NOT Do' "$A" \
+    || { echo "FAIL: AGENTS.md §3 missing 'What Agents Must NOT Do' (QRC rule 10 home)" >&2; exit 1; }
 
-# CLAUDE.md sync check (defense in depth; pre-commit hook auto-syncs but verify local state)
+# Rule 5: one commit per operation → §3 Commit Conventions
+grep -q 'One commit per logical operation\|one commit per logical operation' "$A" \
+    || { echo "FAIL: AGENTS.md §3 missing one-commit rule (QRC rule 5 home)" >&2; exit 1; }
+
+# Rule 6: Privacy default wiki-local/ → schema/reference/privacy.md
+grep -q 'Privacy default' "$REPO_ROOT/schema/reference/privacy.md" \
+    || { echo "FAIL: schema/reference/privacy.md missing 'Privacy default' (QRC rule 6 home)" >&2; exit 1; }
+
+# ASSERTION 3: Appendix A/B docs still exist on disk (reachable via docs/ tree)
+test -f "$REPO_ROOT/docs/reference/dataview-queries.md" \
+    || { echo "FAIL: docs/reference/dataview-queries.md missing (Appendix A target)" >&2; exit 1; }
+test -f "$REPO_ROOT/docs/reference/commit-examples.md" \
+    || { echo "FAIL: docs/reference/commit-examples.md missing (Appendix B target)" >&2; exit 1; }
+
+# ASSERTION 4: CLAUDE.md sync check
 (cd "$REPO_ROOT" && bash bin/sync-claude.sh --check) \
-    || { echo "FAIL: CLAUDE.md drifted from AGENTS.md after §16 edit" >&2; exit 1; }
+    || { echo "FAIL: CLAUDE.md drifted from AGENTS.md" >&2; exit 1; }
 
-echo "PASS: AGENTS.md §16 A/B extracted; C preserved; CLAUDE.md synced"
+echo "PASS: §16 absent; QRC rule homes verified in §3 + privacy.md; Appendix A/B docs on disk; CLAUDE.md synced"

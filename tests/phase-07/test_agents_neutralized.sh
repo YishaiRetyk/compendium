@@ -1,9 +1,20 @@
 #!/usr/bin/env bash
 # test_agents_neutralized.sh -- Phase 07 Plan 03
 # Asserts AGENTS.md is neutralized: no Kahneman tokens outside of legitimate
-# `See: examples/kahneman/...` pointer lines, >=3 section-end pointers exist,
-# example: field documented (NEUT-04), and §2 Directory Structure references
-# the new top-level dirs.
+# `See: examples/kahneman/...` pointer lines, example: field documented (NEUT-04),
+# and §2 Directory Structure references the new top-level dirs.
+#
+# POST-EXTRACTION (Phase 16): The >=3 See: examples/kahneman/ pointer count
+# threshold was set before §4 was extracted to schema/reference/page-types.md.
+# The §4 type-specific kahneman pointers (entity/concept/source/etc.) now live
+# in page-types.md. AGENTS.md still has 2 kahneman pointers (§11.2, §12).
+# The pointer count check is relaxed to >=1 (at least one pointer must remain
+# per NEUT-04; additional pointers live in the leaf files).
+# Phase 16 precedent (same as 08-04/09-06/13.1): when a successor plan changes
+# the shape, the prior-phase test threshold is updated.
+#
+# The kahneman-leak check (no Kahneman tokens outside See: / examples/ lines)
+# remains unchanged — that is a load-bearing safety invariant.
 set -euo pipefail
 
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
@@ -25,10 +36,19 @@ if [ -n "$LEAK" ]; then
   FAIL=1
 fi
 
-# 2. At least 3 `See: examples/kahneman/...` pointers at illustrative section ends
+# 2. At least 1 `See: examples/kahneman/...` pointer in AGENTS.md
+# (>=3 was the pre-extraction threshold; Phase 16 moved §4 type pointers to page-types.md;
+# at least 1 must remain in AGENTS.md for inline-content illustration)
 POINTERS=$(grep -c '^See: examples/kahneman/' AGENTS.md || true)
-if [ "${POINTERS:-0}" -lt 3 ]; then
-  echo "FAIL: expected >=3 See: examples/kahneman/ pointers in AGENTS.md, got $POINTERS"
+if [ "${POINTERS:-0}" -lt 1 ]; then
+  echo "FAIL: expected >=1 See: examples/kahneman/ pointer in AGENTS.md, got $POINTERS"
+  FAIL=1
+fi
+
+# 2b. page-types.md has the moved type-specific kahneman pointers (≥6)
+PT_POINTERS=$(grep -c '^See: schema/examples/.* for a concrete filled-in instance\.$' "$REPO_ROOT/schema/reference/page-types.md" || true)
+if [ "${PT_POINTERS:-0}" -lt 6 ]; then
+  echo "FAIL: expected >=6 See: schema/examples/ pointers in page-types.md (moved from §4), got $PT_POINTERS"
   FAIL=1
 fi
 
@@ -50,5 +70,5 @@ if [ "$FAIL" -ne 0 ]; then
   exit 1
 fi
 
-echo "PASS: AGENTS.md neutralized ($POINTERS See: pointers, example: documented, dirs listed)"
+echo "PASS: AGENTS.md neutralized ($POINTERS See: pointers remaining, $PT_POINTERS in page-types.md, example: documented, dirs listed)"
 exit 0

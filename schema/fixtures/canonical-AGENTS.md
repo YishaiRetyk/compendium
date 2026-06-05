@@ -1,8 +1,8 @@
 # LLM Wiki Compiler Schema
 
-> **This is the sole authoritative specification for the LLM Wiki Compiler.**
+> **This file is the authoritative router for the LLM Wiki Compiler spec.**
 > Any LLM agent maintaining this wiki MUST read and follow this document.
-> No other file contains conventions, rules, or workflow definitions.
+> This file is the router; each linked file listed in the routing table is authoritative for its own sections.
 
 ## 1. Overview and Principles
 
@@ -10,7 +10,7 @@ The LLM Wiki Compiler is a personal knowledge management system with three layer
 
 1. **Raw sources** (`sources/`) -- Immutable input documents (articles, papers, transcripts, journal entries, images). The human curates this layer. Sources are never modified after ingestion.
 2. **The wiki** (`wiki-cloud/` + `wiki-local/`) -- LLM-generated and maintained markdown pages. This is the compiled artifact: summaries, entity pages, concept pages, comparisons, overviews, an index, and an activity log. `wiki-cloud/` is the cloud-safe tier; `wiki-local/` is the local-only tier.
-3. **The schema** (this file + `schema/`) -- The specification that governs LLM behavior. This file is the sole source of truth.
+3. **The schema** (this file + `schema/`) -- The specification that governs LLM behavior. This file routes to reference files under `schema/reference/` and `schema/workflows/`; each is authoritative for its own sections.
 
 **Core principle:** The wiki is a persistent, compounding artifact. Cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested. Knowledge accumulates rather than being re-derived.
 
@@ -32,12 +32,39 @@ Workflows for each operation are defined in Section 11 of this document.
 These four operations are the wiki's mutation vocabulary. Layered on top is the **Audit** -- a review-only diagnostic workflow (`bin/audit-claims.sh`, Section 11.7) that checks whether sampled claims semantically follow from the source passage they cite. The Audit never mutates a wiki page; like Lint, it is a workflow, not one of the four mutation operations, so the four-operation framing is preserved.
 
 This file (`CLAUDE.md`) is the canonical agent spec; the wizard selects `AGENTS.md` or `CLAUDE.md` per the user's agent choice.
+> **IMPORTANT — Reference Routing Table**
+>
+> This file is the router. Each linked file is authoritative for its own sections (D-09).
+> Read the target file before acting — do not rely on the stub alone.
+>
+> **Resolvable references** (the target file exists — read it before acting):
+>
+> | When you need this | Go to |
+> |-------------------|-------|
+> | Authoring a wiki page (type rules, section order) | `schema/reference/page-types.md` |
+> | Checking required frontmatter fields | `schema/reference/frontmatter.md` |
+> | Adding `[prov:]` or `[epistemic::]` markers | `schema/reference/provenance.md` |
+> | Decay table / staleness auto-fix math | `schema/workflows/lint.md` |
+> | Creating cross-references (wikilinks) | `schema/reference/wikilinks.md` |
+> | Determining `wiki-cloud/` vs `wiki-local/` placement | `schema/reference/privacy.md` |
+> | Wiki capacity / scaling signals | `docs/reference/scaling.md` |
+> | Obsidian, Git, and optional tools | `docs/reference/tooling.md` |
+>
+> **Workflows — STILL INLINE in §11 until Phase 17. Do NOT dereference these paths yet;**
+> **the authoritative content is §11 below until the file is created in Phase 17.**
+>
+> | Workflow | Where it lives NOW |
+> |----------|--------------------|
+> | Ingest | §11.1 (inline). Future home: `schema/workflows/ingest.md` *(Phase 17)* |
+> | Query | §11.2 (inline). Future home: `schema/workflows/query.md` *(Phase 17)* |
+> | Lint | §11.3 (inline). Decay math already at `schema/workflows/lint.md`; full procedure *(Phase 17)* |
+> | Reflect | §11.4 (inline). Future home: `schema/workflows/reflect.md` *(Phase 17)* |
 
 ## 2. Directory Structure
 
 ```
 life/                               # repo root
-├── AGENTS.md                       # This file (sole authority)
+├── AGENTS.md                       # This file (router; see routing table)
 ├── sources/                        # Raw immutable sources (cloud-safe-only; see §13)
 │   ├── YYYY/                       # Year grouping
 │   │   └── YYYY-MM/               # Month grouping
@@ -85,8 +112,7 @@ life/                               # repo root
 - `wiki-local/maintenance/` holds the audit control-plane (`audit-report.md`, `audit-state.md`). `wiki-cloud/maintenance/` holds `lint-report.md`.
 
 **Schema directory rules:**
-- `schema/` is optional and holds templates and examples.
-- It does NOT contain rules or conventions -- those live only in this file.
+- `schema/reference/` and `schema/workflows/` hold authoritative reference content the router links to; `schema/templates/` holds blank templates.
 
 ## 3. Global Rules
 
@@ -124,12 +150,12 @@ This progressive disclosure navigation minimizes context window consumption.
 
 ### Red Links
 
-Red links (wikilinks to non-existent pages) are allowed and intentional. They signal knowledge gaps that the lint workflow tracks. Do not remove red links unless creating the target page or confirming the gap is irrelevant.
+→ See `schema/reference/wikilinks.md` (red links section).
 
 ### What Agents Must NOT Do
 
 - DO NOT create topic-based directories (e.g., `wiki-cloud/machine-learning/`). Use frontmatter `domains` field and Dataview queries instead.
-- DO NOT put conventions or rules in any file other than AGENTS.md. This is the sole source of truth.
+- DO NOT put conventions or rules in any file other than AGENTS.md or the files listed in the routing table. AGENTS.md is the router; each linked file is authoritative for its own sections.
 - DO NOT put wikilinks in YAML frontmatter. Use string IDs in frontmatter, wikilinks in body text.
 - DO NOT write bare `[[Title]]` wikilinks. ALWAYS write `[[id|Exact Title]]` (target = page `id`; display = exact canonical `title`). Bare links without a pipe do not reliably resolve for multi-word-title pages in Obsidian (which resolves by filename/path ONLY, never by `aliases`).
 - DO NOT put provenance blobs, relation arrays, or decay settings in base frontmatter. Those belong in type-specific fields.
@@ -138,573 +164,28 @@ Red links (wikilinks to non-existent pages) are allowed and intentional. They si
 - DO NOT create multiple commits for a single logical operation. One ingest = one commit, even if it touches 15 files.
 - DO NOT read `wiki-local/` from a cloud session -- the tier boundary is structural (directory + harness permission), not a per-turn rule. local→cloud is the forbidden leak direction.
 - DO NOT link to the same page more than once in a single page body. Link on first mention only.
+- DO NOT use real slugs, page IDs, or terms drawn from the user's private wiki content (under `examples/`, archived sources, or any `wiki-local/` page) when authoring or editing **template-public files**: `AGENTS.md`, `CLAUDE.md`, `README.md`, `PRIVACY.md`, `docs/`, `.github/`, `wiki-cloud/` scaffolding (`index.md`, `log.md`, `maintenance/`), and `bin/`. Use abstract placeholders instead — `<concept-slug>`, `<source-id>`, `<page-title>`, `<entity-name>`, `<YYYY-MM-DD-slug>`, `<term>`. The `bin/check-neutrality.sh` denylist gate is a backstop, not the primary defense; prevent leaks at write-time. This rule applies to examples in schema docs, illustrative snippets, sample commands, test fixtures shipped to public paths, and any narrative that would benefit from a "concrete example" -- pick a placeholder, not a real vault term.
 
 ## 4. Page Types and Templates
 
-Six page types exist. Each has a defined purpose, section order, and frontmatter requirements.
+Six page types: **entity**, **concept**, **source**, **comparison**, **overview**, **decision**.
 
-### 4.1 Entity (`type: entity`)
-
-**Purpose:** People, tools, organizations, specific named things.
-
-**Section order:** TL;DR -> Key Facts -> Detail -> Related Pages -> Sources
-
-**When to use:** The subject has a proper name and is a concrete thing (not an abstract idea).
-
-**Example:** Geoffrey Hinton. Demonstrates minimal aliases (single "Geoff Hinton"), mixed-locator Key Facts (bare `sec:`, `sec:` + `direct`, and `sec:` + `direct` + `checked_at`), and the Related-Pages link-on-first-mention convention.
-
-See: schema/examples/entity.md for a concrete filled-in instance.
-
-### 4.2 Concept (`type: concept`)
-
-**Purpose:** Ideas, theories, frameworks, abstract topics.
-
-**Section order:** TL;DR -> Key Facts -> Detail -> Related Pages -> Sources
-
-**When to use:** The subject is an abstract idea, theory, methodology, or framework -- not a specific named entity.
-
-**Example:** Attention Mechanism. Demonstrates multi-source sourced claims (two sources in frontmatter), three-locator-shape Key Facts (`sec:introduction`, `sec:self-attention`, `p5`), and Related-Pages cross-referencing to entity and concept siblings.
-
-See: schema/examples/concept.md for a concrete filled-in instance.
-
-### 4.3 Source Summary (`type: source`)
-
-**Purpose:** One summary page per ingested source document. Links the raw source to the wiki.
-
-**Section order:** TL;DR -> Key Takeaways -> Extracted Claims -> Notes -> Source Metadata
-
-**When to use:** Every time a source is ingested, a source summary page is created in `wiki-cloud/sources/` (or `wiki-local/sources/` for local-only content).
-
-**Additional frontmatter fields** (beyond the base set):
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `path` | string | Path to raw source file in `sources/` |
-| `url` | string | Original URL if applicable |
-| `content_hash` | string | SHA-256 hash for staleness detection |
-| `ingested_at` | date | When the source was processed |
-| `source_type` | enum | `article`, `paper`, `transcript`, `journal`, `data`, `image` |
-
-**Example:** "Vaswani et al. - Attention Is All You Need" (`type: source`, `source_type: paper`; filename `schema/examples/source-summary.md` matches the `schema/templates/` sibling — readers should NOT expect `schema/examples/source.md`). Demonstrates full population of `path` / `url` / `content_hash` / `ingested_at` / `source_type`, Extracted Claims with direct-quote provenance, and the Source Metadata authors / published block.
-
-See: schema/examples/source-summary.md for a concrete filled-in instance.
-
-### 4.4 Comparison (`type: comparison`)
-
-**Purpose:** Contrasting sources, viewpoints, approaches, or technologies.
-
-**Section order:** TL;DR -> Bottom Line -> Comparison Table -> Detailed Comparison -> Sources
-
-**When to use:** When two or more subjects need structured side-by-side analysis.
-
-**Example:** RNNs vs Transformers. Demonstrates the Bottom Line + Comparison Table + Detailed Comparison three-tier structure, mixed-source `sources` list in frontmatter, and domain-spanning dimension rows.
-
-See: schema/examples/comparison.md for a concrete filled-in instance.
-
-### 4.5 Overview (`type: overview`)
-
-**Purpose:** High-level topic summaries that synthesize across multiple sources and pages.
-
-**Section order:** TL;DR -> Key Facts -> Detail -> Related Pages -> Sources
-
-**When to use:** When a broad topic needs a synthesis page that ties together multiple entities, concepts, and sources.
-
-**Example:** Deep Learning. Demonstrates synthesis across 3 sources (frontmatter list + body provenance), four-claim Key Facts with domain-internal wikilinks to entity and concept siblings, and Related-Pages as a navigation hub.
-
-See: schema/examples/overview.md for a concrete filled-in instance.
-
-### 4.6 Decision (`type: decision`)
-
-Decision records capture why structural changes were made to the wiki. They answer the question: "Why is the wiki shaped this way?" Create a decision record when future-you would reasonably ask that question.
-
-**When to use:**
-
-- Page merges or splits
-- Schema updates (new fields, changed conventions)
-- Domain reorganization (moving pages between categories)
-- Significant reframing of a concept or topic
-- Major supersession (SUPERSEDE of a key page or concept)
-- Contradiction-resolution decisions (structural resolution, not the contradiction itself)
-
-**Directory:** `wiki-cloud/decisions/`
-
-**File naming:** `dr-YYYY-MM-DD-slug.md`. The `dr-` prefix prevents ID collisions with other page types. The date provides natural chronological sorting. The slug provides human readability.
-
-**ID convention:** Same as filename without `.md` extension: `dr-YYYY-MM-DD-slug`. Use lowercase, hyphen-separated slugs. The ID is used in `decision_history` on affected pages.
-
-**Frontmatter (in addition to base fields):**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `trigger_type` | enum | Yes | One of: `merge`, `split`, `schema-update`, `domain-reorg`, `reframing`, `contradiction-resolution` |
-| `affected_pages` | list | Yes | YAML list of page IDs (the `id` field value) of pages affected by this decision. Empty list `[]` is valid for inaugural or infrastructure-only records. |
-
-**Section ordering (all required):**
-
-1. ## TL;DR
-2. ## Decision
-3. ## Why -- Must state what framing was adopted and what it replaced.
-4. ## Alternatives Considered -- Must list alternatives and why they were rejected.
-5. ## Consequences
-6. ## Affected Pages -- Wikilinks to affected pages with how each was affected.
-7. ## Sources
-
-**Epistemic pattern:** Decision records use `epistemic_status: sourced` (the decision itself is the source of truth). They do NOT participate in staleness tracking or contradiction detection -- a decision is a historical fact, not a claim that can become stale.
-
-**`decision_history` back-link:** Pages affected by a decision gain a `decision_history` field in their frontmatter -- a YAML list of decision record IDs. This field is optional (not part of BASE_FIELDS); it is added when the first decision references a page. A visible "Decision History" section in the page body is optional -- include only when the history is meaningful for readers.
-
-**Example:** Introduce Decision Record Page Type (`dr-2026-04-14-phase6-decision-type`). Demonstrates `trigger_type: schema-update` classification, empty `affected_pages: []` for an infrastructure record, and the Why-section-names-replaced-framing pattern.
-
-See: schema/examples/decision.md for a concrete filled-in instance.
+→ See `schema/reference/page-types.md` for section ordering, authoring conventions, and full type details.
 
 ## 5. Frontmatter Schema
 
-### Base Fields (Required on Every Wiki Page)
-
-```yaml
----
-id: slug-style-identifier          # Unique page ID, kebab-case
-title: "Human Readable Title"      # Canonical page title
-type: entity|concept|source|comparison|overview|decision
-status: active|stale|superseded|archived
-summary: "One-sentence description for index scanning."
-created_at: YYYY-MM-DD            # ISO 8601
-updated_at: YYYY-MM-DD            # ISO 8601
-sources:                           # List of source IDs (strings, NOT wikilinks)
-  - src-YYYY-MM-DD-slug
-epistemic_status: sourced|mixed|tentative|stale
-tags:                              # Flat list for Dataview queries
-  - tag-name
-domains:                           # Topic/category classification
-  - domain-name
-supersedes:                        # ID of page this replaces (if any)
-superseded_by:                     # ID of page that replaces this (if any)
-aliases:                           # Alternative names for Obsidian resolution
-  - Alternate Name
-has_contradictions: false       # true when page contains [contradiction:...] markers
-knowledge_domain: "personal-knowledge"   # Primary decay-rate bucket (set by wizard from user's domain)
-privacy_default: cloud_safe     # Wizard-recorded default tier preference -- NOT a per-page field; privacy is structural (wiki-cloud/ vs wiki-local/) per §13
-example: false                  # Optional; true for reference-only pages (examples/). Lint skips these.
----
-```
-
-### Field Descriptions
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | string | Unique identifier in kebab-case. Used in `sources` lists and `[prov:]` markers. Must match the filename (without `.md`). |
-| `title` | string | Human-readable canonical title. Used in page headings and as the display text in piped links `[[id|Title]]`. Obsidian resolves `[[X]]` by **filename/path ONLY** — never by this field and never by `aliases`. |
-| `type` | enum | Page type: `entity`, `concept`, `source`, `comparison`, `overview`, `decision`. Determines section structure. |
-| `status` | enum | Lifecycle state: `active` (current), `stale` (may be outdated), `superseded` (replaced by another page), `archived` (no longer relevant). |
-| `summary` | string | One sentence. Used for index scanning and Dataview table previews. Must be a single quoted string, not multi-line. |
-| `created_at` | date | ISO 8601 date when the page was first created. |
-| `updated_at` | date | ISO 8601 date when the page was last modified. |
-| `sources` | list | YAML list of source IDs (strings). References raw sources this page draws from. NOT wikilinks. |
-| `epistemic_status` | enum | Evidence quality: `sourced` (directly from source), `mixed` (some sourced + some inferred), `tentative` (weak evidence), `stale` (likely outdated). |
-| `tags` | list | YAML list of lowercase kebab-case strings. Used for Dataview queries and filtering. |
-| `domains` | list | YAML list of topic/category classifications in kebab-case. Used for cross-domain Dataview queries. |
-| `supersedes` | string | ID of the page this one replaces. Null if not applicable. |
-| `superseded_by` | string | ID of the page that replaces this one. Null if not applicable. |
-| `aliases` | list | OPTIONAL. Genuine alternate names (e.g. common abbreviations). Obsidian uses these for Quick Switcher / autocomplete and as display text in piped links `[[file|Alias]]`. They do NOT affect bare `[[X]]` resolution — that is always filename/path only. |
-| `has_contradictions` | boolean | `true` when any claim on the page has a `[contradiction:...]` marker. Independent of `epistemic_status` -- a `sourced` page can have contradictions. May be set by lint workflow OR by any workflow that inserts contradiction markers (ingest, query). The lint mechanically syncs this field: if `[contradiction:]` markers exist in the body, `has_contradictions` MUST be `true`; if no markers exist, it MUST be `false`. |
-| `example` | boolean | Optional (default `false`). When `true`, the page is a reference-only example (e.g., pages under `examples/kahneman/`). Lint MUST skip these pages for health checks so illustrative content does not trigger warnings. Applies anywhere in the tree, not just under `examples/`. |
-| `knowledge_domain` | string | Primary knowledge domain for staleness decay rate calculation. This is the **staleness policy bucket**, distinct from the `domains` field which is a topical classification list. A page may have `domains: [psychology, economics]` but `knowledge_domain: science` because both topics decay at the science rate. Maps to the decay rate table in Section 6. One of: `software`, `science`, `biography`, `personal-goals`, or a custom domain. Empty string if not yet classified. |
-| `bootstrap_stage` | enum | Brownfield onboarding sentinel. Values: `raw | bootstrapped | verified`. Page-level marker tracking migration state from pre-existing Obsidian vault content into the schema. **NOT a substitute for claim-level provenance (see §6 PROV-01..05)** — the authoritative provenance mechanism remains claim-level `[prov::...]` markers + source summary pages. Written by `bin/brownfield.sh bootstrap` (Phase 10); stripped by `bin/ingest.sh` on normal ingest to prevent pollution. Absent from greenfield pages. See `§11.5 Brownfield Workflow` (populated in Phase 11). |
-| `bootstrap_date` | date | ISO 8601 `YYYY-MM-DD` stamp (UTC) recording when `bin/brownfield.sh bootstrap` injected `bootstrap_stage: bootstrapped` on this page. Read by `bin/lint.sh` `brownfield` category for the 30-day staleness warning (BRWN-09). Written alongside `bootstrap_stage`; stripped by `bin/ingest.sh` on normal ingest. |
-
-### Source Summary Additional Fields
-
-Source summary pages (`type: source`) include these additional frontmatter fields:
-
-```yaml
-path: sources/YYYY/YYYY-MM/YYYY-MM-DD-slug/source.md
-url: "https://..."                  # Original URL if applicable
-content_hash: "sha256:abc123..."    # SHA-256 hash for staleness detection
-ingested_at: YYYY-MM-DD            # When source was processed
-source_type: article|paper|transcript|journal|data|image
-
-# Compilation tracking
-compilation_status: pending         # pending | partial | compiled | stale
-compiled_against_hash: ""           # SHA-256 of source content at last compilation
-compiled_targets: []                # Wiki page IDs that received compiled claims
-```
-
-### Compilation Tracking Fields (Source Summary Pages)
-
-Source summary pages carry three additional fields that track whether their extracted claims have been compiled into topic pages. These fields enable delta compilation (compiling only new or changed sources) and stale-source detection.
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `compilation_status` | enum | Compilation lifecycle: `pending` (new, uncompiled), `partial` (some claims merged), `compiled` (all claims merged into topic pages), `stale` (source content changed since last compilation) |
-| `compiled_against_hash` | string | SHA-256 hash of source content at time of last compilation. Copied from `content_hash` when compilation completes. When `content_hash` changes on re-ingest and no longer matches `compiled_against_hash`, status resets to `stale`. |
-| `compiled_targets` | list | YAML list of wiki page IDs (the `id` field value, not file paths) that received claims from this source during compilation. Example: `[<concept-slug>, <concept-slug-2>, <entity-slug>]` |
-
-#### Compilation Status Transition Rules
-
-The following transitions are the ONLY valid state changes. Any other transition is a bug.
-
-| From | To | Trigger | Who Sets It |
-|------|----|---------|-------------|
-| (new source) | `pending` | Source ingested, before merge pass | Ingest workflow step 5 (extract) |
-| `pending` | `compiled` | All extracted claims merged into topic pages | Ingest workflow step 6a |
-| `pending` | `partial` | Some claims merged, others deferred | Ingest workflow step 6a |
-| `partial` | `compiled` | Remaining claims compiled (via query delta or manual) | Query workflow step 6 or follow-up ingest |
-| `compiled` | `stale` | `content_hash` changed on re-ingest (no longer matches `compiled_against_hash`) | Ingest workflow on re-ingest detection |
-| `stale` | `compiled` | Re-compilation completed against new content | Query workflow step 6 or follow-up ingest |
-| `stale` | `partial` | Partial re-compilation completed | Query workflow step 6 |
-
-**Invariants:**
-- `compiled_against_hash` is ALWAYS equal to `content_hash` when `compilation_status` is `compiled`.
-- `compiled_against_hash` differs from `content_hash` when `compilation_status` is `stale`.
-- `compiled_targets` is empty ONLY when `compilation_status` is `pending`.
-- Pages missing `compilation_status` (pre-Phase-4 legacy) are treated as `compiled` by tooling.
-
-### Decision Record Additional Fields
-
-Decision record pages (`type: decision`) include these additional frontmatter fields:
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `trigger_type` | enum | Yes | What prompted this decision: `merge`, `split`, `schema-update`, `domain-reorg`, `reframing`, `contradiction-resolution` |
-| `affected_pages` | list | Yes | YAML list of page IDs affected by this decision. Used for bidirectional navigation via `decision_history` on those pages. |
-
-### Optional Back-Link Field
-
-Any page type may include this field when referenced by a decision record:
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `decision_history` | list | No | YAML list of decision record IDs (e.g., `[dr-2026-04-14-slug]`). Added when a decision record lists this page in `affected_pages`. NOT a base field -- absence is valid. When present, must be a YAML list of strings. |
-
-### Frontmatter Validation Checklist
-
-When creating or updating any wiki page, verify:
-
-1. All base fields are present (id, title, type, status, summary, created_at, updated_at, sources, epistemic_status, tags, domains, supersedes, superseded_by, aliases)
-2. `type` is one of: `entity`, `concept`, `source`, `comparison`, `overview`, `decision`
-3. `status` is one of: `active`, `stale`, `superseded`, `archived`
-4. `epistemic_status` is one of: `sourced`, `mixed`, `tentative`, `stale`
-5. `created_at` and `updated_at` match ISO 8601 pattern `YYYY-MM-DD`
-6. `sources` is a YAML list of string IDs, NOT wikilinks
-7. `tags` and `domains` are YAML lists of lowercase kebab-case strings
-8. `summary` is a single quoted string, not multi-line
-9. `id` matches the filename (without `.md` extension)
-10. For `type: source` pages: `path`, `content_hash`, `ingested_at`, and `source_type` are present
-11. For `type: source` pages: `compilation_status` is one of: `pending`, `partial`, `compiled`, `stale`
-12. `has_contradictions` is a boolean (`true` or `false`)
-13. `knowledge_domain` is a non-empty string for pages with provenance-backed claims
-14. For `type: decision` pages: `trigger_type` is one of: `merge`, `split`, `schema-update`, `domain-reorg`, `reframing`, `contradiction-resolution`
-15. For `type: decision` pages: `affected_pages` is present and is a YAML list of string IDs
-16. If `decision_history` is present on any page: it is a YAML list of string IDs
-17. Every intra-wiki body link MUST use the piped form `[[id|Exact Title]]` — target is the page `id` (= filename stem, always resolves in Obsidian); display is the exact canonical `title`. Bare `[[Title]]` links are a convention error.
+→ Full frontmatter schema and validation checklist in `schema/reference/frontmatter.md`.
 
 ## 6. Provenance, Epistemics, and Staleness
 
-### Inline Provenance Syntax
+Every factual claim MUST have an inline provenance marker `[prov:source_id#locator]`.
 
-Every factual claim in wiki pages SHOULD have an inline provenance marker linking it to a specific location in a source.
-
-**Basic form:**
-
-```
-[prov:<source_id>#<locator>]
-```
-
-**Extended form (with support type and verification date):**
-
-```
-[prov:<source_id>#<locator>|<support_type>|<checked_at>]
-```
-
-### Locator Types
-
-| Locator | Format | Example | Use for |
-|---------|--------|---------|---------|
-| Page range | `#p<start>-<end>` or `#p<page>` | `#p12-14`, `#p8` | PDFs, papers |
-| Section | `#sec:<name>` | `#sec:introduction` | Markdown sections |
-| Paragraph | `#para<number>` | `#para3` | Specific paragraphs |
-| Timestamp | `#t<start>-<end>` | `#t00:12:10-00:12:48` | Audio/video transcripts |
-| Image | `#img<number>` | `#img2` | Figures, diagrams |
-
-### Page-marker convention
-
-Markdown-native raw sources lose the page boundaries a PDF carries, so a `#p<n>` locator has nothing to bound against. The OPTIONAL `<!-- page: N -->` HTML-comment marker, hand-inserted in the raw source at each page break, makes `#p` resolvable where authors opt in. It is Obsidian-invisible (an HTML comment does not render in reading view), grep-able, and requires NO change to the `[prov:]` grammar -- `#p` already exists in the Locator Types table above.
-
-**Marker syntax:** insert `<!-- page: N -->` on its own line in the raw source file (the file at the source page's `path:`) at each page boundary, where `N` is the page number that begins below the marker:
-
-```markdown
-<!-- page: 7 -->
-...the text of page 7...
-
-<!-- page: 8 -->
-...the text of page 8...
-
-<!-- page: 9 -->
-...the text of page 9...
-```
-
-**Slice semantics:** `#p8` resolves from the `<!-- page: 8 -->` marker to the line before `<!-- page: 9 -->`; `#p12-14` spans the `<!-- page: 12 -->` marker to the `<!-- page: 15 -->` marker (exclusive upper bound -- the slice ends just before the `page: 15` marker, so the range covers pages 12, 13, and 14). The lower marker is inclusive, the next-page marker is exclusive.
-
-**Optional, with a documented fallback:** markers are never required. When present, `#p` resolves to a bounded passage; when absent, a `#p` locator degrades to the audit's first-class `insufficient-locator` verdict (NOT an error). This is additive -- it imposes nothing on existing sources, and unmarked paginated sources are not errors (D-06). The fallback nudges authors toward `#sec:`/`#para` locators for markdown-native sources that have no real pages.
-
-**Document-now / helper-later (D-07):** the curator hand-marks sources today; any auto-insertion helper (e.g. PDF-to-markdown page-break detection at ingest) is deferred to a later version. The audit consumes the markers read-only; ingest gains zero new logic from this convention.
-
-### Support Types
-
-| Type | Meaning |
-|------|---------|
-| `direct` | Claim is directly stated in the source |
-| `inferred` | Claim is logically inferred from source content |
-| `tentative` | Weak evidence; claim may not hold |
-| `derived` | Synthesized from multiple parts of the source or across sources |
-
-### Checked At
-
-The `checked_at` field records the ISO 8601 date when the provenance link was last verified against the source. This enables staleness detection: if the source's `content_hash` has changed since `checked_at`, the claim should be reviewed.
-
-### Examples in Context
-
-```markdown
-- Attention mechanisms allow models to focus on relevant input tokens [prov:src-2026-03-15-vaswani-attention#sec:introduction|direct|2026-04-08]
-- The model achieves 28.4 BLEU on WMT 2014 English-to-German [prov:src-2026-03-15-vaswani-attention#p8|direct|2026-04-08]
-- Hinton expressed concerns about AI safety risks [prov:src-2026-03-20-hinton-interview#t00:12:10-00:12:48|direct|2026-04-08]
-- The learning rate schedule uses warmup followed by inverse square root decay [prov:src-2026-03-15-vaswani-attention#sec:training|direct|2026-04-08]
-- RNNs struggle with long-range dependencies due to vanishing gradients [prov:src-2026-04-02-lstm-survey#sec:limitations|direct|2026-04-08]
-```
-
-### Bad vs. Good Provenance Examples
-
-```
-BAD:  Attention is important.
-GOOD: Attention mechanisms allow models to focus on relevant input tokens [prov:src-2026-03-15-vaswani-attention#sec:introduction|direct|2026-04-08]
-
-BAD:  [prov:vaswani] (missing locator, wrong source ID format)
-GOOD: [prov:src-2026-03-15-vaswani-attention#sec:introduction]
-
-BAD:  [prov:src-2026-03-15-vaswani-attention#page8] (invalid locator format)
-GOOD: [prov:src-2026-03-15-vaswani-attention#p8] (correct: #p prefix for pages)
-
-BAD:  [prov:src-2026-03-15-vaswani-attention] (no locator at all)
-GOOD: [prov:src-2026-03-15-vaswani-attention#sec:abstract] (always include a locator)
-```
-
-### Source Registry
-
-Each source summary page in `wiki-cloud/sources/` serves as the registry entry for that source. Its frontmatter contains: `id` (the source_id), `path`, `title`, `source_type`, `url`, `content_hash`, `ingested_at`.
-
-This is the Dataview-native approach -- query source metadata with:
-
-```dataview
-TABLE source_type, ingested_at, content_hash
-FROM "wiki-cloud/sources"
-WHERE status = "active"
-SORT ingested_at DESC
-```
-
-No separate registry file is needed. Source summary pages ARE the registry.
-
-### Provenance Validation Rules
-
-1. Every `[prov:...]` reference MUST resolve to a known source ID in `wiki-cloud/sources/`.
-2. Every locator MUST be syntactically valid (matches one of the defined patterns above).
-3. If a source's `content_hash` has changed since `checked_at`, dependent claims SHOULD be reviewed and the page's `epistemic_status` SHOULD be set to `stale`.
-4. The lint workflow checks these rules automatically.
-
-### Inline Epistemic Markers
-
-Per-claim epistemic status uses Dataview inline field syntax, separate from provenance markers.
-
-**Syntax:** `[epistemic:: <status>]`
-
-**Valid statuses:**
-
-| Status | Meaning | When to use |
-|--------|---------|-------------|
-| `sourced` | Directly from a source | Verbatim or close paraphrase with provenance |
-| `inferred` | Synthesized from source(s) | Logical conclusion not explicitly stated in any single source |
-| `tentative` | Weak or contested evidence | Claim may not hold; flag for review |
-| `stale` | Likely outdated | Source has changed, finding superseded, or claim is time-sensitive |
-
-Queryable via Dataview:
-
-```dataview
-TABLE file.name
-FROM "wiki"
-FLATTEN file.lists.text as item
-WHERE contains(item, "[epistemic:: tentative]")
-```
-
-### Page-Level vs Claim-Level Epistemic Status
-
-- **Page-level:** `epistemic_status` frontmatter field (Section 5). Reflects overall page evidence quality: `sourced`, `mixed`, `tentative`, or `stale`.
-- **Claim-level:** Inline `[epistemic:: <status>]` in body text. Applies to individual claims within a page.
-
-A page with `epistemic_status: sourced` may contain individual `[epistemic:: inferred]` claims if the majority is directly sourced. Use `mixed` when the page has a significant proportion of non-sourced claims.
-
-### Mixed Inline Grammar
-
-Two inline syntaxes coexist intentionally in wiki page bodies. Do NOT normalize to a single syntax.
-
-| Syntax | Purpose | Tool |
-|--------|---------|------|
-| `[prov:source_id#locator\|support_type]` | Traceability | grep, scripts |
-| `[epistemic:: status]` | Confidence discovery | Dataview |
-
-**Combined pattern:** `Claim text. [prov:source_id#locator|support_type] [epistemic:: status]`
-
-Not every claim needs both markers. Provenance is omitted when there is no specific source. Epistemic status is recommended on all factual claims.
-
-### Domain-Based Decay Rate Table
-
-Claims inherit temporal relevance from their source publication dates. Different knowledge domains decay at different rates. The lint workflow uses this table to flag stale claims mechanically.
-
-| Domain | Base Decay Period | Rationale |
-|--------|-------------------|-----------|
-| `software` | 180 days (6 months) | Libraries, APIs, and tooling change rapidly |
-| `science` | 730 days (2 years) | Replication and meta-analysis cycles |
-| `biography` | 1825 days (5 years) | Biographical facts change slowly |
-| `personal-goals` | 90 days (3 months) | Goals evolve with life circumstances |
-| (default) | 365 days (1 year) | Fallback for unclassified domains |
-
-The default staleness decay profile is `default` (set by the wizard from the user's chosen decay profile name).
-
-**Epistemic status modifiers** (per D-08): Tentative and inferred claims decay faster than their domain default. Multiply the base decay period by the modifier:
-
-| Epistemic Status | Modifier | Effect |
-|------------------|----------|--------|
-| `sourced` | 1.0 | Base rate |
-| `mixed` | 0.85 | 15% faster decay |
-| `inferred` | 0.75 | 33% faster decay |
-| `tentative` | 0.5 | Twice as fast decay |
-
-**Hash override** (per D-09): If a source page's `content_hash` differs from `compiled_against_hash`, ALL claims linked to that source via `[prov:]` markers are immediately stale regardless of decay window.
-
-**Date fallback chain** for staleness calculation: When `checked_at` is missing from a provenance marker, use (in order): (1) the source page's `ingested_at` date, (2) the wiki page's `updated_at` date.
-
-### Contradiction Inline Syntax
-
-When two different sources assert conflicting claims about the same subject/attribute (per D-01), the contradiction is flagged inline on the affected claim(s):
-
-```
-[contradiction:source_a_id#locator vs source_b_id#locator]
-```
-
-Example:
-
-```markdown
-<CONCEPT_NAME_2> coefficient is approximately 2.0 [prov:<source-slug>#sec:core-findings|direct|2026-04-10] [contradiction:<source-slug>#sec:core-findings vs <source-slug-2>#sec:results]
-```
-
-Rules:
-- Contradiction markers sit alongside provenance markers on the affected claim
-- Both source references in the contradiction marker MUST resolve to known sources in `wiki-cloud/sources/`
-- The lint does NOT decide which source is correct -- it surfaces the disagreement
-- Pages with any contradiction marker must have `has_contradictions: true` in frontmatter (lint syncs this mechanically)
-- Contradictions are severity: **warning** (source disagreement is expected in scholarship)
-- Semantic conflicts without provenance grounding are out of scope for v1 (per D-02)
-
-See: examples/kahneman/concepts/loss-aversion.md for a concrete filled-in instance.
-
-### Staleness Auto-Fix Rules
-
-The lint workflow applies mechanical staleness fixes (per D-12):
-
-**Claim-level auto-fix:** When a claim's provenance date exceeds its domain decay threshold (adjusted by epistemic modifier), the lint adds `[epistemic:: stale]` after the claim's provenance marker cluster. Rules for marker placement:
-- One `[epistemic:: stale]` marker per claim -- do not duplicate if already present
-- Place immediately after the last `[prov:...]` marker on the claim line
-- If the claim already has `[epistemic:: sourced]` or `[epistemic:: inferred]`, replace it with `[epistemic:: stale]`
-- A "claim" is defined as a single bullet point or paragraph containing `[prov:]` markers
-- This operation is deterministic and reversible (removing the stale marker restores prior state)
-
-**Page-level status:** The lint only auto-updates page-level `epistemic_status` to `stale` when the rollup clearly warrants it (per D-13): all material claims are stale, OR the TL;DR/Key Facts section contains materially stale claims. Default: do NOT auto-change page-level status.
-
-**Logging:** All auto-fix staleness changes are logged in `wiki-cloud/maintenance/lint-report.md` and `wiki-cloud/log.md` (per D-14).
-
-## 7. Progressive Disclosure
-
-**Principle:** All wiki pages are structured shallow-to-deep. The top of every page is optimized for fast LLM scanning; the bottom is for human verification and deep reading.
-
-### Rules for LLM Agents
-
-1. When searching for information, read `wiki-cloud/index.md` FIRST.
-2. Scan `## TL;DR` and `## Key Facts` sections of relevant pages BEFORE reading `## Detail` sections.
-3. Only read `## Detail` and `## Sources` sections when shallow sections are insufficient to answer the question.
-4. When creating pages, `## TL;DR` MUST be 1 short paragraph or 2-4 bullets.
-5. `## Key Facts` MUST be compact bullets with inline provenance markers.
-6. `## Detail` contains full narrative, synthesis, caveats, and nuance.
-7. `## Sources` at the bottom lists human-readable source references with wikilinks to source summary pages.
-
-### Per-Type Section Ordering
-
-| Page Type | Section Order |
-|-----------|--------------|
-| Entity | TL;DR -> Key Facts -> Detail -> Related Pages -> Sources |
-| Concept | TL;DR -> Key Facts -> Detail -> Related Pages -> Sources |
-| Source Summary | TL;DR -> Key Takeaways -> Extracted Claims -> Notes -> Source Metadata |
-| Comparison | TL;DR -> Bottom Line -> Comparison Table -> Detailed Comparison -> Sources |
-| Overview | TL;DR -> Key Facts -> Detail -> Related Pages -> Sources |
-
-See Section 4 for fully worked examples of each type.
-
-### Why This Matters
-
-An LLM processing a query about "attention mechanisms" should be able to:
-1. Read `wiki-cloud/index.md` to find `wiki-cloud/concepts/attention-mechanism.md` (seconds)
-2. Read its `## TL;DR` to confirm relevance (seconds)
-3. Read `## Key Facts` for specific claims with provenance (seconds)
-4. Only read `## Detail` if the above is insufficient (more expensive)
-
-This structure means the LLM reads the minimum necessary context for each query, preserving context window for synthesis and reasoning.
+→ Syntax, locator types, epistemic markers, and contradiction markers: `schema/reference/provenance.md`.
+→ Decay table and staleness auto-fix: `schema/workflows/lint.md`.
 
 ## 8. Wikilink and Graph Conventions
 
-### Rules
-
-1. Use `[[id|Exact Title]]` for ALL intra-wiki cross-references in page body text.
-   The target before `|` is the page `id` (= filename stem — always resolves in Obsidian
-   since Obsidian resolves `[[X]]` by **filename/path ONLY**, never by `title` and never
-   by `aliases`). The display text after `|` is the exact canonical `title`.
-2. Link on FIRST mention only per page. Subsequent mentions are plain text.
-3. ALWAYS write `[[id|Exact Title]]` — bare `[[Title]]` links are a convention error.
-   Examples: `[[attention-mechanism|Attention Mechanism]]`, `[[<entity-id>|Entity Title (Parens)]]`.
-4. The `aliases` frontmatter field is OPTIONAL — for genuine alternate names (Quick Switcher /
-   autocomplete), NOT for link resolution. Obsidian resolves `[[X]]` by **filename/path ONLY**.
-5. Red links (links to not-yet-existing page `id`s) are ALLOWED and intentional. They signal
-   knowledge gaps for the lint workflow. Write them as `[[not-yet-existing-id|Display Text]]`
-   where the `id` is the planned slug.
-6. DO NOT put wikilinks in YAML frontmatter. Use string IDs in frontmatter, wikilinks in body text.
-7. The `## Related Pages` section lists explicit wikilinks to connected pages.
-8. The `## Sources` section in page body lists human-readable source references with wikilinks to
-   source summary pages.
-
-### Bad vs. Good Wikilink Examples
-
-```
-BAD:  sources: ["[[Vaswani et al]]"]                    (wikilink in frontmatter)
-GOOD: sources: [src-2026-03-15-vaswani-attention]       (string ID in frontmatter)
-
-BAD:  [[Attention Mechanism]]                           (bare link -- does not resolve for multi-word titles)
-GOOD: [[attention-mechanism|Attention Mechanism]]       (piped: target=id, display=title)
-
-BAD:  [[attention-mechanism|attention]]                 (display text is not the exact canonical title)
-GOOD: [[attention-mechanism|Attention Mechanism]]       (display = exact title from page frontmatter)
-
-BAD:  ...[[attention-mechanism|Attention Mechanism]] uses [[attention-mechanism|Attention Mechanism]] weights...  (linked twice)
-GOOD: ...[[attention-mechanism|Attention Mechanism]] uses attention weights...  (linked once, plain after)
-
-BAD:  [[<Entity Title> (Parens)]]                       (bare link, parens title, will not resolve)
-GOOD: [[<entity-id>|Entity Title (Parens)]]             (piped: id target resolves, parens in display)
-
-BAD:  [[<Concept Titles>]]                              (bare plural link)
-GOOD: [[<concept-id>|Concept Titles]]                   (id target resolves; plural cosmetic in display)
-```
-
-### Graph View Implications
-
-- Only wikilinks in page body text appear in Obsidian's graph view. Piped links `[[id|Title]]` display the `title` in reading view while forming a graph edge to the `id` target.
-- String IDs in frontmatter do NOT create graph edges. This is intentional -- frontmatter holds structured data; body text holds navigable links.
-- First-mention linking prevents link noise. A page that mentions a concept many times creates only one graph edge, not many.
-- Red links (piped links whose `id` target does not exist yet) appear as unresolved nodes, providing a visual map of knowledge gaps.
+Use `[[id|Title]]` for ALL intra-wiki links — see `schema/reference/wikilinks.md`.
 
 ## 9. Structured Operations and Executor Model
 
@@ -1521,101 +1002,14 @@ See: examples/kahneman/concepts/prospect-theory.md for concrete filled-in instan
 
 ## 13. Privacy Routing
 
-Vault tier is structural: `wiki-cloud/` is the cloud-safe tier; `wiki-local/` is the local-only tier. Cloud sessions MUST NOT read `wiki-local/` — the directory boundary is the enforcement mechanism, not a per-turn rule. See `docs/reference/privacy-model.md` for the full asymmetric model, enforcement options (deny-profile vs. separate-repo), honest fail-direction table, and the `sources-local/` forward reference for future local raw sources.
+→ See `schema/reference/privacy.md` for the agent-facing tier rules.
+  For the full human-facing model: `docs/reference/privacy-model.md`.
 
 ## 14. Scaling Boundaries
 
-**Important:** These are provisional heuristics, not hard boundaries. They are starting points derived from reasoning about likely pain points. Validate and adjust through actual use. The numbers below are approximate -- the real signals are behavioral (the wiki becomes awkward to use in specific ways).
-
-These tiers are additive. Each builds on the previous rather than replacing it.
-
-### Tier 1: Markdown-First Baseline (v1)
-
-This is the starting configuration. Everything is markdown files and YAML frontmatter.
-
-- **Navigation:** `wiki-cloud/index.md` is the primary navigation mechanism. The LLM reads it to find pages.
-- **Lint:** Full lint scans all pages in the wiki.
-- **Agent behavior:** Read the full index, scan all pages during lint.
-- **Approximate capacity:** Up to ~100-200 wiki pages, ~50-100 ingested sources.
-- **Pain points at limit:** `index.md` becomes slow to navigate. The LLM's context window fills up scanning the full index. Full lint takes multiple passes or minutes.
-- **Signal you are outgrowing this tier:** `index.md` exceeds ~500 lines. The LLM frequently retrieves pages irrelevant to the query because the index is too dense to scan efficiently.
-
-### Tier 2: Split Index
-
-When the single index becomes unwieldy (approximately a few hundred wiki pages).
-
-- **Change:** Split `wiki-cloud/index.md` into per-type or per-domain sub-indexes: `wiki-cloud/index-entities.md`, `wiki-cloud/index-concepts.md`, `wiki-cloud/index-sources.md`, etc. The main `wiki-cloud/index.md` becomes a meta-index pointing to sub-indexes.
-- **Agent behavior:** Read the meta-index to determine which sub-index is relevant, then read only that sub-index.
-- **Approximate capacity:** Up to ~500-1000 wiki pages.
-- **Pain points at limit:** Even sub-indexes become large. Cross-type queries require reading multiple sub-indexes. The meta-index itself grows.
-- **Signal to upgrade:** Sub-indexes exceed ~200 entries each. Cross-domain queries are slow because the LLM must read multiple sub-indexes.
-
-### Tier 3: Incremental Lint
-
-When full lint becomes too expensive to run routinely.
-
-- **Change:** Track which pages changed since the last lint (via `git diff` or `log.md` timestamps). Only lint changed pages and their direct neighbors (pages they link to or are linked from).
-- **Agent behavior:** Run `git diff --name-only <last-lint-commit>` to scope the lint to changed files. Expand scope to include pages linked to/from changed pages.
-- **Approximate capacity:** Any size where full lint is impractical.
-- **Pain points at limit:** Neighbor expansion can still be large in highly connected wikis. Deep dependency chains may be missed by incremental lint.
-- **Signal to upgrade:** Lint takes so long that you stop running it, or incremental lint misses issues that a full lint would catch.
-
-### Tier 4: DB-Backed Metadata
-
-When provenance queries, search, or concurrency become awkward in pure markdown.
-
-- **Change:** Add SQLite (or similar lightweight database) for metadata: source registry, provenance index, search index, wikilink graph. Markdown pages remain the human-facing artifact; the database is an acceleration layer.
-- **Agent behavior:** Query the database for source and provenance lookups instead of scanning markdown files. Use the database for search instead of grep.
-- **Approximate capacity:** Thousands of pages and sources.
-- **Pain points:** Requires maintaining synchronization between the database and markdown files. Adds a tooling dependency beyond plain markdown.
-- **Signal to upgrade:** Provenance validation is slow because it requires scanning many files. Search needs more than grep. Multiple agents need concurrent access to the wiki.
+→ See `docs/reference/scaling.md` for scaling tier heuristics.
 
 ## 15. Tooling and Integrations
 
-> This section is informational, not normative. It describes tools the wiki is designed to work with, but does not mandate their installation. The wiki functions as plain markdown files in a git repo regardless of tooling.
+→ See `docs/reference/tooling.md` for Obsidian, Git, and optional tooling notes.
 
-### Obsidian (Primary Human Interface)
-
-- **Graph View:** Visualize the wiki's link structure. All intra-wiki links use piped form `[[id|Title]]` — the `id` target resolves reliably in Obsidian (filename/path only), and the `title` displays in reading view.
-- **Dataview plugin:** Query frontmatter fields with TABLE/LIST/TASK syntax. All frontmatter fields defined in Section 5 are queryable. Example: `TABLE summary, epistemic_status FROM "wiki-cloud/entities" WHERE status = "active"`.
-- **Properties:** Obsidian 1.4+ supports typed frontmatter editing. All base fields render as editable properties in the sidebar.
-- **Aliases:** The `aliases` frontmatter field is OPTIONAL — useful for Quick Switcher / autocomplete and as display text in piped links `[[file|Alias]]`, but NOT used for bare `[[X]]` resolution (filename/path only).
-- **Backlinks:** Obsidian's backlinks panel shows all pages that link to the current page, complementing the `## Related Pages` section.
-
-### Git (Version Control)
-
-- All changes are tracked in git with conventional commits (Section 3).
-- History provides a full audit trail of wiki evolution.
-- Branching is available for experimental restructuring (e.g., major domain reorganization).
-- The activity log (`wiki-cloud/log.md`) complements git history with human-readable operation summaries.
-
-### Optional Future Tools (Not Required for v1)
-
-- **Local search engine** (e.g., qmd or similar): Hybrid BM25/vector search for faster query workflow when the wiki grows beyond grep's effectiveness.
-- **Obsidian Web Clipper:** Source acquisition from the web -- clip articles directly into the `sources/` directory.
-- **Marp plugin:** Generate slide decks from wiki content for presentations and reviews.
-
-## 16. Appendices and Examples
-
-### Appendix A: Dataview Query Examples
-
-See `docs/reference/dataview-queries.md` for five Dataview query patterns (active entities, sources by domain, stale pages, missing privacy classification, pages in a domain).
-
-### Appendix B: Commit Message Examples
-
-See `docs/reference/commit-examples.md` for representative commit messages per workflow type (schema/ingest/query/lint/reflect).
-
-### Appendix C: Quick Reference Card
-
-A compact summary of the most critical rules for fast LLM scanning:
-
-1. **Read `wiki-cloud/index.md` first, always.** This is the entry point for all wiki operations.
-2. **TL;DR and Key Facts before Detail.** Read shallow sections first; drill into Detail only when needed.
-3. **`[[id|Exact Title]]` on first mention only.** Piped form only — target = page `id`, display = exact canonical `title`. No bare `[[Title]]` links. No repeated links. No wikilinks in frontmatter.
-4. **`[prov:source_id#locator]` for every factual claim.** Every claim needs provenance. No exceptions.
-5. **One commit per logical operation.** One ingest = one commit, even if it touches many files.
-6. **Privacy default: `wiki-local/` tier.** When in doubt, place content in `wiki-local/` -- do not expose to cloud sessions.
-7. **All dates: ISO 8601.** `YYYY-MM-DD` or `YYYY-MM-DDTHH:mm:ss`.
-8. **All field names: `snake_case`.** For Dataview compatibility.
-9. **Operations: UPDATE, MERGE, SUPERSEDE, ARCHIVE.** No raw file rewrites. Log every operation.
-10. **See Section 3 "What Agents Must NOT Do"** for the full list of prohibitions.

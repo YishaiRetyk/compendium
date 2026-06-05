@@ -1,8 +1,8 @@
 # LLM Wiki Compiler Schema
 
-> **This is the sole authoritative specification for the LLM Wiki Compiler.**
+> **This file is the authoritative router for the LLM Wiki Compiler spec.**
 > Any LLM agent maintaining this wiki MUST read and follow this document.
-> No other file contains conventions, rules, or workflow definitions.
+> This file is the router; each linked file listed in the routing table is authoritative for its own sections.
 
 ## 1. Overview and Principles
 
@@ -10,7 +10,7 @@ The LLM Wiki Compiler is a personal knowledge management system with three layer
 
 1. **Raw sources** (`sources/`) -- Immutable input documents (articles, papers, transcripts, journal entries, images). The human curates this layer. Sources are never modified after ingestion.
 2. **The wiki** (`wiki-cloud/` + `wiki-local/`) -- LLM-generated and maintained markdown pages. This is the compiled artifact: summaries, entity pages, concept pages, comparisons, overviews, an index, and an activity log. `wiki-cloud/` is the cloud-safe tier; `wiki-local/` is the local-only tier.
-3. **The schema** (this file + `schema/`) -- The specification that governs LLM behavior. This file is the sole source of truth.
+3. **The schema** (this file + `schema/`) -- The specification that governs LLM behavior. This file routes to reference files under `schema/reference/` and `schema/workflows/`; each is authoritative for its own sections.
 
 **Core principle:** The wiki is a persistent, compounding artifact. Cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested. Knowledge accumulates rather than being re-derived.
 
@@ -31,11 +31,39 @@ Workflows for each operation are defined in Section 11 of this document.
 
 These four operations are the wiki's mutation vocabulary. Layered on top is the **Audit** -- a review-only diagnostic workflow (`bin/audit-claims.sh`, Section 11.7) that checks whether sampled claims semantically follow from the source passage they cite. The Audit never mutates a wiki page; like Lint, it is a workflow, not one of the four mutation operations, so the four-operation framing is preserved.
 
+> **IMPORTANT — Reference Routing Table**
+>
+> This file is the router. Each linked file is authoritative for its own sections (D-09).
+> Read the target file before acting — do not rely on the stub alone.
+>
+> **Resolvable references** (the target file exists — read it before acting):
+>
+> | When you need this | Go to |
+> |-------------------|-------|
+> | Authoring a wiki page (type rules, section order) | `schema/reference/page-types.md` |
+> | Checking required frontmatter fields | `schema/reference/frontmatter.md` |
+> | Adding `[prov:]` or `[epistemic::]` markers | `schema/reference/provenance.md` |
+> | Decay table / staleness auto-fix math | `schema/workflows/lint.md` |
+> | Creating cross-references (wikilinks) | `schema/reference/wikilinks.md` |
+> | Determining `wiki-cloud/` vs `wiki-local/` placement | `schema/reference/privacy.md` |
+> | Wiki capacity / scaling signals | `docs/reference/scaling.md` |
+> | Obsidian, Git, and optional tools | `docs/reference/tooling.md` |
+>
+> **Workflows — STILL INLINE in §11 until Phase 17. Do NOT dereference these paths yet;**
+> **the authoritative content is §11 below until the file is created in Phase 17.**
+>
+> | Workflow | Where it lives NOW |
+> |----------|--------------------|
+> | Ingest | §11.1 (inline). Future home: `schema/workflows/ingest.md` *(Phase 17)* |
+> | Query | §11.2 (inline). Future home: `schema/workflows/query.md` *(Phase 17)* |
+> | Lint | §11.3 (inline). Decay math already at `schema/workflows/lint.md`; full procedure *(Phase 17)* |
+> | Reflect | §11.4 (inline). Future home: `schema/workflows/reflect.md` *(Phase 17)* |
+
 ## 2. Directory Structure
 
 ```
 life/                               # repo root
-├── AGENTS.md                       # This file (sole authority)
+├── AGENTS.md                       # This file (router; see routing table)
 ├── sources/                        # Raw immutable sources (cloud-safe-only; see §13)
 │   ├── YYYY/                       # Year grouping
 │   │   └── YYYY-MM/               # Month grouping
@@ -83,8 +111,7 @@ life/                               # repo root
 - `wiki-local/maintenance/` holds the audit control-plane (`audit-report.md`, `audit-state.md`). `wiki-cloud/maintenance/` holds `lint-report.md`.
 
 **Schema directory rules:**
-- `schema/` is optional and holds templates and examples.
-- It does NOT contain rules or conventions -- those live only in this file.
+- `schema/reference/` and `schema/workflows/` hold authoritative reference content the router links to; `schema/templates/` holds blank templates.
 
 ## 3. Global Rules
 
@@ -127,7 +154,7 @@ This progressive disclosure navigation minimizes context window consumption.
 ### What Agents Must NOT Do
 
 - DO NOT create topic-based directories (e.g., `wiki-cloud/machine-learning/`). Use frontmatter `domains` field and Dataview queries instead.
-- DO NOT put conventions or rules in any file other than AGENTS.md. This is the sole source of truth.
+- DO NOT put conventions or rules in any file other than AGENTS.md or the files listed in the routing table. AGENTS.md is the router; each linked file is authoritative for its own sections.
 - DO NOT put wikilinks in YAML frontmatter. Use string IDs in frontmatter, wikilinks in body text.
 - DO NOT write bare `[[Title]]` wikilinks. ALWAYS write `[[id|Exact Title]]` (target = page `id`; display = exact canonical `title`). Bare links without a pipe do not reliably resolve for multi-word-title pages in Obsidian (which resolves by filename/path ONLY, never by `aliases`).
 - DO NOT put provenance blobs, relation arrays, or decay settings in base frontmatter. Those belong in type-specific fields.
