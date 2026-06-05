@@ -1,23 +1,22 @@
 ---
 phase: 16-reference-extraction
 verified: 2026-06-05T00:00:00Z
-status: human_needed
-score: 4/5 must-haves verified
+status: passed
+score: 5/5 must-haves verified
 overrides_applied: 0
-human_verification:
+resolution: "Both human_needed items resolved in commit 14c8c75 (fix(16): CR-01 + WR-01/02/04). User decision: 'accept drop + clean up'. CR-01 — wizard placeholder drop accepted as intentional (privacy structural per Phase 15; decay recorded as answer, not rendered); dead .replace() no-ops removed from bin/init-wizard.sh; docs/manual-setup.md Sections 4/5 converted to 'File to edit: None'; placeholder test tightened to exact-set; REF-10 DR records the drop. WR-02 — Section 7 ref fixed to 'Section 3 LLM Navigation Rule' across AGENTS.md/CLAUDE.md/template/canonical fixture. WR-04 — leaf §5/§6 cross-refs re-pointed at their leaf-file home. All gates green; phase-08 reconciled to 21/21."
+resolved_human_verification:
   - test: "Assess whether the dead wizard no-ops for {{DEFAULT_PRIVACY}} and {{DECAY_PROFILE}} constitute an acceptable loss or require re-homing the carrier lines into the leaf files"
-    expected: "Either the carrier lines are restored in schema/reference/frontmatter.md and schema/workflows/lint.md, OR an explicit decision is made and recorded that this content was intentionally dropped (Phase 15 made privacy structural, making privacy_default: legitimately obsolete; decay profile is a new question)"
-    why_human: "The criterion init-wizard --dry-run passes is technically satisfied (exit 0, no leftover {{...}} tokens). But the replace() calls at init-wizard.sh:657-658 are dead no-ops — chosen values no longer appear anywhere in the rendered AGENTS.md. Whether this is an acceptable loss (Phase-15 structural-privacy made privacy_default: obsolete; decay profile was illustrative) or a functional regression requires a human decision, since it involves intent rather than observable code state."
+    resolution: "RESOLVED — accepted as intentional drop and cleaned up (Phase 15 made privacy structural so privacy_default: is obsolete; decay profile remains a recorded answer in .wizard-answers.yaml + DR, not rendered). Dead no-ops removed; exact-set placeholder test added; REF-10 DR updated."
   - test: "Confirm that the dangling 'Section 7' cross-reference at AGENTS.md:947 (and CLAUDE.md:947) is an acceptable minor defect or must be fixed before phase close"
-    expected: "Either line 947 is updated to '(per Section 3 LLM Navigation Rule)' or an explicit decision is made to defer WR-02 to a follow-up"
-    why_human: "The reference points at a section (§7) that no longer exists in AGENTS.md. Automated checks pass because nothing enforces internal section-reference integrity. Fixing is a one-line edit; the decision to fix or defer is human's."
+    resolution: "RESOLVED — fixed to '(per Section 3 LLM Navigation Rule)' in AGENTS.md, CLAUDE.md, schema/AGENTS.template.md, and schema/fixtures/canonical-AGENTS.md."
 ---
 
 # Phase 16: Reference Extraction Verification Report
 
 **Phase Goal:** Every static reference section (page-type definitions, frontmatter schema, provenance syntax, wikilink conventions, privacy model, scaling, tooling) lives in its own standalone markdown file under `schema/reference/` or `docs/reference/`, with the core replaced by routing stubs; §16 is deleted.
 **Verified:** 2026-06-05
-**Status:** human_needed
+**Status:** passed (both human_needed items resolved in commit 14c8c75)
 **Re-verification:** No — initial verification
 
 ## Goal Achievement
@@ -29,10 +28,10 @@ human_verification:
 | 1   | Every section in the Extraction Map (§4,§5,§6,§7,§8,§13,§14,§15,§16) is present as a standalone file at its target path OR explicitly dissolved/deleted | ✓ VERIFIED | All 8 target files exist; §16 deleted (0 occurrences in AGENTS.md); §7 dissolved (0 occurrences) |
 | 2   | The IMPORTANT:-flagged routing table is at the top of AGENTS.md core, mapping every extracted operation/topic to its target file | ✓ VERIFIED | Routing table at line 34 (between §1 and §2); all 8 resolvable rows point to existing files; Phase-17 rows marked "do NOT dereference yet" |
 | 3   | The v1.1.1 uniform-piped-link truth carried verbatim into wikilinks.md; §4/§7 section-ordering dedupe in place; §7 dissolved | ✓ VERIFIED | `filename/path ONLY` appears 2× in wikilinks.md; page-types.md has both "Per-Type Section Ordering" and "Authoring Conventions"; §7 dissolved from AGENTS.md |
-| 4   | AGENTS.md byte-identical to CLAUDE.md; schema/AGENTS.template.md mirrors all routing stubs; bin/sync-claude.sh --check AND bin/init-wizard.sh --dry-run both pass | ? UNCERTAIN | AGENTS.md ≡ CLAUDE.md (diff empty). All stubs mirrored in template. sync-claude --check exits 0. init-wizard --dry-run exits 0 with no leftover {{...}}. BUT: {{DEFAULT_PRIVACY}} and {{DECAY_PROFILE}} replace() calls at wizard:657-658 are confirmed dead no-ops — the placeholders were deleted from template without being relocated to leaf files; human decision required on whether this is acceptable |
+| 4   | AGENTS.md byte-identical to CLAUDE.md; schema/AGENTS.template.md mirrors all routing stubs; bin/sync-claude.sh --check AND bin/init-wizard.sh --dry-run both pass | ✓ VERIFIED | AGENTS.md ≡ CLAUDE.md (diff empty). All stubs mirrored in template. sync-claude --check exits 0. init-wizard --dry-run exits 0 with no leftover {{...}}. CR-01 resolved (commit 14c8c75): the dead {{DEFAULT_PRIVACY}}/{{DECAY_PROFILE}} no-ops were removed (intentional drop — privacy structural per Phase 15; decay recorded as answer not rendered); placeholder test tightened to exact-set; byte-equality (template render == canonical) still passes |
 | 5   | All CI gates green (lint 3-job, neutrality, setup-parity, check-privacy.sh, check-neutrality.sh) over the new schema/reference/*.md tree | ✓ VERIFIED | check-neutrality exits 0; check-privacy exits 0; init-wizard --dry-run exits 0; phase-08 21/21; phase-09.1 11/11; phase-10 32/32; phase-07 20/22 (2 pre-existing failures in test_kahneman_moved.sh and test_wiki_skeleton.sh, documented as pre-existing in the SUMMARY and unrelated to Phase 16) |
 
-**Score:** 4/5 truths verified (SC4 uncertain pending human decision)
+**Score:** 5/5 truths verified (SC4 resolved in commit 14c8c75 — see frontmatter `resolution`)
 
 ### Required Artifacts
 
