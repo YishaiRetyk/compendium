@@ -78,7 +78,7 @@ Report-only (no auto-fix): contradictions, knowledge gaps, orphan pages, missing
 | Flag | Effect |
 |------|--------|
 | `--format json` | Emit JSON array `[{severity, category, path, line?, message}]` to stdout; do NOT write `lint-report.md`. |
-| `--ci` | Apply severity-remap dispatch table: `yaml`/`orphan`/`crossref`/`provenance`/`linkres` -> `error`; `stale`/`gap`/`contradiction`/`contradiction-sync`/`drift`/`contributor` -> `warning`; `autofix`/`skip-count` -> `info`. Default-skip `drift-external` category. Exit 1 iff any post-remap finding has severity `error`. |
+| `--ci` | Apply severity-remap dispatch table: `yaml`/`orphan`/`crossref`/`provenance`/`linkres` -> `error`; `routing` forward findings (dangling refs, `§N` pattern violations) -> `error`, with two inverse exceptions that stay non-gating — `ORPHAN:`-prefixed routing -> `warning` and `AUDIT:`-prefixed routing (WF-08 drift) -> `info`; `stale`/`gap`/`contradiction`/`contradiction-sync`/`drift`/`contributor` -> `warning`; `autofix`/`skip-count` -> `info`. Default-skip `drift-external` category. Exit 1 iff any post-remap finding has severity `error`. |
 | `--skip-category <cat>` | Exclude one category. Repeatable. Inverse of `--category`. |
 | `--strict` | Quality ratchet: fail on (a) new `[epistemic:: inferred]` / `[epistemic:: tentative]` claims without a matching decision record whose `affected_pages` frontmatter contains the page ID; (b) new (git-diff status `A`) pages of type `entity`/`concept`/`overview`/`comparison` with zero `[prov:` markers. Source pages and decision records are exempt by design. |
 | `--staged` | Phase 12.2 local-write-gate scope swap. With `--strict`, replaces the diff source from `git diff origin/main...HEAD` to `git diff --cached --name-only --diff-filter=A` and applies D-10 (new-page provenance) ONLY — D-08 (DR-match) stays CI-only. Files are read from the working tree, not from staged blobs. No-op without `--strict`. Used by `.githooks/pre-commit`. See "Staged-mode rules" below. |
@@ -147,7 +147,7 @@ Placement rules (strict):
 14. Append entry to `wiki-cloud/log.md`: `## [YYYY-MM-DD] lint | <scope>` with summary of findings counts and auto-fixes applied.
 15. Commit: `lint(<scope>): <one-line summary of findings and fixes>`
 
-**Categories** (valid values for `--category` filter): `orphan`, `crossref`, `stale`, `contradiction`, `gap`, `provenance`, `yaml`, `drift`, `duplicate`.
+**Categories** (valid values for `--category` filter): `orphan`, `crossref`, `stale`, `contradiction`, `gap`, `provenance`, `yaml`, `drift`, `duplicate`, `contributor`, `brownfield`, `linkres`, `routing`.
 
 **Abort conditions:**
 

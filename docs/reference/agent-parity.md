@@ -100,7 +100,7 @@ This desk-check covers the two judgment dimensions that the mechanical routing l
 Trace:
 - The routing table sits immediately after the overview (before any multi-paragraph prose) as an `IMPORTANT:` blockquote at the top of the AGENTS.md core.
 - It is labeled "Reference Routing Table" and reads "Read the target file before acting — do not rely on the stub alone."
-- The ingest workflow row is marked "Future home: `schema/workflows/ingest.md`" with a "(Phase 17)" annotation — unambiguous that Phase 17 is the migration target.
+- The ingest workflow row points directly to `schema/workflows/ingest.md` as a resolvable reference (the Phase-17 migration is complete — the prior "Future home / (Phase 17)" annotation is gone).
 - A foreign agent reading the routing table would find the ingest row and follow the path before reading the inline workflow content.
 
 ### Dimension 2 — Content self-sufficiency of schema/workflows/ingest.md
@@ -112,7 +112,7 @@ Trace:
 Trace:
 - `schema/workflows/ingest.md` contains: Pass 0–4 step list with all sub-steps, abort conditions, claim granularity table, Append-Then-Synthesize policy, compilation-tracking field instructions, and contributor attribution rules (steps 9a).
 - Cross-references to type/frontmatter/provenance/wikilinks are dispatches to their own authoritative leaf files; an agent follows those hops rather than returning to the monolith.
-- The one intentional gap: the inline workflow content in AGENTS.md is still the "live" text in Phase 17 cycle 4 (the routing table's `schema/workflows/ingest.md` row is Phase-17-gated). An agent reading AGENTS.md today still executes the inline workflow; once Phase 17 completes the move, the routing table row becomes unconditional.
+- Phase 17 completed the move: the inline workflow content was extracted out of AGENTS.md, the `schema/workflows/ingest.md` routing-table row is now unconditional, and an agent reading AGENTS.md is dispatched to the leaf file rather than to resident inline text.
 
 ### Mechanical resolvability
 

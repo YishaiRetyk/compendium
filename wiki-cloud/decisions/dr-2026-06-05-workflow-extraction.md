@@ -33,8 +33,8 @@ Phase 17 continues the reference-extraction trajectory begun in Phase 16 (see [[
 
 Extract the following sections from the AGENTS.md/CLAUDE.md monolith to standalone authoritative files:
 
-- §9 (Operations Vocabulary + Executor Model) → `schema/workflows/operations.md`
-- §10 (Compiler Pipeline) → `schema/workflows/pipeline.md`
+- §9 (Operations Vocabulary + Executor Model) → `schema/workflows/structured-operations.md`
+- §10 (Compiler Pipeline) → folded into `schema/workflows/ingest.md` (Claim Granularity Rules + Append-Then-Synthesize policy); the pipeline state-machine diagram is retained inline in core
 - §11.1 (Ingest Workflow) → `schema/workflows/ingest.md`
 - §11.2 (Query Workflow) → `schema/workflows/query.md`
 - §11.3 (Lint Workflow) → `schema/workflows/lint.md` (already seeded in Phase 16; extended)
