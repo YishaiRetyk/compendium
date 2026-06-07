@@ -4,6 +4,9 @@
 > Any LLM agent maintaining this wiki MUST read and follow this document.
 > This file is the router; each linked file listed in the routing table is authoritative for its own sections.
 
+<!-- inclusion-audit: 273 lines @ 2026-06-05 -->
+<!-- Resident core: justify any added line against the inclusion test (ambient / unscriptable-AND-unacceptable-miss / dispatch) or extract it. Re-run WF-08 and update this baseline. -->
+
 ## 1. Overview and Principles
 
 The LLM Wiki Compiler is a personal knowledge management system with three layers:
