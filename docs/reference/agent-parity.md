@@ -87,6 +87,54 @@ Rows are the rubric dimensions; columns are the three comparisons; cells are `MA
 
 Both scratch dirs are `mktemp -d`, torn down by absolute path after diff capture (`rm -rf "$S1" "$S2"`; assert `test ! -d`). No scratch output is committed — confirm with `git status --porcelain | grep -iE 'scratch|\.codex|tmp\.'` returning empty.
 
+## Routing Desk-Check (gating floor)
+
+This desk-check covers the two judgment dimensions that the mechanical routing lint (`bash bin/lint.sh --category routing`) cannot resolve: routing-table prominence/unambiguity and content self-sufficiency of the extracted workflow file. Resolvability (do the `path` references in the routing table actually exist on disk?) is mechanized — run `bash bin/lint.sh --category routing` and it exits 0 if all referenced files resolve. Do NOT re-prove resolvability by hand.
+
+### Dimension 1 — Routing-table prominence and unambiguity
+
+**Question:** Is the IMPORTANT routing table positioned and worded such that a foreign agent given only AGENTS.md would follow it to `schema/workflows/ingest.md`?
+
+**Verdict: PASS**
+
+Trace:
+- The routing table sits immediately after the overview (before any multi-paragraph prose) as an `IMPORTANT:` blockquote at the top of the AGENTS.md core.
+- It is labeled "Reference Routing Table" and reads "Read the target file before acting — do not rely on the stub alone."
+- The ingest workflow row is marked "Future home: `schema/workflows/ingest.md`" with a "(Phase 17)" annotation — unambiguous that Phase 17 is the migration target.
+- A foreign agent reading the routing table would find the ingest row and follow the path before reading the inline workflow content.
+
+### Dimension 2 — Content self-sufficiency of schema/workflows/ingest.md
+
+**Question:** Does `schema/workflows/ingest.md` contain everything needed to ingest without reading the monolith?
+
+**Verdict: PASS**
+
+Trace:
+- `schema/workflows/ingest.md` contains: Pass 0–4 step list with all sub-steps, abort conditions, claim granularity table, Append-Then-Synthesize policy, compilation-tracking field instructions, and contributor attribution rules (steps 9a).
+- Cross-references to type/frontmatter/provenance/wikilinks are dispatches to their own authoritative leaf files; an agent follows those hops rather than returning to the monolith.
+- The one intentional gap: the inline workflow content in AGENTS.md is still the "live" text in Phase 17 cycle 4 (the routing table's `schema/workflows/ingest.md` row is Phase-17-gated). An agent reading AGENTS.md today still executes the inline workflow; once Phase 17 completes the move, the routing table row becomes unconditional.
+
+### Mechanical resolvability
+
+```bash
+bash bin/lint.sh --category routing --format json
+# Expected: exit 0, no error-severity findings for schema/workflows/ingest.md
+```
+
+This check is CI-gated (routing maps to `error` in the CI severity remap) — routing failures block merge.
+
+## Empirical Agent Run (best-effort, non-gating)
+
+> **NON-GATING.** This section records an empirical re-run attempt using Codex on the prospect-theory seed. The re-run is best-effort; a blocked-on-host-runtime outcome is acceptable and honest, never padded with fabricated results. The gating floor is the Routing Desk-Check above.
+
+**Re-run status: blocked-on-host-runtime**
+
+The Codex empirical run was attempted but remains blocked by the same host runtime sandbox pathology recorded in the diff-presentation table above: `AppArmor apparmor_restrict_unprivileged_userns=1` prevents Codex's bubblewrap sandbox from creating user namespaces. This is a host-environment limitation, not a parity failure. No Codex wiki pages were produced; no fabricated MATCH/DIFFERS cells are recorded.
+
+**What this means:** the routing discoverability question (would Codex follow the routing table to `schema/workflows/ingest.md`?) cannot be answered empirically from this environment. The desk-check above provides the gating evidence — mechanical resolvability via `bin/lint.sh --category routing` and judgment-layer analysis of the routing table structure. A future re-run on a host where Codex can create user namespaces would add behavioral evidence; the desk-check verdict does not depend on it.
+
+**Recorded as:** blocked-on-host-runtime (AppArmor `apparmor_restrict_unprivileged_userns=1`), consistent with the Phase 13.2 D-02 acceptance decision.
+
 ## See also
 
 - [AGENTS.md](../../AGENTS.md) — routing table; ingest: `schema/workflows/ingest.md`; audit/verifier-locality: `schema/workflows/audit.md`; privacy: `schema/reference/privacy.md`.
