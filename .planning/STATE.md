@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Schema Architecture
-status: executing
-stopped_at: Phase 17 context gathered
-last_updated: "2026-06-07T15:43:45.388Z"
-last_activity: 2026-06-07 -- Phase 17 execution started
+status: ready_to_plan
+stopped_at: Phase 17 complete (4/4) — ready to discuss/plan Phase 18
+last_updated: 2026-06-07T20:16:57.501Z
+last_activity: 2026-06-07 -- Phase 17 (Workflow Extraction) execution complete
 progress:
   total_phases: 11
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 12
-  completed_plans: 8
-  percent: 18
+  completed_plans: 12
+  percent: 27
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-04)
 
 **Core value:** The wiki is a persistent, compounding artifact -- cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested.
-**Current focus:** Phase 17 — workflow-extraction
+**Current focus:** Phase 18 — Skills Overlay (SKILL-01..02). NOTE: `gsd phase.complete` again mis-advanced to superseded backlog Phase 999.1 (absorbed into Phases 10–11); hand-corrected to Phase 18, the real next v1.2 phase (gates on Phase 17, now ✓ complete).
 
 ## Current Position
 
-Phase: 17 (workflow-extraction) — EXECUTING
-Plan: 1 of 4
-Status: Executing Phase 17
-Last activity: 2026-06-07 -- Phase 17 execution started
+Phase: 18 — Skills Overlay (Not started — gates on Phase 17, now ✓ complete)
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-06-07 -- Phase 17 complete; verified 9/9 must-haves, code-review WR-01/02/03 fixed
 
 ### v1.2 Phase Summary
 
@@ -36,8 +36,8 @@ Last activity: 2026-06-07 -- Phase 17 execution started
 |-------|------|--------------|--------|
 | 15 | Privacy Architecture | PRIV-01..07 (7 reqs) | Not started |
 | 16 | Reference Extraction | REF-01..10 (10 reqs) | Not started — gates on Phase 15 |
-| 17 | Workflow Extraction | WF-01..09 (9 reqs) | Not started — gates on Phase 16 |
-| 18 | Skills Overlay | SKILL-01..02 (2 reqs) | Not started — gates on Phase 17 |
+| 17 | Workflow Extraction | WF-01..09 (9 reqs) | ✓ Complete (2026-06-07) |
+| 18 | Skills Overlay | SKILL-01..02 (2 reqs) | Not started — gates on Phase 17 (now ✓) |
 
 **Total:** 28 requirements across 4 phases. 100% mapped.
 
@@ -91,7 +91,7 @@ Phase 12.2 closure: 5/5 plans complete; WGATE-01..04 → Complete; verifier PASS
 
 **Velocity:**
 
-- Total plans completed: 35
+- Total plans completed: 39
 - Average duration: -
 - Total execution time: 0 hours
 
@@ -107,6 +107,7 @@ Phase 12.2 closure: 5/5 plans complete; WGATE-01..04 → Complete; verifier PASS
 | 14 | 3 | - | - |
 | 15 | 3 | - | - |
 | 16 | 5 | - | - |
+| 17 | 4 | - | - |
 
 **Recent Trend:**
 

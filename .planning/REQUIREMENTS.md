@@ -38,15 +38,15 @@ Requirements for milestone v1.2. Each maps to exactly one roadmap phase.
 
 ### Workflow Extraction (`WF`) — Phase 17
 
-- [ ] **WF-01**: Extract §9 structured ops → `schema/workflows/structured-operations.md`; core keeps vocab + `validate-op.sh` pointer + the **locked 2-line solo-op log shape**. **MUST close the solo-op commit-prefix gap (Open Q9, surfaced 2026-06-04):** the current §3 commit table defines only `ingest/query/lint/reflect/schema` prefixes — a *solo* UPDATE/MERGE/SUPERSEDE/ARCHIVE has no defined commit prefix. This is a real spec hole the extraction must fill, not just relocate.
-- [ ] **WF-02**: §10 → **diagram stays (1 line), NO `pipeline.md`** (LOCKED); fold the two substantive blocks into the relevant workflow files, delete the pass-narrative.
-- [ ] **WF-03**: Extract §11.1 ingest → `schema/workflows/ingest.md` (+ folded §10 claim-granularity rules).
-- [ ] **WF-04**: Extract §11.2 query → `schema/workflows/query.md`; core keeps **only the write-back-mandatory line**.
-- [ ] **WF-05**: Extract §11.3 lint → `schema/workflows/lint.md` (+ folded §6 decay/staleness). **Guard:** preserve its "source of truth for CI contracts" framing — other docs link here, must not restate.
-- [ ] **WF-06**: Extract §11.4 reflect, **§11.5 brownfield (the 182-line miss)**, §11.6 release, §11.7 audit → `schema/workflows/*.md`.
-- [ ] **WF-07**: Extract §12 formats → `schema/reference/log-format.md`; bare log format **inlined per-workflow**; core resident ~0.
-- [ ] **WF-08**: Verify core **section-by-section against the inclusion test** (ambient / unscriptable-unacceptable-miss / dispatch). No line target gates the milestone; ~145 is an expected output, with a tripwire only to trigger re-audit on upward drift. Every resident section carries a one-line justification citing its clause.
-- [ ] **WF-09**: Manual agent-parity check — a Codex/Cursor agent given only `AGENTS.md` can ingest by following the routing table to `workflows/ingest.md`; evidence in `docs/reference/agent-parity.md`.
+- [x] **WF-01**: Extract §9 structured ops → `schema/workflows/structured-operations.md`; core keeps vocab + `validate-op.sh` pointer + the **locked 2-line solo-op log shape**. **MUST close the solo-op commit-prefix gap (Open Q9, surfaced 2026-06-04):** the current §3 commit table defines only `ingest/query/lint/reflect/schema` prefixes — a *solo* UPDATE/MERGE/SUPERSEDE/ARCHIVE has no defined commit prefix. This is a real spec hole the extraction must fill, not just relocate.
+- [x] **WF-02**: §10 → **diagram stays (1 line), NO `pipeline.md`** (LOCKED); fold the two substantive blocks into the relevant workflow files, delete the pass-narrative.
+- [x] **WF-03**: Extract §11.1 ingest → `schema/workflows/ingest.md` (+ folded §10 claim-granularity rules).
+- [x] **WF-04**: Extract §11.2 query → `schema/workflows/query.md`; core keeps **only the write-back-mandatory line**.
+- [x] **WF-05**: Extract §11.3 lint → `schema/workflows/lint.md` (+ folded §6 decay/staleness). **Guard:** preserve its "source of truth for CI contracts" framing — other docs link here, must not restate.
+- [x] **WF-06**: Extract §11.4 reflect, **§11.5 brownfield (the 182-line miss)**, §11.6 release, §11.7 audit → `schema/workflows/*.md`.
+- [x] **WF-07**: Extract §12 formats → `schema/reference/log-format.md`; bare log format **inlined per-workflow**; core resident ~0.
+- [x] **WF-08**: Verify core **section-by-section against the inclusion test** (ambient / unscriptable-unacceptable-miss / dispatch). No line target gates the milestone; ~145 is an expected output, with a tripwire only to trigger re-audit on upward drift. Every resident section carries a one-line justification citing its clause.
+- [x] **WF-09**: Manual agent-parity check — a Codex/Cursor agent given only `AGENTS.md` can ingest by following the routing table to `workflows/ingest.md`; evidence in `docs/reference/agent-parity.md`.
 
 ### Skills Overlay (`SKILL`) — Phase 18 (optional, ship only if it doesn't slow A+B)
 
@@ -97,15 +97,15 @@ Which phases cover which requirements. Phase mapping filled during roadmap creat
 | REF-08 | Phase 16 | Complete |
 | REF-09 | Phase 16 | Complete |
 | REF-10 | Phase 16 | Complete |
-| WF-01 | Phase 17 | Pending |
-| WF-02 | Phase 17 | Pending |
-| WF-03 | Phase 17 | Pending |
-| WF-04 | Phase 17 | Pending |
-| WF-05 | Phase 17 | Pending |
-| WF-06 | Phase 17 | Pending |
-| WF-07 | Phase 17 | Pending |
-| WF-08 | Phase 17 | Pending |
-| WF-09 | Phase 17 | Pending |
+| WF-01 | Phase 17 | Complete |
+| WF-02 | Phase 17 | Complete |
+| WF-03 | Phase 17 | Complete |
+| WF-04 | Phase 17 | Complete |
+| WF-05 | Phase 17 | Complete |
+| WF-06 | Phase 17 | Complete |
+| WF-07 | Phase 17 | Complete |
+| WF-08 | Phase 17 | Complete |
+| WF-09 | Phase 17 | Complete |
 | SKILL-01 | Phase 18 | Pending |
 | SKILL-02 | Phase 18 | Pending |
 
