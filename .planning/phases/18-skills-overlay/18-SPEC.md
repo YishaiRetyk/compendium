@@ -16,6 +16,26 @@ Design lineage (`.planning/phases/999.4-…/CONTEXT-NOTES.md`): two independent 
 
 Wiki-grounded authoring facts (`wiki-cloud/`: `progressive-disclosure`, `src-2026-05-06-anthropic-agent-skills-best-practices`, `claude-code`): a Claude Code skill is a directory containing `SKILL.md` (YAML frontmatter + body); Level-1 metadata (`name`+`description`) is always loaded (~100 tokens/skill); Level-2 loads **all** `.md` files in the skill's top-level directory when triggered; descriptions must be third-person stating *what* and *when*; reference paths use forward slashes.
 
+## Source-of-Truth Model
+
+Phase 18 introduces **two distinct source-of-truth layers**, and the committed `SKILL.md` file is authoritative for *neither* — it is a derived, drift-checked, committed artifact. This must be explicit so the planner and verifier never treat a checked-in `SKILL.md` as editable truth.
+
+| Layer | Source of truth | Status of the `SKILL.md` file |
+|-------|-----------------|-------------------------------|
+| **Behavior** (what the operation does) | the canonical workflow markdown `schema/workflows/{op}.md` | the body is a pointer to it; encodes zero behavior (SKILL-02) |
+| **Artifact text** (the bytes of the skill file) | the generator `bin/gen-skills.sh` (its body template + per-op `description` data) | a generated copy; `--check` (regenerate→diff) fails on drift |
+
+This is the same derived-artifact relationship the repo already uses for `schema/AGENTS.template.md → AGENTS.md → CLAUDE.md` (each downstream file generated and guarded by a `--check`):
+
+```
+bin/gen-skills.sh template ──generate──▶ .claude/skills/{op}/SKILL.md   (derived; --check guarded; committed)
+schema/workflows/{op}.md   ◀──points to── every SKILL.md body           (behavioral SOT)
+```
+
+Two invariants follow:
+1. **Hand-editing a `SKILL.md` is prohibited** — it is a generated copy; changes go to the generator template / description data, then regenerate. `--check` enforces this mechanically (a hand-edit fails the gate).
+2. **The `SKILL.md` files are committed, NOT gitignored.** Claude Code discovers skills from files physically present at `.claude/skills/` at session start — it cannot lazily materialize them — so a fresh clone, the release/orphan-branch snapshot, and every contributor must get the generated files in-tree. Committed-but-generated, exactly like `AGENTS.md`/`CLAUDE.md`.
+
 ## Requirements
 
 1. **Skill generator (`bin/gen-skills.sh`)**: A deterministic, idempotent emitter produces all four skill files from one body template + the op list.
@@ -43,10 +63,10 @@ Wiki-grounded authoring facts (`wiki-cloud/`: `progressive-disclosure`, `src-202
    - Target: Each `SKILL.md` `description` is third-person and states both what the operation does and when to invoke it; model invocation is allowed (no `disable-model-invocation` key set to true).
    - Acceptance: Every frontmatter has `name` and a non-empty `description`; no description contains a first-person pronoun ("I", "I'll", "we"); no `disable-model-invocation: true` key is present.
 
-6. **Markdown remains the sole authority (SKILL-02)**: Skills add zero behavior not already in the workflow file.
+6. **Markdown remains the sole authority (SKILL-02)**: Skills add zero behavior not already in the workflow file, per the two-layer Source-of-Truth Model above.
    - Current: `schema/workflows/{op}.md` is authoritative; nothing duplicates or overrides it.
-   - Target: A skill body contributes no rule, step, default, or branch absent from its `schema/workflows/{op}.md`; the description names *when* to invoke but encodes no *how*.
-   - Acceptance: A verifier desk-check (plus grep for imperative/procedural verbs in bodies) confirms each body is a pure pointer; removing all four skills would change invocation ergonomics only, not any documented behavior.
+   - Target: Behavioral SOT = `schema/workflows/{op}.md`; artifact SOT = the `bin/gen-skills.sh` template/description data; the committed `SKILL.md` is a derived, drift-checked, **git-tracked** copy authoritative for nothing. A skill body contributes no rule, step, default, or branch absent from its workflow file; the description names *when* to invoke but encodes no *how*.
+   - Acceptance: A verifier desk-check (plus grep for imperative/procedural verbs in bodies) confirms each body is a pure pointer; removing all four skills would change invocation ergonomics only, not any documented behavior; the four `SKILL.md` files are tracked by git (not gitignored).
 
 ## Boundaries
 
@@ -72,6 +92,7 @@ Wiki-grounded authoring facts (`wiki-cloud/`: `progressive-disclosure`, `src-202
 - **Inert bodies:** no executable code, network calls, or tool invocation in skill bodies — skills run with full machine access in Claude Code, and pure pointers minimize the trust surface (wiki: `claude-code` security note).
 - **Forward-slash paths** in all pointers (`schema/workflows/{op}.md`), never backslashes (cross-platform; wiki best-practice).
 - **Generator semantics** mirror `bin/sync-claude.sh`: deterministic output, idempotent re-run, `--check` exits 1 on drift.
+- **Derived-artifact discipline (Source-of-Truth Model):** the committed `SKILL.md` files are generated copies — hand-edits are prohibited (caught by `--check`), and the files are committed (NOT gitignored) so Claude Code can discover them on clone. The generator template / description data is the artifact SOT; `schema/workflows/{op}.md` is the behavioral SOT.
 - **Naming deviation (documented):** short op-names (`ingest`/`query`/`lint`/`reflect`) mirror the `schema/workflows/{op}.md` filenames 1:1 rather than the gerund form best-practice recommends; the `description` field compensates by carrying the full what/when discovery signal.
 - **Template-public neutrality:** skill files ship in the repo (template-public surface, AGENTS.md §3). Pointer bodies + workflow paths contain no private vault terms by construction; confirm `bin/check-neutrality.sh` either covers `.claude/skills/` or that the generated content is provably neutral.
 - **No regression** to existing gates: `sync-claude --check`, `check-neutrality`, `check-privacy`, and `lint --ci` (incl. `routing`) stay green.
@@ -85,6 +106,8 @@ Wiki-grounded authoring facts (`wiki-cloud/`: `progressive-disclosure`, `src-202
 - [ ] Every skill directory contains exactly one file (`SKILL.md`) — no stray `.md` or other files
 - [ ] Every `SKILL.md` frontmatter has `name` + a non-empty third-person `description` (no first-person pronoun); no `disable-model-invocation: true` key
 - [ ] No skill body encodes a step/rule/default absent from its `schema/workflows/{op}.md` (verifier desk-check + grep)
+- [ ] The four `SKILL.md` files are tracked by git (committed, not gitignored) — a fresh clone has them present at `.claude/skills/`
+- [ ] A hand-edit to any committed `SKILL.md` is rejected by `bin/gen-skills.sh --check` (derived-artifact discipline)
 - [ ] Existing gates remain green: `sync-claude --check`, `check-neutrality`, `check-privacy`, `lint --ci` (incl. `routing`)
 
 ## Ambiguity Report
@@ -110,6 +133,7 @@ Status: ✓ = met minimum, ⚠ = below minimum (planner treats as assumption)
 | 1b    | Seed Closer     | *How* are the skills created?                      | Generated-from-template (`bin/gen-skills.sh`), not hand-authored; `--check` is the gate |
 | 1c    | Seed Closer     | Will a generic skill-creator skill be used?       | No — excluded; would violate SKILL-01/02. The deterministic generator is the creator |
 | —     | Research        | Best practices for `bin/gen-skills.sh` / SKILL.md | Browsed `wiki-cloud/`: 3rd-person what+when descriptions, only-`SKILL.md`-per-dir (L2 loads all `.md`), L1 ~100 tok/skill, forward-slash paths, inert bodies |
+| 1d    | Seed Closer     | Is the canonical workflow markdown the SOT for skills? | Two-layer SOT: behavioral SOT = `schema/workflows/{op}.md`; artifact SOT = generator template; committed `SKILL.md` = derived/`--check`-guarded/git-tracked, hand-edits prohibited |
 
 ---
 
