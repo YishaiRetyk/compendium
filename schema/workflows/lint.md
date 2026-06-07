@@ -2,7 +2,7 @@
 
 > **Note:** This file contains only the decay table and staleness auto-fix rules (seeded by Phase 16).
 > The full lint workflow procedure (`bin/lint.sh` steps, severity tiers, CI flags) is added in Phase 17.
-> AGENTS.md §6 decay/staleness content points here.
+> The AGENTS.md routing table (decay/staleness) points here.
 
 ### Domain-Based Decay Rate Table
 
@@ -46,5 +46,5 @@ The lint workflow applies mechanical staleness fixes (per D-12):
 
 ## See Also
 
-- [AGENTS.md](../../AGENTS.md) — §6 stub (decay/staleness pointer to this file).
+- [AGENTS.md](../../AGENTS.md) — routing-table stub (decay/staleness pointer to this file).
 - `schema/reference/provenance.md` — provenance syntax, epistemic markers, contradiction markers.
