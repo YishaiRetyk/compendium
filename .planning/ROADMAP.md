@@ -55,7 +55,7 @@ Full phase details: [milestones/v1.1.1-ROADMAP.md](milestones/v1.1.1-ROADMAP.md)
 
 - [x] **Phase 15: Privacy Architecture** — Replace per-page §13 privacy model with the asymmetric two-directory model (`wiki-cloud/` / `wiki-local/`); enforcement becomes a harness permission. Gates Phase 16. (completed 2026-06-04)
 - [x] **Phase 16: Reference Extraction** — Extract §4/5/6/7/8/13 → `schema/reference/*.md`; §14/15 → `docs/reference/*.md`; §16 deleted; routing table added to core. (completed 2026-06-05)
-- [ ] **Phase 17: Workflow Extraction** — Extract §9/10/11.1–11.7/12 → `schema/workflows/*.md`; verify core against the inclusion test; agent-parity check.
+- [x] **Phase 17: Workflow Extraction** — Extract §9/10/11.1–11.7/12 → `schema/workflows/*.md`; verify core against the inclusion test; agent-parity check. (completed 2026-06-07)
 - [ ] **Phase 18: Skills Overlay** — Thin `.claude/skills/` routers (ingest/query/lint/reflect); pointer-only bodies; zero authoritative content.
 
 ## Phase Details
@@ -148,7 +148,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 — routing guard goes green only after all §N abolished; gates close)*
 
-- [ ] 17-04-PLAN.md — Build the `routing` lint category (bidirectional resolvability guard); WF-08 inclusion-audit baseline + drift info check + section justification; WF-09 agent-parity desk-check + empirical record; schema-update DR; full CI gate suite (WF-08, WF-09)
+- [x] 17-04-PLAN.md — Build the `routing` lint category (bidirectional resolvability guard); WF-08 inclusion-audit baseline + drift info check + section justification; WF-09 agent-parity desk-check + empirical record; schema-update DR; full CI gate suite (WF-08, WF-09)
 
 ### Phase 18: Skills Overlay
 
@@ -344,5 +344,5 @@ The following are intentionally deferred until real usage demands them, captured
 | 14. Graph Link Resolution | v1.1.1 | 3/3 | Complete    | 2026-06-03 |
 | 15. Privacy Architecture | v1.2 | 3/3 | Complete    | 2026-06-04 |
 | 16. Reference Extraction | v1.2 | 5/5 | Complete    | 2026-06-05 |
-| 17. Workflow Extraction | v1.2 | 3/4 | In Progress|  |
+| 17. Workflow Extraction | v1.2 | 4/4 | Complete   | 2026-06-07 |
 | 18. Skills Overlay | v1.2 | 0/TBD | Not started | - |
