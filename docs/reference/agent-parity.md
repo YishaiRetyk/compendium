@@ -6,7 +6,7 @@
 
 Agent parity asks a simple question: when a *different* coding agent (e.g. Codex) ingests the same raw source under the same wiki schema, does it produce a structurally equivalent wiki? "Structurally equivalent" is a deliberately loose bar — same page set, same page types, same provenance source IDs and locator targets, valid frontmatter. Claim **prose may differ freely**; only structure is graded. This structural equivalence bar is the DEBT-02 tolerance contract — this page documents that rubric and the exact re-run procedure.
 
-> **Source of truth:** The schema being compared against lives in [AGENTS.md](../../AGENTS.md) (§4 page types, §5 frontmatter, §6 provenance, §11.1 ingest workflow). The verifier-locality and privacy contracts that govern the cloud subprocess live in [AGENTS.md §11.7](../../AGENTS.md) and [§13](../../AGENTS.md). The recorded run outcome lives in the phase verification record; this page is the re-run manual.
+> **Source of truth:** The schema being compared against lives in [AGENTS.md](../../AGENTS.md) (page types: `schema/reference/page-types.md`; frontmatter: `schema/reference/frontmatter.md`; provenance: `schema/reference/provenance.md`; ingest workflow: `schema/workflows/ingest.md`). The verifier-locality and privacy contracts that govern the cloud subprocess live in `schema/workflows/audit.md` and `schema/reference/privacy.md`. The recorded run outcome lives in the phase verification record; this page is the re-run manual.
 
 ## Structural-equivalence tolerance rubric
 
@@ -21,7 +21,7 @@ A parity run **PASSES** when the candidate wiki matches the golden on every stru
 | Frontmatter valid | All pages pass `bin/lint.sh --category yaml,provenance` | Zero errors |
 | Claim prose / wording | TL;DR phrasing, Key-Facts ordering, claim sentences | **May differ freely — noted, never a failure** |
 
-The rationale: two faithful agents reading the same source should extract the same *facts* anchored at the same *locators*, even if they phrase them differently. Prose variance is expected and is recorded as an observation, not a defect (AGENTS.md §6 support-type model).
+The rationale: two faithful agents reading the same source should extract the same *facts* anchored at the same *locators*, even if they phrase them differently. Prose variance is expected and is recorded as an observation, not a defect (provenance support-type model — see `schema/reference/provenance.md`).
 
 ## Golden reference
 
@@ -33,7 +33,7 @@ The golden is the committed `examples/kahneman/` cluster. Full live composition 
 
 ## How to re-run the Codex parity diff
 
-### 1. codex = CLOUD egress by default (§11.7)
+### 1. codex = CLOUD egress by default (see `schema/workflows/audit.md` verifier-locality model)
 
 `codex exec` runs on remote infrastructure: anything it reads becomes cloud context. `-s/--sandbox workspace-write` confines only LOCAL shell writes and `-C <dir>` is a working directory — **neither bounds network egress.** The single mandatory egress defense is a **fail-closed seed guard** over `$SCRATCH/sources`: every seeded source file must declare `^privacy:[[:space:]]*cloud_safe$`, and anything else (missing frontmatter, other value, directory-only signal) fails closed and aborts the run BEFORE any `codex exec`. Do NOT use `--dangerously-bypass-approvals-and-sandbox`.
 
@@ -49,8 +49,8 @@ Create scratch dirs with `mktemp -d` and a `trap 'rm -rf "$S1" "$S2"' EXIT INT T
   -C "$S2" -s workspace-write --skip-git-repo-check \
   -o "$S2/.codex-last-message.txt" \
   "Read CLAUDE.md (the wiki schema authority in this directory). Ingest the single raw
-   source at <relative-path-to-source> into the wiki/ tree following the §11.1 ingest
-   workflow: create a source summary page plus the entity and concept pages this single
+   source at <relative-path-to-source> into the wiki/ tree following the ingest workflow
+   (schema/workflows/ingest.md): create a source summary page plus the entity and concept pages this single
    source supports, each with full base frontmatter and inline [prov:source_id#locator]
    markers using #sec: locators. Use source_id <source-id>. Do NOT create comparison or
    overview pages. Do not touch any file outside this directory. Write the files directly
@@ -89,7 +89,7 @@ Both scratch dirs are `mktemp -d`, torn down by absolute path after diff capture
 
 ## See also
 
-- [AGENTS.md](../../AGENTS.md) — §11.1 ingest workflow, §11.7 audit/verifier-locality, §13 privacy routing.
+- [AGENTS.md](../../AGENTS.md) — routing table; ingest: `schema/workflows/ingest.md`; audit/verifier-locality: `schema/workflows/audit.md`; privacy: `schema/reference/privacy.md`.
 - [examples.md](examples.md) — the `examples/kahneman/` golden cluster and `examples/dataview-fixtures/`.
 - [privacy-model.md](privacy-model.md) — the fail-closed precedence the seed guard enforces.
 - [ci.md](ci.md) — the structural lint categories used in the frontmatter-valid check.

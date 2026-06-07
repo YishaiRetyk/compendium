@@ -1,7 +1,7 @@
 # Wikilink and Graph Conventions
 
 > Agent-authoritative reference for intra-wiki linking: the uniform piped-link form, red links, and Obsidian graph behavior.
-> AGENTS.md §8 and §3 Red Links point here. This file carries the v1.1.1 uniform-piped-link truth.
+> The AGENTS.md routing table (wikilinks + Red Links) points here. This file carries the v1.1.1 uniform-piped-link truth.
 
 ## Red Links
 
@@ -58,5 +58,5 @@ GOOD: [[<concept-id>|Concept Titles]]                   (id target resolves; plu
 
 ## See Also
 
-- [AGENTS.md](../../AGENTS.md) — §8 stub (pointer to this file).
+- [AGENTS.md](../../AGENTS.md) — routing-table stub (pointer to this file).
 - `schema/reference/page-types.md` — per-type section ordering (relevant for link context).

@@ -1,7 +1,7 @@
 # Provenance, Epistemics, and Contradiction
 
 > Agent-authoritative reference for inline provenance markers `[prov:...]`, epistemic status markers `[epistemic::]`, and contradiction markers `[contradiction:...]`.
-> AGENTS.md §6 (syntax/epistemics portion) points here.
+> The AGENTS.md routing table points here (syntax/epistemics portion).
 
 Every factual claim MUST have an inline provenance marker — see the syntax below.
 
@@ -185,6 +185,6 @@ See: examples/kahneman/concepts/loss-aversion.md for a concrete filled-in instan
 
 ## See Also
 
-- [AGENTS.md](../../AGENTS.md) — §6 stub (pointer to this file and to lint.md for decay math).
+- [AGENTS.md](../../AGENTS.md) — routing-table stub (pointer to this file and to `schema/workflows/lint.md` for decay math).
 - `schema/workflows/lint.md` — decay rate table, epistemic modifiers, staleness auto-fix rules.
 - `schema/reference/frontmatter.md` — frontmatter fields including `epistemic_status`.

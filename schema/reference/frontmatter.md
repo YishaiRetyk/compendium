@@ -1,7 +1,7 @@
 # Frontmatter Schema
 
 > Agent-authoritative reference for all wiki page frontmatter fields, types, validation rules, and compilation tracking.
-> AGENTS.md §5 points here.
+> The AGENTS.md routing table points here.
 
 ### Base Fields (Required on Every Wiki Page)
 
@@ -26,7 +26,7 @@ superseded_by:                     # ID of page that replaces this (if any)
 aliases:                           # Alternative names for Obsidian resolution
   - Alternate Name
 has_contradictions: false       # true when page contains [contradiction:...] markers
-knowledge_domain: ""            # Primary decay-rate bucket (maps to Section 6 decay table)
+knowledge_domain: ""            # Primary decay-rate bucket (maps to the decay table in `schema/workflows/lint.md`)
 example: false                  # Optional; true for reference-only pages (examples/). Lint skips these.
 ---
 ```
@@ -51,8 +51,8 @@ example: false                  # Optional; true for reference-only pages (examp
 | `aliases` | list | OPTIONAL. Genuine alternate names (e.g. common abbreviations). Obsidian uses these for Quick Switcher / autocomplete and as display text in piped links `[[file|Alias]]`. They do NOT affect bare `[[X]]` resolution — that is always filename/path only. |
 | `has_contradictions` | boolean | `true` when any claim on the page has a `[contradiction:...]` marker. Independent of `epistemic_status` -- a `sourced` page can have contradictions. May be set by lint workflow OR by any workflow that inserts contradiction markers (ingest, query). The lint mechanically syncs this field: if `[contradiction:]` markers exist in the body, `has_contradictions` MUST be `true`; if no markers exist, it MUST be `false`. |
 | `example` | boolean | Optional (default `false`). When `true`, the page is a reference-only example (e.g., pages under `examples/kahneman/`). Lint MUST skip these pages for health checks so illustrative content does not trigger warnings. Applies anywhere in the tree, not just under `examples/`. |
-| `knowledge_domain` | string | Primary knowledge domain for staleness decay rate calculation. This is the **staleness policy bucket**, distinct from the `domains` field which is a topical classification list. A page may have `domains: [psychology, economics]` but `knowledge_domain: science` because both topics decay at the science rate. Maps to the decay rate table in `schema/workflows/lint.md`. One of: `software`, `science`, `biography`, `personal-goals`, or a custom domain. Empty string if not yet classified. |
-| `bootstrap_stage` | enum | Brownfield onboarding sentinel. Values: `raw | bootstrapped | verified`. Page-level marker tracking migration state from pre-existing Obsidian vault content into the schema. **NOT a substitute for claim-level provenance (see §6 PROV-01..05)** -- the authoritative provenance mechanism remains claim-level `[prov::...]` markers + source summary pages. Written by `bin/brownfield.sh bootstrap` (Phase 10); stripped by `bin/ingest.sh` on normal ingest to prevent pollution. Absent from greenfield pages. See `§11.5 Brownfield Workflow` (populated in Phase 11). |
+| `knowledge_domain` | string | Primary knowledge domain for staleness decay rate calculation. This is the **staleness policy bucket**, distinct from the `domains` field which is a topical classification list. A page may have `domains: [psychology, economics]` but `knowledge_domain: science` because both topics decay at the science rate. Maps to the decay table in `schema/workflows/lint.md`. One of: `software`, `science`, `biography`, `personal-goals`, or a custom domain. Empty string if not yet classified. |
+| `bootstrap_stage` | enum | Brownfield onboarding sentinel. Values: `raw | bootstrapped | verified`. Page-level marker tracking migration state from pre-existing Obsidian vault content into the schema. **NOT a substitute for claim-level provenance (see `schema/reference/provenance.md` PROV-01..05)** -- the authoritative provenance mechanism remains claim-level `[prov::...]` markers + source summary pages. Written by `bin/brownfield.sh bootstrap` (Phase 10); stripped by `bin/ingest.sh` on normal ingest to prevent pollution. Absent from greenfield pages. See `schema/workflows/brownfield.md` (populated in Phase 11). |
 | `bootstrap_date` | date | ISO 8601 `YYYY-MM-DD` stamp (UTC) recording when `bin/brownfield.sh bootstrap` injected `bootstrap_stage: bootstrapped` on this page. Read by `bin/lint.sh` `brownfield` category for the 30-day staleness warning (BRWN-09). Written alongside `bootstrap_stage`; stripped by `bin/ingest.sh` on normal ingest. |
 
 ### Source Summary Additional Fields
@@ -145,5 +145,5 @@ When creating or updating any wiki page, verify:
 
 ## See Also
 
-- [AGENTS.md](../../AGENTS.md) -- §5 stub (pointer to this file).
+- [AGENTS.md](../../AGENTS.md) -- routing-table stub (pointer to this file).
 - `schema/reference/page-types.md` -- per-type section ordering and authoring conventions.

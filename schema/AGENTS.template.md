@@ -27,9 +27,9 @@ The LLM Wiki Compiler is a personal knowledge management system with three layer
 | **Lint** | Detect contradictions, stale claims, orphan pages, missing cross-references |
 | **Reflect** | Structural reasoning, decision records, reframing history |
 
-Workflows for each operation are defined in Section 11 of this document.
+Workflows for each operation are defined in the workflow files under `schema/workflows/` (see the routing table).
 
-These four operations are the wiki's mutation vocabulary. Layered on top is the **Audit** -- a review-only diagnostic workflow (`bin/audit-claims.sh`, Section 11.7) that checks whether sampled claims semantically follow from the source passage they cite. The Audit never mutates a wiki page; like Lint, it is a workflow, not one of the four mutation operations, so the four-operation framing is preserved.
+These four operations are the wiki's mutation vocabulary. Layered on top is the **Audit** -- a review-only diagnostic workflow (`bin/audit-claims.sh`, see `schema/workflows/audit.md`) that checks whether sampled claims semantically follow from the source passage they cite. The Audit never mutates a wiki page; like Lint, it is a workflow, not one of the four mutation operations, so the four-operation framing is preserved.
 
 This file (`{{AGENT_FILENAME}}`) is the canonical agent spec; the wizard selects `AGENTS.md` or `CLAUDE.md` per the user's agent choice.
 > **IMPORTANT — Reference Routing Table**
@@ -44,28 +44,26 @@ This file (`{{AGENT_FILENAME}}`) is the canonical agent spec; the wizard selects
 > | Authoring a wiki page (type rules, section order) | `schema/reference/page-types.md` |
 > | Checking required frontmatter fields | `schema/reference/frontmatter.md` |
 > | Adding `[prov:]` or `[epistemic::]` markers | `schema/reference/provenance.md` |
-> | Decay table / staleness auto-fix math | `schema/workflows/lint.md` |
+> | Lint workflow + decay/staleness auto-fix math + CI severity/JSON contract | `schema/workflows/lint.md` |
 > | Creating cross-references (wikilinks) | `schema/reference/wikilinks.md` |
 > | Determining `wiki-cloud/` vs `wiki-local/` placement | `schema/reference/privacy.md` |
 > | Wiki capacity / scaling signals | `docs/reference/scaling.md` |
 > | Obsidian, Git, and optional tools | `docs/reference/tooling.md` |
 > | Ingesting a new source (classify → extract → merge) | `schema/workflows/ingest.md` |
 > | Answering a question + write-back rules | `schema/workflows/query.md` |
->
-> **Workflows — STILL INLINE in §11 until Phase 17. Do NOT dereference these paths yet;**
-> **the authoritative content is §11 below until the file is created in Phase 17.**
->
-> | Workflow | Where it lives NOW |
-> |----------|--------------------|
-> | Lint | §11.3 (inline). Decay math already at `schema/workflows/lint.md`; full procedure *(Phase 17)* |
-> | Reflect | §11.4 (inline). Future home: `schema/workflows/reflect.md` *(Phase 17)* |
+> | Reflect workflow (decision records) | `schema/workflows/reflect.md` |
+> | Structured operations (UPDATE/MERGE/SUPERSEDE/ARCHIVE) | `schema/workflows/structured-operations.md` |
+> | Brownfield vault onboarding | `schema/workflows/brownfield.md` |
+> | Orphan-branch template release | `schema/workflows/release.md` |
+> | Claim-faithfulness audit | `schema/workflows/audit.md` |
+> | Index / log entry formats | `schema/reference/log-format.md` |
 
 ## 2. Directory Structure
 
 ```
 life/                               # repo root
 ├── AGENTS.md                       # This file (router; see routing table)
-├── sources/                        # Raw immutable sources (cloud-safe-only; see §13)
+├── sources/                        # Raw immutable sources (cloud-safe-only; see `schema/reference/privacy.md`)
 │   ├── YYYY/                       # Year grouping
 │   │   └── YYYY-MM/               # Month grouping
 │   │       ├── YYYY-MM-DD-slug/   # Bundle: source.md + assets
@@ -96,7 +94,7 @@ life/                               # repo root
 └── .githooks/                      # Repo-local git hooks (e.g., pre-commit sync check)
 ```
 
-**Permitted top-level directories:** `sources/`, `wiki-cloud/`, `wiki-local/`, `schema/`, `examples/`, `docs/`, `.github/`, `bin/`, `.githooks/`. Content in `examples/` is reference-only (see `example: true` in Section 5); it is skipped by lint and excluded from the published wiki.
+**Permitted top-level directories:** `sources/`, `wiki-cloud/`, `wiki-local/`, `schema/`, `examples/`, `docs/`, `.github/`, `bin/`, `.githooks/`. Content in `examples/` is reference-only (see `example: true` in `schema/reference/frontmatter.md`); it is skipped by lint and excluded from the published wiki.
 
 **Source directory rules:**
 - Sources use chronological nesting: `YYYY/YYYY-MM/YYYY-MM-DD-slug/`
@@ -236,466 +234,27 @@ These are the operator procedures that implement the conceptual pipeline (see th
 
 ### 11.3 Lint Workflow
 
-```
-Trigger:  User requests a health check, or periodically after several ingests
-Inputs:   wiki-cloud/ directory (all pages)
-Outputs:  Structured findings report, optionally fixed pages, updated log
-Commit:   lint(<scope>): <one-line summary>
-```
-
-**Severity Tiers** (per D-17):
-
-| Severity | Meaning | Examples |
-|----------|---------|----------|
-| `error` | Must fix -- broken references, invalid structure | Broken provenance refs, missing source pages, YAML parse failures, invalid frontmatter enum values |
-| `warning` | Should fix -- quality degradation | Stale claims, orphan pages, contradictions, missing cross-references |
-| `info` | Nice to know -- improvement opportunities | Knowledge gaps, sparse coverage, suggested questions |
-
-**Auto-Fix Boundary** (per D-18, D-19):
-
-Auto-fix (mechanical, deterministic, reversible): updating stale claim markers per decay table, syncing `has_contradictions` frontmatter boolean to match presence of `[contradiction:]` markers in body.
-
-Report-only (no auto-fix): contradictions, knowledge gaps, orphan pages, missing cross-references, page restructuring, any fix requiring judgment.
-
-#### CI mode (Phase 9)
-
-> **Source of truth for Phase 9 / Phase 12.2 CI + local-gate contracts.** This section is the authoritative specification for: (a) the severity-remap dispatch table, (b) the `--format json` output schema, (c) the escape-hatch marker contract, (d) the `--require-version` semantics, and (e) the `--staged` local-write-gate contract (Phase 12.2). Other docs (`docs/reference/ci.md`, `CONTRIBUTING.md`, `.github/workflows/lint.yml` comments) MUST link here rather than restating the policy. Drift between this section and the shipped code is a regression.
-
-`bin/lint.sh` supports a CI operating profile via several independent, orthogonal flags:
-
-| Flag | Effect |
-|------|--------|
-| `--format json` | Emit JSON array `[{severity, category, path, line?, message}]` to stdout; do NOT write `lint-report.md`. |
-| `--ci` | Apply severity-remap dispatch table: `yaml`/`orphan`/`crossref`/`provenance`/`linkres` -> `error`; `stale`/`gap`/`contradiction`/`contradiction-sync`/`drift`/`contributor` -> `warning`; `autofix`/`skip-count` -> `info`. Default-skip `drift-external` category. Exit 1 iff any post-remap finding has severity `error`. |
-| `--skip-category <cat>` | Exclude one category. Repeatable. Inverse of `--category`. |
-| `--strict` | Quality ratchet: fail on (a) new `[epistemic:: inferred]` / `[epistemic:: tentative]` claims without a matching decision record whose `affected_pages` frontmatter contains the page ID; (b) new (git-diff status `A`) pages of type `entity`/`concept`/`overview`/`comparison` with zero `[prov:` markers. Source pages and decision records are exempt by design. |
-| `--staged` | Phase 12.2 local-write-gate scope swap. With `--strict`, replaces the diff source from `git diff origin/main...HEAD` to `git diff --cached --name-only --diff-filter=A` and applies D-10 (new-page provenance) ONLY — D-08 (DR-match) stays CI-only. Files are read from the working tree, not from staged blobs. No-op without `--strict`. Used by `.githooks/pre-commit`. See "Staged-mode rules" below. |
-| `--require-version X.Y.Z` | Minimum-version pin. Fails if `LINT_VERSION < X.Y.Z`. Semver tuple comparison, not string. |
-| `--version` | Print `LINT_VERSION` and exit 0. |
-| `--count-skips` | Enumerate every `<!-- lint:expect-* -->` escape-hatch marker. Emits one `info`/`skip-count` finding per marker (human-review aid). |
-
-**Escape-hatch marker syntax (`--strict` exemption):**
-
-```
-<!-- lint:expect-inferred id=<page-id> reason="<one line>" -->
-<!-- lint:expect-tentative id=<page-id> reason="<one line>" -->
-```
-
-Placement rules (strict):
-
-1. Marker MUST appear on the line IMMEDIATELY above the claim line -- no blank line between.
-2. `id` MUST match the containing page's frontmatter `id` field.
-3. `reason` is required and non-empty.
-4. Exempted claims are emitted as severity `info`, category `skip-count` (visible in PR annotations as `::notice`, non-blocking).
-
-**CI workflow reference:** `.github/workflows/lint.yml` invokes three jobs in parallel -- `lint`, `privacy-leak`, `strict` -- each a required check in branch protection. See `docs/reference/ci.md`.
-
-**Staged-mode rules (`--staged`, Phase 12.2):**
-
-`bin/lint.sh --staged` is the local-write-gate scope swap. The `.githooks/pre-commit` hook invokes `bash bin/lint.sh --strict --staged --category provenance` after the AGENTS.md ↔ CLAUDE.md sync check. Rules:
-
-1. **Requires `--strict`.** `--staged` is a no-op without `--strict` (no provenance enforcement; standard categories run as usual). The pre-commit hook always passes both flags together.
-2. **Diff source:** `git diff --cached --name-only --diff-filter=A` (status-A entries in the staged index). Files are read from the WORKING TREE, not from staged blobs — pre-commit hooks fire after `git add`, so working-tree content matches the index for the typical add-then-commit flow. If you `git add foo.md && echo extra >> foo.md && git commit`, the gate sees the dirty version (which already contains the staged content); known caveat, not a bug.
-3. **Scope:** D-10 (new-page provenance) ONLY. Pages staged as status-A under `wiki-cloud/{entities,concepts,overviews,comparisons}/` must contain at least one `[prov:` marker. D-08 (DR-match for added inferred/tentative claims) stays CI-only — not enforced at commit time.
-4. **Exemption ordering** (first match wins):
-   1. Path NOT under `wiki-cloud/{entities,concepts,overviews,comparisons}/` — not gated.
-   2. Path under `examples/` anywhere in the tree — not gated (path-prefix exemption, mirrors `EXCLUDE_DIRS` for full-lint).
-   3. Frontmatter `type: source` — not gated (source pages are themselves the provenance anchors).
-   4. Frontmatter `type: decision` — not gated (decision records are the gating mechanism, can't gate on themselves).
-   5. Frontmatter `example: true` — not gated (reference content, anywhere in the tree).
-   6. Frontmatter `bootstrap_stage: bootstrapped` — not gated (brownfield in-flight; provenance-bootstrap migration `02-provenance-bootstrap.sh` adds markers later).
-5. **`bootstrap_stage: verified` is NOT exempt.** Pages promoted through the brownfield 5-gate `verify --promote` flow are first-class wiki content from the gate's perspective — they must carry `[prov:]` markers like any other entity / concept / overview / comparison page.
-6. **Exit policy:** reuses `--strict`'s contract — exit 1 iff any post-remap error-severity finding exists. `provenance` already maps to `error` in the severity remap.
-7. **Bypass:** `git commit --no-verify` only. No `WGATE_SKIP=1` env var. No per-page `wgate_exempt: true` frontmatter (would create a permanent bypass surface defeating the gate's purpose). Per AGENTS.md §3, `--no-verify` is the operator's escape hatch — use rarely, document the reason in the commit message when used.
-8. **Hook activation:** `bash bin/install-hooks.sh` once per clone. The hook composes the existing AGENTS.md ↔ CLAUDE.md sync check (runs first; can re-stage CLAUDE.md) with the new write-gate (runs second; read-only over the staged index).
-
-**Failure UX:** when the gate blocks, `bin/lint.sh` prints per-page `error/provenance/<path>: new <type> page has zero [prov:...] markers (D-10; ...)` lines, and the hook appends a single trailing footer line listing the three actionable paths (add `[prov:source_id#locator]` markers, set `type: source` / `type: decision` in frontmatter if it's not a synthesized page, or `git commit --no-verify` to bypass).
-
-**Steps:**
-
-1. Read `wiki-cloud/index.md` for full page inventory. Build resolution map: for each wiki page, collect filename, id, title, and aliases (case-insensitive matching).
-2. **YAML frontmatter validation:** Parse all page frontmatter, check required fields, validate enum values against Section 5 schema. Severity: error for parse failures or missing required fields.
-3. **Provenance validation:** Verify all `[prov:]` references resolve to known source IDs in `wiki-cloud/sources/`. Verify locator syntax. Severity: error for broken refs.
-4. **Orphan detection:** Find pages with no inbound wikilinks from other wiki pages (using resolution map for alias-aware, case-insensitive matching). Exclude index.md, log.md, lint-report.md. Severity: warning. Report-only.
-5. **Missing cross-references:** Identify pages sharing 2+ domains AND 2+ tags that lack mutual wikilinks. Only flag for active pages (not archived/superseded). Severity: warning. Report-only.
-6. **Stale claims:** Compute staleness using domain decay rate table (Section 6), epistemic modifier, and hash override. Date fallback chain: `checked_at` -> `ingested_at` -> `updated_at`. Severity: warning. Auto-fix: add/update `[epistemic:: stale]` markers per Staleness Auto-Fix Rules.
-7. **Potential contradiction candidates:** Flag wiki page sections where claims carry `[prov:]` markers from 2+ different source_ids AND the section is NOT on a page of type `comparison` or `overview` (these are inherently multi-source by design). Mark as "potential contradiction candidates for agent review." The lint does NOT assert these ARE contradictions -- the LLM agent running the lint workflow reviews flagged sections and promotes confirmed disagreements to `[contradiction:]` inline markers. Severity: warning. Report-only.
-8. **`has_contradictions` sync:** Verify that `has_contradictions` frontmatter matches actual presence of `[contradiction:]` markers in the body. Auto-fix: set `true` if markers present, `false` if no markers present.
-9. **Knowledge gaps (red links):** Collect unresolved wikilinks. Flag when: appears on 2+ distinct pages, OR appears in TL;DR/Key Facts section of any page (per D-20). Severity: info. Report-only. Suggest investigative question per D-23.
-10. **Source coverage gaps:** Compare domain source counts. Flag domains with materially fewer sources than median. Only run when wiki has 5+ distinct knowledge_domain values with at least 3 having 2+ source pages (maturity guardrail per D-22). Use `knowledge_domain` consistently for both page classification and source counting. Severity: info. Report-only. Suggest investigative question per D-23.
-11. **Near-duplicate pages (category: `duplicate`):** Flag same-`type` page pairs that are lexical near-duplicates -- candidate iff one page's title/alias contains the other's title/alias as a case-insensitive substring (contained length > 5), OR Levenshtein distance < 3 on titles longer than 5 chars. Survivor = the page with more inbound wikilinks (tie -> lexicographically-first id). One finding per pair. Severity: warning. Report-only -- feeds the human-confirmed MERGE operation (Section 9); never auto-merges. Excludes `EXCLUDE_DIRS`/`examples/`, `example: true`, and archived/superseded pages. Pure-stdlib (no embeddings) -- semantic dedup is a deferred Tier-4 extension.
-12. **Drift detection (category: `drift`):** Run cross-system drift checks. These detect misalignment between the wiki layer and its dependencies.
-    - **Unrepresented sources (DRFT-01):** Walk `sources/` directory for `.md` files, check each has a corresponding wiki source summary page (matching the `path` field in source page frontmatter). Severity: warning.
-    - **Missing source files (DRFT-02):** For each source summary page, verify the raw source file at the `path` frontmatter field exists on disk. Severity: error.
-    - **Content-hash drift:** Recompute SHA-256 of the raw source file, compare against `content_hash` in source summary frontmatter. If mismatch: report finding (severity: warning). When `--fix` is passed, auto-fix `compilation_status` to `stale` on the affected source page. See Section 10 compilation status transitions.
-    - **Index coverage:** Verify every wiki page (excluding index.md, log.md, and maintenance/ pages) has a wikilink entry in `wiki-cloud/index.md`. Severity: warning.
-    - **Obsidian vault awareness (DRFT-03):** Verify `.obsidian/` directory exists (info if missing). Check for non-markdown files in `wiki-cloud/` subdirectories (severity: info).
-13. Compile findings into `wiki-cloud/maintenance/lint-report.md` organized by severity then category. Findings are grouped with category subsections (e.g., `### Drift` under `## Warnings`). Include total counts and per-category breakdowns.
-14. Append entry to `wiki-cloud/log.md`: `## [YYYY-MM-DD] lint | <scope>` with summary of findings counts and auto-fixes applied.
-15. Commit: `lint(<scope>): <one-line summary of findings and fixes>`
-
-**Categories** (valid values for `--category` filter): `orphan`, `crossref`, `stale`, `contradiction`, `gap`, `provenance`, `yaml`, `drift`, `duplicate`.
-
-**Abort conditions:**
-
-- Wiki is empty (no pages beyond `index.md` and `log.md`). Report that the wiki is empty and skip the lint. Log this in `wiki-cloud/log.md`.
+→ See `schema/workflows/lint.md` for the lint workflow, severity tiers, the CI-mode contract (source of truth for CI severity/JSON/escape-hatch/staged-gate policy), and the 15-step procedure.
 
 ### 11.4 Reflect Workflow
 
-The reflect workflow creates decision records (see Section 4.6) that capture why structural changes were made to the wiki. It operates through three tiers, from automatic to manual.
-
-```
-Trigger:  After structural operations, on workflow recommendation, or periodically
-Inputs:   Recent changes (from log.md and git history), reflect checkpoint state
-Outputs:  Decision record page(s) in wiki-cloud/decisions/, updated index/log, advanced checkpoint
-Commit:   reflect(<scope>): <one-line summary>
-```
-
-#### Three-Tier Reflect Model
-
-**Tier 1 -- Inline creation:** MERGE, SUPERSEDE, splits, domain reorganization, schema updates, and recognized reframings produce decision records as part of the operation commit. No separate reflect pass needed. The agent creating the structural change also creates the decision record in the same commit. See Section 9 operation definitions for inline hooks (steps 7a and 6a).
-
-Inline creation is for operations where the "why" is obvious because the agent is actively making the structural choice. The decision record is a natural byproduct, not extra work.
-
-**Tier 2 -- Workflow recommendations:** Ingest, query, and lint workflows emit a structured recommendation when they detect ambiguous signals that may warrant a decision record but require judgment:
-
-```
-reflect recommended: [trigger_type] -- [reason]
-```
-
-Signals that trigger recommendations:
-- Material framing shifts during ingest (a new source substantially reframes an existing concept)
-- Contradiction resolution choices during query write-back (choosing one framing over another)
-- Novel synthesis frames created during query compilation (new overview page creates a novel organizing principle)
-- Accumulated structural drift detected during lint (3+ related drift findings suggest a systemic issue)
-
-This message is appended to the workflow's log entry in `wiki-cloud/log.md`. It is NOT an automatic action. The agent or human decides whether to act on it in a subsequent reflect pass or immediately.
-
-**Tier 3 -- Manual/periodic reflect:** A safety-net pass that scans recent activity and backfills missed decision records. Run periodically (e.g., after several ingests or a batch of structural changes) or when the operator suspects structural decisions went unrecorded.
-
-#### Reflect Checkpoint
-
-The reflect checkpoint lives at `wiki-cloud/maintenance/reflect-state.md`. It tracks where the last reflect pass ended so subsequent passes resume from the correct position, even when a pass produces no decision records.
-
-Fields (in frontmatter):
-- `last_reflect_log_entry`: The full heading line of the last log entry scanned (e.g., `"## [2026-04-14] lint | wiki health check"`)
-- `last_reflect_commit`: The short SHA of the last git commit inspected (e.g., `"abc1234"`)
-- `last_reflect_at`: ISO 8601 date of the last reflect pass (e.g., `2026-04-14`)
-
-`wiki-cloud/maintenance/` is a control-plane directory. Files here (lint-report.md, reflect-state.md) are NOT listed in wiki-cloud/index.md -- they are infrastructure, not content.
-
-#### Periodic Reflect Procedure (Tier 3)
-
-1. Read the reflect checkpoint from `wiki-cloud/maintenance/reflect-state.md`.
-2. Scan `wiki-cloud/log.md` for entries after `last_reflect_log_entry`. Identify:
-   - Structural operations: MERGE, SUPERSEDE, ARCHIVE entries
-   - Schema changes: entries referencing AGENTS.md modifications
-   - Workflow recommendations: lines matching `reflect recommended: [trigger_type] -- [reason]`
-3. Inspect `git log --oneline` for commits after `last_reflect_commit`. Look for structural file changes: new/deleted/renamed pages, template modifications, AGENTS.md updates, directory reorganizations. **Deduplication rule:** If both log.md and git show the same event, use the log.md entry as the primary trigger (it has intent). Git-only changes (no log entry) indicate unrecorded structural work and should be investigated.
-4. For each identified structural change that lacks a corresponding decision record:
-   a. Create a decision record page in `wiki-cloud/decisions/` using the decision template (Section 4.6).
-   b. Set `trigger_type` to the most appropriate value from the six allowed types.
-   c. Set `affected_pages` to the IDs of pages touched by the change.
-   d. Fill all 7 required sections with real content (not placeholders). The "Why" section must state what framing was adopted and what it replaced. "Alternatives Considered" must list at least one alternative.
-   e. Add the decision record ID to `decision_history` on each affected page's frontmatter (only when meaningful per D-05).
-5. Update `wiki-cloud/index.md` with new decision record entries under the Decisions category.
-6. Append entry to `wiki-cloud/log.md`: `## [YYYY-MM-DD] reflect | <scope>` with a summary of how many decision records were created, or "no structural changes detected" if none.
-7. Advance the reflect checkpoint: update `last_reflect_log_entry` to the most recent log entry heading, `last_reflect_commit` to current HEAD short SHA, `last_reflect_at` to today's date. **A reflect run that produces no decision records still advances the checkpoint.**
-8. Commit: `reflect(<scope>): <one-line summary>`
-
-#### Abort Conditions
-
-- No structural changes detected since the last checkpoint AND no pending workflow recommendations. Advance the checkpoint (step 7) and skip record creation. Log: `## [YYYY-MM-DD] reflect | no structural changes detected`.
-- Log entry for a structural operation already has a corresponding decision record in `wiki-cloud/decisions/` (check by date + scope match). Skip that event -- already recorded.
-
-#### Unifying Principle
-
-Create a decision record when future-you would reasonably ask "why is the wiki shaped this way?" When in doubt, record. A redundant record is retrievable; a missing record is lost context.
+→ See `schema/workflows/reflect.md` for the three-tier reflect model, reflect checkpoint, periodic reflect procedure, and decision record authoring.
 
 ### 11.5 Brownfield Workflow
 
-The brownfield workflow onboards existing Obsidian vaults into the wiki compiler
-schema. It is the mechanical counterpart to ingest (§11.1) — where ingest creates
-wiki pages from sources, brownfield transforms pre-existing vault pages into
-schema-compliant form. The workflow operates through five subcommands plus the
-`bootstrap_stage` lifecycle gate.
-
-**Core principle:** *Review may be interactive and AI-guided; apply must always be deterministic.*
-
-**Architectural boundary — apply class vs advisory class:**
-
-| Subcommand / script | Class | What it does |
-|---------------------|-------|--------------|
-| `bin/brownfield.sh scan` | inventory | Dry-run classification; writes `.brownfield/REPORT.md`; zero vault mutation (Phase 10) |
-| `bin/brownfield.sh bootstrap` | apply | Mechanical frontmatter injection with `bootstrap_stage: bootstrapped` (Phase 10) |
-| `bin/brownfield.sh suggest` | generator | Byte-copies canonical migration scripts + generates candidate data files |
-| `bin/brownfield.sh review-typing` | orchestrator | TTY small-batch cluster prompts OR large-batch AI-handoff via prompt.md |
-| `bin/brownfield.sh verify [--promote]` | gate | Read-only lint wrapper + stale-artifact WARN; `--promote` flips `bootstrap_stage` on passing pages |
-| `.brownfield/migrations/01-page-typing.sh` | apply | Page typing from paired manifests (candidates + decisions) |
-| `.brownfield/migrations/02-provenance-bootstrap.sh` | apply | TL;DR + Key Facts top-level-bullet `[epistemic:: inferred]` tagging |
-| `.brownfield/migrations/03-cross-link-inference.sh` | advisory | Cross-link candidates report |
-| `.brownfield/migrations/04-privacy-review.sh` | advisory | Privacy-sensitive findings report |
-
-**Root resolution (all four migration scripts):** each script derives its vault
-root from its own filesystem location — specifically, the parent of the
-`.brownfield/` directory containing the script. Migration scripts do NOT default
-to `$(pwd)`; `BROWNFIELD_ROOT` is an explicit env-var override for advanced use.
-This prevents cross-tree mutation when a script is invoked via absolute path
-from an unrelated cwd.
-
-#### bootstrap_stage Lifecycle
-
-```
-(absent) ──[bin/brownfield.sh bootstrap --apply]──> bootstrapped
-bootstrapped ──[bin/brownfield.sh verify --promote, passes gate]──> verified
-bootstrapped ──[normal ingest via bin/ingest.sh]──> (stripped per BRWN-10)
-verified     ──[no automatic downgrade]──> (manual edit only)
-raw          ──[reserved for future import workflows]──> (no writer in v1.1)
-```
-
-#### 11.5.1 suggest
-
-```
-Trigger:  User completes bootstrap and wants to migrate typing / provenance /
-          cross-links / privacy.
-Inputs:   Vault (current state) + bin/lib/brownfield_classify.py rule set.
-Outputs:  .brownfield/migrations/*.sh (byte-copies with op_hash headers on lines
-          2 and 3, shebang preserved on line 1),
-          .brownfield/*.yaml candidate data files (each opening with a D-09
-          metadata header including source_script_hash for stale-artifact
-          detection by `verify`),
-          REPORT.md advisory sections.
-Commit:   N/A (.brownfield/ is gitignored per TMPL-04).
-```
-
-**Steps:**
-
-1. Byte-copy canonical scripts from `schema/brownfield/migrations/*.sh` into
-   `.brownfield/migrations/*.sh`. Prepend `# op_hash: sha256:<hex>` (line 2) +
-   `# op_hash_scope: canonical-script-body + data-schema-version` (line 3),
-   preserving the shebang on line 1.
-2. Walk vault using `bin/lib/brownfield_walk.py walk_vault_respecting_ignore()` —
-   the SAME helper used by `scan`. Honors `.brownfield-ignore` patterns.
-3. Cluster classifications via `cluster_by_signals()`. Write
-   `.brownfield/page-typing-candidates.yaml` with metadata header per D-09.
-4. Write `.brownfield/page-typing-decisions.yaml` with every cluster
-   `decision: pending`. High-confidence clusters auto-approve when EITHER the
-   frontmatter signal is an explicit valid type enum OR 3+ non-frontmatter
-   signals agree with the proposed label (D-03 verbatim).
-5. Generate `.brownfield/provenance-bootstrap-report.yaml`,
-   `cross-link-candidates.yaml`, `privacy-findings.yaml`.
-6. Append `## Cross-link candidates` + `## Privacy review` sections to
-   `.brownfield/REPORT.md`.
-
-**Paired immutable inputs contract:** `page-typing-candidates.yaml` (cluster
-membership — which pages belong to which cluster) and `page-typing-decisions.yaml`
-(policy — which clusters are approved, rejected, or pending, with optional
-per-page overrides) are consumed TOGETHER by `01-page-typing.sh --apply`.
-`--apply` never re-classifies at apply time; candidates.yaml is read strictly
-for the cluster-id → page-list lookup. Both files are required — deleting
-either before apply causes a hard error.
-
-**Abort conditions:**
-
-- `schema/brownfield/migrations/` missing from repo.
-- Vault root does not exist.
-
-#### 11.5.2 review-typing
-
-```
-Trigger:  User resolves pending clusters in page-typing-decisions.yaml.
-Inputs:   .brownfield/page-typing-candidates.yaml (read)
-          .brownfield/page-typing-decisions.yaml (read+write)
-Outputs:  Updated decisions.yaml with resolved decisions; OR
-          .brownfield/review-typing-prompt.md (large-batch AI handoff).
-Commit:   N/A (.brownfield/ is gitignored).
-```
-
-**Steps:**
-
-1. Count pending clusters in decisions.yaml.
-2. **If pending count < N (default 20) AND stdout is a TTY:** TTY prompts
-   cluster-by-cluster with primitives `approve all / reject all / inspect /
-   override / skip`. Override labels are validated against the `type:` enum
-   before being persisted to the decisions manifest.
-3. **If pending count ≥ N OR non-TTY:** emit `.brownfield/review-typing-prompt.md`
-   — directive template pointing at candidates + decisions YAMLs. Tell user to
-   open in AI session (Claude Code, Codex, etc.) and edit the decisions manifest.
-4. On stdin EOF (e.g., piped `</dev/null`): write back any decisions made so
-   far and exit cleanly. Never loop indefinitely.
-5. Write decisions.yaml with ruamel.yaml round-trip (preserves user comments).
-
-The CLI never calls an LLM. The AI-handoff template operates on the file
-artifact from outside the CLI; the user runs a deterministic apply script afterward.
-
-**Abort conditions:**
-
-- `.brownfield/page-typing-decisions.yaml` not found → run `suggest` first.
-- All clusters already resolved → report cleanly and exit 0.
-
-#### 11.5.3 verify [--promote]
-
-```
-Trigger:  User checks vault passes lint after migration scripts have run.
-Inputs:   Vault + `.brownfield/page-typing-decisions.yaml` (for Gate 5) +
-          .brownfield/*.yaml metadata headers (for stale-artifact detection).
-Outputs:  stdout summary of blockers + optional WARN on stale candidate
-          artifacts; (with --promote) `bootstrap_stage` flips on eligible pages.
-Commit:   N/A (frontmatter mutations via ruamel round-trip; user commits separately).
-```
-
-**Steps (read-only mode):**
-
-1. For each `.brownfield/*.yaml` candidate file, compare its D-09
-   `source_script_hash:` header against the current body-post-op_hash-strip
-   sha256 of the corresponding `.brownfield/migrations/*.sh`. Emit a stderr
-   WARN for each mismatch (`stale candidate artifact detected: <cand>; re-run
-   `bin/brownfield.sh suggest` to refresh`).
-2. Run `bin/lint.sh --ci --format json --category yaml,provenance,orphan,crossref,brownfield`.
-3. Print summary grouped by severity; list paths blocking promotion.
-4. Exit 0 regardless of findings (stale WARN and lint findings are diagnostic,
-   not gating).
-
-**Steps (`--promote`):**
-
-1. Run steps 1–3 above (stale-artifact WARN + lint).
-2. Read `.brownfield/page-typing-decisions.yaml`; build pending-pages set.
-3. Walk vault; for each `bootstrap_stage: bootstrapped` page, apply the 5-gate
-   pass-list: (a) currently bootstrapped; (b) `type:` is a valid enum per §4;
-   (c) zero error-severity lint findings for the page; (d) type-specific
-   required fields present (e.g., `path`, `content_hash`, `ingested_at`,
-   `source_type` for `type: source`); (e) not in pending-pages set.
-4. If all 5 gates pass: flip `bootstrap_stage: verified` via `write_roundtrip`.
-5. Print summary: `N pages promoted; M pages blocked`.
-
-Privacy is not checked here — `bin/check-privacy.sh` handles the public-paths
-leak guard (see §13 and Phase 9).
-
-**Abort conditions:**
-
-- `bin/lint.sh` not found or exits with runtime error.
-- No `bootstrap_stage: bootstrapped` pages found → nothing to verify.
-
-#### 11.5.4 applied.log per-script shapes
-
-`.brownfield/applied.log` is append-only; one block per meaningful execution.
-Apply-class (01, 02) append on `--apply` only (dry-run never appends); advisory-
-class (03, 04) append on findings. The block shape is **per-script** — each
-script's exact schema is documented verbatim in `schema/brownfield/migrations/README.md`
-and summarized here as `applied.log block shapes`:
-
-- **01-page-typing.sh (apply):** `inputs:` is a two-item list — hashed candidates.yaml + hashed decisions.yaml. `summary:` has `approved_clusters`, `overridden_pages`, `pending_pages_remaining`.
-- **02-provenance-bootstrap.sh (apply):** `inputs:` is a one-item literal string `- (vault walk — no candidate inputs; 02 is direct-apply)` — 02 is direct-apply, no candidate manifest. `summary:` has `pages_with_eligible_bullets`, `pages_with_no_eligible_bullets`.
-- **03-cross-link-inference.sh (advisory):** no `inputs:` field. `mutations: none` + `report_section: REPORT.md#cross-link-candidates`.
-- **04-privacy-review.sh (advisory):** no `inputs:` field. `mutations: none` + `report_section: REPORT.md#privacy-review`.
-
-All four share the invariant fields: `## <script> @ <UTC ISO>` header, `mode:`, `op_hash:`, `exit_code:`, `prereq_check:`, `summary:`. Field variance beyond these is intentional and documented (NOT drift).
-
-See: docs/reference/brownfield.md for operator runbook, troubleshooting, and the
-full lifecycle walkthrough.
+→ See `schema/workflows/brownfield.md` for the brownfield vault onboarding workflow: scan, bootstrap, suggest, review-typing, verify subcommands, the `bootstrap_stage` lifecycle, and the `applied.log` per-script shapes.
 
 ### 11.6 Release Workflow (Orphan-Branch Publish)
 
-Template releases use an orphan-branch workflow that publishes a neutralized snapshot of the repo without the creator's personal `wiki-cloud/` content. See `docs/reference/release.md` for the full runbook.
+→ See `schema/workflows/release.md` for the orphan-branch template release workflow.
 
 ### 11.7 Audit Workflow
 
-The Audit is a **review-only** diagnostic workflow. It is NOT a fifth top-level operation -- the four-operation framing (Ingest / Query / Lint / Reflect) is preserved (Section 1). The Audit is layered on top, analogous to how Lint is a workflow rather than one of the four mutation operations. It adds no wiki page type.
-
-```
-Trigger:  Operator runs bin/audit-claims.sh on-demand; OR a non-binding
-          "audit recommended" note surfaces during a lint run.
-Inputs:   wiki-cloud/ + wiki-local/ pages with [prov:] claims + the raw sources at their path:.
-Outputs:  wiki-local/maintenance/audit-report.md (+ lint-compatible JSON), advanced
-          wiki-local/maintenance/audit-state.md checkpoint. NO wiki page is mutated.
-Commit:   N/A by default (the audit writes only control-plane artifacts; the
-          operator commits the report if they wish to track it).
-```
-
-**What it is.** `bin/audit-claims.sh` is a source-grounded, review-only audit. It samples high-risk claims, resolves each `[prov:source_id#locator]` to the cited passage in the **raw** source file at the source page's `path:` (never the source summary's `## Extracted Claims` -- that would be circular), and emits a verdict per claim: `supports` / `weak` / `contradicts` / `insufficient`, plus the operational verdicts `insufficient-locator` (no passage extractable -- e.g. a `#p` locator against an unmarked source per the Section 6 page-marker convention), `skipped-privacy` (withheld for privacy), and `skipped-nontext` (`#img`). Findings extend Lint's `{severity, category, path, message}` tuple with `verdict`, `line`, `source_id`, `locator`, and `rationale`, and are written to `wiki-local/maintenance/audit-report.md` (the pattern-twin of `lint-report.md`), grouped by verdict. The audit NEVER mutates a wiki page, never gates by default (no `error` severity -- `contradicts` maps to `warning`, the rest to `info`), and runs on-demand.
-
-**Cadence.** The primary path is operator-invoked (`bin/audit-claims.sh`). Additionally, the Lint workflow MAY emit a non-binding `audit recommended: <reason>` note (the Section 11.4 Tier-2 recommendation pattern) when high-risk-claim counts cross a threshold -- Lint already computes the stale / epistemic / orphan signals, so it is the cheapest host. This note is **informational only**: it does not run the audit, and the audit is never a CI gate in v1.
-
-**Privacy (the load-bearing FAITH-04 contract).** The audit resolves each claim's **effective claim privacy** via the §13 structural predicate: a claim is effective-`local_only` iff its page OR any contributing source-summary lives under `wiki-local/`. This is NOT "source privacy" alone: the worklist payload carries the wiki page's own claim text, so a page under `wiki-local/` citing a `wiki-cloud/` source must still be withheld. Effective-`local_only` claims are withheld (their claim text AND the resolved passage) from BOTH the verifier subprocess AND the `--emit-worklist` stdout -- the partition gates every passage-bearing egress surface, not just the subprocess. Withheld claims emit a `skipped-privacy` verdict; on a primarily-local vault, a high `skipped-privacy` count is acceptable, expected UX (it satisfies FAITH-04 without forcing a local-model dependency), not a failure to pad around.
-
-On the cloud-facing `--emit-worklist` stdout, a withheld claim's `skipped-privacy` metadata (`source_id` / `path` / `locator`) is redacted to a bare aggregate count; full per-record detail is written only to the local-control-plane `audit-report.md` under `wiki-local/maintenance/`. This keeps even the existence-metadata of local-only claims off the cloud-facing surface.
-
-**Verifier-locality model.** Every `--verifier <cmd>` is treated as cloud / egress **by default**. The audit NEVER infers a verifier's locality from its command -- locality is an operator assertion via a flag, never a guess. An effective-`local_only` passage (from a page or source under `wiki-local/`) is admitted to a verifier ONLY via an explicit `--allow-local` flag (with `--local-verifier <cmd>` documented as sugar for `--verifier <cmd> --allow-local`). The script enforces this mechanically; the docs must never describe a weaker "local verifier auto-detected" behavior.
-
-**The contradicts → marker handoff (D-10).** The audit stays strictly report-only. A human or agent MAY, as a SEPARATE explicit operation, add an `[epistemic:: tentative]` or a `[contradiction:source_a#locator vs source_b#locator]` marker (Section 6) to a claim with a confirmed `contradicts` verdict, then sync `has_contradictions` per the Lint mechanics (Section 11.3). This is **never automatic** -- the audit produces a finding; a subsequent human-approved decision promotes it to a marker.
-
-**Checkpoint.** `wiki-local/maintenance/audit-state.md` (frontmatter `last_audit_commit`, `last_audit_at`, `last_sample_size`) mirrors `reflect-state.md`. It is control-plane (not listed in `wiki-cloud/index.md`) and advances even on a no-finding run.
+→ See `schema/workflows/audit.md` for the review-only claim-faithfulness audit: `bin/audit-claims.sh`, the privacy-partitioned verifier model (FAITH-04), and the audit checkpoint.
 
 ## 12. Index and Log
 
-### index.md (Content Index)
-
-- Lives at `wiki-cloud/index.md`.
-- Organized by page type: Entities, Concepts, Sources, Comparisons, Overviews, Decisions.
-- Each entry follows the format: `- [[Page Title]] -- <one-line summary> (<epistemic_status>, <updated_at>)`
-- Updated on every ingest and every query that creates or modifies pages.
-- The LLM reads this FIRST when searching for information (per Section 3 LLM Navigation Rule).
-- Archived pages are listed separately under an "Archived" heading if any exist.
-- The index is the primary navigation mechanism for both LLMs and humans browsing the wiki.
-
-### log.md (Activity Log)
-
-- Lives at `wiki-cloud/log.md`.
-- Chronological, newest entries at the bottom (append-only).
-- Entry format:
-
-```markdown
-## [YYYY-MM-DD] <operation_type> | <description>
-
-<what was done, which pages were affected, brief rationale>
-```
-
-- Valid operation types: workflow-level (`ingest`, `query`, `lint`, `reflect`) and structured operations (`UPDATE`, `MERGE`, `SUPERSEDE`, `ARCHIVE`). Structured operations use the extended format below.
-- Each entry includes: what was done, which pages were affected, and a brief rationale.
-- The log is parseable with: `grep "^## \[" wiki-cloud/log.md | tail -5`
-- Structural reasoning and decision analysis belong in decision record pages (reflect workflow, Section 11.4), NOT in the log. The log records WHAT happened; decision records explain WHY.
-
-#### Structured Operation Log Entries
-
-When logging individual structured operations (UPDATE, MERGE, SUPERSEDE, ARCHIVE), use this extended format:
-
-```markdown
-## [YYYY-MM-DD] OPERATION | target_page
-
-source: source_id
-result: what changed (e.g., "added 3 claims, refreshed TL;DR")
-reason: one-line rationale
-```
-
-This format extends the base log entry format with structured sub-fields for machine-parseability. It applies to individual operations, NOT to workflow-level entries. Workflow-level entries (ingest, query, lint, reflect) use the base format with their own sub-fields as defined in Section 11.
-
-**Examples:**
-
-```markdown
-## [2026-04-15] UPDATE | <concept-slug>
-
-source: <source-slug>
-result: added 2 claims on a sub-topic, refreshed TL;DR
-reason: new source provides empirical evidence for specific parameters
-```
-
-```markdown
-## [2026-04-15] MERGE | <overview-slug>
-
-source: n/a (structural reorganization)
-result: merged <sub-concept-slug> into <overview-slug>, added subsection
-reason: <sub-concept-slug> page had <3 claims, better as subsection of parent concept
-```
-
-```markdown
-## [2026-04-15] SUPERSEDE | old-<entity-slug>-summary
-
-source: <source-slug-2>
-result: marked old-<entity-slug>-summary as superseded by <entity-slug>
-reason: new comprehensive source makes old summary redundant
-```
-
-See: examples/kahneman/concepts/prospect-theory.md for concrete filled-in instances of these operation patterns.
+→ See `schema/reference/log-format.md` for the `index.md` content-index entry shape, the `log.md` chronological activity-log format, the structured-operation extended log entries (UPDATE/MERGE/SUPERSEDE/ARCHIVE), and the contributor inline field.
 
 ## 13. Privacy Routing
 

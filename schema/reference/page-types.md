@@ -1,7 +1,7 @@
 # Page Types and Templates
 
 > Agent-authoritative reference for wiki page types, section ordering, and authoring conventions.
-> AGENTS.md §4 points here. If you find a discrepancy between this file and AGENTS.md, this file wins.
+> The AGENTS.md routing table points here. If you find a discrepancy between this file and AGENTS.md, this file wins.
 
 ## Page Types (dispatch vocabulary)
 
@@ -149,6 +149,6 @@ See: schema/examples/decision.md for a concrete filled-in instance.
 
 ## See Also
 
-- [AGENTS.md](../../AGENTS.md) -- §4 stub (dispatch pointer to this file).
+- [AGENTS.md](../../AGENTS.md) -- routing-table stub (dispatch pointer to this file).
 - `schema/reference/frontmatter.md` -- frontmatter validation checklist.
 - `schema/templates/` -- blank page templates per type.

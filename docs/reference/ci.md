@@ -14,7 +14,7 @@ All three jobs are required status checks in branch protection on `main`.
 
 ## Severity policy
 
-> **Source of truth:** The authoritative severity mapping lives in [AGENTS.md §11.3 "CI mode"](../../AGENTS.md). This page reproduces the table for ergonomic reference and adds **rationale** for each category — the mapping itself must stay in sync with §11.3. If you find a discrepancy, §11.3 wins and this page is the bug.
+> **Source of truth:** The authoritative severity mapping lives in [schema/workflows/lint.md](../../schema/workflows/lint.md) "CI mode". This page reproduces the table for ergonomic reference and adds **rationale** for each category — the mapping itself must stay in sync with `schema/workflows/lint.md`. If you find a discrepancy, `schema/workflows/lint.md` wins and this page is the bug.
 
 `bin/lint.sh --ci` applies the following severity remap via a single dispatch table (keeps rule changes auditable in one place).
 
@@ -23,7 +23,7 @@ All three jobs are required status checks in branch protection on `main`.
 | `yaml` | error | Parse failure — page unreadable by tooling. |
 | `orphan` | error | Broken wiki structure — page unreachable from index. |
 | `crossref` | error | Broken wikilink — navigation failure. |
-| `provenance` | error | Claim without source — schema requirement (AGENTS.md §6). |
+| `provenance` | error | Claim without source — schema requirement (`schema/reference/provenance.md`). |
 | `linkres` | error | Obsidian link unresolvable: page title not in aliases, or body link has unique normalized match (D-02). Graph-integrity defect; blocks CI. |
 | `stale` | warning | Decay-date exceeded — content review recommended, not required. |
 | `gap` | warning | Red link with multiple references — knowledge gap signal. |
@@ -43,7 +43,7 @@ All three jobs are required status checks in branch protection on `main`.
 
 ## JSON output schema
 
-> **Source of truth:** [AGENTS.md §11.3 "CI mode"](../../AGENTS.md). The JSON shape is defined there; this section reproduces it with field-level documentation. Schema changes land in AGENTS.md first.
+> **Source of truth:** [schema/workflows/lint.md](../../schema/workflows/lint.md) "CI mode". The JSON shape is defined there; this section reproduces it with field-level documentation. Schema changes land in `schema/workflows/lint.md` first.
 
 `bin/lint.sh --format json` writes a single JSON array to stdout. Shape matches the internal `add_finding()` tuple exactly — no schema divergence between local and CI findings.
 
@@ -90,7 +90,7 @@ All three jobs are required status checks in branch protection on `main`.
 - `README.md`
 - `.github/`
 
-**Explicitly EXCLUDED:** `wiki/**`. `local_only` is valid user content there — see [PRIVACY.md](../../PRIVACY.md) and [AGENTS.md §13](../../AGENTS.md).
+**Explicitly EXCLUDED:** `wiki/**`. `local_only` is valid user content there — see [PRIVACY.md](../../PRIVACY.md) and [schema/reference/privacy.md](../../schema/reference/privacy.md).
 
 **Scan scope:** Full tree, frontmatter-only (body-text mentions of the tier name in prose are NOT flagged).
 
@@ -108,8 +108,8 @@ All three jobs are required status checks in branch protection on `main`.
 
 **What it fails on:**
 
-1. **Unmatched inferred/tentative claims:** A wiki page contains `[epistemic:: inferred]` or `[epistemic:: tentative]` but no `type: decision` page in the wiki has the containing page's `id` in its `affected_pages` frontmatter list (AGENTS.md §4.6).
-2. **New pages without provenance:** A git-diff status `A` (Added) page under `wiki/{entities,concepts,overviews,comparisons}/` has zero `[prov:...]` markers in body. Source pages (`type: source`) and decision records (`type: decision`) are exempt by design (different support models per AGENTS.md §4.3/§4.6).
+1. **Unmatched inferred/tentative claims:** A wiki page contains `[epistemic:: inferred]` or `[epistemic:: tentative]` but no `type: decision` page in the wiki has the containing page's `id` in its `affected_pages` frontmatter list (see `schema/reference/page-types.md` decision type).
+2. **New pages without provenance:** A git-diff status `A` (Added) page under `wiki/{entities,concepts,overviews,comparisons}/` has zero `[prov:...]` markers in body. Source pages (`type: source`) and decision records (`type: decision`) are exempt by design (see `schema/reference/page-types.md` for page-type definitions and `schema/reference/frontmatter.md` for type-specific fields).
 
 **What it does not fail on:** Everything the `--ci` mode warns about (stale, gap, contradiction). Those stay warnings.
 
@@ -119,7 +119,7 @@ All three jobs are required status checks in branch protection on `main`.
 
 ## Local pre-commit write gate (Phase 12.2)
 
-> **Source of truth:** The authoritative specification lives in [AGENTS.md §11.3 "CI mode"](../../AGENTS.md). This page reproduces the install + bypass commands for ergonomic reference — the rules themselves (exemption ordering, exit codes, scope) must stay in sync with §11.3. If you find a discrepancy, §11.3 wins and this page is the bug.
+> **Source of truth:** The authoritative specification lives in [schema/workflows/lint.md](../../schema/workflows/lint.md) "CI mode". This page reproduces the install + bypass commands for ergonomic reference — the rules themselves (exemption ordering, exit codes, scope) must stay in sync with `schema/workflows/lint.md`. If you find a discrepancy, `schema/workflows/lint.md` wins and this page is the bug.
 
 `bin/lint.sh --staged` is a local-only scope swap that gates new synthesized wiki pages over the **staged index** (not `origin/main...HEAD`), so structurally invalid writes are caught BEFORE they land in local history. The CI `--strict` job remains the merge-time ratchet; this is the pre-commit-time complement.
 
@@ -127,7 +127,7 @@ All three jobs are required status checks in branch protection on `main`.
 
 - A page staged as git-diff status `A` under `wiki/{entities,concepts,overviews,comparisons}/` with zero `[prov:...]` markers in the body. This is D-10 (new-page provenance) ONLY — D-08 (DR-match for added inferred/tentative claims) is enforced by the CI `strict` job, not the local gate.
 
-**What it does not fail on:** see the AGENTS.md §11.3 "Staged-mode rules" subsection for the full exemption ordering. Summary: pages outside the four required-types directories, anything under `examples/`, `type: source` or `type: decision` pages, `example: true`, and `bootstrap_stage: bootstrapped` are exempt; `bootstrap_stage: verified` is NOT exempt.
+**What it does not fail on:** see the `schema/workflows/lint.md` "Staged-mode rules" subsection for the full exemption ordering. Summary: pages outside the four required-types directories, anything under `examples/`, `type: source` or `type: decision` pages, `example: true`, and `bootstrap_stage: bootstrapped` are exempt; `bootstrap_stage: verified` is NOT exempt.
 
 **How to install:**
 
@@ -143,7 +143,7 @@ Activates `core.hooksPath=.githooks`, which composes the existing AGENTS.md ↔ 
 git commit --no-verify
 ```
 
-Per AGENTS.md §3, `--no-verify` is the only operator escape; document the reason in the commit message when used. There is no `WGATE_SKIP=1` env var and no per-page `wgate_exempt: true` frontmatter — those would create permanent bypass surfaces and are explicitly rejected.
+Per the `--no-verify` escape-hatch note in AGENTS.md Global Rules, `--no-verify` is the only operator escape; document the reason in the commit message when used. There is no `WGATE_SKIP=1` env var and no per-page `wgate_exempt: true` frontmatter — those would create permanent bypass surfaces and are explicitly rejected.
 
 **How to fix a blocked commit:**
 
@@ -297,7 +297,9 @@ Any CI system that can run bash + Python 3 + PyYAML can enforce this gate. GitHu
 
 ## See also
 
-- [../../AGENTS.md](../../AGENTS.md) §11.3 CI mode, §12 contributor:: inline field, §13 privacy routing
+- [../../schema/workflows/lint.md](../../schema/workflows/lint.md) — CI mode, severity policy, local-gate contracts
+- [../../schema/reference/log-format.md](../../schema/reference/log-format.md) — contributor:: inline field format
+- [../../schema/reference/privacy.md](../../schema/reference/privacy.md) — privacy routing
 - [../../CONTRIBUTING.md](../../CONTRIBUTING.md)
 - [../../PRIVACY.md](../../PRIVACY.md)
 - [../../.github/workflows/lint.yml](../../.github/workflows/lint.yml)

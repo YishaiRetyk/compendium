@@ -1,7 +1,7 @@
 # Privacy Routing
 
 > Agent-authoritative reference for wiki privacy tier routing: `wiki-cloud/` (cloud-safe) vs `wiki-local/` (local-only).
-> AGENTS.md §13 points here.
+> The AGENTS.md routing table points here.
 
 ## Structural Rule
 
@@ -21,4 +21,4 @@ The enforcement mechanism is the **directory boundary** (harness permissions), n
 ## See Also
 
 - `docs/reference/privacy-model.md` — full asymmetric model: enforcement options (deny-profile vs. separate-repo), fail-direction table, `sources-local/` forward reference. End-user audience.
-- [AGENTS.md](../../AGENTS.md) — §13 stub (pointer to this file).
+- [AGENTS.md](../../AGENTS.md) — routing-table stub (pointer to this file).
