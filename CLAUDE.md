@@ -190,8 +190,6 @@ Use `[[id|Title]]` for ALL intra-wiki links — see `schema/reference/wikilinks.
 
 All wiki mutations use a formal operations vocabulary. Raw file rewrites are prohibited -- every change goes through one of these four operations with mandatory logging.
 
-### Operations Vocabulary
-
 | Operation    | Verb    | What It Does                                       |
 |-------------|---------|---------------------------------------------------|
 | **UPDATE**  | Modify  | Add new information to an existing page            |
@@ -199,195 +197,27 @@ All wiki mutations use a formal operations vocabulary. Raw file rewrites are pro
 | **SUPERSEDE** | Replace | Mark a page/claim as replaced by newer information |
 | **ARCHIVE** | Retire  | Move outdated content out of active wiki           |
 
-### Operation Definitions
+Before applying ANY operation, run `bin/validate-op.sh <OPERATION> <target_path> [<second_path>]` — it mechanically enforces the 5 executor checks (target exists, both-pages-distinct for MERGE, provenance resolves, frontmatter valid, privacy respected). If it returns FAIL, do NOT apply the operation.
 
-**UPDATE** -- Modify an existing page with new information.
-
-1. Add new claims with provenance markers to the appropriate section of the existing page.
-2. Preserve all existing provenance markers -- do not remove or overwrite them.
-3. Add new source IDs to the `sources` list in frontmatter.
-4. Update `updated_at` in frontmatter to today's date.
-5. If new claims change the evidence balance, update `epistemic_status` accordingly.
-6. Log: `"UPDATE <page_id>: <one-line rationale>"`
-
-For the full incremental update policy governing how new claims integrate with existing content during ingestion, see Section 10 Pass 3 (Append-Then-Synthesize).
-
-**MERGE** -- Combine two pages covering the same concept.
-
-1. Create a new merged page with the union of claims from both pages, preserving all provenance markers.
-2. Set `supersedes` on the new page to list both merged page IDs.
-3. Set `superseded_by` on both old pages to point to the new page ID.
-4. Set `status: superseded` on both old pages.
-5. Replace the body of both old pages with a brief redirect note: `> This page has been merged into [[New Page Title]].`
-6. Update `wiki-cloud/index.md`: add the new page, move old pages to "Archived" section (if one exists) or remove them from active listings.
-7. Log: `"MERGE <page_a> + <page_b> -> <new_page>: <rationale>"`
-7a. **Decision record (inline -- Tier 1):** If this merge represents a significant structural choice -- combining two established pages, resolving a long-standing organizational ambiguity, or eliminating a redundant page that multiple other pages linked to -- create a decision record page in `wiki-cloud/decisions/` with `trigger_type: merge` and `affected_pages` listing both original page IDs and the new merged page ID. Add the new decision record to `wiki-cloud/index.md` under Decisions. Commit the decision record as part of this same commit. **Skip for trivial cleanup merges** (e.g., merging a stub into its parent when the stub has no unique claims). See Section 11.4, Tier 1.
-
-**SUPERSEDE** -- Mark a page or claim as replaced by newer information.
-
-1. Set `superseded_by` on the old page to the replacing page's ID.
-2. Set `status: superseded` on the old page.
-3. Add a note at the top of the old page body: `> This page has been superseded by [[New Page Title]].`
-4. On the new page, set `supersedes` to the old page's ID.
-5. Update `wiki-cloud/index.md`: move the old page to "Archived" section or remove from active listings.
-6. Log: `"SUPERSEDE <old_page> -> <new_page>: <rationale>"`
-6a. **Decision record (inline -- Tier 1):** If this supersession replaces a key page or represents a significant editorial judgment -- the new page substantially reframes the concept, or the superseded page was widely linked -- create a decision record page in `wiki-cloud/decisions/` with `trigger_type: reframing` (if the new page reframes the concept) or `trigger_type: merge` (if consolidating). Set `affected_pages` to include both old and new page IDs. Add to `wiki-cloud/index.md` under Decisions. Commit as part of this same commit. **Skip for routine stale-claim supersessions** (e.g., updating a fact to a newer version without reframing). See Section 11.4, Tier 1.
-
-**ARCHIVE** -- Move outdated content out of active wiki.
-
-1. Set `status: archived` on the page.
-2. Remove the page from `wiki-cloud/index.md` active listings (move to an "Archived" section if one exists).
-3. The page remains in its directory -- do NOT delete or move files.
-4. Log: `"ARCHIVE <page_id>: <rationale>"`
-
-### Executor Model
-
-The LLM proposes operations. Before applying any operation, it MUST validate:
-
-1. **Target exists:** For UPDATE, SUPERSEDE, and ARCHIVE, the target page must exist.
-2. **Both pages exist and are distinct:** For MERGE, both source pages must exist and must not be the same page.
-3. **Provenance resolves:** All `[prov:...]` references in new content must resolve to known source IDs in `wiki-cloud/sources/` or `wiki-local/sources/`.
-4. **Frontmatter is valid:** All required base fields are present and correctly typed (see Section 5 validation checklist).
-5. **Privacy is respected:** No `wiki-local/` content is included in operations that will be sent to cloud APIs (§13 asymmetric model).
-
-If validation fails, the LLM MUST NOT apply the operation. Instead, log the validation failure and report it to the user.
-
-Every operation MUST be logged in `wiki-cloud/log.md` with: timestamp, operation type, affected page(s), and rationale. See Section 12 for log format.
-
-#### Deterministic Enforcement
-
-In addition to LLM self-validation, a deterministic bash validator provides mechanical enforcement:
-
+**Solo-op log shape (compact dispatch form).** A standalone structured op (not wrapped in a workflow) logs to `wiki-cloud/log.md` as:
 ```
-bin/validate-op.sh <OPERATION> <target_path> [<second_path>]
+## [YYYY-MM-DD] OPERATION | target_page
+
+source: source_id | result: what changed | reason: one-line rationale
 ```
+The canonical multi-line structured-operation log entry (the `source:` / `result:` / `reason:` three-line form) lives in `schema/reference/log-format.md`; the compact one-liner above is a dispatch summary of it, not a competing standard.
 
-The LLM MUST run `bin/validate-op.sh` before applying any operation. The validator performs the same 5 checks listed above using file system inspection and YAML parsing — no LLM judgment involved. If the validator returns FAIL, the operation MUST NOT be applied.
+**Solo-op commit prefix (D-01).** A *solo* structured op gets its own lowercased per-op commit prefix, symmetric with the workflow prefixes: `update(<page>): …` / `merge(<page>): …` / `supersede(<page>): …` / `archive(<page>): …`. Within a workflow, ops roll up under the workflow prefix instead (D-02) — only a standalone structural action gets its own per-op prefix.
 
-**Batch validation:** When a workflow proposes multiple operations (e.g., an ingest that UPDATEs several pages), validate ALL operations before applying ANY. If any single validation fails, abort the entire batch. This prevents partial application of interdependent changes.
-
-#### Per-Operation Preconditions and Postconditions
-
-Each operation type has specific rules beyond the 5 global checks:
-
-**UPDATE**
-- Precondition: Target page exists and has `status: active` (do not UPDATE archived or superseded pages — un-archive or un-supersede first).
-- Postcondition: `updated_at` field is set to today's date. `sources` list includes any new source IDs. Provenance markers are added for new claims.
-- Privacy tier: If new content derives from `wiki-local/` sources but target is in `wiki-cloud/`, STOP — see Section 13 and query workflow Section 11.2 privacy rules.
-
-**MERGE**
-- Precondition: Both pages exist, are distinct, and both have `status: active`.
-- Postcondition: One surviving page contains the combined content. The other page has `status: superseded` and `superseded_by` set to the surviving page's ID. `sources` lists from both pages are merged (union). All provenance markers from both pages are preserved.
-- Privacy tier: If either source page is under `wiki-local/`, the surviving page MUST remain under `wiki-local/`.
-
-**SUPERSEDE**
-- Precondition: Target page exists, has `status: active`, and `superseded_by` is empty/null.
-- Postcondition: Target page has `status: superseded` and `superseded_by` set to the replacing page's ID. The replacing page has `supersedes` set to the target's ID.
-- Note: The replacing page must already exist or be created in the same batch.
-
-**ARCHIVE**
-- Precondition: Target page exists and has `status: active` (do not archive already-archived pages).
-- Postcondition: Target page has `status: archived`. `updated_at` set to today's date. Page remains in its directory but is excluded from active index queries.
-- Note: Archive is reversible — change `status` back to `active` to un-archive.
+→ Full operation definitions, executor model, batch validation, and per-op preconditions/postconditions: `schema/workflows/structured-operations.md`.
 
 ## 10. Compiler Pipeline (Conceptual Model)
-
-This section describes the conceptual compilation model -- the state machine that source material passes through on its way into the wiki. Section 11 (Workflows) provides the step-by-step operator procedures that implement this model.
-
-The pipeline is a multi-pass process for ingesting a source document:
 
 ```
 Source -> [Classify] -> [Diff] -> [Extract] -> [Merge] -> [Lint] -> Wiki
 ```
 
-### Pass 0: Classify
-
-Determine the source type before processing.
-
-- **Input:** Raw source document.
-- **Types:** article, paper, book-chapter, transcript, journal entry, data file, image-heavy.
-- **Note:** `book-chapter` is the canonical source type for book content. Full books MUST be ingested as a sequence of `book-chapter` sources (one per chapter or coherent section). Historical note: some older source summaries used `source_type: book`; that value has been normalized to `book-chapter`. Agents MUST use `book-chapter` going forward; `book` is no longer accepted.
-- **Purpose:** Different source types require different extraction logic (e.g., papers have abstract/methodology/results; transcripts have timestamped segments).
-- **Output:** Source type classification, passed to Pass 2 for type-appropriate extraction.
-
-### Pass 1: Diff
-
-Compare the new source against current wiki state.
-
-- **Input:** Source document + current wiki state (via `wiki-cloud/index.md`).
-- **Process:** Read `wiki-cloud/index.md` to identify existing pages on related topics. Read the TL;DR and Key Facts of those related pages. Determine what the new source adds that the wiki does not already cover.
-- **Output:** A mental model of new vs. existing knowledge. This is not a file -- it is the LLM's internal understanding of the delta.
-
-### Pass 2: Extract
-
-Pull structured knowledge from the source.
-
-- **Input:** Source document + type classification from Pass 0.
-- **Process:** Apply type-appropriate extraction. Papers get abstract, methodology, results, and conclusions. Transcripts get timestamped claims. Journal entries get reflections and decisions. Extract claims, entities, and relationships, each with a provenance locator (`[prov:source_id#locator]`).
-- **Output:** A source summary page created in `wiki-cloud/sources/<source_id>.md` with full frontmatter (including `path`, `content_hash`, `ingested_at`, `source_type`) and all extracted claims with provenance.
-
-#### Claim Granularity Rules
-
-Source classification (Pass 0) drives extraction depth. The guiding heuristic: **"the smallest unit that preserves meaningful provenance without making the page unreadable."**
-
-| Source Type | Default Granularity | Guidance |
-|-------------|-------------------|----------|
-| article, paper, report, technical doc | Atomic claims | One provenance marker per distinct assertion. Split when a paragraph contains multiple independently important assertions. |
-| book-chapter, essay | Atomic for factual/conceptual claims; paragraph-level for broader interpretive passages | Important factual claims get individual provenance. Interpretive or argumentative passages that form a single coherent point stay grouped. |
-| transcript, meeting notes, journal entry | Paragraph-level or utterance-level clusters | Group by natural conversation turns or reflection units. Individual sentences rarely stand alone as claims. |
-| image-heavy, mixed media | Tied to specific image, caption, or observation | Each image or visual element that contributes a distinct claim gets its own provenance marker referencing the image locator. |
-
-**Bias toward atomic:** Across all source types, prefer atomic granularity for durable factual and conceptual claims. The split/group decision:
-- **Split** when a paragraph contains multiple independently important assertions that future readers might cite separately.
-- **Keep grouped** when a passage is only useful as one bundled observation and splitting would lose context.
-
-### Pass 3: Merge
-
-Integrate extracted knowledge into the wiki.
-
-- **Input:** Extracted claims + current wiki pages.
-- **Process:**
-  - UPDATE existing pages with new claims (using the UPDATE operation from Section 9).
-  - Create new pages for entities or concepts not yet in the wiki, using the appropriate page type template (Section 4).
-  - Generate wikilinks between related pages (first mention only, per Section 8).
-  - MERGE pages if the new source reveals that two existing pages cover the same topic (using the MERGE operation from Section 9).
-  - Place new pages in `wiki-cloud/` (for cloud-safe content) or `wiki-local/` (for content deriving from local sources -- §13).
-- **Output:** Updated and/or new wiki pages with provenance-tracked claims and cross-references.
-
-#### Incremental Update Policy: Append-Then-Synthesize
-
-The default policy for living wiki pages (entities, concepts, overviews, comparisons):
-
-1. **Append in the detail layer:** Add new claims into the appropriate detail sections, preserving all existing material. Never silently delete existing claims. Insert new claims at the end of the relevant section with their provenance markers.
-2. **Mark superseded or stale claims per current schema conventions:** When new information contradicts or replaces an existing claim, mark the old claim as superseded or stale using the epistemic and provenance syntax currently documented in the schema (see Section 6), and add a short note pointing to the superseding claim. Never remove the old claim -- the provenance trail must remain visible. Phase 5 will formalize the exact contradiction and staleness semantics; until then, follow current schema conventions and keep the old claim visible.
-3. **Re-synthesize the summary layer:** After appending new detail, rewrite the TL;DR and Key Facts sections so they reflect the complete current state of the page -- all claims, old and new. This is the only place where rewriting is expected on every update.
-4. **Record framing shifts:** If new material fundamentally changes a page's framing or interpretation, record the shift in a decision/reflection entry (see Section 11.4) rather than hiding it inside prose edits.
-
-**Exceptions:**
-- **Logs and source summary pages:** Strict append-only. These are records, not living synthesis. Never rewrite existing log entries or source summary content.
-- **Full section rewrite:** Reserved for exceptional cases only -- severe page drift, extensive duplication, or fundamentally broken earlier structure. When performed, log the rationale as a decision record.
-
-**Mantra:** "Append in the detail layer, synthesize in the summary layer, supersede explicitly when needed."
-
-### Pass 4: Lint
-
-Verify consistency after merge.
-
-- **Input:** All pages modified or created during this ingest.
-- **Checks:**
-  - All new `[prov:...]` markers resolve to valid source IDs in `wiki-cloud/sources/` or `wiki-local/sources/`.
-  - All new wikilinks point to existing pages or are intentional red links.
-  - Frontmatter is complete and valid on all modified pages (Section 5 checklist).
-  - No contradictions between new claims and existing claims on the same topic.
-- **Output:** List of issues found (if any). Trivially fixable issues (e.g., missing frontmatter fields) are fixed inline. Non-trivial issues are reported.
-
-### Optional Follow-On Passes
-
-These are not required on every ingest:
-
-- **Summary regeneration:** Rewrite TL;DR and Key Facts sections of affected pages to reflect new information.
-- **Image processing:** Extract information from figures, diagrams, or images in the source.
-- **Structural reorganization:** Split pages that have grown too large, or reorganize domain sections.
+→ Claim-granularity rules and the Append-Then-Synthesize incremental-update policy live in `schema/workflows/ingest.md`. Each pass is implemented by the corresponding workflow (see the routing table).
 
 ## 11. Workflows
 
