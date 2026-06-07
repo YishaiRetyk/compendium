@@ -48,14 +48,14 @@ These four operations are the wiki's mutation vocabulary. Layered on top is the 
 > | Determining `wiki-cloud/` vs `wiki-local/` placement | `schema/reference/privacy.md` |
 > | Wiki capacity / scaling signals | `docs/reference/scaling.md` |
 > | Obsidian, Git, and optional tools | `docs/reference/tooling.md` |
+> | Ingesting a new source (classify → extract → merge) | `schema/workflows/ingest.md` |
+> | Answering a question + write-back rules | `schema/workflows/query.md` |
 >
 > **Workflows — STILL INLINE in §11 until Phase 17. Do NOT dereference these paths yet;**
 > **the authoritative content is §11 below until the file is created in Phase 17.**
 >
 > | Workflow | Where it lives NOW |
 > |----------|--------------------|
-> | Ingest | §11.1 (inline). Future home: `schema/workflows/ingest.md` *(Phase 17)* |
-> | Query | §11.2 (inline). Future home: `schema/workflows/query.md` *(Phase 17)* |
 > | Lint | §11.3 (inline). Decay math already at `schema/workflows/lint.md`; full procedure *(Phase 17)* |
 > | Reflect | §11.4 (inline). Future home: `schema/workflows/reflect.md` *(Phase 17)* |
 
@@ -225,153 +225,13 @@ These are the operator procedures that implement the conceptual pipeline (Sectio
 
 ### 11.1 Ingest Workflow
 
-```
-Trigger:  User places a new source document and requests ingestion
-Inputs:   Source file at sources/YYYY/YYYY-MM/YYYY-MM-DD-slug/ (bundle) or .md (single file)
-Outputs:  Source summary page, updated wiki pages, updated index, updated log
-Commit:   ingest(<source-slug>): <one-line summary>
-```
-
-**Steps:**
-
-1. User places source document in `sources/YYYY/YYYY-MM/YYYY-MM-DD-slug/` (bundle with `source.md` + assets) or `sources/YYYY/YYYY-MM/YYYY-MM-DD-slug.md` (single file).
-2. LLM reads the source document completely.
-3. **Classify** (Pipeline Pass 0): Determine source type -- article, paper, transcript, journal entry, data file, or image-heavy.
-4. **Diff** (Pipeline Pass 1): Read `wiki-cloud/index.md`, identify related existing pages, read their TL;DR and Key Facts sections. Determine what this source adds that the wiki does not already cover.
-5. **Extract** (Pipeline Pass 2): Extract claims with provenance locators, applying the claim granularity rules from Section 10 Pass 2 based on the source type classified in step 3. Create source summary page at `wiki-cloud/sources/<source_id>.md` (or `wiki-local/sources/` if content derives from a local source -- §13) with full frontmatter including `path`, `content_hash`, `ingested_at`, and `source_type`.
-6. **Merge** (Pipeline Pass 3): Update or create entity/concept/overview pages using UPDATE operations (Section 9) and the append-then-synthesize policy (Section 10 Pass 3). Generate wikilinks on first mention. MERGE pages if the source reveals duplicates.
-   - 6a. After merge is complete, update the source summary page's compilation tracking fields:
-     - Set `compilation_status` to `compiled` if all extracted claims were merged into topic pages, or `partial` if some claims were deferred.
-     - Set `compiled_against_hash` to the current `content_hash` value.
-     - Set `compiled_targets` to the list of wiki page IDs that received claims from this source (page IDs only, not paths).
-7. **Lint** (Pipeline Pass 4): Verify all provenance references resolve, wikilinks are valid, frontmatter is complete on all modified pages.
-8. Update `wiki-cloud/index.md` (or `wiki-local/index.md` if applicable) with new and modified pages.
-9. Append entry to `wiki-cloud/log.md` (or `wiki-local/log.md` if applicable): `## [YYYY-MM-DD] ingest | <source title>` with affected pages and rationale.
-    - 9a. **Contributor attribution (COLAB-03, COLAB-04):** If the log entry is produced via `bin/ingest.sh`, the helper resolves a contributor handle via the following order:
-        1. Explicit `--contributor @handle` flag wins (forces emission even on single-author repos).
-        2. On single-author repos (`git log --all --format='%ae' | sort -u | wc -l == 1`), the field is omitted entirely.
-        3. Otherwise, look up `git config user.email` in `.git-author-map.txt` at the repo root (case-insensitive; format `email  ->  @handle`, `#` comments allowed). On hit, emit `contributor:: @handle` as a Dataview inline body field directly below the `## [YYYY-MM-DD]` log-entry header (see §12).
-        4. On map miss, warn to stderr (actionable: suggest `--contributor @handle` or adding the mapping) and OMIT the field. NEVER write a bare email into the `contributor::` field (privacy hygiene + parser consistency).
-      Git commit authorship remains the attribution source of truth; `contributor::` is a Dataview convenience index.
-10. Commit: `ingest(<source-slug>): <one-line summary>`
-
-**Abort conditions:**
-
-- Source is unreadable or corrupted. Log failure in `wiki-cloud/log.md`, do NOT create partial wiki pages.
-- Source duplicates an already-ingested source (check `content_hash` against existing source summary pages). Log the duplicate detection, do NOT re-ingest.
-- Privacy tier cannot be determined. Default to `wiki-local/` placement and log the classification gap.
+→ See `schema/workflows/ingest.md` for the full ingest procedure (classify, diff, extract with provenance, merge, lint, log, commit) and the claim-granularity rules.
 
 ### 11.2 Query Workflow
 
-```
-Trigger:  User asks a question about the wiki contents
-Inputs:   User question (natural language)
-Outputs:  Cited answer, optionally new/updated wiki pages, updated index/log
-Commit:   query(<topic>): <one-line summary>
-```
+**Write-back is mandatory** when a query produces novel or durable synthesis — a new claim, a new connection, a meaningful reframing, or a reusable artifact MUST be compiled back into the wiki (it is not optional).
 
-**Steps:**
-
-1. **Search** -- Read `wiki-cloud/index.md` to find pages relevant to the question. Optionally use `bin/search.sh` to identify candidates.
-2. **Shallow read** -- Read TL;DR and Key Facts sections of relevant pages (progressive disclosure -- shallow first).
-3. **Deep read** -- Read Detail sections only where shallow content is insufficient to answer the question.
-4. **Synthesize** -- Compose answer with citations to specific wiki pages and inline provenance markers.
-5. **Write-back decision** -- Determine whether the answer should be written back to the wiki (see Write-Back Rules below).
-6. **Delta compilation** -- Check for uncompiled or stale sources relevant to this query (see Delta Compilation below).
-7. **Apply write-back** -- If write-back is triggered, apply using structured operations (Section 9). Run `bin/validate-op.sh` before applying each operation.
-8. Update `wiki-cloud/index.md` (or `wiki-local/index.md` if applicable) if new pages were created or existing pages were significantly modified.
-9. Append entry to `wiki-cloud/log.md` (or `wiki-local/log.md` if applicable) (see Query Log Entry Format below).
-10. Commit (only if wiki was modified): `query(<topic>): <one-line summary>`
-
-#### Write-Back Rules
-
-Write-back is **mandatory** when the answer produces novel or durable synthesis. It is NOT optional -- queries that produce reusable knowledge MUST contribute back to the wiki.
-
-**Write back when the answer produces at least one of:**
-- A new claim not already captured in the wiki
-- A new connection between existing pages or sources
-- A meaningful reframing or synthesis of existing material
-- A reusable artifact (comparison, overview, decision note)
-- A correction to an existing page's framing or status
-
-**Do NOT write back for:**
-- Pure lookups of facts already present in the wiki
-- Reformatted restatements of a single existing page
-- Transient conversational answers with no durable value
-
-**Page targeting:** Use page ownership, not query origin.
-- If an existing page clearly owns the topic being synthesized, UPDATE that page.
-- If no single page cleanly owns the synthesis, or the output is a distinct reusable artifact (comparison, overview, reflection), CREATE a new page.
-- New pages are typed by semantic role (entity, concept, comparison, overview) -- NEVER by workflow origin. There is no "query result" page type.
-
-#### Privacy Tier for Write-Back
-
-**Deterministic structural rule (§13 asymmetric model):** If ANY source contributing to the synthesis lives under `wiki-local/` (its source-summary is in `wiki-local/sources/`), the write-back target page MUST go into `wiki-local/`. A page in `wiki-cloud/` may cite only sources whose summaries are under `wiki-cloud/sources/`. This is a structural check, not a judgment call.
-
-**How to apply:**
-1. Collect all source IDs referenced in the synthesized answer (from provenance markers and the `sources` frontmatter list of pages read).
-2. Check each source-summary's tier: is the summary page under `wiki-cloud/sources/` or `wiki-local/sources/`?
-3. If ANY contributing source summary is under `wiki-local/`, the write-back target belongs in `wiki-local/`.
-4. If updating an existing `wiki-cloud/` page with `wiki-local/`-sourced content: STOP. Either (a) create a new page in `wiki-local/` for the sensitive synthesis, or (b) move the existing page to `wiki-local/` if appropriate.
-5. Run `bin/validate-op.sh` -- it enforces this rule mechanically (Check 4).
-
-#### Delta Compilation
-
-Before or during answer synthesis, check whether relevant sources have uncompiled material:
-
-1. Read source summary pages referenced by or related to the query topic.
-2. Check `compilation_status` field (Section 5): if `pending`, `partial`, or `stale`, the source has uncompiled material.
-3. **Query-scoped compilation (default):** Compile only claims from uncompiled sources that are relevant to the current question. Log remaining uncompiled material for later pickup.
-4. **Full-source compilation (exception):** Only when the source is central to many pages, query-scoped extraction would be wasteful, or the user explicitly requests a fuller refresh.
-5. After compiling, update the source summary page: set `compilation_status` to `compiled` (or `partial` if not all claims were compiled), update `compiled_against_hash`, and extend `compiled_targets`.
-
-**Detecting uncompiled material:** Primary mechanism is the `compilation_status` field on source summary pages. Secondary verification: check whether source claims actually appear in target topic pages via provenance markers.
-
-#### Query Log Entry Format
-
-Append to `wiki-cloud/log.md`:
-
-```markdown
-## [YYYY-MM-DD] query | <question summary>
-
-answer: <one-line summary of the answer>
-write_back: <WRITE-BACK: trigger met -> UPDATE/CREATE page_id> OR <NO-WRITE-BACK: reason>
-delta_compiled: <source_ids compiled, or "none">
-pages_affected: <list of page IDs modified or created, or "none">
-```
-
-The write-back decision MUST be logged -- structured and terse, stating which trigger was met or why write-back was skipped. This enables auditing.
-
-**Ordering:** The workflow executes linearly: (1) answer with citations, (2) delta compile if needed, (3) write back results. Write-back happens ONCE at the end, not recursively.
-
-**Abort conditions:**
-
-- No relevant pages exist AND no sources exist on the topic. Inform the user that the wiki has no information on this topic rather than hallucinating an answer. Log the knowledge gap in `wiki-cloud/log.md` so the lint workflow can track it.
-
-#### Worked Example
-
-**Question:** "What <OVERVIEW_NAME> are related to <CONCEPT_NAME_2>?"
-
-1. **Search:** `bin/search.sh "<concept-slug-2>"` returns matching concept and overview pages under `wiki-cloud/concepts/`.
-2. **Shallow read:** Read TL;DR of all three pages. `<concept-slug-2>.md` covers the core item. `<overview-slug>.md` lists item families. `<concept-slug>.md` frames the item within the broader concept.
-3. **Deep read:** Read Detail section of `<overview-slug>.md` to find family relationships.
-4. **Synthesize:** Answer cites all three pages with provenance markers.
-5. **Write-back decision:** The answer connects `<concept-slug-2>` to specific families in a way not explicitly articulated in any single page. Trigger: "new connection between existing pages." Decision: UPDATE the relevant concept page to add a new subsection.
-6. **Delta compilation:** Check sources. `<source-slug>.md` has `compilation_status: compiled`. No delta needed.
-7. **Apply:** Run `bin/validate-op.sh UPDATE wiki-cloud/concepts/<page>.md` -> PASS. Apply UPDATE using append-then-synthesize policy.
-8. **Index:** No new pages created, but `<concept-slug-2>.md` summary in index updated to reflect new subsection.
-9. **Log:**
-   ```
-   ## [2026-04-15] query | What <OVERVIEW_NAME> are related to <CONCEPT_NAME_2>?
-
-   answer: <CONCEPT_NAME_2> connects to several related families through shared mechanisms
-   write_back: WRITE-BACK: new connection between existing pages -> UPDATE <concept-slug-2>
-   delta_compiled: none
-   pages_affected: <concept-slug-2>
-   ```
-10. **Commit:** `query(<concept-slug-2>): add related connections`
-
-See: examples/kahneman/concepts/loss-aversion.md for a concrete filled-in instance.
+→ See `schema/workflows/query.md` for the full query procedure, write-back rules, privacy-tier routing, and delta compilation.
 
 ### 11.3 Lint Workflow
 
