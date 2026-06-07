@@ -4,8 +4,8 @@ milestone: v1.2
 milestone_name: Schema Architecture
 status: executing
 stopped_at: Phase 17 context gathered
-last_updated: "2026-06-05T11:25:51.519Z"
-last_activity: 2026-06-05 -- Phase 17 planning complete
+last_updated: "2026-06-07T15:43:45.388Z"
+last_activity: 2026-06-07 -- Phase 17 execution started
 progress:
   total_phases: 11
   completed_phases: 2
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-04)
 
 **Core value:** The wiki is a persistent, compounding artifact -- cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested.
-**Current focus:** v1.2 Schema Architecture — Phase 16 (Reference Extraction) complete; next is Phase 17 (Workflow Extraction, WF-01..09). NOTE: `gsd phase.complete` mis-advanced to backlog Phase 999.1 (superseded — absorbed into Phases 10–11); hand-corrected to Phase 17.
+**Current focus:** Phase 17 — workflow-extraction
 
 ## Current Position
 
-Phase: 17 — Workflow Extraction (Not started — gates on Phase 16, now ✓ complete)
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-06-05 -- Phase 17 planning complete
+Phase: 17 (workflow-extraction) — EXECUTING
+Plan: 1 of 4
+Status: Executing Phase 17
+Last activity: 2026-06-07 -- Phase 17 execution started
 
 ### v1.2 Phase Summary
 
