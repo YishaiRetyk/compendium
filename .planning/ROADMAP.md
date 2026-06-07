@@ -136,7 +136,7 @@ Plans:
 
 **Wave 1**
 
-- [ ] 17-01-PLAN.md — Extract §9 structured-ops → structured-operations.md; fold §10 substantive blocks → ingest.md seed; reduce core §9 (vocab + validate-op + solo-op log + D-01 commit prefix) and §10 (diagram only) (WF-01, WF-02)
+- [x] 17-01-PLAN.md — Extract §9 structured-ops → structured-operations.md; fold §10 substantive blocks → ingest.md seed; reduce core §9 (vocab + validate-op + solo-op log + D-01 commit prefix) and §10 (diagram only) (WF-01, WF-02)
 
 **Wave 2** *(blocked on Wave 1 — shares core file)*
 
@@ -344,5 +344,5 @@ The following are intentionally deferred until real usage demands them, captured
 | 14. Graph Link Resolution | v1.1.1 | 3/3 | Complete    | 2026-06-03 |
 | 15. Privacy Architecture | v1.2 | 3/3 | Complete    | 2026-06-04 |
 | 16. Reference Extraction | v1.2 | 5/5 | Complete    | 2026-06-05 |
-| 17. Workflow Extraction | v1.2 | 0/TBD | Not started | - |
+| 17. Workflow Extraction | v1.2 | 1/4 | In Progress|  |
 | 18. Skills Overlay | v1.2 | 0/TBD | Not started | - |
