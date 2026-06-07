@@ -10,7 +10,7 @@ set -euo pipefail
 # Lint rule-set semver per CI-08 / D-26. Bump MAJOR on breaking changes
 # (removed category, changed severity semantics). MINOR on non-breaking
 # additions. PATCH on bug fixes. --require-version X.Y.Z is a minimum check.
-LINT_VERSION="1.7.0"
+LINT_VERSION="1.8.0"
 
 usage() {
     cat <<'EOF'
@@ -26,7 +26,7 @@ Options:
   --category <cat>    Run only specified category:
                         orphan, crossref, stale, contradiction, gap,
                         provenance, yaml, drift, duplicate, contributor,
-                        brownfield, linkres
+                        brownfield, linkres, routing
                       Default: all categories
   --version           Print lint rule-set semver (LINT_VERSION) and exit 0
   --require-version X.Y.Z
@@ -319,6 +319,7 @@ CI_SEVERITY_REMAP = {
     'crossref':           'error',
     'provenance':         'error',
     'linkres':            'error',    # high-confidence graph defects gate CI (LINK-04, LINK-05)
+    'routing':            'error',    # forward dangling refs and §N pattern violations gate CI
     'stale':              'warning',
     'gap':                'warning',
     'contradiction':      'warning',
@@ -329,6 +330,28 @@ CI_SEVERITY_REMAP = {
     'autofix':            'info',
     'skip-count':         'info',      # Plan 03 populates
 }
+
+def remap_ci_severity(sev, cat, msg):
+    """Return the post-CI-remap severity for a finding (sev, cat, msg).
+
+    Centralizes severity remap exceptions so that forward routing findings
+    (no special prefix) remap to 'error', while inverse ORPHAN findings and
+    WF-08 AUDIT drift findings keep their lower non-gating severity under
+    --ci.  This function is the ONLY site where the routing-category
+    severity exceptions are resolved — do NOT add inline prefix-matching
+    elsewhere.  Mirrors the 'drift-external' EXTERNAL: prefix pattern from
+    matches_skip().
+
+    Precedence:
+      1. ORPHAN: prefix under 'routing' -> keep 'warning' (inverse orphan)
+      2. AUDIT: prefix under 'routing'  -> keep 'info'    (WF-08 drift)
+      3. All other findings              -> CI_SEVERITY_REMAP dict lookup
+    """
+    if cat == 'routing' and msg.startswith('ORPHAN: '):
+        return 'warning'   # inverse stays warning, never promoted to error
+    if cat == 'routing' and msg.startswith('AUDIT: '):
+        return 'info'      # WF-08 drift stays info, never promoted to error
+    return CI_SEVERITY_REMAP.get(cat, sev)
 
 def matches_skip(cat, msg, skip_set):
     """Return True iff the finding (cat, msg) should be dropped per skip_set.
@@ -2330,6 +2353,170 @@ if should_run('drift') or should_run('all'):
                                 f"its commit; commit the page or fix the log entry)")
 
 # ---------------------------------------------------------------------------
+# Check: routing (D-03..D-08, WF-08) — bidirectional schema tree reachability
+# ---------------------------------------------------------------------------
+# This check is REPO_ROOT/schema-rooted, NOT wiki_dir-rooted, so it runs even
+# when the wiki is near-empty (empty-wiki-abort bypass, D-06).
+#
+# FORWARD (dangling pointer -> error):
+#   a) Cross-file path references in corpus files that resolve to missing files.
+#   b) Pattern-prohibition: §N / "Section N" cross-file refs (D-05 abolish-§N).
+#
+# INVERSE (orphan file -> warning):
+#   Extracted schema/workflows/*.md + schema/reference/log-format.md files that
+#   have NO routing-table ROW in AGENTS.md (the `> | … | \`path\` |` form in
+#   the IMPORTANT blockquote).  Stub arrows do NOT count (NEW-HIGH-B).
+#
+# WF-08 INCLUSION-AUDIT DRIFT (info, non-blocking):
+#   Parse `<!-- inclusion-audit: <N> lines @ <YYYY-MM-DD> -->` from AGENTS.md,
+#   compare <N> against current line count, emit AUDIT: info when drift exceeds
+#   max(25, ceil(0.20 * N)).
+#
+# Do NOT wire into --staged (D-07: staging scope structurally can't see
+# whole-tree routing properties).
+
+if should_run('routing'):
+    import math as _math
+    print("  Checking schema/ routing integrity (forward + inverse + drift)...", file=sys.stderr)
+
+    # -----------------------------------------------------------------------
+    # Corpus: AGENTS.md + every schema/reference/*.md + schema/workflows/*.md
+    # -----------------------------------------------------------------------
+    corpus_files = []
+    agents_md_path = os.path.join(REPO_ROOT, 'AGENTS.md')
+    if os.path.isfile(agents_md_path):
+        corpus_files.append(agents_md_path)
+
+    schema_dir = os.path.join(REPO_ROOT, 'schema')
+    for sub in ('reference', 'workflows'):
+        subdir = os.path.join(schema_dir, sub)
+        if os.path.isdir(subdir):
+            for fname in sorted(os.listdir(subdir)):
+                if fname.endswith('.md'):
+                    corpus_files.append(os.path.join(subdir, fname))
+
+    # -----------------------------------------------------------------------
+    # FORWARD CHECK a): cross-file path references that resolve to missing
+    # files.  Match repo-relative markdown path forms:
+    #   schema/(reference|workflows)/<name>.md
+    #   docs/reference/<name>.md
+    #   <any-dir>/<file>.md  (generalised, catches other valid refs)
+    # Resolution: os.path.isfile(REPO_ROOT / target).  Only MISSING files
+    # are a dangling error — do NOT use a hard-coded known-set (HIGH #2).
+    # -----------------------------------------------------------------------
+    # Match ONLY the canonical routing-target path forms:
+    #   schema/(reference|workflows)/<name>.md
+    #   docs/reference/<name>.md
+    # Other repo-relative paths (wiki-local/, sources/, wiki-cloud/, etc.)
+    # are not routing targets and must NOT be checked for existence here.
+    # The scope constraint (HIGH #2) keeps docs/reference/* valid targets.
+    PATH_REF_RE = re.compile(
+        r'`('
+        r'(?:schema/(?:reference|workflows)|docs/reference)'
+        r'/[a-zA-Z0-9_-]+\.md'
+        r')`'
+    )
+
+    # -----------------------------------------------------------------------
+    # FORWARD CHECK b): pattern-prohibition: §N or "Section N" cross-file refs.
+    # Plans 01-03 abolished every §N from the corpus, so zero matches are
+    # expected. Section headings (## 9., ### 11.3) carry no § glyph and do not
+    # match \bSection [0-9] — exempt by construction, no special-case needed.
+    # -----------------------------------------------------------------------
+    SECTION_REF_RE = re.compile(r'§[0-9]|\bSection [0-9]')
+
+    for corpus_path in corpus_files:
+        try:
+            corpus_content = open(corpus_path, encoding='utf-8').read()
+        except Exception:
+            continue
+        referrer_rel = os.path.relpath(corpus_path, REPO_ROOT)
+
+        # Forward check a): path references
+        for m in PATH_REF_RE.finditer(corpus_content):
+            target = m.group(1)
+            target_abs = os.path.join(REPO_ROOT, target)
+            if not os.path.isfile(target_abs):
+                add_finding('error', 'routing', referrer_rel,
+                            f'dangling routing reference: `{target}` does not exist on disk')
+
+        # Forward check b): §N pattern-prohibition
+        for m in SECTION_REF_RE.finditer(corpus_content):
+            # Provide context: up to 60 chars around the match
+            start = max(0, m.start() - 20)
+            snippet = corpus_content[start:m.end() + 20].replace('\n', ' ')
+            add_finding('error', 'routing', referrer_rel,
+                        f'cross-file section-number reference forbidden (D-05); '
+                        f'use a schema/ path instead (near: …{snippet}…)')
+
+    # -----------------------------------------------------------------------
+    # INVERSE CHECK: extracted schema/workflows/*.md and
+    # schema/reference/log-format.md must each have a routing-TABLE ROW in
+    # AGENTS.md.  Reachability is defined ONLY by the `> | … | \`path\` |`
+    # blockquote table-cell form — stub arrows (`→ See \`path\``) do NOT
+    # count (NEW-HIGH-B spec/test alignment).
+    # -----------------------------------------------------------------------
+    # Match routing-table rows: `> | description | \`path\` |`
+    # Use [^\n|] (not [^|]) so the pattern stays on a single line and
+    # does not span across table rows under re.MULTILINE.
+    ROUTING_ROW_RE = re.compile(r'^> \|[^\n|]*\|[^\n|]*`([^`\n]+)`[^\n|]*\|', re.MULTILINE)
+
+    agents_md_content = ''
+    if os.path.isfile(agents_md_path):
+        try:
+            agents_md_content = open(agents_md_path, encoding='utf-8').read()
+        except Exception:
+            pass
+
+    # Build set of paths referenced in AGENTS.md routing-TABLE rows
+    routing_table_paths = set()
+    for m in ROUTING_ROW_RE.finditer(agents_md_content):
+        routing_table_paths.add(m.group(1))
+
+    # Files that must have a routing-table row: all schema/workflows/*.md
+    # and schema/reference/log-format.md
+    orphan_candidates = []
+    workflows_dir = os.path.join(schema_dir, 'workflows')
+    if os.path.isdir(workflows_dir):
+        for fname in sorted(os.listdir(workflows_dir)):
+            if fname.endswith('.md'):
+                orphan_candidates.append(f'schema/workflows/{fname}')
+
+    log_format_path = 'schema/reference/log-format.md'
+    if os.path.isfile(os.path.join(REPO_ROOT, log_format_path)):
+        orphan_candidates.append(log_format_path)
+
+    for candidate_rel in orphan_candidates:
+        if candidate_rel not in routing_table_paths:
+            add_finding('warning', 'routing', candidate_rel,
+                        f'ORPHAN: extracted file unreachable from core routing table '
+                        f'(no `> | … | `{candidate_rel}` |` row in AGENTS.md routing table)')
+
+    # -----------------------------------------------------------------------
+    # WF-08 INCLUSION-AUDIT DRIFT CHECK (info, non-blocking)
+    # Parse <!-- inclusion-audit: <N> lines @ <YYYY-MM-DD> --> from AGENTS.md,
+    # compare against current line count, emit AUDIT: info when drift exceeds
+    # max(25, ceil(0.20 * N)).  Threshold is a drift *tolerance*, not a budget.
+    # -----------------------------------------------------------------------
+    INCLUSION_AUDIT_RE = re.compile(
+        r'<!--\s*inclusion-audit:\s*(\d+)\s+lines\s*@\s*(\d{4}-\d{2}-\d{2})\s*-->'
+    )
+    if agents_md_content:
+        m_audit = INCLUSION_AUDIT_RE.search(agents_md_content)
+        if m_audit:
+            baseline_n = int(m_audit.group(1))
+            baseline_date = m_audit.group(2)
+            current_n = len(agents_md_content.splitlines())
+            delta = current_n - baseline_n
+            # Threshold: +20% or +25 lines, whichever is larger
+            threshold = max(25, _math.ceil(0.20 * baseline_n))
+            if delta > threshold:
+                add_finding('info', 'routing', 'AGENTS.md',
+                            f'AUDIT: core drifted +{delta} lines since last inclusion audit '
+                            f'({baseline_date}) — re-run WF-08 '
+                            f'(threshold: +{threshold} lines = max(25, 20% of {baseline_n}))')
+
+# ---------------------------------------------------------------------------
 # Check: brownfield (BRWN-09) — 30-day staleness + summary counts
 # ---------------------------------------------------------------------------
 # Emits:
@@ -2394,7 +2581,7 @@ if SKIP_CATEGORIES:
     findings = [f for f in findings if not matches_skip(f[1], f[3], SKIP_CATEGORIES)]
 
 if CI_MODE:
-    findings = [(CI_SEVERITY_REMAP.get(cat, sev), cat, path, msg)
+    findings = [(remap_ci_severity(sev, cat, msg), cat, path, msg)
                 for (sev, cat, path, msg) in findings]
     # BRWN-08: downgrade allowlist findings on bootstrapped pages from error
     # to info. SCOPE (I-1): --ci mode only; text-mode lint is unaffected.

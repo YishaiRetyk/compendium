@@ -4,7 +4,11 @@
 > Any LLM agent maintaining this wiki MUST read and follow this document.
 > This file is the router; each linked file listed in the routing table is authoritative for its own sections.
 
+<!-- inclusion-audit: 287 lines @ 2026-06-05 -->
+<!-- Resident core: justify any added line against the inclusion test (ambient / unscriptable-AND-unacceptable-miss / dispatch) or extract it. Re-run WF-08 and update this baseline. -->
+
 ## 1. Overview and Principles
+<!-- inclusion: ambient — three-layer model + four-operation vocabulary are context every turn; no dispatch target (dispatched by routing table below) -->
 
 The LLM Wiki Compiler is a personal knowledge management system with three layers:
 
@@ -59,6 +63,7 @@ This file (`{{AGENT_FILENAME}}`) is the canonical agent spec; the wizard selects
 > | Index / log entry formats | `schema/reference/log-format.md` |
 
 ## 2. Directory Structure
+<!-- inclusion: ambient — file placement conventions govern every ingest/query/lint turn; an agent writing a file to the wrong directory silently corrupts the wiki with no lint gate -->
 
 ```
 life/                               # repo root
@@ -113,6 +118,7 @@ life/                               # repo root
 - `schema/reference/` and `schema/workflows/` hold authoritative reference content the router links to; `schema/templates/` holds blank templates.
 
 ## 3. Global Rules
+<!-- inclusion: ambient — date format, snake_case frontmatter, commit conventions, navigation rule, MUST-NOT list govern all four operations on every turn; no dispatch target and silent failure is costly (wrong dates break Dataview, wrong field names misparse, bare links break Obsidian graph) -->
 
 ### Date Format
 
@@ -165,16 +171,19 @@ This progressive disclosure navigation minimizes context window consumption.
 - DO NOT use real slugs, page IDs, or terms drawn from the user's private wiki content (under `examples/`, archived sources, or any `wiki-local/` page) when authoring or editing **template-public files**: `AGENTS.md`, `CLAUDE.md`, `README.md`, `PRIVACY.md`, `docs/`, `.github/`, `wiki-cloud/` scaffolding (`index.md`, `log.md`, `maintenance/`), and `bin/`. Use abstract placeholders instead — `<concept-slug>`, `<source-id>`, `<page-title>`, `<entity-name>`, `<YYYY-MM-DD-slug>`, `<term>`. The `bin/check-neutrality.sh` denylist gate is a backstop, not the primary defense; prevent leaks at write-time. This rule applies to examples in schema docs, illustrative snippets, sample commands, test fixtures shipped to public paths, and any narrative that would benefit from a "concrete example" -- pick a placeholder, not a real vault term.
 
 ## 4. Page Types and Templates
+<!-- inclusion: dispatch — the 6 type names are the dispatch vocabulary; full section ordering and authoring conventions JIT-load via schema/reference/page-types.md -->
 
 Six page types: **entity**, **concept**, **source**, **comparison**, **overview**, **decision**.
 
 → See `schema/reference/page-types.md` for section ordering, authoring conventions, and full type details.
 
 ## 5. Frontmatter Schema
+<!-- inclusion: dispatch — routing pointer only; full field definitions JIT-load via schema/reference/frontmatter.md at authoring time -->
 
 → Full frontmatter schema and validation checklist in `schema/reference/frontmatter.md`.
 
 ## 6. Provenance, Epistemics, and Staleness
+<!-- inclusion: unscriptable-AND-unacceptable-miss — the "MUST have [prov:]" rule is a safety requirement an agent might skip without being prompted; lint catches missing markers but only post-hoc; the one-line mandate must be ambient to prevent silent omission -->
 
 Every factual claim MUST have an inline provenance marker `[prov:source_id#locator]`.
 
@@ -182,10 +191,12 @@ Every factual claim MUST have an inline provenance marker `[prov:source_id#locat
 → Decay table and staleness auto-fix: `schema/workflows/lint.md`.
 
 ## 8. Wikilink and Graph Conventions
+<!-- inclusion: unscriptable-AND-unacceptable-miss — the "ALWAYS piped [[id|Title]]" rule is non-obvious and agents frequently write bare [[Title]] links; lint catches bare links but only post-hoc; the one-line mandate must be ambient to prevent silent graph disconnection -->
 
 Use `[[id|Title]]` for ALL intra-wiki links — see `schema/reference/wikilinks.md`.
 
 ## 9. Structured Operations and Executor Model
+<!-- inclusion: ambient — the ops-vocab table (UPDATE/MERGE/SUPERSEDE/ARCHIVE) + validate-op.sh pointer + solo-op log shape + commit prefix are used on every mutation turn; the full executor definitions JIT-load via schema/workflows/structured-operations.md -->
 
 All wiki mutations use a formal operations vocabulary. Raw file rewrites are prohibited -- every change goes through one of these four operations with mandatory logging.
 
@@ -211,6 +222,7 @@ The canonical multi-line structured-operation log entry (the `source:` / `result
 → Full operation definitions, executor model, batch validation, and per-op preconditions/postconditions: `schema/workflows/structured-operations.md`.
 
 ## 10. Compiler Pipeline (Conceptual Model)
+<!-- inclusion: ambient — the one-line pipeline diagram is the mental model anchoring the five-pass compilation flow; the full pass details JIT-load via schema/workflows/ingest.md -->
 
 ```
 Source -> [Classify] -> [Diff] -> [Extract] -> [Merge] -> [Lint] -> Wiki
@@ -219,6 +231,7 @@ Source -> [Classify] -> [Diff] -> [Extract] -> [Merge] -> [Lint] -> Wiki
 → Claim-granularity rules and the Append-Then-Synthesize incremental-update policy live in `schema/workflows/ingest.md`. Each pass is implemented by the corresponding workflow (see the routing table).
 
 ## 11. Workflows
+<!-- inclusion: dispatch — workflow stubs + write-back-mandatory line are the resident dispatch residue; full procedure JIT-loads via the per-workflow schema/workflows/*.md files in the routing table -->
 
 These are the operator procedures that implement the conceptual pipeline (see the routing table above). Each workflow is a complete recipe an LLM agent follows step-by-step.
 
@@ -253,19 +266,23 @@ These are the operator procedures that implement the conceptual pipeline (see th
 → See `schema/workflows/audit.md` for the review-only claim-faithfulness audit: `bin/audit-claims.sh`, the privacy-partitioned verifier model (FAITH-04), and the audit checkpoint.
 
 ## 12. Index and Log
+<!-- inclusion: dispatch — routing pointer only; full index/log entry formats JIT-load via schema/reference/log-format.md -->
 
 → See `schema/reference/log-format.md` for the `index.md` content-index entry shape, the `log.md` chronological activity-log format, the structured-operation extended log entries (UPDATE/MERGE/SUPERSEDE/ARCHIVE), and the contributor inline field.
 
 ## 13. Privacy Routing
+<!-- inclusion: dispatch — routing pointer only; full privacy tier rules JIT-load via schema/reference/privacy.md at classification time -->
 
 → See `schema/reference/privacy.md` for the agent-facing tier rules.
   For the full human-facing model: `docs/reference/privacy-model.md`.
 
 ## 14. Scaling Boundaries
+<!-- inclusion: dispatch — routing pointer only; scaling tier heuristics JIT-load via docs/reference/scaling.md when the operator needs them -->
 
 → See `docs/reference/scaling.md` for scaling tier heuristics.
 
 ## 15. Tooling and Integrations
+<!-- inclusion: dispatch — routing pointer only; Obsidian/Git tooling notes JIT-load via docs/reference/tooling.md when the operator needs them -->
 
 → See `docs/reference/tooling.md` for Obsidian, Git, and optional tooling notes.
 

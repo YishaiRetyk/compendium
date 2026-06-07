@@ -490,3 +490,43 @@ report: wiki-cloud/maintenance/lint-report.md
 findings: 0 total (0 errors, 0 warnings, 0 info)
 auto_fixes: 0 applied
 report: wiki-cloud/maintenance/lint-report.md
+
+## [2026-06-07] lint | wiki-cloud health check
+
+findings: 21 total (12 errors, 9 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki-cloud/maintenance/lint-report.md
+
+## [2026-06-07] lint | wiki-cloud health check
+
+findings: 9 total (0 errors, 9 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki-cloud/maintenance/lint-report.md
+
+## [2026-06-07] lint | wiki-cloud health check
+
+findings: 0 total (0 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki-cloud/maintenance/lint-report.md
+
+## [2026-06-07] lint | wiki-cloud health check
+
+findings: 0 total (0 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki-cloud/maintenance/lint-report.md
+
+## [2026-06-07] lint | wiki-cloud health check
+
+findings: 0 total (0 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki-cloud/maintenance/lint-report.md
+
+## [2026-06-07] reflect | workflow extraction (Phase 17)
+
+Created dr-2026-06-05-workflow-extraction (trigger_type: schema-update) recording the §9–§12 → schema/workflows + log-format.md extraction, the solo-op commit-prefix (D-01), the abolish-§N routing guard (D-05), and the inclusion-audit tripwire (D-09..D-12). affected_pages: schema/workflows/operations.md, schema/workflows/pipeline.md, schema/workflows/ingest.md, schema/workflows/query.md, schema/workflows/reflect.md, schema/workflows/brownfield.md, schema/workflows/release.md, schema/workflows/audit.md, schema/reference/log-format.md.
+
+## [2026-06-07] lint | wiki-cloud health check
+
+findings: 0 total (0 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki-cloud/maintenance/lint-report.md
