@@ -144,7 +144,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 — shares core file; final extraction)*
 
-- [ ] 17-03-PLAN.md — Merge §11.3 lint body INTO lint.md (CI-contract framing preserved); extract §11.4/11.5/11.6/11.7 reflect/brownfield/release/audit; extract §12 → log-format.md; repoint external §N referrers; delete routing scaffold (WF-05, WF-06, WF-07)
+- [x] 17-03-PLAN.md — Merge §11.3 lint body INTO lint.md (CI-contract framing preserved); extract §11.4/11.5/11.6/11.7 reflect/brownfield/release/audit; extract §12 → log-format.md; repoint external §N referrers; delete routing scaffold (WF-05, WF-06, WF-07)
 
 **Wave 4** *(blocked on Wave 3 — routing guard goes green only after all §N abolished; gates close)*
 
@@ -344,5 +344,5 @@ The following are intentionally deferred until real usage demands them, captured
 | 14. Graph Link Resolution | v1.1.1 | 3/3 | Complete    | 2026-06-03 |
 | 15. Privacy Architecture | v1.2 | 3/3 | Complete    | 2026-06-04 |
 | 16. Reference Extraction | v1.2 | 5/5 | Complete    | 2026-06-05 |
-| 17. Workflow Extraction | v1.2 | 2/4 | In Progress|  |
+| 17. Workflow Extraction | v1.2 | 3/4 | In Progress|  |
 | 18. Skills Overlay | v1.2 | 0/TBD | Not started | - |
