@@ -9,7 +9,7 @@ Every contribution (new source, page update, schema amendment) follows the **bra
 1. **Fork** the repo on GitHub (or clone directly if you have write access).
 2. **Branch** from `main`: `git checkout -b ingest/<source-slug>`.
 3. **Scaffold** the source bundle with `bin/ingest.sh <path-to-source-file>`. This writes the raw source under `sources/YYYY/YYYY-MM/YYYY-MM-DD-slug/` and prints a ready-to-paste log-entry template.
-4. **Compile** — follow the ingest workflow in [AGENTS.md §11.1](AGENTS.md) to update entity/concept/overview pages, append the log entry, and regenerate TL;DRs.
+4. **Compile** — follow the ingest workflow in [schema/workflows/ingest.md](schema/workflows/ingest.md) to update entity/concept/overview pages, append the log entry, and regenerate TL;DRs.
 5. **Lint locally**: `bash bin/lint.sh` — fix structural errors before pushing.
 6. **Open a PR** against `main`. The PR template auto-populates with a 6-section checklist (see `.github/pull_request_template.md`).
 
@@ -25,7 +25,7 @@ See [docs/reference/ci.md](docs/reference/ci.md) for the full severity policy, J
 
 ### Local pre-commit gate
 
-Run `bash bin/install-hooks.sh` once per clone to activate the AGENTS.md ↔ CLAUDE.md sync check and the local wiki write-gate (Phase 12.2). The gate blocks new staged pages under `wiki-cloud/{entities,concepts,overviews,comparisons}/` that contain zero `[prov:]` markers; bypass with `git commit --no-verify` (rare, document the reason in the commit message). See [docs/reference/ci.md](docs/reference/ci.md) and [AGENTS.md §11.3](AGENTS.md) for the full contract (exemption ordering, exit codes, --staged-requires-strict).
+Run `bash bin/install-hooks.sh` once per clone to activate the AGENTS.md ↔ CLAUDE.md sync check and the local wiki write-gate (Phase 12.2). The gate blocks new staged pages under `wiki-cloud/{entities,concepts,overviews,comparisons}/` that contain zero `[prov:]` markers; bypass with `git commit --no-verify` (rare, document the reason in the commit message). See [docs/reference/ci.md](docs/reference/ci.md) and [schema/workflows/lint.md](schema/workflows/lint.md) for the full contract (exemption ordering, exit codes, --staged-requires-strict).
 
 ## Attribution
 
@@ -53,7 +53,7 @@ your.email@example.com  ->  @your-github-handle
 
 ## Privacy
 
-See [PRIVACY.md](PRIVACY.md) for the `local_only` / `cloud_safe` tiers. The `privacy-leak` CI job fails any PR that puts `privacy: local_only` frontmatter in public paths. `local_only` is valid inside `wiki-cloud/**` — it is your user content and never reaches cloud LLM APIs per AGENTS.md §13.
+See [PRIVACY.md](PRIVACY.md) for the `local_only` / `cloud_safe` tiers. The `privacy-leak` CI job fails any PR that puts `privacy: local_only` frontmatter in public paths. `local_only` is valid inside `wiki-cloud/**` — it is your user content and never reaches cloud LLM APIs per the tier rules in [schema/reference/privacy.md](schema/reference/privacy.md).
 
 ## Merge conflicts
 
@@ -111,7 +111,7 @@ Three tiers gate PR merges:
 - `warning` annotates but does not block — judgment findings (stale claims, knowledge gaps, contradictions, drift, contributor mismatches)
 - `info` annotates as a notice — mechanical observations (autofix applied, escape-hatch markers)
 
-**Source of truth for the exact category → severity mapping:** [AGENTS.md §11.3 "CI mode"](AGENTS.md) — do not reproduce the table here; it drifts. [docs/reference/ci.md](docs/reference/ci.md) provides the full policy rationale and multi-provider equivalents.
+**Source of truth for the exact category → severity mapping:** [schema/workflows/lint.md](schema/workflows/lint.md) "CI mode" — do not reproduce the table here; it drifts. [docs/reference/ci.md](docs/reference/ci.md) provides the full policy rationale and multi-provider equivalents.
 
 ## Escape-hatch markers (intentional inferred/tentative claims)
 
@@ -129,4 +129,4 @@ Rules:
 - `reason` is required and non-empty.
 - Exempted claims surface in CI annotations as `::notice` (visible to reviewers, non-blocking).
 
-See [AGENTS.md §11.3 CI mode](AGENTS.md) and [docs/reference/ci.md](docs/reference/ci.md) for details.
+See [schema/workflows/lint.md](schema/workflows/lint.md) and [docs/reference/ci.md](docs/reference/ci.md) for details.
