@@ -3,7 +3,41 @@
 > Agent-authoritative reference for the ingest workflow: classifying a source, extracting claims with provenance, and merging into the wiki.
 > The AGENTS.md routing table points here. If you find a discrepancy between this file and AGENTS.md, this file wins.
 
-> **Note:** The step-by-step ingest procedure is added by Plan 02. This file currently holds the two reference blocks folded in from the former Compiler Pipeline section of AGENTS.md (claim-granularity + incremental-update policy).
+```
+Trigger:  User places a new source document and requests ingestion
+Inputs:   Source file at sources/YYYY/YYYY-MM/YYYY-MM-DD-slug/ (bundle) or .md (single file)
+Outputs:  Source summary page, updated wiki pages, updated index, updated log
+Commit:   ingest(<source-slug>): <one-line summary>
+```
+
+**Steps:**
+
+1. User places source document in `sources/YYYY/YYYY-MM/YYYY-MM-DD-slug/` (bundle with `source.md` + assets) or `sources/YYYY/YYYY-MM/YYYY-MM-DD-slug.md` (single file).
+2. LLM reads the source document completely.
+3. **Classify** (Pipeline Pass 0): Determine source type -- article, paper, transcript, journal entry, data file, or image-heavy.
+4. **Diff** (Pipeline Pass 1): Read `wiki-cloud/index.md`, identify related existing pages, read their TL;DR and Key Facts sections. Determine what this source adds that the wiki does not already cover.
+5. **Extract** (Pipeline Pass 2): Extract claims with provenance locators, applying the claim granularity rules in this file (see Claim Granularity Rules below) based on the source type classified in step 3. Create source summary page at `wiki-cloud/sources/<source_id>.md` (or `wiki-local/sources/` if content derives from a local source -- see `schema/reference/privacy.md`) with full frontmatter including `path`, `content_hash`, `ingested_at`, and `source_type`.
+6. **Merge** (Pipeline Pass 3): Update or create entity/concept/overview pages using UPDATE operations (see `schema/workflows/structured-operations.md`) and the append-then-synthesize policy (see Incremental Update Policy below). Generate wikilinks on first mention (see `schema/reference/wikilinks.md`). MERGE pages if the source reveals duplicates.
+   - 6a. After merge is complete, update the source summary page's compilation tracking fields:
+     - Set `compilation_status` to `compiled` if all extracted claims were merged into topic pages, or `partial` if some claims were deferred.
+     - Set `compiled_against_hash` to the current `content_hash` value.
+     - Set `compiled_targets` to the list of wiki page IDs that received claims from this source (page IDs only, not paths).
+7. **Lint** (Pipeline Pass 4): Verify all provenance references resolve, wikilinks are valid, frontmatter is complete on all modified pages.
+8. Update `wiki-cloud/index.md` (or `wiki-local/index.md` if applicable) with new and modified pages.
+9. Append entry to `wiki-cloud/log.md` (or `wiki-local/log.md` if applicable): `## [YYYY-MM-DD] ingest | <source title>` with affected pages and rationale.
+    - 9a. **Contributor attribution (COLAB-03, COLAB-04):** If the log entry is produced via `bin/ingest.sh`, the helper resolves a contributor handle via the following order:
+        1. Explicit `--contributor @handle` flag wins (forces emission even on single-author repos).
+        2. On single-author repos (`git log --all --format='%ae' | sort -u | wc -l == 1`), the field is omitted entirely.
+        3. Otherwise, look up `git config user.email` in `.git-author-map.txt` at the repo root (case-insensitive; format `email  ->  @handle`, `#` comments allowed). On hit, emit `contributor:: @handle` as a Dataview inline body field directly below the `## [YYYY-MM-DD]` log-entry header (see `schema/reference/log-format.md`).
+        4. On map miss, warn to stderr (actionable: suggest `--contributor @handle` or adding the mapping) and OMIT the field. NEVER write a bare email into the `contributor::` field (privacy hygiene + parser consistency).
+      Git commit authorship remains the attribution source of truth; `contributor::` is a Dataview convenience index.
+10. Commit: `ingest(<source-slug>): <one-line summary>`
+
+**Abort conditions:**
+
+- Source is unreadable or corrupted. Log failure in `wiki-cloud/log.md`, do NOT create partial wiki pages.
+- Source duplicates an already-ingested source (check `content_hash` against existing source summary pages). Log the duplicate detection, do NOT re-ingest.
+- Privacy tier cannot be determined. Default to `wiki-local/` placement and log the classification gap.
 
 ## Claim Granularity Rules
 
@@ -40,3 +74,4 @@ The default policy for living wiki pages (entities, concepts, overviews, compari
 - [AGENTS.md](../../AGENTS.md) — routing-table stub (dispatch pointer to this file).
 - `schema/workflows/structured-operations.md` — the UPDATE/MERGE operations the merge step invokes.
 - `schema/reference/provenance.md` — provenance marker syntax used during extraction.
+- `schema/reference/log-format.md` — consolidated log entry format reference.
