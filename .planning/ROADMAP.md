@@ -140,7 +140,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 — shares core file)*
 
-- [ ] 17-02-PLAN.md — Complete ingest.md (§11.1 procedure); extract §11.2 → query.md; reduce core §11.1/§11.2 to routing dispatch + the one write-back-mandatory line (WF-03, WF-04)
+- [x] 17-02-PLAN.md — Complete ingest.md (§11.1 procedure); extract §11.2 → query.md; reduce core §11.1/§11.2 to routing dispatch + the one write-back-mandatory line (WF-03, WF-04)
 
 **Wave 3** *(blocked on Wave 2 — shares core file; final extraction)*
 
@@ -344,5 +344,5 @@ The following are intentionally deferred until real usage demands them, captured
 | 14. Graph Link Resolution | v1.1.1 | 3/3 | Complete    | 2026-06-03 |
 | 15. Privacy Architecture | v1.2 | 3/3 | Complete    | 2026-06-04 |
 | 16. Reference Extraction | v1.2 | 5/5 | Complete    | 2026-06-05 |
-| 17. Workflow Extraction | v1.2 | 1/4 | In Progress|  |
+| 17. Workflow Extraction | v1.2 | 2/4 | In Progress|  |
 | 18. Skills Overlay | v1.2 | 0/TBD | Not started | - |
