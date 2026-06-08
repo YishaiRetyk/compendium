@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Schema Architecture
-status: milestone_complete
-stopped_at: Phase 18 complete (3/3) — v1.2 Schema Architecture milestone complete (Phases 15–18 all done); ready for /gsd-complete-milestone
-last_updated: 2026-06-08T18:18:44.511Z
-last_activity: 2026-06-08 -- Phase 18 executed and verified (3/3 plans); v1.2 milestone complete
+status: Awaiting next milestone
+stopped_at: Phase 18 context gathered
+last_updated: "2026-06-08T20:01:07.412Z"
+last_activity: 2026-06-08 — Milestone v1.2 completed and archived
 progress:
   total_phases: 11
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 15
-  completed_plans: 73
-  percent: 27
+  completed_plans: 15
+  percent: 36
 ---
 
 # Project State
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-06-04)
 
 ## Current Position
 
-Phase: 18 (complete) — v1.2 milestone complete
-Plan: 3/3 complete
-Status: Milestone complete — ready for /gsd-complete-milestone
-Last activity: 2026-06-08
+Phase: Milestone v1.2 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-06-08 — Milestone v1.2 completed and archived
 
 ### v1.2 Phase Summary
 
@@ -58,6 +58,15 @@ Items acknowledged and deferred at the v1.1.1 milestone close (2026-06-03):
 |----------|------|--------|
 | todo | `phase-14-lint-mask-fence-edge-cases` — WR-02/03 fence-edge-case hardening for lint markdown masking | Deferred from Phase 14; in `.planning/todos/pending/`. Promote via `/gsd-quick`. |
 | quick_task (DONE) | 4 quick tasks flagged by audit-open as status `missing` (`260415-fvc`, `260415-gzu`, `260501-g5n`, `260602-d6a`) | All complete — each has a SUMMARY.md; flagged only due to unparseable status field. 260501-g5n & 260602-d6a already noted delivered at v1.1 close. No action. |
+
+Items acknowledged and deferred at the v1.2 milestone close (2026-06-08):
+
+| Category | Item | Status |
+|----------|------|--------|
+| todo | `phase-14-lint-mask-fence-edge-cases` — WR-02/03 fence-edge-case hardening for lint markdown masking | Still pending in `.planning/todos/pending/`; carried forward. Promote via `/gsd-quick`. |
+| quick_task (DONE) | 4 audit-open quick tasks (`260415-fvc`, `260415-gzu`, `260501-g5n`, `260602-d6a`) flagged `missing` | False-positive — all complete (each has a SUMMARY.md); unparseable status field only. No action. |
+
+These 5 items were the open-artifact-audit findings at v1.2 close; all are pre-existing acknowledged deferrals (carried from v1.1/v1.1.1). Acknowledged and milestone closed.
 
 Phase D (`WIZ`) deferred from v1.2 scope per 2026-06-04 design review — WIZ-01 blocked on resolving Phase-8 minimalism conflict; WIZ-02 observation-gated. Tracked in REQUIREMENTS.md Backlog and ROADMAP.md 999.3.
 
@@ -386,5 +395,4 @@ Resume file: .planning/phases/18-skills-overlay/18-CONTEXT.md
 
 ## Operator Next Steps
 
-- `/gsd-discuss-phase 17` — Discuss Phase 17 (Workflow Extraction, WF-01..09) before planning
-- `/gsd-plan-phase 17` — Plan Phase 17 directly (skip discuss)
+- Start the next milestone with /gsd-new-milestone

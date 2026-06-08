@@ -10,27 +10,30 @@ The wiki is a persistent, compounding artifact — cross-references are already 
 
 ## Current State
 
-**Shipped:** v1.1.1 Graph Integrity (2026-06-04) — the Obsidian graph now actually connects. The milestone's start premise was **proven false mid-flight** (Obsidian resolves `[[X]]` by **filename/path ONLY** — never by `title`, never by `aliases`; confirmed for v1.12.7) and re-planned around the correct fix: **uniform piped links `[[id|Title]]`** (target = page `id` = filename, always resolves; display = canonical title). §8/§5 + 12 templates corrected, self-alias invariant removed, superseding DR `dr-2026-06-03-uniform-piped-links`; `bin/lint.sh` `linkres` re-pointed to validate link *targets* + `--fix` bare→piped + alias-free `orphan` (LINT_VERSION 1.6.0); all `wiki/` + `examples/` body links rewritten to piped form. Orphan count 19→0; connected graph human-verified in Obsidian. LINK-01..10 Complete.
+**Shipped:** v1.2 Schema Architecture (2026-06-08) — applied the project's own §7 progressive-disclosure principle to its own spec. The always-loaded `AGENTS.md`/`CLAUDE.md` monolith (**1,689 lines**) was reduced to a ~287-line resident core decided by an inclusion test (ambient / unscriptable-AND-unacceptable-miss / dispatch), with everything else extracted into `schema/reference/*.md` + `schema/workflows/*.md`. Four phases, 15 plans, 28/28 requirements Complete: **Phase 15 Privacy Architecture (`PRIV`)** — replaced per-page §13 privacy with the asymmetric two-directory `wiki-cloud/` / `wiki-local/` model (one-way permeability enforced as a harness `deny`-read permission, not a resident rule); **Phase 16 Reference Extraction (`REF`)** — §4/5/6/7/8/13 → `schema/reference/*.md`, §14/15 → `docs/reference/*.md`, §16 deleted, `IMPORTANT:`-flagged routing table added; **Phase 17 Workflow Extraction (`WF`)** — §9/10/11.1–11.7/12 → `schema/workflows/*.md` (incl. the 182-line brownfield miss), new `routing` lint category (LINT_VERSION 1.8.0) gates path-ref integrity; **Phase 18 Skills Overlay (`SKILL`)** — thin pointer-only `.claude/skills/{ingest,query,lint,reflect}/SKILL.md` routers generated + drift-gated by `bin/gen-skills.sh --check`, zero authoritative content. Byte-equality (`sync-claude --check`), neutrality, and privacy gates all green throughout.
 
-**Cumulative:** v1.0 MVP (Phases 1–6, shipped 2026-04-15) + v1.1 Shareability (Phases 7–13.2, shipped 2026-06-02) + v1.1.1 Graph Integrity (Phase 14, shipped 2026-06-04). 58 plans total across 3 milestones.
+**Cumulative:** v1.0 MVP (Phases 1–6, shipped 2026-04-15) + v1.1 Shareability (Phases 7–13.2, shipped 2026-06-02) + v1.1.1 Graph Integrity (Phase 14, shipped 2026-06-04) + v1.2 Schema Architecture (Phases 15–18, shipped 2026-06-08). 73 plans total across 4 milestones.
 
-**Active milestone:** **v1.2 Schema Architecture** (started 2026-06-04, promoted from backlog 999.4) — see the dedicated section below. **In-flight progress:** Phase 15 (Privacy Architecture, `PRIV`) ✓ · Phase 16 (Reference Extraction, `REF`) ✓ · Phase 17 (Workflow Extraction, `WF-01..09`) ✓ complete 2026-06-07 — §9/10/11.1–11.7/12 extracted to `schema/workflows/*.md` + `schema/reference/log-format.md`, resident core 1,689→287 lines, new `routing` lint category (LINT_VERSION 1.8.0) gates path-ref integrity. Next: Phase 18 (Skills Overlay, `SKILL`). Other backlog: 999.3 (template placeholder system, partially folded as deferred Phase D/`WIZ`), 999.5 (external source drift detection), 999.6 (observed GTD review patterns).
+**Active milestone:** None — v1.2 complete. Next milestone via `/gsd-new-milestone`. Live backlog (do not plan against superseded 999.1/999.2/999.7): 999.3 (template placeholder system, partially folded as the deferred Phase D/`WIZ`), 999.4 (now delivered as v1.2 itself), 999.5 (external source drift detection), 999.6 (observed GTD review patterns).
 
-**Deferred to backlog:** Obsidian plugin distribution, one-command installer (`curl|bash`), hosted docs site, brownfield `--apply` mode — all carried forward.
+**Deferred to backlog:** Obsidian plugin distribution, one-command installer (`curl|bash`), hosted docs site, brownfield `--apply` mode, Phase D Wizard/Template fold-in (`WIZ`) — all carried forward.
 
-## Current Milestone: v1.2 Schema Architecture
+<details>
+<summary>✅ v1.2 Schema Architecture (Phases 15–18) — SHIPPED 2026-06-08</summary>
 
-**Goal:** Apply the project's own §7 progressive-disclosure principle to its own spec — reduce the always-loaded `AGENTS.md`/`CLAUDE.md` (now **1,689 lines**) to a resident core of only what genuinely belongs in every-turn context, decided by an **inclusion test** (ambient / unscriptable-AND-unacceptable-miss-cost / dispatch), not a line target. The ~145-line core is an expected *output*, not a goal. Everything else extracts into `schema/reference/*.md` + `schema/workflows/*.md`, preserving a markdown-authoritative, harness-portable architecture.
+**Goal (delivered):** Apply the project's own §7 progressive-disclosure principle to its own spec — reduce the always-loaded `AGENTS.md`/`CLAUDE.md` (1,689 lines) to a resident core of only what genuinely belongs in every-turn context, decided by an **inclusion test** (ambient / unscriptable-AND-unacceptable-miss-cost / dispatch), not a line target. Outcome: ~287-line core; the rest extracted into `schema/reference/*.md` + `schema/workflows/*.md`, preserving a markdown-authoritative, harness-portable architecture.
 
-**Target features (committed: Phase 0 + A + B + C):**
-- **Phase 0 — Privacy Architecture (`PRIV`, gates A):** replace per-page §13 privacy with a per-vault **asymmetric two-directory** model (`wiki-cloud/` / `wiki-local/`; one-way permeability — local runs read both, cloud runs cannot read `wiki-local/`); enforcement is a harness permission (`deny`-read), not a resident agent rule. Decided/ACCEPTED 2026-06-04. Must land before §13 is extracted.
-- **Phase A — Reference Extraction (`REF`, low-risk):** §4/5/6/7/8/13 → `schema/reference/*.md`; §14/15 → `docs/reference/*.md`; delete §16; add the `IMPORTANT:`-flagged routing table; mirror stubs into `schema/AGENTS.template.md`.
-- **Phase B — Workflow Extraction (`WF`, medium-risk):** §9/10/11.1–11.7/12 → `schema/workflows/*.md` (incl. the 182-line brownfield miss); absorbs the `workflows-operations-to-skills` seed; verify core against the inclusion test.
-- **Phase C — Skills Overlay (`SKILL`, optional):** thin `.claude/skills/` routers (ingest/query/lint/reflect), pointer-only bodies; zero authoritative content.
+**Phases (all complete):**
+- **Phase 15 — Privacy Architecture (`PRIV`):** per-vault asymmetric two-directory model (`wiki-cloud/` / `wiki-local/`; one-way permeability — local runs read both, cloud runs cannot read `wiki-local/`); enforcement is a harness `deny`-read permission, not a resident rule. Landed before §13 extraction.
+- **Phase 16 — Reference Extraction (`REF`):** §4/5/6/7/8/13 → `schema/reference/*.md`; §14/15 → `docs/reference/*.md`; §16 deleted; `IMPORTANT:`-flagged routing table added; stubs mirrored into `schema/AGENTS.template.md`.
+- **Phase 17 — Workflow Extraction (`WF`):** §9/10/11.1–11.7/12 → `schema/workflows/*.md` (incl. the 182-line brownfield miss); resident core 1,689→287 lines; new `routing` lint category (LINT_VERSION 1.8.0) gates path-ref integrity.
+- **Phase 18 — Skills Overlay (`SKILL`):** thin pointer-only `.claude/skills/{ingest,query,lint,reflect}/SKILL.md` routers generated + drift-gated by `bin/gen-skills.sh --check` (regenerate-diff + 6 structural assertions), wired into pre-commit + a hard-fail CI `skills-check` job; zero authoritative content.
 
-**Deferred this milestone:** Phase D — Wizard/Template fold-in (`WIZ`) — D1 conflicts with the Phase-8 minimalism decision (must be justified first); D2 is observation-gated. Promotable later via `/gsd-phase`.
+**Deferred:** Phase D — Wizard/Template fold-in (`WIZ`) — D1 conflicts with the Phase-8 minimalism decision; D2 is observation-gated. Promotable later via `/gsd-phase`.
 
-**Design constraints (non-negotiable, carry into every phase):** markdown-authoritative; `AGENTS.md ≡ CLAUDE.md` byte-equality (pre-commit `sync-claude --check`); wizard pipeline preserved; always-loaded safety core stays resident (provenance requirement, MUST-NOT list verbatim, write-back-mandatory, structured-op vocabulary — **privacy no longer in this list**, dissolved by Phase 0); CI gates unchanged in behavior (extraction relocates text, not logic).
+**Design constraints held throughout:** markdown-authoritative; `AGENTS.md ≡ CLAUDE.md` byte-equality (pre-commit `sync-claude --check`); wizard pipeline preserved; always-loaded safety core stays resident (provenance requirement, MUST-NOT list verbatim, write-back-mandatory, structured-op vocabulary — privacy dissolved into the harness permission by Phase 15); CI gates unchanged in behavior (extraction relocated text, not logic).
+
+</details>
 
 ## Requirements
 
@@ -68,6 +71,15 @@ The wiki is a persistent, compounding artifact — cross-references are already 
 - [x] Complementary-systems boundary decision record — compendium owns durable wiki memory; task / calendar / reminder / inbox layers belong to complementary systems (BOUND-01) — Validated in Phase 12: complementary-systems-boundary-gtd-alignment
 - [x] Three-layer reference doc — task / working-memory / wiki-compiler split with capture/clarify/organize/review routing rules and explicit anti-features (BOUND-02) — Validated in Phase 12: complementary-systems-boundary-gtd-alignment
 - [x] Reviewed-match boundary audit — README + AGENTS.md + docs/ + wiki/decisions/ verified to contain zero "all-in-one PKM/task" framing (BOUND-03) — Validated in Phase 12: complementary-systems-boundary-gtd-alignment
+
+### Validated (v1.2 Schema Architecture — shipped 2026-06-08)
+
+- ✓ Asymmetric two-directory privacy model (`wiki-cloud/` / `wiki-local/`); one-way permeability enforced as a harness `deny`-read permission; per-page §13 privacy dissolved (`PRIV-01..07`) — v1.2 (Phase 15)
+- ✓ Reference extraction — §4/5/6/7/8/13 → `schema/reference/*.md`, §14/15 → `docs/reference/*.md`, §16 deleted, `IMPORTANT:`-flagged routing table added (`REF-01..10`) — v1.2 (Phase 16)
+- ✓ Workflow extraction — §9/10/11.1–11.7/12 → `schema/workflows/*.md`; resident core 1,689→287 lines; `routing` lint category (LINT_VERSION 1.8.0) gates path-ref integrity (`WF-01..09`) — v1.2 (Phase 17)
+- ✓ Skills overlay — four thin pointer-only `.claude/skills/*/SKILL.md` routers generated + drift-gated by `bin/gen-skills.sh --check`, wired into pre-commit + CI; zero authoritative content (`SKILL-01..02`) — v1.2 (Phase 18)
+
+Closure: 28/28 v1.2 requirements Complete; byte-equality (`sync-claude --check`), neutrality, privacy, and `gen-skills --check` gates all green.
 
 ### Validated (v1.1 Shareability — shipped 2026-06-02)
 
@@ -127,6 +139,9 @@ The v1 is a full starter kit: schema, workflows, conventions, page templates, ex
 | Full framework from v1 (provenance, epistemic status, structured ops) | The advanced features are what differentiate this from "LLM writes notes" | ✓ Good — all three shipped and validated end-to-end |
 | Obsidian as primary interface | Graph view, Dataview, Marp, plugin ecosystem — best-in-class for interlinked markdown | ⚠️ Revisit — Obsidian render/Dataview check deferred from Phase 4 |
 | Agent-agnostic design | Avoid lock-in, test with multiple agents to find what works | — Pending — only Claude Code exercised in v1.0 |
+| Progressive-disclosure self-refactor (v1.2): extract the spec monolith into `schema/reference/*.md` + `schema/workflows/*.md`, keep a minimal resident core decided by an inclusion test | The always-loaded 1,689-line AGENTS.md/CLAUDE.md violated the project's own §7 principle | ✓ Good — core shrank to ~287 lines; routing-table + `routing` lint category prevent dangling refs |
+| Asymmetric two-directory privacy (`wiki-cloud/` / `wiki-local/`) enforced as a harness permission, not a resident agent rule | Per-page §13 privacy was fragile and bloated the resident core; structural enforcement is stronger than a rule the agent must remember | ✓ Good — privacy dropped from the safety core (Phase 15) |
+| Thin generated `.claude/skills/` overlay (pointer-only bodies, drift-gated) over markdown SOT | Skills add discoverability without forking authority away from markdown | ✓ Good — `gen-skills --check` keeps bodies zero-authoritative; SOT stays in `schema/workflows/*.md` |
 
 ## Evolution
 
@@ -144,6 +159,9 @@ This document evolves at phase transitions and milestone boundaries.
 2. Core Value check — still the right priority?
 3. Audit Out of Scope — reasons still valid?
 4. Update Context with current state
+
+---
+*Last updated: 2026-06-08 — **Milestone v1.2 Schema Architecture SHIPPED + ARCHIVED.** Phases 15–18 complete (15 plans); 28/28 requirements Complete. The 1,689-line AGENTS.md/CLAUDE.md monolith reduced to a ~287-line resident core via an inclusion test, the rest extracted to `schema/reference/*.md` + `schema/workflows/*.md`; asymmetric two-dir privacy (`wiki-cloud/`/`wiki-local/`) enforced as a harness permission; thin drift-gated `.claude/skills/` overlay added. Archived to `.planning/milestones/v1.2-*`; ROADMAP collapsed (Backlog preserved); `REQUIREMENTS.md` removed for a fresh next-milestone; RETROSPECTIVE updated; git tag `v1.2`. Open items at close (5) acknowledged as pre-existing deferrals — see STATE.md Deferred Items. Next: `/gsd-new-milestone`.*
 
 ---
 *Last updated: 2026-06-08 — Phase 18 (Skills Overlay, `SKILL-01..02`) complete (3/3 plans, 11/11 must-haves) — **closes milestone v1.2 Schema Architecture** (Phases 15–18 all done). Shipped a thin `.claude/skills/` overlay: four pointer-only routers (`ingest`/`query`/`lint`/`reflect`), each a ≤3-line body invoking `schema/workflows/{op}.md` — zero authoritative content (markdown remains the SOT). Generated and drift-gated by `bin/gen-skills.sh --check` (regenerate-diff + 6 structural assertions: body-line, dir-purity, dead-pointer, YAML-safety, first-person, no-disable-model-invocation), wired into the pre-commit hook (sync-claude → gen-skills → lint) and a hard-fail CI `skills-check` job; `.gitignore` flipped to `.claude/*` file-glob form to track the four SKILL.md; neutrality gate extended to `.claude/skills`. TDD harness `tests/phase-18/` 10/10 green. Cross-phase regression gate: one stale prior test (`tests/phase-09/test_lint_workflow.sh` hard-coded exactly-3 CI jobs) updated for the intended new `skills-check` job; all other prior-phase harness failures confirmed pre-existing at the pre-phase baseline. Code review (advisory) found 0 blocker / 6 warning / 3 info; the warnings cluster on `gen-skills.sh` cwd-relative path resolution (latent — hook/CI always run from root) and tests not `cd`-ing to repo root, tracked in `18-REVIEW.md` for follow-up. `gsd phase.complete` again mis-advanced to SUPERSEDED backlog Phase 999.1; hand-corrected STATE to reflect v1.2 milestone-complete. Next: `/gsd-complete-milestone`.*

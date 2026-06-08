@@ -1,5 +1,24 @@
 # Milestones
 
+## v1.2 Schema Architecture (Shipped: 2026-06-08)
+
+**Phases completed:** 4 phases (15–18), 15 plans
+**Requirements:** 28/28 complete (PRIV-01..07, REF-01..10, WF-01..09, SKILL-01..02)
+**Timeline:** 2026-06-04 → 2026-06-08 (~4 days)
+
+**Delivered:** The project's own §7 progressive-disclosure principle applied to its own spec — the always-loaded `AGENTS.md`/`CLAUDE.md` monolith (1,689 lines) reduced to a ~287-line resident core, the rest extracted into a markdown-authoritative `schema/reference/*.md` + `schema/workflows/*.md` tree, with privacy re-architected as a structural harness permission and a thin drift-gated skills overlay added.
+
+**Key accomplishments:**
+
+- **Privacy Architecture (Phase 15, `PRIV-01..07`):** Replaced per-page §13 `privacy` frontmatter with the asymmetric two-directory model — `wiki-cloud/` (cloud-safe) and `wiki-local/` (local-only), one-way permeability enforced as a harness `deny`-read permission rather than a resident agent rule. One security-atomic migration commit re-keyed every privacy predicate so no intermediate had a dead guard; a TDD harness armed the Nyquist gate before any structural change. Privacy thereby dropped out of the always-loaded safety core.
+- **Reference Extraction (Phase 16, `REF-01..10`):** §4/5/6/7/8/13 → `schema/reference/*.md`; §14/15 → `docs/reference/*.md`; §16 deleted; the `IMPORTANT:`-flagged routing table added to the core; stubs mirrored into `schema/AGENTS.template.md`; byte-equality and neutrality gates held.
+- **Workflow Extraction (Phase 17, `WF-01..09`):** §9/10/11.1–11.7/12 → `schema/workflows/*.md` (including the previously-missed 182-line brownfield workflow); resident core shrank 1,689→287 lines with per-section inclusion justifications; a new `routing` lint category (LINT_VERSION 1.8.0) gates forward dangling-ref and inverse orphan-file integrity over the live tree.
+- **Skills Overlay (Phase 18, `SKILL-01..02`):** Four thin pointer-only `.claude/skills/{ingest,query,lint,reflect}/SKILL.md` routers generated and drift-gated by `bin/gen-skills.sh --check` (regenerate-diff + 6 structural assertions), wired into the pre-commit hook and a hard-fail CI `skills-check` job; zero authoritative content (markdown stays the SOT). TDD harness `tests/phase-18/` 10/10 green; advisory code-review warnings on generator cwd-resolution fixed in `18-REVIEW-FIX.md`.
+
+**Known deferred items at close:** 5 (see STATE.md Deferred Items) — all pre-existing acknowledged deferrals carried from prior closes: the `phase-14-lint-mask-fence-edge-cases` todo, and 4 audit-flagged quick tasks (`260415-fvc`, `260415-gzu`, `260501-g5n`, `260602-d6a`) that are actually complete (false-positive from an unparseable status field). Plus Phase D Wizard fold-in (`WIZ`) deferred from v1.2 scope.
+
+---
+
 ## v1.1.1 Graph Integrity (Shipped: 2026-06-04)
 
 **Phases completed:** 1 phase (Phase 14: Graph Link Resolution), 3 plans
