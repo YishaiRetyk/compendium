@@ -540,3 +540,31 @@ Created dr-2026-06-08-skills-overlay (trigger_type: schema-update) recording the
 findings: 0 total (0 errors, 0 warnings, 0 info)
 auto_fixes: 0 applied
 report: wiki-cloud/maintenance/lint-report.md
+
+## [2026-06-09] ingest | PDF-to-Text Extraction and LLM PDF Ingestion — State of the Art (2025–2026)
+
+source: src-2026-06-09-pdf-to-text-llm-ingestion-sota
+classification: article (synthesized deep-research report; secondary synthesis over 21 public web sources, 22/25 sampled claims survived 3-vote adversarial verification)
+result: created source summary; 1 overview (pdf-text-extraction-for-llm-ingestion); 1 comparison (ocr-pipeline-vs-vlm-ingestion); 2 entities (olmocr, omnidocbench); 1 concept (vlm-ocr-hallucination). Net-new "document AI / PDF extraction" domain — no existing wiki pages overlapped, so no UPDATEs to prior pages.
+write_back: WRITE-BACK — new sources establish the three-camp taxonomy (traditional OCR / pipeline tools / VLM-OCR), the extraction-vs-native-vision paradigm debate, OmniDocBench + olmOCR-Bench as accuracy references, the per-page cost picture across self-hosted and commercial tiers, the VLM hallucination failure mode, and a concrete Markdown-pipeline recommendation. None present in the wiki before this ingest.
+delta_compiled: src-2026-06-09-pdf-to-text-llm-ingestion-sota → [pdf-text-extraction-for-llm-ingestion, ocr-pipeline-vs-vlm-ingestion, olmocr, omnidocbench, vlm-ocr-hallucination]. Flipped pending → compiled with compiled_against_hash + compiled_targets populated per frontmatter §Compilation Tracking invariants.
+pages_affected: src-2026-06-09-pdf-to-text-llm-ingestion-sota, pdf-text-extraction-for-llm-ingestion, ocr-pipeline-vs-vlm-ingestion, olmocr, omnidocbench, vlm-ocr-hallucination, index
+notes: privacy cloud_safe (public technology and public sources; no PII). Single-author repo, contributor field omitted per ingest §9a. Time-sensitivity is the dominant caveat — benchmark-leaderboard positions and per-page prices move monthly, so edit-distance numbers, the v1.5 leaderboard ordering, olmOCR-Bench scores, the human-eval ELO, and the price table are marked [epistemic:: tentative] (also reflecting first-party/aggregator sourcing), while the structural taxonomy, paradigm split, and hallucination failure mode are [epistemic:: sourced]. olmOCR-Bench and the olmOCR human eval are Ai2-authored (first-party). Three vendor/leaderboard accuracy claims were REFUTED in verification and excluded from findings — recorded in the source summary Notes and the raw source #sec:refuted for the provenance trail. MinerU and Marker referenced as red links (knowledge-gap pages not yet written). Gaps: Docling, LlamaParse, Reducto, Unstructured were in scope but no verified accuracy/cost claims survived — candidates for a follow-up query.
+
+## [2026-06-09] lint | wiki-cloud health check
+
+findings: 66 total (19 errors, 47 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki-cloud/maintenance/lint-report.md
+
+## [2026-06-09] lint | wiki-cloud health check
+
+findings: 65 total (18 errors, 47 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki-cloud/maintenance/lint-report.md
+
+## [2026-06-09] lint | wiki-cloud health check
+
+findings: 65 total (18 errors, 47 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki-cloud/maintenance/lint-report.md

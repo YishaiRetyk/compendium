@@ -36,6 +36,8 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[claude-code|Claude Code]] — Anthropic's CLI for Claude (terminal, desktop, web, IDE); custom-only Agent Skills mounted at ~/.claude/skills/ or .claude/skills/ (sourced, 2026-05-06)
 - [[claude-api|Claude API]] — Anthropic's HTTP API surface; pre-built and custom Agent Skills via container.skills + code_execution_20250825 tool with three required betas (sourced, 2026-05-06)
 - [[geoffrey-huntley|Geoffrey Huntley]] — Software engineer who originated the "Ralph" autonomous-coding-loop technique (sourced, 2026-05-06)
+- [[olmocr|olmOCR]] — Ai2's open-source self-hostable VLM document converter (Qwen2.5-VL-7B fine-tune); headline PDF-to-Markdown self-hosting pick, 82.4 on olmOCR-Bench (mixed, 2026-06-09)
+- [[omnidocbench|OmniDocBench]] — Authoritative CVPR 2025 benchmark for diverse PDF document parsing (~1,651 pages, ~10 doc types, end-to-end/task/attribute modes) (mixed, 2026-06-09)
 
 ## Concepts
 
@@ -49,6 +51,7 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[progressive-disclosure|Progressive Disclosure]] — Three-level loading pattern in Anthropic Agent Skills (metadata always, instructions when triggered, resources as needed); also a general context-engineering principle shared by the Ralph autonomous-loop playbook (sourced, 2026-06-01)
 - [[ralph-loop|Ralph (Autonomous Coding Loop)]] — Geoffrey Huntley's minimal autonomous-coding pattern: bash `while` loop + fixed PROMPT.md + IMPLEMENTATION_PLAN.md on disk as cross-iteration shared state (sourced, 2026-05-06)
 - [[backpressure|Backpressure]] — Downstream rejection signals (tests, typechecks, lints, builds, LLM-as-judge) that block invalid agent output before commit (sourced, 2026-05-06)
+- [[vlm-ocr-hallucination|VLM OCR Hallucination]] — Vision-language models default to linguistic priors on degraded document images, emitting plausible-but-wrong text instead of flagging unreadability (sourced, 2026-06-09)
 
 ## Sources
 
@@ -67,10 +70,12 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[src-2026-05-06-anthropic-claude-cookbook-skills-introduction|Introduction to Claude Skills (claude-cookbooks notebook 01)]] — Anthropic claude-cookbooks notebook with concrete SDK call shape (client.beta.messages.create + betas= parameter), required SDK version (anthropic>=0.71.0), and observed generation times (sourced, 2026-05-06)
 - [[src-2026-05-06-anthropic-claude-cookbook-skills-custom-development|Building Custom Skills for Claude (claude-cookbooks notebook 03)]] — Anthropic claude-cookbooks notebook on custom-Skill upload (skills.create + files_from_dir), display_title workspace-uniqueness, type:'custom' container discriminator, versioning lifecycle, and skill composition (sourced, 2026-05-06)
 - [[src-2026-05-06-ralph-playbook|The Ralph Playbook (Clayton Farr's how-to-ralph-wiggum)]] — Clayton Farr, 2026-05-06 — Long-form synthesis of Geoffrey Huntley's Ralph autonomous-coding-loop technique: 3 phases / 2 prompts / 1 loop, with five proposed enhancements (sourced, 2026-05-06)
+- [[src-2026-06-09-pdf-to-text-llm-ingestion-sota|PDF-to-Text Extraction and LLM PDF Ingestion: State of the Art (2025–2026)]] — Synthesized deep-research report: three-camp taxonomy, extraction-vs-native-vision paradigms, OmniDocBench/olmOCR-Bench, per-page cost, VLM hallucination, pipeline recommendation (mixed, 2026-06-09)
 
 ## Comparisons
 
 - [[financial-ai-repository-tradeoffs|Financial AI Repository Tradeoffs]] — Tradeoff comparison for finance repositories with TA/FA analysis-style coverage (mixed, 2026-05-04)
+- [[ocr-pipeline-vs-vlm-ingestion|OCR Pipeline vs VLM Ingestion]] — The two competing PDF-to-Markdown paradigms — extraction/OCR pipelines vs native multimodal VLM ingestion — on accuracy, cost, determinism, and hallucination (mixed, 2026-06-09)
 
 ## Overviews
 
@@ -78,6 +83,7 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[financial-ai-repository-landscape|Financial AI Repository Landscape]] — Synthesis of six finance-related repositories as a layered ecosystem (mixed, 2026-05-04)
 - [[agent-skills|Agent Skills]] — Filesystem-based capability packages (SKILL.md + bundled code/refs) loaded via three-level progressive disclosure across Claude API, Claude Code, and Claude.ai (sourced, 2026-05-06)
 - [[ralph-loop-creator-skill|Ralph Loop Creator Skill]] — Specification for a custom Agent Skill that scaffolds Ralph prompts, loop scripts, specs, implementation-plan state, AGENTS.md operational guidance, and backpressure checks without running the autonomous loop (mixed, 2026-05-06)
+- [[pdf-text-extraction-for-llm-ingestion|PDF-to-Text Extraction for LLM Ingestion]] — 2025–2026 landscape for PDF-to-Markdown: three-camp taxonomy, paradigm debate, self-hosted vs commercial tiers, and a concrete ingestion-pipeline recommendation (mixed, 2026-06-09)
 
 ## Decisions
 
