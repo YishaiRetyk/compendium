@@ -15,7 +15,7 @@
 #   Settings -> Branches -> Branch protection rule for `main`:
 #     [x] Require status checks to pass before merging
 #     [x] Require branches to be up to date before merging
-#         Required checks: lint, privacy-leak, strict
+#         Required checks: lint, privacy-leak, strict, skills-check
 #         (alongside existing neutrality, setup-parity)
 #
 # See: docs/reference/ci.md for the full severity policy, JSON output schema,
@@ -85,3 +85,18 @@ jobs:
         run: pip install pyyaml
       - name: Strict quality ratchet (CI-06)
         run: bash bin/lint.sh --require-version 1.1.0 --strict
+
+  skills-check:
+    # D-03 / D-04: gen-skills --check hard-fail gate. CI never auto-fixes (hard-fail only).
+    # D-07: structural assertions inside gen-skills --check catch fattened templates
+    # that would still pass a pure regenerate-diff (committed == fattened-template).
+    # Required status check name: skills-check (add to branch protection on public template repo).
+    runs-on: ubuntu-latest
+    # Match the sibling `strict` job's draft-PR posture (REVIEWS.md LOW: skills-check
+    # previously lacked this guard, inconsistent with strict): skip on draft PRs, run on
+    # ready-for-review PRs and pushes to main.
+    if: github.event.pull_request.draft == false || github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v6
+      - name: Skills drift + structural assertions (SKILL-02)
+        run: bash bin/gen-skills.sh --check
