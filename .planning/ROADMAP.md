@@ -56,7 +56,7 @@ Full phase details: [milestones/v1.1.1-ROADMAP.md](milestones/v1.1.1-ROADMAP.md)
 - [x] **Phase 15: Privacy Architecture** — Replace per-page §13 privacy model with the asymmetric two-directory model (`wiki-cloud/` / `wiki-local/`); enforcement becomes a harness permission. Gates Phase 16. (completed 2026-06-04)
 - [x] **Phase 16: Reference Extraction** — Extract §4/5/6/7/8/13 → `schema/reference/*.md`; §14/15 → `docs/reference/*.md`; §16 deleted; routing table added to core. (completed 2026-06-05)
 - [x] **Phase 17: Workflow Extraction** — Extract §9/10/11.1–11.7/12 → `schema/workflows/*.md`; verify core against the inclusion test; agent-parity check. (completed 2026-06-07)
-- [ ] **Phase 18: Skills Overlay** — Thin `.claude/skills/` routers (ingest/query/lint/reflect); pointer-only bodies; zero authoritative content.
+- [x] **Phase 18: Skills Overlay** — Thin `.claude/skills/` routers (ingest/query/lint/reflect); pointer-only bodies; zero authoritative content. (completed 2026-06-08)
 
 ## Phase Details
 
@@ -174,7 +174,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1)*
 
-- [ ] 18-02-PLAN.md — Decision record (D-09) + docs/reference/skills.md (D-11) + index.md + ROADMAP
+- [x] 18-02-PLAN.md — Decision record (D-09) + docs/reference/skills.md (D-11) + index.md + ROADMAP
 
 ## Backlog
 
@@ -355,4 +355,4 @@ The following are intentionally deferred until real usage demands them, captured
 | 15. Privacy Architecture | v1.2 | 3/3 | Complete    | 2026-06-04 |
 | 16. Reference Extraction | v1.2 | 5/5 | Complete    | 2026-06-05 |
 | 17. Workflow Extraction | v1.2 | 4/4 | Complete    | 2026-06-07 |
-| 18. Skills Overlay | v1.2 | 2/3 | In Progress|  |
+| 18. Skills Overlay | v1.2 | 3/3 | Complete   | 2026-06-08 |
