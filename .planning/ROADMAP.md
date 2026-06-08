@@ -166,7 +166,7 @@ Plans:
 
 **Wave 0**
 
-- [ ] 18-00-PLAN.md — .gitignore un-ignore + RED test harness (11 tests)
+- [ ] 18-00-PLAN.md — .gitignore un-ignore + RED test harness (10 tests)
 
 **Wave 1** *(blocked on Wave 0)*
 
