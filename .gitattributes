@@ -1,0 +1,12 @@
+*.md text eol=lf
+*.sh text eol=lf
+
+# Phase 8 byte-equality fixtures — pin LF to prevent CRLF drift on Windows checkouts (M-2 mitigation).
+schema/fixtures/canonical-AGENTS.md text eol=lf
+schema/fixtures/canonical-answers.yaml text eol=lf
+schema/fixtures/README.md text eol=lf
+
+# Phase 10 BRWN-21 fixtures — LF-pinned by default (inherit from *.md above), with one
+# explicit exception for the crlf fixture whose input MUST retain literal \r\n bytes on
+# disk so `bin/brownfield.sh bootstrap` exercises the CRLF-to-LF normalization path.
+tests/phase-10/fixtures/crlf/input/page.md -text

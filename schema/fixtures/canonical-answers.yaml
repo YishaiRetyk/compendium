@@ -1,0 +1,15 @@
+# Canonical answer set for Phase 8 byte-equality CI test (MANUAL-06).
+# Used by: bin/init-wizard.sh --answers-file schema/fixtures/canonical-answers.yaml
+# Expected render: schema/fixtures/canonical-AGENTS.md (byte-equal)
+# See schema/fixtures/README.md for the cloud_safe-vs-local_only rationale.
+# DO NOT EDIT without regenerating canonical-AGENTS.md and updating tests.
+wizard_version: "1.1.0"
+generated_at: "2026-04-16T00:00:00Z"
+template_sha: "<frozen-fixture>"
+answers:
+  maintainer_name: "Template Maintainer"
+  primary_domain: "personal-knowledge"
+  agent: "claude-code"
+  default_privacy: "cloud_safe"
+  decay_profile: "default"
+  obsidian: true

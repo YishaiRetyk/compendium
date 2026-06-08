@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+# Pre-commit hook: enforce AGENTS.md <-> CLAUDE.md byte-equality (D-03)
+# AND run the local wiki write-gate over staged changes (Phase 12.2).
+set -euo pipefail
+
+# Surface real diagnostics rather than swallowing stderr (REVIEW WR-05): a non-drift failure
+# of the sync gate would otherwise masquerade as drift with no actionable message.
+if ! bash bin/sync-claude.sh --check; then
+    echo "CLAUDE.md drift detected. Auto-syncing..." >&2
+    bash bin/sync-claude.sh
+    git add CLAUDE.md
+    echo "CLAUDE.md resynced and re-staged. Re-run commit." >&2
+    exit 1
+fi
+
+# Phase 18 / SKILL-02: gen-skills drift gate (D-03, D-04).
+# Skills are committed generated artifacts; auto-fix + restage mirrors sync-claude pattern.
+# D-07: structural assertions inside gen-skills --check are NOT redundant with the
+# regenerate-diff check -- a fattened template still passes diff. Never remove.
+# Do NOT swallow stderr here (REVIEW WR-05): a non-drift failure (mktemp failure, a dead
+# schema/workflows/<op>.md pointer, dir-purity assertion) is otherwise indistinguishable from
+# real drift, and the auto-regenerate path below cannot fix it -- the user needs the diagnostic.
+if ! bash bin/gen-skills.sh --check; then
+    echo "Skills drift detected. Auto-regenerating..." >&2
+    bash bin/gen-skills.sh
+    # Stage the FOUR exact generated files, NOT a blanket `git add .claude/skills/`
+    # (REVIEWS.md Codex HIGH + recommended disposition item 4): a blanket add could stage a
+    # stray non-SKILL.md file that slipped into the dir, and -- if the structural assertion
+    # then keeps failing on that stray file -- the auto-fix + re-run loop never converges.
+    # Staging the exact known files keeps the hook deterministic and the dir-purity assertion
+    # is the gate that rejects any stray content (it does NOT get auto-staged here).
+    git add .claude/skills/ingest/SKILL.md \
+            .claude/skills/query/SKILL.md \
+            .claude/skills/lint/SKILL.md \
+            .claude/skills/reflect/SKILL.md
+    # Re-run the gate once after regenerating. If it STILL fails, the failure is not a
+    # diff-drift the regenerate can fix (e.g. a stray non-SKILL.md file tripping the
+    # dir-purity assertion, or a dead workflow pointer) -- regenerate does not remove stray
+    # files, so the naive "re-run commit" message loops forever (REVIEW WR-03). Surface the
+    # gate's real diagnostics and emit an actionable error instead of implying success on retry.
+    if ! bash bin/gen-skills.sh --check; then
+        echo "" >&2
+        echo "Skills gate still failing after regenerate -- this is not auto-fixable drift." >&2
+        echo "Remove any stray files from .claude/skills/<op>/ (only SKILL.md is allowed) and" >&2
+        echo "fix any dead schema/workflows/<op>.md pointer reported above, then re-run commit." >&2
+        exit 1
+    fi
+    echo "Skills resynced and re-staged. Re-run commit." >&2
+    exit 1
+fi
+
+# Phase 12.2 / WGATE-01..04: local wiki write-gate over staged changes.
+# Reuses bin/lint.sh --strict policy via the additive --staged flag.
+# See AGENTS.md §11.3 for the normative contract (exemption ordering,
+# bypass, exit codes). Bypass via `git commit --no-verify` when needed.
+if ! bash bin/lint.sh --strict --staged --category provenance >&2; then
+    echo "" >&2
+    echo "Write-gate failed. Add [prov:source_id#locator] markers to the page, set type: source / type: decision in frontmatter if it's not a synthesized page, or run \`git commit --no-verify\` to bypass." >&2
+    exit 1
+fi

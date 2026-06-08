@@ -1,0 +1,36 @@
+# Obsidian noise
+.obsidian/
+.obsidian/workspace*.json
+.obsidian/cache
+.trash/
+
+# Local agent/tool state (settings.cloud.json is tracked -- the cloud deny-profile artifact)
+# .claude/* (file-glob, NOT .claude/ directory ignore): git cannot re-include descendants of an
+# ignored DIRECTORY, so the skills negations below only work under the .claude/* file-glob form.
+.claude/*
+!.claude/settings.cloud.json
+!.claude/skills/
+!.claude/skills/*/
+# Re-ignore ALL contents of each skill op dir, then re-include ONLY SKILL.md (REVIEW WR-06).
+# Without the .claude/skills/*/* re-ignore, the directory-traversal negation above also
+# re-includes stray non-SKILL.md siblings, making them trackable and defeating the dir-purity
+# gate at the commit boundary. Order matters: the broad re-ignore must precede the SKILL.md
+# re-include. Result: `git add .claude/skills/` stages only SKILL.md; strays stay ignored.
+.claude/skills/*/*
+!.claude/skills/*/SKILL.md
+.git.backup-*/
+
+# Brownfield workflow artifacts
+.brownfield/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.swp
+*.err
+.idea/
+.vscode/
+
+# Python bytecode cache (generated when bin/lib/*.py modules are imported)
+__pycache__/
+*.pyc

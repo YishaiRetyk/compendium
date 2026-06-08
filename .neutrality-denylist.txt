@@ -1,0 +1,42 @@
+# Category: Kahneman reference example terms (NEUT-06)
+# Kahneman content lives legitimately in examples/kahneman/** only.
+kahneman
+daniel kahneman
+prospect theory
+loss aversion
+thinking fast and slow
+system 1
+system 2
+cognitive biases
+
+# Category: Personal-decision content archived from wiki/ (NEUT-08)
+# Source pages personal-decision-patterns.md and personal-decision-journal.md
+# were archived before v1.0 release. Defense-in-depth: keep these terms denied
+# so a future ingest cannot reintroduce the personal content by accident.
+personal-decision-patterns
+personal-decision-journal
+personal-decision-frameworks
+articulate-the-want
+autopilot-purchase
+flinch-level
+heuristic-origin
+pre-committed
+pre-commitment
+
+# Category: Personal-vault terms expanded curation (NEUT-08, 2026-05-02)
+# Curated subset of .planning/backlog-neutrality-denylist-candidate.txt under a
+# defense-in-depth rubric: SPEC §Constraints baseline (vault-coined hyphenated
+# identifiers) + (a) spaced multi-word phrases coined in archived journal sources
+# (precedent: existing denylist uses spaced forms `loss aversion`, `system 1`)
+# and (b) popular cog-bias terms used heavily in the user's archived journal
+# whose appearance in public template paths would betray vault provenance via
+# LLM-mediated example-leak. Generic English vocabulary rejected. See
+# .planning/phases/12.1-neut-08-personal-term-denylist-curation/12.1-VERIFICATION.md
+# for kept/rejected counts and rubric-class breakdown.
+pre-committing
+physical flinch
+pre-mortem
+pre-mortems
+decision fatigue
+decision-fatigue
+meta-observation
