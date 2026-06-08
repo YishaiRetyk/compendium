@@ -90,8 +90,11 @@ done
 
 [ -z "$DENYLIST" ] && DENYLIST="$ROOT/$DENYLIST_DEFAULT"
 
-# Public control-plane paths scanned (D-06). examples/ is explicitly excluded.
-PUBLIC_PATHS=(AGENTS.md CLAUDE.md README.md PRIVACY.md docs .github wiki-cloud bin schema)
+# Public control-plane paths scanned (D-06 + D-10). examples/ is explicitly excluded.
+# D-10: .claude/skills/ added (Phase 18) to guard generated description strings
+# against private vault term leaks. Bodies are provably neutral by construction;
+# the scan backstops the description strings (authored text, not generated from template).
+PUBLIC_PATHS=(AGENTS.md CLAUDE.md README.md PRIVACY.md docs .github wiki-cloud bin schema .claude/skills)
 
 export CN_ROOT="$ROOT"
 export CN_SUGGEST="$SUGGEST"

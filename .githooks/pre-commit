@@ -11,6 +11,27 @@ if ! bash bin/sync-claude.sh --check 2>/dev/null; then
     exit 1
 fi
 
+# Phase 18 / SKILL-02: gen-skills drift gate (D-03, D-04).
+# Skills are committed generated artifacts; auto-fix + restage mirrors sync-claude pattern.
+# D-07: structural assertions inside gen-skills --check are NOT redundant with the
+# regenerate-diff check -- a fattened template still passes diff. Never remove.
+if ! bash bin/gen-skills.sh --check 2>/dev/null; then
+    echo "Skills drift detected. Auto-regenerating..." >&2
+    bash bin/gen-skills.sh
+    # Stage the FOUR exact generated files, NOT a blanket `git add .claude/skills/`
+    # (REVIEWS.md Codex HIGH + recommended disposition item 4): a blanket add could stage a
+    # stray non-SKILL.md file that slipped into the dir, and -- if the structural assertion
+    # then keeps failing on that stray file -- the auto-fix + re-run loop never converges.
+    # Staging the exact known files keeps the hook deterministic and the dir-purity assertion
+    # is the gate that rejects any stray content (it does NOT get auto-staged here).
+    git add .claude/skills/ingest/SKILL.md \
+            .claude/skills/query/SKILL.md \
+            .claude/skills/lint/SKILL.md \
+            .claude/skills/reflect/SKILL.md
+    echo "Skills resynced and re-staged. Re-run commit." >&2
+    exit 1
+fi
+
 # Phase 12.2 / WGATE-01..04: local wiki write-gate over staged changes.
 # Reuses bin/lint.sh --strict policy via the additive --staged flag.
 # See AGENTS.md §11.3 for the normative contract (exemption ordering,
