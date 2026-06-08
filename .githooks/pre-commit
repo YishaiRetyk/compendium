@@ -3,7 +3,9 @@
 # AND run the local wiki write-gate over staged changes (Phase 12.2).
 set -euo pipefail
 
-if ! bash bin/sync-claude.sh --check 2>/dev/null; then
+# Surface real diagnostics rather than swallowing stderr (REVIEW WR-05): a non-drift failure
+# of the sync gate would otherwise masquerade as drift with no actionable message.
+if ! bash bin/sync-claude.sh --check; then
     echo "CLAUDE.md drift detected. Auto-syncing..." >&2
     bash bin/sync-claude.sh
     git add CLAUDE.md
@@ -15,7 +17,10 @@ fi
 # Skills are committed generated artifacts; auto-fix + restage mirrors sync-claude pattern.
 # D-07: structural assertions inside gen-skills --check are NOT redundant with the
 # regenerate-diff check -- a fattened template still passes diff. Never remove.
-if ! bash bin/gen-skills.sh --check 2>/dev/null; then
+# Do NOT swallow stderr here (REVIEW WR-05): a non-drift failure (mktemp failure, a dead
+# schema/workflows/<op>.md pointer, dir-purity assertion) is otherwise indistinguishable from
+# real drift, and the auto-regenerate path below cannot fix it -- the user needs the diagnostic.
+if ! bash bin/gen-skills.sh --check; then
     echo "Skills drift detected. Auto-regenerating..." >&2
     bash bin/gen-skills.sh
     # Stage the FOUR exact generated files, NOT a blanket `git add .claude/skills/`
@@ -28,6 +33,18 @@ if ! bash bin/gen-skills.sh --check 2>/dev/null; then
             .claude/skills/query/SKILL.md \
             .claude/skills/lint/SKILL.md \
             .claude/skills/reflect/SKILL.md
+    # Re-run the gate once after regenerating. If it STILL fails, the failure is not a
+    # diff-drift the regenerate can fix (e.g. a stray non-SKILL.md file tripping the
+    # dir-purity assertion, or a dead workflow pointer) -- regenerate does not remove stray
+    # files, so the naive "re-run commit" message loops forever (REVIEW WR-03). Surface the
+    # gate's real diagnostics and emit an actionable error instead of implying success on retry.
+    if ! bash bin/gen-skills.sh --check; then
+        echo "" >&2
+        echo "Skills gate still failing after regenerate -- this is not auto-fixable drift." >&2
+        echo "Remove any stray files from .claude/skills/<op>/ (only SKILL.md is allowed) and" >&2
+        echo "fix any dead schema/workflows/<op>.md pointer reported above, then re-run commit." >&2
+        exit 1
+    fi
     echo "Skills resynced and re-staged. Re-run commit." >&2
     exit 1
 fi
