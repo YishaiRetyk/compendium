@@ -160,11 +160,21 @@ Plans:
   1. Four skill files exist under `.claude/skills/` (ingest, query, lint, reflect); each body is at most 3 lines and contains only a pointer to its corresponding `schema/workflows/{op}.md` file.
   2. No behavior is encoded in a skill file that is not already present in the corresponding workflow markdown file; markdown remains the sole authoritative source.
 
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
 
-- [ ] 18-01: TBD
+**Wave 0**
+
+- [ ] 18-00-PLAN.md — .gitignore un-ignore + RED test harness (11 tests)
+
+**Wave 1** *(blocked on Wave 0)*
+
+- [ ] 18-01-PLAN.md — bin/gen-skills.sh + four SKILL.md files + pre-commit + neutrality + CI gate (SKILL-01, SKILL-02)
+
+**Wave 2** *(blocked on Wave 1)*
+
+- [ ] 18-02-PLAN.md — Decision record (D-09) + docs/reference/skills.md (D-11) + index.md + ROADMAP
 
 ## Backlog
 
