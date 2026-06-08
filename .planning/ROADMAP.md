@@ -166,7 +166,7 @@ Plans:
 
 **Wave 0**
 
-- [ ] 18-00-PLAN.md — .gitignore un-ignore + RED test harness (10 tests)
+- [x] 18-00-PLAN.md — .gitignore un-ignore + RED test harness (10 tests)
 
 **Wave 1** *(blocked on Wave 0)*
 
@@ -355,4 +355,4 @@ The following are intentionally deferred until real usage demands them, captured
 | 15. Privacy Architecture | v1.2 | 3/3 | Complete    | 2026-06-04 |
 | 16. Reference Extraction | v1.2 | 5/5 | Complete    | 2026-06-05 |
 | 17. Workflow Extraction | v1.2 | 4/4 | Complete    | 2026-06-07 |
-| 18. Skills Overlay | v1.2 | 0/TBD | Not started | - |
+| 18. Skills Overlay | v1.2 | 1/3 | In Progress|  |
