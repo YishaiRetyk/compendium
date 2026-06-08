@@ -4,8 +4,8 @@ milestone: v1.2
 milestone_name: Schema Architecture
 status: executing
 stopped_at: Phase 18 context gathered
-last_updated: "2026-06-08T17:37:16.911Z"
-last_activity: 2026-06-08 -- Phase 18 planning complete
+last_updated: "2026-06-08T17:39:07.241Z"
+last_activity: 2026-06-08 -- Phase 18 execution started
 progress:
   total_phases: 11
   completed_phases: 3
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-04)
 
 **Core value:** The wiki is a persistent, compounding artifact -- cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested.
-**Current focus:** Phase 18 — Skills Overlay (SKILL-01..02). NOTE: `gsd phase.complete` again mis-advanced to superseded backlog Phase 999.1 (absorbed into Phases 10–11); hand-corrected to Phase 18, the real next v1.2 phase (gates on Phase 17, now ✓ complete).
+**Current focus:** Phase 18 — skills-overlay
 
 ## Current Position
 
-Phase: 18 — Skills Overlay (Not started — gates on Phase 17, now ✓ complete)
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-06-08 -- Phase 18 planning complete
+Phase: 18 (skills-overlay) — EXECUTING
+Plan: 1 of 3
+Status: Executing Phase 18
+Last activity: 2026-06-08 -- Phase 18 execution started
 
 ### v1.2 Phase Summary
 

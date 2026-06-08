@@ -5,8 +5,13 @@
 .trash/
 
 # Local agent/tool state (settings.cloud.json is tracked -- the cloud deny-profile artifact)
-.claude/
+# .claude/* (file-glob, NOT .claude/ directory ignore): git cannot re-include descendants of an
+# ignored DIRECTORY, so the skills negations below only work under the .claude/* file-glob form.
+.claude/*
 !.claude/settings.cloud.json
+!.claude/skills/
+!.claude/skills/*/
+!.claude/skills/*/SKILL.md
 .git.backup-*/
 
 # Brownfield workflow artifacts
