@@ -517,22 +517,25 @@ PUBLIC_PATHS=(AGENTS.md CLAUDE.md README.md PRIVACY.md docs .github wiki-cloud b
 
 **If this table is empty:** All other claims in this research were verified against the actual codebase or wiki pages in this session.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Exact per-op `description` strings**
    - What we know: Must be third-person, what+when, ≤1024 chars, no first-person pronouns, tight ~1-2 sentences. Claude's Discretion (not locked).
    - What's unclear: The exact draft text — the executor drafts these, constrained by the authoring rules.
    - Recommendation: Plan should include drafting the four description strings as a task item, with the `description` authoring rules from the wiki as the constraint. Example form: "Processes a new source into wiki pages by running classify-extract-merge-lint. Invoke when asked to ingest, add, or process a new source document."
+   - RESOLVED: Description strings are drafted in 18-01 Task 1 `get_desc()` function — third-person what+when, no first-person pronoun, one sentence per op.
 
 2. **Associative array bash compatibility**
    - What we know: `declare -A` (associative arrays) requires bash ≥4.0. macOS ships bash 3.2 (GPLv2) by default; Linux typically ships bash ≥4.
    - What's unclear: Whether any CI runner or contributor environment uses bash <4.
    - Recommendation: The CI runs on `ubuntu-latest` (bash ≥5). Pre-commit runs on the user's machine. Given macOS ships bash 3.2, the script should either (a) use a `case` statement or indexed arrays instead of `declare -A`, or (b) use `#!/usr/bin/env bash` and require bash ≥4 with an explicit check. A `case` statement for four fixed ops is the safest zero-assumption approach. [ASSUMED — worth confirming the user's shell version]
+   - RESOLVED: Use `case`-based `get_desc()` function (bash 3.2 portable) — satisfies D-01's inline/zero-dep/single-file intent with broader portability. Deviation from D-01's `declare -A` example is documented in script comment.
 
 3. **Decision record `trigger_type` value**
    - What we know: D-09 says "trigger_type: schema-update or equivalent". The existing DR template requires a non-null value.
    - What's unclear: Whether "schema-update" is a valid enum or a free text field in this repo's frontmatter.
    - Recommendation: Inspect `schema/templates/decision.md` — `trigger_type` is `null` in the template (free text). Use `schema-update` to match the wording of other DRs in this repo (e.g., `dr-2026-06-04-privacy-asymmetric-two-dir`).
+   - RESOLVED: `trigger_type: schema-update` — confirmed free text field; matches existing DR convention.
 
 ## Environment Availability
 
