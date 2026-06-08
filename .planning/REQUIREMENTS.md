@@ -50,8 +50,8 @@ Requirements for milestone v1.2. Each maps to exactly one roadmap phase.
 
 ### Skills Overlay (`SKILL`) — Phase 18 (optional, ship only if it doesn't slow A+B)
 
-- [ ] **SKILL-01**: Thin `.claude/skills/` wrappers for ingest/query/lint/reflect; each body ≤ 3 lines, pointer-only ("You have been invoked to {op}. Read `schema/workflows/{op}.md` and follow it verbatim."). Consider `disable-model-invocation: true`.
-- [ ] **SKILL-02**: Skills add zero authoritative content (routers only); markdown remains the source of truth. Verify no behavior is encoded in a skill that isn't in the workflow file.
+- [x] **SKILL-01**: Thin `.claude/skills/` wrappers for ingest/query/lint/reflect; each body ≤ 3 lines, pointer-only ("You have been invoked to {op}. Read `schema/workflows/{op}.md` and follow it verbatim."). Consider `disable-model-invocation: true`.
+- [x] **SKILL-02**: Skills add zero authoritative content (routers only); markdown remains the source of truth. Verify no behavior is encoded in a skill that isn't in the workflow file.
 
 ## Deferred → Backlog 999.3 (revisit immediately post-v1.2)
 
@@ -106,8 +106,8 @@ Which phases cover which requirements. Phase mapping filled during roadmap creat
 | WF-07 | Phase 17 | Complete |
 | WF-08 | Phase 17 | Complete |
 | WF-09 | Phase 17 | Complete |
-| SKILL-01 | Phase 18 | Pending |
-| SKILL-02 | Phase 18 | Pending |
+| SKILL-01 | Phase 18 | Complete |
+| SKILL-02 | Phase 18 | Complete |
 
 **Coverage:**
 - v1.2 requirements: 28 total (PRIV ×7, REF ×10, WF ×9, SKILL ×2)

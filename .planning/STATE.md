@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Schema Architecture
-status: executing
-stopped_at: Phase 18 context gathered
-last_updated: "2026-06-08T17:39:07.241Z"
-last_activity: 2026-06-08 -- Phase 18 execution started
+status: milestone_complete
+stopped_at: Phase 18 complete (3/3) — v1.2 Schema Architecture milestone complete (Phases 15–18 all done); ready for /gsd-complete-milestone
+last_updated: 2026-06-08T18:18:44.511Z
+last_activity: 2026-06-08 -- Phase 18 executed and verified (3/3 plans); v1.2 milestone complete
 progress:
   total_phases: 11
   completed_phases: 3
   total_plans: 15
-  completed_plans: 12
+  completed_plans: 73
   percent: 27
 ---
 
@@ -21,23 +21,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-04)
 
 **Core value:** The wiki is a persistent, compounding artifact -- cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested.
-**Current focus:** Phase 18 — skills-overlay
+**Current focus:** v1.2 Schema Architecture — milestone complete (Phases 15–18). Next: `/gsd-complete-milestone`. (Backlog Phase 999.1 is SUPERSEDED — do not plan against it.)
 
 ## Current Position
 
-Phase: 18 (skills-overlay) — EXECUTING
-Plan: 1 of 3
-Status: Executing Phase 18
-Last activity: 2026-06-08 -- Phase 18 execution started
+Phase: 18 (complete) — v1.2 milestone complete
+Plan: 3/3 complete
+Status: Milestone complete — ready for /gsd-complete-milestone
+Last activity: 2026-06-08
 
 ### v1.2 Phase Summary
 
 | Phase | Name | Requirements | Status |
 |-------|------|--------------|--------|
-| 15 | Privacy Architecture | PRIV-01..07 (7 reqs) | Not started |
-| 16 | Reference Extraction | REF-01..10 (10 reqs) | Not started — gates on Phase 15 |
+| 15 | Privacy Architecture | PRIV-01..07 (7 reqs) | ✓ Complete (2026-06-04) |
+| 16 | Reference Extraction | REF-01..10 (10 reqs) | ✓ Complete (2026-06-05) |
 | 17 | Workflow Extraction | WF-01..09 (9 reqs) | ✓ Complete (2026-06-07) |
-| 18 | Skills Overlay | SKILL-01..02 (2 reqs) | Not started — gates on Phase 17 (now ✓) |
+| 18 | Skills Overlay | SKILL-01..02 (2 reqs) | ✓ Complete (2026-06-08) |
 
 **Total:** 28 requirements across 4 phases. 100% mapped.
 
@@ -91,7 +91,7 @@ Phase 12.2 closure: 5/5 plans complete; WGATE-01..04 → Complete; verifier PASS
 
 **Velocity:**
 
-- Total plans completed: 39
+- Total plans completed: 42
 - Average duration: -
 - Total execution time: 0 hours
 
@@ -108,6 +108,7 @@ Phase 12.2 closure: 5/5 plans complete; WGATE-01..04 → Complete; verifier PASS
 | 15 | 3 | - | - |
 | 16 | 5 | - | - |
 | 17 | 4 | - | - |
+| 18 | 3 | - | - |
 
 **Recent Trend:**
 
