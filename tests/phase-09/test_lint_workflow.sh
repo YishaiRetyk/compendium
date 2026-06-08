@@ -15,8 +15,15 @@ wf = os.environ["WF_PATH"]
 y = yaml.safe_load(open(wf))
 assert isinstance(y, dict), "workflow must be a dict"
 jobs = y.get('jobs', {})
-assert set(jobs.keys()) == {'lint', 'privacy-leak', 'strict'}, f"expected exactly 3 jobs, got {sorted(jobs.keys())}"
-for name, spec in jobs.items():
+# Three core jobs are required; Phase 18 added an optional bash-only 'skills-check'
+# gate (no Python/pyyaml), so allow it as an extra job without forcing the
+# python-toolchain assertions below onto it.
+core_jobs = {'lint', 'privacy-leak', 'strict'}
+assert core_jobs <= set(jobs.keys()), f"missing core jobs: {sorted(core_jobs - set(jobs.keys()))}"
+assert set(jobs.keys()) <= core_jobs | {'skills-check'}, \
+    f"unexpected jobs: {sorted(set(jobs.keys()) - (core_jobs | {'skills-check'}))}"
+for name in sorted(core_jobs):
+    spec = jobs[name]
     assert spec.get('runs-on') == 'ubuntu-latest', f"{name}: runs-on must be ubuntu-latest"
     steps = spec.get('steps', [])
     step_uses = [s.get('uses', '') for s in steps]
