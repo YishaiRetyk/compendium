@@ -2,6 +2,11 @@
 # tests/phase-18/run.sh -- Phase 18 Skills Overlay test aggregator.
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Run the whole suite from the repo root (REVIEW WR-02): the generator and several tests
+# use repo-relative paths, so a non-root caller cwd causes vacuous passes and can corrupt
+# the real working tree via the drift-test restore trap.
+REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+cd "$REPO_ROOT"
 PASS=0; FAIL=0
 run_test() {
     local name="$1"

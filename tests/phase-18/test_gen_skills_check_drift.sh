@@ -3,6 +3,7 @@
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib.sh"
+cd "$REPO_ROOT"  # REVIEW WR-02: generator + restore trap write cwd-relative; pin to repo root
 [ -f "$REPO_ROOT/bin/gen-skills.sh" ] || { echo "SKIP"; exit 1; }
 # Restore committed skill files on any exit (idempotent), so a mid-loop abort never
 # leaves a drifted file in the working tree.

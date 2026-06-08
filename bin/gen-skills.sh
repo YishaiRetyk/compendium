@@ -22,6 +22,19 @@
 # zero-dep, single-file intent, broader portability.
 set -euo pipefail
 
+# Anchor every relative path to the repo root, not the caller's cwd (REVIEW WR-01).
+# All paths below (.claude/skills/${op}, schema/workflows/${op}.md) are repo-relative;
+# without this cd, invoking the script from any other cwd silently writes a stray
+# .claude/skills/ tree there and reports false "missing" drift. Fail loudly if the
+# resolved root does not look like the repo (a workflow file the generator depends on).
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+cd "$REPO_ROOT"
+if [ ! -f "schema/workflows/ingest.md" ]; then
+    echo "ERROR: cannot resolve repo root from $REPO_ROOT (schema/workflows/ingest.md missing)" >&2
+    exit 1
+fi
+
 OPS=(ingest query lint reflect)
 CHECK_ONLY=0
 

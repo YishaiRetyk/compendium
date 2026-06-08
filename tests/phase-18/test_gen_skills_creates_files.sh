@@ -3,6 +3,7 @@
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib.sh"
+cd "$REPO_ROOT"  # REVIEW WR-02: generator writes cwd-relative; must run from repo root
 
 # RED: bin/gen-skills.sh does not exist yet
 [ -f "$REPO_ROOT/bin/gen-skills.sh" ] || { echo "SKIP (generator not implemented)"; exit 1; }
