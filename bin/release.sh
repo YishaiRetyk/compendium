@@ -82,9 +82,12 @@ Pre-flight (inside the staged dir):
   - bash bin/sync-claude.sh --check  (hard-fail on AGENTS.md/CLAUDE.md drift)
   - Programmatic sweep for `privacy: local_only` markers (hard-fail)
 
-Publish:
-  git rev-list --all --count on the pushed remote MUST return 1
-  (TMPL-11 single-commit history assertion — REVIEWS.md HIGH #4).
+Publish (tag-only):
+  Pushes ONLY the immutable version tag; never main (which is a protected,
+  CI-gated PR branch). Each release is a self-contained single-commit orphan
+  snapshot reachable via its tag (git clone --branch <tag>). The single-commit
+  assertion is tag-scoped: `git rev-list --count <tag>` on the remote MUST
+  return 1 (TMPL-11 — REVIEWS.md HIGH #4).
 
 Exit: 0 ok/dry-run/abort, 1 missing args / bad flag, 2 pre-flight failed
 EOF
@@ -190,9 +193,17 @@ fi
 git add -A
 git commit -m "${TAG} release" >/dev/null
 git tag "$TAG"
-git push "$REMOTE" HEAD:main
+# Tag-only publish: push ONLY the immutable version tag, never main.
+# `main` on the remote is a protected, CI-gated PR branch; force-pushing an
+# unrelated orphan snapshot onto it would be rejected (and would bypass the
+# required status checks). Each release is a self-contained single-commit
+# orphan snapshot reachable via its tag — consumers run `git clone --branch
+# <tag>` (or `git checkout <tag>`). Pushing the tag uploads the orphan commit's
+# objects even though no branch references it. If the tag already exists on the
+# remote, the push is rejected (a version is published once) — investigate, do
+# not clobber.
 git push "$REMOTE" "$TAG"
 
 echo ""
-echo "Published ${TAG} to $REMOTE."
-echo "Smoke-check: clone the remote and run 'git rev-list --all --count' -- must return 1."
+echo "Published tag ${TAG} to $REMOTE (main untouched — protected PR/CI branch)."
+echo "Smoke-check: 'git clone --branch ${TAG} --single-branch $REMOTE t && git -C t rev-list --count HEAD' -- must return 1."
