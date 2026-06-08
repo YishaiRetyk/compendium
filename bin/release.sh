@@ -28,6 +28,7 @@ ALLOWLIST=(
   "bin"
   "schema"
   "docs"
+  ".claude/skills"
   "wiki-cloud/index.md"
   "wiki-cloud/log.md"
   "wiki-cloud/decisions"
@@ -35,6 +36,7 @@ ALLOWLIST=(
   ".github"
   ".githooks"
   "tests/phase-07"
+  "tests/phase-18"
 )
 
 # --- DENYLIST (defense-in-depth). Must never ship; hard-fail if present. ---
