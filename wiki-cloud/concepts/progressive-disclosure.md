@@ -9,14 +9,15 @@ summary: "Three-level loading pattern at the heart of Anthropic Agent Skills. L1
   and scripts are accessed only as needed, with script source code never entering
   context."
 created_at: 2026-05-06
-updated_at: 2026-06-01
+updated_at: 2026-06-09
 sources:
 - src-2026-05-06-anthropic-agent-skills-overview
 - src-2026-05-06-anthropic-agent-skills-best-practices
 - src-2026-05-06-anthropic-claude-cookbook-skills-introduction
 - src-2026-05-06-anthropic-claude-cookbook-skills-custom-development
 - src-2026-05-06-ralph-playbook
-epistemic_status: sourced
+- src-2026-04-16-claude-code-frameworks-report
+epistemic_status: mixed
 tags:
 - progressive-disclosure
 - context-engineering
@@ -41,7 +42,7 @@ example: false
 
 ## TL;DR
 
-Progressive disclosure is the loading discipline Anthropic uses to let many Agent Skills coexist without paying full token cost upfront. Information loads in three levels: Level 1 metadata (the YAML `name` + `description`, always preloaded into the system prompt at ~100 tokens per Skill); Level 2 instructions (the SKILL.md body, read via bash when the Skill is triggered, kept under ~5k tokens); Level 3 resources (additional `.md` references, datasets, scripts — accessed only when explicitly referenced, with script source code executed via bash so it never enters context). The pattern lets a Skill bundle dozens of reference files, comprehensive API docs, or large datasets without context penalty until something is actually read. The same discipline is a general context-engineering principle, not a Skills-only mechanism: the [[src-2026-05-06-ralph-playbook|The Ralph Playbook]] applies it to autonomous coding loops by keeping its always-loaded `AGENTS.md` minimal and deferring status/detail to a separate on-demand file.
+Progressive disclosure is the loading discipline Anthropic uses to let many Agent Skills coexist without paying full token cost upfront. Information loads in three levels: Level 1 metadata (the YAML `name` + `description`, always preloaded into the system prompt at ~100 tokens per Skill); Level 2 instructions (the SKILL.md body, read via bash when the Skill is triggered, kept under ~5k tokens); Level 3 resources (additional `.md` references, datasets, scripts — accessed only when explicitly referenced, with script source code executed via bash so it never enters context). The pattern lets a Skill bundle dozens of reference files, comprehensive API docs, or large datasets without context penalty until something is actually read. The same discipline is a general context-engineering principle, not a Skills-only mechanism: the [[src-2026-05-06-ralph-playbook|The Ralph Playbook]] applies it to autonomous coding loops by keeping its always-loaded `AGENTS.md` minimal and deferring status/detail to a separate on-demand file. More broadly, progressive disclosure — originally a Jakob Nielsen UX pattern (1995) — has become the architectural backbone of Claude Code itself, spanning a full load hierarchy from always-loaded CLAUDE.md down to forked [[subagents|subagent]] contexts, and is the unifying principle behind all three [[claude-code-orchestration-frameworks|Claude Code orchestration frameworks]].
 
 ## Key Facts
 
@@ -57,6 +58,9 @@ Progressive disclosure is the loading discipline Anthropic uses to let many Agen
 - The "98% savings" framing for Skills tokens applies to the *initial context only* — Level 1 metadata is essentially free; once Level 2 fires for a given request, the full ~5k tokens of instructions load and are paid for that request [prov:src-2026-05-06-anthropic-claude-cookbook-skills-introduction#sec:token-usage-optimization|direct|2026-05-06] [epistemic:: sourced]
 - Container reuse via `container.id` (passing the id from a previous response into subsequent requests) is the API-level token-optimization pattern that lets Skills stay loaded across calls without re-paying L2 [prov:src-2026-05-06-anthropic-claude-cookbook-skills-introduction#sec:token-optimization-tips|direct|2026-05-06] [epistemic:: sourced]
 - The same disclosure discipline appears outside Agent Skills: the Ralph Playbook keeps its `AGENTS.md` loop file concise (~60 lines, operational-only) and pushes mutable status/progress into a separate `IMPLEMENTATION_PLAN.md`, so the always-loaded file stays small while detail is deferred to a file read only when needed — the same L1-stays-small / detail-loads-on-demand split that governs Skills' three levels [prov:src-2026-05-06-ralph-playbook#sec:files|direct|2026-06-01] [prov:src-2026-05-06-anthropic-agent-skills-overview#sec:how-skills-work|direct|2026-06-01] [epistemic:: inferred]
+- Progressive disclosure originated as a Jakob Nielsen UX pattern (1995); Anthropic elevated it to the architectural backbone of Claude Code — for humans it improves learnability, for LLMs it is an architectural necessity given context rot, attention dilution, and cache economics [prov:src-2026-04-16-claude-code-frameworks-report#sec:progressive-disclosure|direct|2026-06-09] [epistemic:: sourced]
+- The Claude-Code-wide load hierarchy runs top to bottom: enterprise policy → `~/.claude/CLAUDE.md` (always) → `./CLAUDE.md` (always) → subdir CLAUDE.md (lazy on file access) → skill metadata (always, ~100 tokens each) → skill body (on trigger, <5K) → bundled references/scripts (on demand, unbounded) → subagent contexts (forked, compressed on return) [prov:src-2026-04-16-claude-code-frameworks-report#sec:progressive-disclosure|direct|2026-06-09] [epistemic:: sourced]
+- Key anti-pattern — over-reliance on auto-activation: Vercel found skills were never invoked in 56% of test cases, and explicit "IMPORTANT: read X" pointers outperformed pure auto-discovery; other anti-patterns are bloated CLAUDE.md, monolithic mega-prompts, eager `Read all of docs/`, and accepting context rot instead of externalizing state [prov:src-2026-04-16-claude-code-frameworks-report#sec:progressive-disclosure|direct|2026-06-09] [epistemic:: tentative]
 
 ## Detail
 
@@ -105,12 +109,22 @@ Progressive disclosure is not unique to Agent Skills; it is a general context-en
 
 The connection is interpretive rather than a claim either source makes about the other: neither the Ralph playbook nor the Agent Skills docs reference each other [epistemic:: inferred]. What they share is the underlying principle — *defer loading anything not immediately needed, and keep the always-resident layer minimal* — which is why this wiki files both under progressive disclosure rather than treating them as unrelated token-optimization tricks.
 
+### Progressive disclosure as the architectural backbone of Claude Code
+
+Beyond Skills and the Ralph loop, the [[src-2026-04-16-claude-code-frameworks-report|Claude Code Frameworks report]] frames progressive disclosure as *the* architectural backbone of Claude Code as a whole, with a precise lineage and rationale. The pattern began as a Jakob Nielsen UX principle in 1995 (show only what's needed, reveal advanced options on demand); Anthropic adopted it not merely for human learnability but as an architectural necessity for LLMs, driven by three forces: context rot (quality degrades as the window fills), attention dilution (more loaded context means weaker focus on any part), and cache economics (stable prefixes are cheaper) [prov:src-2026-04-16-claude-code-frameworks-report#sec:progressive-disclosure|direct|2026-06-09] [epistemic:: sourced].
+
+Seen this way, the three-level Skills model is one slice of a longer load hierarchy that runs from enterprise policy and the always-loaded `~/.claude/CLAUDE.md` and `./CLAUDE.md`, through lazily-loaded subdirectory CLAUDE.md files, skill metadata (~100 tokens each, always) and skill bodies (<5K, on trigger), down to on-demand bundled references and, at the bottom, forked subagent contexts that are compressed on return. The same patterns recur at every level — lazy loading, just-in-time references, summary-first/detail-on-demand, index-then-fetch, script-as-tool (only stdout enters context), and subagent fan-out / compress-on-return [prov:src-2026-04-16-claude-code-frameworks-report#sec:progressive-disclosure|direct|2026-06-09] [epistemic:: sourced].
+
+The report is equally explicit about anti-patterns, the most consequential being over-reliance on auto-activation: Vercel reported that skills were never invoked in 56% of test cases, and that explicit `IMPORTANT: read X` pointers outperformed pure auto-discovery — a caution that the always-resident layer sometimes *should* name what to load rather than trusting the model to discover it [prov:src-2026-04-16-claude-code-frameworks-report#sec:progressive-disclosure|direct|2026-06-09] [epistemic:: tentative]. This same principle, applied across agents, is what makes subagent isolation work and is the shared backbone of all three Claude Code orchestration frameworks.
+
 ## Related Pages
 
 - [[agent-skills|Agent Skills]]
 - [[anthropic|Anthropic]]
 - [[claude-api|Claude API]]
 - [[claude-code|Claude Code]]
+- [[subagents|Subagents]]
+- [[claude-code-orchestration-frameworks|Claude Code Orchestration Frameworks]]
 
 ## Sources
 
@@ -119,3 +133,4 @@ The connection is interpretive rather than a claim either source makes about the
 - [[src-2026-05-06-anthropic-claude-cookbook-skills-introduction|Introduction to Claude Skills (claude-cookbooks notebook 01)]] — Anthropic claude-cookbooks, 2026-05-06
 - [[src-2026-05-06-anthropic-claude-cookbook-skills-custom-development|Building Custom Skills for Claude (claude-cookbooks notebook 03)]] — Anthropic claude-cookbooks, 2026-05-06
 - [[src-2026-05-06-ralph-playbook|The Ralph Playbook (Clayton Farr's how-to-ralph-wiggum)]] — Clayton Farr / Geoffrey Huntley, 2026-05-06
+- [[src-2026-04-16-claude-code-frameworks-report|Claude Code Frameworks & Patterns: A Comparative Report]] — comparative synthesis report, April 2026

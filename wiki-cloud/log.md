@@ -568,3 +568,25 @@ report: wiki-cloud/maintenance/lint-report.md
 findings: 65 total (18 errors, 47 warnings, 0 info)
 auto_fixes: 0 applied
 report: wiki-cloud/maintenance/lint-report.md
+
+## [2026-06-09] ingest | Claude Code Frameworks & Patterns: A Comparative Report
+
+source: src-2026-04-16-claude-code-frameworks-report
+classification: article (secondary synthesis of 8 parallel web-research investigations, authored April 2026 — file dated 2026-04-16; ingested 2026-06-09). Raw source stored verbatim at sources/2026/2026-04/2026-04-16-claude-code-frameworks-report.md (content_hash sha256:f47a0431…).
+result: created source summary; 3 entities (spec-kit, superpowers, gsd); 1 comparison (claude-code-orchestration-frameworks); 2 concepts (spec-driven-development, subagents). UPDATEd 3 existing pages via append-then-synthesize (§Incremental Update Policy): progressive-disclosure (added Nielsen-1995 origin, the full Claude-Code load hierarchy, the auto-activation anti-pattern + Vercel 56% finding, frameworks-backbone framing), claude-code (added building blocks beyond Skills — slash commands + v2.1.101 commands/skills merge, subagents, CLAUDE.md length + router pattern, AGENTS.md non-native read #6235), agent-skills (added Oct-2025 launch / agentskills.io standard + frameworks-assemble-skills cross-link).
+write_back: WRITE-BACK — net-new "Claude Code orchestration framework" cluster (Spec Kit, Superpowers, GSD), the spec-driven-development methodology, and subagents as a first-class building block; plus extension of the existing progressive-disclosure / claude-code / agent-skills cluster with cross-framework framing. None present in the wiki before this ingest.
+delta_compiled: src-2026-04-16-claude-code-frameworks-report → [spec-kit, superpowers, gsd, claude-code-orchestration-frameworks, spec-driven-development, subagents, progressive-disclosure, claude-code, agent-skills]. Flipped pending → compiled.
+pages_affected: src-2026-04-16-claude-code-frameworks-report, spec-kit, superpowers, gsd, claude-code-orchestration-frameworks, spec-driven-development, subagents, progressive-disclosure, claude-code, agent-skills, index
+notes: privacy cloud_safe (public frameworks + public Claude Code features; no PII). Single-author repo, contributor field omitted per §9a. Source is a SECONDARY synthesis → epistemic_status mixed; structural claims (theses, architectures, workflow shapes, building-block roles) marked [epistemic:: sourced], while point-in-time figures (star counts, version numbers, dates, the commands/skills-merge specifics, the Vercel 56% finding) marked [epistemic:: tentative]. The Superpowers ~156K-star figure is unusually high and single-sourced — flagged tentative with explicit caution. Where the report restates already-documented Anthropic-primary facts (three-tier loading model, skill authoring rules) those were NOT re-extracted — existing primary-sourced claims stand; only net-new material was merged. No contradictions vs prior wiki content (the report extends rather than challenges). Authors (Jesse Vincent, TÂCHES, Den Delimarsky, John Lam) surfaced in-body but NOT given entity pages — same precedent as Clayton Farr; revisit if recurring. GSD described as the public open-source framework only (no reference to this repo's private .planning/).
+
+## [2026-06-09] lint | wiki-cloud health check
+
+findings: 78 total (24 errors, 54 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki-cloud/maintenance/lint-report.md
+
+## [2026-06-09] lint | wiki-cloud health check
+
+findings: 72 total (18 errors, 54 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki-cloud/maintenance/lint-report.md

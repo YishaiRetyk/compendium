@@ -9,13 +9,14 @@ summary: "Anthropic's Agent Skills are filesystem-based capability packages — 
   API, Claude Code, and Claude.ai. Distinguishes Skills (reusable, on-demand, persisted
   on filesystem) from prompts (one-conversation instructions)."
 created_at: 2026-05-06
-updated_at: 2026-05-06
+updated_at: 2026-06-09
 sources:
 - src-2026-05-06-anthropic-agent-skills-overview
 - src-2026-05-06-anthropic-agent-skills-quickstart
 - src-2026-05-06-anthropic-agent-skills-best-practices
 - src-2026-05-06-anthropic-claude-cookbook-skills-introduction
 - src-2026-05-06-anthropic-claude-cookbook-skills-custom-development
+- src-2026-04-16-claude-code-frameworks-report
 epistemic_status: sourced
 tags:
 - agent-skills
@@ -65,6 +66,8 @@ Agent Skills are filesystem-based capability packages: a directory containing a 
 - All `.md` files in a Skill's top-level directory load at Level 2 (not just `SKILL.md`/`REFERENCE.md`); the ~5k-token budget recommendation thus applies to the *sum* of top-level markdown [prov:src-2026-05-06-anthropic-claude-cookbook-skills-custom-development#sec:additional-documentation-files|direct|2026-05-06] [epistemic:: sourced]
 - Observed end-to-end generation times via the API: Excel ~1-2 minutes, PowerPoint ~1-2 minutes, PDF ~40-60 seconds — concrete planning numbers for sync timeouts and UI loading states [prov:src-2026-05-06-anthropic-claude-cookbook-skills-introduction#sec:expected-generation-times|direct|2026-05-06] [epistemic:: sourced]
 - Container reuse via `container.id` (passing the id from a previous response into subsequent requests) is the API-level token-optimization pattern that lets Skills stay loaded across calls without re-paying L2 [prov:src-2026-05-06-anthropic-claude-cookbook-skills-introduction#sec:token-optimization-tips|direct|2026-05-06] [epistemic:: sourced]
+- Skills have become Anthropic's flagship abstraction since Oct 16, 2025 and were opened as a standard at agentskills.io in December 2025; in Claude Code, slash commands and Skills were subsequently merged (v2.1.101, April 2026) with Skills the recommended form — see [[claude-code|Claude Code]] [prov:src-2026-04-16-claude-code-frameworks-report#sec:agent-skills|direct|2026-06-09] [prov:src-2026-04-16-claude-code-frameworks-report#sec:slash-commands|direct|2026-06-09] [epistemic:: tentative]
+- Skills are the building block that the [[claude-code-orchestration-frameworks|Claude Code orchestration frameworks]] (Spec Kit, Superpowers, GSD) assemble into opinionated workflows — all three converge on skill-style packaging over monolithic prompts [prov:src-2026-04-16-claude-code-frameworks-report#sec:cross-cutting-themes|direct|2026-06-09] [epistemic:: sourced]
 
 ## Detail
 
@@ -127,6 +130,7 @@ For SDK call shape (`client.beta.messages.create()` + `betas=[...]`), the minimu
 - [[claude-code|Claude Code]]
 - [[claude-api|Claude API]]
 - [[anthropic-financial-services|Anthropic Financial Services]]
+- [[claude-code-orchestration-frameworks|Claude Code Orchestration Frameworks]]
 
 ## Sources
 
@@ -135,3 +139,4 @@ For SDK call shape (`client.beta.messages.create()` + `betas=[...]`), the minimu
 - [[src-2026-05-06-anthropic-agent-skills-best-practices|Anthropic Agent Skills Best Practices]] — Anthropic platform docs, 2026-05-06
 - [[src-2026-05-06-anthropic-claude-cookbook-skills-introduction|Introduction to Claude Skills (claude-cookbooks notebook 01)]] — Anthropic claude-cookbooks, 2026-05-06
 - [[src-2026-05-06-anthropic-claude-cookbook-skills-custom-development|Building Custom Skills for Claude (claude-cookbooks notebook 03)]] — Anthropic claude-cookbooks, 2026-05-06
+- [[src-2026-04-16-claude-code-frameworks-report|Claude Code Frameworks & Patterns: A Comparative Report]] — comparative synthesis report, April 2026

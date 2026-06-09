@@ -6,7 +6,7 @@ status: active
 summary: "Skeleton index — ingested content will appear here organized by knowledge
   domain."
 created_at: 2026-04-15
-updated_at: 2026-06-08
+updated_at: 2026-06-09
 sources: []
 epistemic_status: sourced
 tags:
@@ -38,6 +38,9 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[geoffrey-huntley|Geoffrey Huntley]] — Software engineer who originated the "Ralph" autonomous-coding-loop technique (sourced, 2026-05-06)
 - [[olmocr|olmOCR]] — Ai2's open-source self-hostable VLM document converter (Qwen2.5-VL-7B fine-tune); headline PDF-to-Markdown self-hosting pick, 82.4 on olmOCR-Bench (mixed, 2026-06-09)
 - [[omnidocbench|OmniDocBench]] — Authoritative CVPR 2025 benchmark for diverse PDF document parsing (~1,651 pages, ~10 doc types, end-to-end/task/attribute modes) (mixed, 2026-06-09)
+- [[spec-kit|Spec Kit]] — GitHub's official spec-driven-development toolkit (CLI "Specify"); tool-agnostic across 20+ agents, spec is the version-controlled source of truth (mixed, 2026-06-09)
+- [[superpowers|Superpowers]] — Jesse Vincent's Claude Code framework enforcing a mandatory brainstorm→plan→implement→review skill chain with a SessionStart re-priming hook (mixed, 2026-06-09)
+- [[gsd|GSD (Get-Shit-Done)]] — TÂCHES' context-engineering orchestrator: every task in a fresh 200K subagent context, coordinated via a .planning/ artifact tree (mixed, 2026-06-09)
 
 ## Concepts
 
@@ -52,9 +55,12 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[ralph-loop|Ralph (Autonomous Coding Loop)]] — Geoffrey Huntley's minimal autonomous-coding pattern: bash `while` loop + fixed PROMPT.md + IMPLEMENTATION_PLAN.md on disk as cross-iteration shared state (sourced, 2026-05-06)
 - [[backpressure|Backpressure]] — Downstream rejection signals (tests, typechecks, lints, builds, LLM-as-judge) that block invalid agent output before commit (sourced, 2026-05-06)
 - [[vlm-ocr-hallucination|VLM OCR Hallucination]] — Vision-language models default to linguistic priors on degraded document images, emitting plausible-but-wrong text instead of flagging unreadability (sourced, 2026-06-09)
+- [[spec-driven-development|Spec-Driven Development]] — Methodology where the spec is the version-controlled source of truth and code is a regenerable expression; implemented by Spec Kit (mixed, 2026-06-09)
+- [[subagents|Subagents]] — Isolated Claude instances with their own context window; process 100K tokens and return a distilled summary, keeping the parent context clean (mixed, 2026-06-09)
 
 ## Sources
 
+- [[src-2026-04-16-claude-code-frameworks-report|Claude Code Frameworks & Patterns: A Comparative Report]] — April 2026 — Synthesis of 8 web-research investigations comparing Spec Kit, Superpowers, and GSD plus the Claude Code building blocks unified by progressive disclosure (mixed, 2026-06-09)
 - [[src-2026-05-03-is-this-the-only-skill-left|Is this the only skill left?]] — Hack (Agentive Stack), 2026-05-03 — YouTube transcript on systems thinking as the durable skill in AI-assisted development (sourced, 2026-05-04)
 - [[src-2026-05-04-three-artifacts-build-with-ai|Three artifacts that changed how I build with AI]] — Hack (Agentive Stack), 2026-05-04 — YouTube transcript on DDD reduced to three artifacts for AI-coding workflows (sourced, 2026-05-04)
 - [[src-2026-05-04-financial-ai-repo-comparison-report|Financial AI and Quant Finance Repository Comparison Report]] — Comparison report mapping six finance-related open-source repositories (sourced, 2026-05-04)
@@ -75,6 +81,7 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 ## Comparisons
 
 - [[financial-ai-repository-tradeoffs|Financial AI Repository Tradeoffs]] — Tradeoff comparison for finance repositories with TA/FA analysis-style coverage (mixed, 2026-05-04)
+- [[claude-code-orchestration-frameworks|Claude Code Orchestration Frameworks]] — Head-to-head of Spec Kit (spec gate) vs Superpowers (execution discipline) vs GSD (context engineering): constraint, workflow, context strategy, and composability (mixed, 2026-06-09)
 - [[ocr-pipeline-vs-vlm-ingestion|OCR Pipeline vs VLM Ingestion]] — The two competing PDF-to-Markdown paradigms — extraction/OCR pipelines vs native multimodal VLM ingestion — on accuracy, cost, determinism, and hallucination (mixed, 2026-06-09)
 
 ## Overviews
