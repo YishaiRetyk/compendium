@@ -44,7 +44,7 @@ updated: 2026-06-10
 | 02-T1: Add #r<n> to provenance.md | 02 | 1 | RPT-02, RPT-03 | T-19-02-A (neutrality) | Abstract placeholder in examples | neutrality | `bash bin/check-neutrality.sh` | ❌ edits existing | ⬜ pending |
 | 02-T2: audit-claims.sh + audit.md | 02 | 1 | RPT-04, RPT-05 | T-19-02-B (nested registry), T-19-02-C (header search) | Nested source_registry access; multi-header _resolve_ref | runtime | `bash bin/audit-claims.sh --select derived-report --sample 5` | ❌ edits existing | ⬜ pending |
 | 03-T1: lint.sh D-08/D-09/version | 03 | 2 | RPT-03 | T-19-03-A (flat registry), T-19-03-D (lint before sweep) | Flat source_registry access; D-08 guard on type!=source | lint version + yaml | `bash bin/lint.sh --require-version 1.9.0 && bash bin/lint.sh --category yaml` | ❌ edits existing | ⬜ pending |
-| 03-T2: Sweep 97 direct→derived | 03 | 2 | RPT-06 | T-19-03-B (source sweep), T-19-03-C (over-grade) | wiki-cloud/sources/ excluded; only vlm-ocr-hallucination re-graded | lint provenance | `bash bin/lint.sh --category provenance` | ❌ edits existing | ⬜ pending |
+| 03-T2: Sweep report-citing direct→derived (103 markers) | 03 | 2 | RPT-06 | T-19-03-B (source sweep), T-19-03-C (over-grade) | wiki-cloud/sources/ excluded; only vlm-ocr-hallucination re-graded | lint provenance | `bash bin/lint.sh --category provenance` | ❌ edits existing | ⬜ pending |
 | 04-T1: Retro-classify source summaries | 04 | 3 | RPT-02, RPT-06 | T-19-04-A (self-citation unchanged) | Source summary |direct| count unchanged | file grep | `grep -Ec '^- r[0-9]+::' wiki-cloud/sources/src-2026-06-09-pdf-to-text-llm-ingestion-sota.md` → 12 | ❌ edits existing | ⬜ pending |
 | 04-T2: Log + index + DR + phase-final gate | 04 | 3 | RPT-05 | T-19-04-C (log format), T-19-04-D (DR fields) | UPDATE entries use compact dispatch form; DR has trigger_type: schema-update; D-08 negative test fires then reverted | full lint | `bash bin/lint.sh && bash bin/check-neutrality.sh` + residual `\|direct\|` grep → 0 | ❌ creates new DR | ⬜ pending |
 
@@ -58,7 +58,7 @@ No Wave 0 gaps — all infrastructure already exists. The validation harness (bi
 
 **Wave 2→3 ordering (cross-AI review fix):** Plan 04 is Wave 3, `depends_on: 19-03`. D-08 fires only once Plan 04 sets `source_type: research-report`, so Plan 03's provenance check is vacuous for D-08; Plan 04's Task 2 runs the phase-final combined gate (full lint + zero-residual grep + D-08 negative test) as the non-vacuous end-to-end proof.
 
-**Critical coupling (Pitfall 1):** Plan 03 Task 1 (lint.sh D-08 check) and Plan 03 Task 2 (97 |direct| → |derived| sweep) must be committed together or sweep-before-lint-check. Running `bash bin/lint.sh --category provenance` before the sweep will produce D-08 errors. The Per-Task Verification Map reflects this: Task 03-T1 only verifies `--category yaml` (not provenance), while Task 03-T2 verifies `--category provenance` after the sweep.
+**Critical coupling (Pitfall 1):** Plan 03 Task 1 (lint.sh D-08 check) and Plan 03 Task 2 (report-citing |direct| → |derived| sweep, 103 markers / 97 lines) must be committed together. D-08 is vacuous until Plan 04 (Wave 3) sets `source_type: research-report`, so provenance lint stays green within Plan 03 either way — but committing lint.sh without the sweep leaves a landmine that turns CI red the moment Plan 04's frontmatter lands. Sweep-completeness proof in Plan 03 is the residual grep (0); the non-vacuous D-08 proof is Plan 04's phase-final gate with the hard negative test.
 
 ---
 

@@ -125,3 +125,16 @@ All 7 Round-1 concerns verdict: **RESOLVED**. Codex confirms the D-08/D-09 coupl
 | GT-2 | INFO | Canonical pre-sweep count re-confirmed live: 97 report-citing `\|direct\|` markers across the four page directories; agent-skills.md has 0 PDF-citing markers, so it belongs only in the frameworks sed list |
 
 ### Residual Risk (Codex): MEDIUM — drops to LOW once R2-2 and R2-3 are fixed. Orchestrator adds GT-1 as a must-fix before execution.
+
+### Round-2 Resolution (2026-06-10)
+
+All round-2 findings fixed inline:
+
+- **GT-1 (paths):** `overviews/agent-skills.md` and `concepts/subagents.md` corrected everywhere in Plan 03 (frontmatter, files, read_first, sed lists) and in Plan 04's negative test target. agent-skills.md removed from the PDF sed list (0 PDF-citing markers).
+- **R2-1 (stale note):** Plan 03 Task 1 note, atomic-commit blockquote, threat T-19-03-D, and VALIDATION.md Pitfall-1 note all rewritten to the vacuous-D-08 model: green provenance in Plan 03 proves nothing for D-08; the landmine is committing lint.sh without the sweep before Plan 04 flips frontmatter.
+- **R2-2 (log grep):** acceptance/verification/key_links now grep `source: src-2026-...` (single-line matchable) plus a `^## \[2026-06-10\] UPDATE` header count.
+- **R2-3 (soft negative test):** rewritten as a hard gate — greps lint output for "Epistemic laundering", reverts the test line in both branches, `exit 1` on failure.
+- **R2-4 (locator):** negative test uses `#sec:negtest`.
+- **R2-5 (broad revert):** kept `git checkout` with an explicit justification comment (Plan 04 makes no other edits to that file).
+- **R2-7 (counts):** ground truth adopted everywhere: 103 markers / 97 grep lines total; per-page counts corrected (olmocr 9, ocr-pipeline comparison 6, pdf-text-extraction 12, agent-skills 3/23 ≈ 13% frameworks-only); binding criterion remains residual 0.
+- **R2-6:** no action — confirmed false positive (prompt artifact).

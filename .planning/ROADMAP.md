@@ -96,7 +96,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 19-03-PLAN.md — bin/lint.sh D-08/D-09/version + 97-marker sweep in 14 dependent pages
+- [ ] 19-03-PLAN.md — bin/lint.sh D-08/D-09/version + report-citing direct→derived sweep (103 markers, 14 dependent pages)
 
 **Wave 3** *(blocked on Wave 2 — 19-04 needs 19-03's D-09 enum live before setting `source_type: research-report`; its final gate proves D-08 non-vacuously)*
 
