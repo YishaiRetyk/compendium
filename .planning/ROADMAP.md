@@ -104,7 +104,7 @@ Plans:
 
 **Wave 4 (gap closure)** *(blocked on Wave 3 — closes verification failures SC-4 + D-08 gate blind spot for table-cell markers)*
 
-- [ ] 19-05-PLAN.md — Fix 11 escaped-pipe \|direct\| markers in comparison files + normalize PROV_RE support_type in lint.sh/audit-claims.sh + D-08 table-cell regression test
+- [x] 19-05-PLAN.md — Fix 11 escaped-pipe \|direct\| markers in comparison files + normalize PROV_RE support_type in lint.sh/audit-claims.sh + D-08 table-cell regression test
 
 ### Phase 20: PDF Ingestion
 
@@ -318,6 +318,6 @@ The following are intentionally deferred until real usage demands them, captured
 | 16. Reference Extraction | v1.2 | 5/5 | Complete    | 2026-06-05 |
 | 17. Workflow Extraction | v1.2 | 4/4 | Complete    | 2026-06-07 |
 | 18. Skills Overlay | v1.2 | 3/3 | Complete    | 2026-06-08 |
-| 19. Extension Contract + Research-Report Type | v1.3 | 4/4 | Complete   | 2026-06-10 |
+| 19. Extension Contract + Research-Report Type | v1.3 | 5/5 | Complete   | 2026-06-10 |
 | 20. PDF Ingestion | v1.3 | 0/TBD | Not started | - |
 | 21. Video/YouTube Ingestion | v1.3 | 0/TBD | Not started | - |
