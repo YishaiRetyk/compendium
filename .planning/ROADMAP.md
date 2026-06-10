@@ -84,7 +84,12 @@ Full phase details: [milestones/v1.2-ROADMAP.md](milestones/v1.2-ROADMAP.md)
   3. An agent ingesting an AI deep-research report finds `source_type: research-report` in the frontmatter enum and Pass-0 classification, knows to preserve the bibliography in the raw source, and captures it as an addressable citation registry in the source summary
   4. Claims extracted from a research report carry `support_type: derived` (never `direct`) and a lower epistemic default (`mixed`/`tentative`), making the second-order-ness visible in every provenance marker
   5. The two existing AI deep-research reports already in `sources/` have been retro-classified with `source_type: research-report` and their citation registries backfilled in their source summary pages
-**Plans**: TBD
+**Plans**: 4 plans (2 waves)
+Plans:
+- [ ] 19-01-PLAN.md — Extension contract (source-types.md) + routing table row + frontmatter enum + ingest Pass 0
+- [ ] 19-02-PLAN.md — Provenance #r<n> locator + audit-claims.sh derived-report selector + audit.md documentation
+- [ ] 19-03-PLAN.md — bin/lint.sh D-08/D-09/version + 97-marker sweep in 14 dependent pages
+- [ ] 19-04-PLAN.md — Source summary retro-classification + citation registries + log + DR
 
 ### Phase 20: PDF Ingestion
 **Goal**: PDF documents can be acquired via a documented pipeline and ingested as a sub-case of an existing source type, with page-anchored provenance and honest epistemic handling for degraded scans
