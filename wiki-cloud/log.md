@@ -614,3 +614,29 @@ report: wiki-cloud/maintenance/lint-report.md
 findings: 73 total (0 errors, 69 warnings, 4 info)
 auto_fixes: 0 applied
 report: wiki-cloud/maintenance/lint-report.md
+
+## [2026-06-10] lint | wiki-cloud health check
+
+findings: 0 total (0 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki-cloud/maintenance/lint-report.md
+
+## [2026-06-10] UPDATE | PDF-to-Text Extraction and LLM PDF Ingestion: State of the Art (2025–2026)
+
+source: src-2026-06-09-pdf-to-text-llm-ingestion-sota | result: source_type article → research-report; ## References block added (r1–r12) | reason: retro-classify as secondary source per Phase 19 research-report type (RPT-06)
+
+## [2026-06-10] UPDATE | Claude Code Frameworks & Patterns: A Comparative Report
+
+source: src-2026-04-16-claude-code-frameworks-report | result: source_type article → research-report; ## References block added (r1–r15) | reason: retro-classify as secondary source per Phase 19 research-report type (RPT-06)
+
+## [2026-06-11] lint | wiki-cloud health check
+
+findings: 73 total (0 errors, 69 warnings, 4 info)
+auto_fixes: 0 applied
+report: wiki-cloud/maintenance/lint-report.md
+
+## [2026-06-11] lint | wiki-cloud health check
+
+findings: 1 total (1 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki-cloud/maintenance/lint-report.md
