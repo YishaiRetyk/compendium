@@ -812,6 +812,7 @@ for rank, (rel, line, sid, loc, line_text, fm), hits in capped:
     mprov = PROV_RE.search(line_text)
     if mprov and mprov.group(3):
         support_type = mprov.group(3)
+        support_type = (support_type or '').rstrip('\\')  # table-cell \|...\| escapes inject trailing backslash
     worklist.append({
         'path': rel, 'line': line, 'source_id': sid, 'locator': loc,
         'claim': line_text.strip(), 'passage': passage,

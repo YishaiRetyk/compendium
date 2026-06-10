@@ -1140,6 +1140,7 @@ if should_run('provenance'):
         # introduced in 14-02; real markers in prose remain validated.
         prov_matches = PROV_RE.findall(mask_markdown(body))
         for source_id, locator, support_type, checked_at in prov_matches:
+            support_type = support_type.rstrip('\\')  # table-cell \|...\| escapes inject trailing backslash
             if source_id not in source_registry:
                 add_finding('error', 'provenance', rel,
                             f'Broken prov ref: {source_id} not found in {wiki_dir}sources/')
