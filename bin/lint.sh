@@ -10,7 +10,7 @@ set -euo pipefail
 # Lint rule-set semver per CI-08 / D-26. Bump MAJOR on breaking changes
 # (removed category, changed severity semantics). MINOR on non-breaking
 # additions. PATCH on bug fixes. --require-version X.Y.Z is a minimum check.
-LINT_VERSION="1.8.0"
+LINT_VERSION="1.9.0"
 
 usage() {
     cat <<'EOF'
@@ -396,6 +396,8 @@ VALID_TYPES = {'entity', 'concept', 'source', 'comparison', 'overview', 'decisio
 VALID_STATUS = {'active', 'stale', 'superseded', 'archived'}
 VALID_EPISTEMIC = {'sourced', 'mixed', 'tentative', 'stale'}
 VALID_COMPILATION = {'pending', 'partial', 'compiled', 'stale'}
+VALID_SOURCE_TYPES = {'article', 'paper', 'transcript', 'journal',
+                      'data', 'image', 'research-report'}
 
 BASE_FIELDS = [
     'id', 'title', 'type', 'status', 'summary', 'created_at', 'updated_at',
@@ -1093,6 +1095,11 @@ if should_run('yaml'):
             cs = fm.get('compilation_status')
             if cs and cs not in VALID_COMPILATION:
                 add_finding('error', 'yaml', rel, f"Invalid compilation_status: '{cs}'")
+            st = fm.get('source_type', '')
+            if st and st not in VALID_SOURCE_TYPES:
+                add_finding('error', 'yaml', rel,
+                            f"Invalid source_type: '{st}' (expected one of: "
+                            f"{', '.join(sorted(VALID_SOURCE_TYPES))})")
 
         # Decision record validation (per AGENTS.md section 5 items 15-17)
         if fm.get('type') == 'decision':
@@ -1136,6 +1143,17 @@ if should_run('provenance'):
             if source_id not in source_registry:
                 add_finding('error', 'provenance', rel,
                             f'Broken prov ref: {source_id} not found in {wiki_dir}sources/')
+            else:
+                # D-08: derived-never-direct for research-report sources
+                # source summary pages self-cite with direct (correct) — skip them
+                if fm.get('type') != 'source':
+                    src_fm = source_registry.get(source_id)
+                    if isinstance(src_fm, dict) and src_fm.get('source_type') == 'research-report':
+                        if support_type == 'direct':
+                            add_finding('error', 'provenance', rel,
+                                        f'Epistemic laundering: [prov:{source_id}#...] '
+                                        f'uses support_type=direct on a research-report source '
+                                        f'(secondary sources must use derived)')
 
 # ---------------------------------------------------------------------------
 # Shared normalization helper (D-02: used by linkres + reconciled orphan/gap)
