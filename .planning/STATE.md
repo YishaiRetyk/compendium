@@ -373,7 +373,7 @@ Recent decisions affecting current work:
 ### Pending Todos
 
 - `a1-lexical-dedup-lint-category` — ✅ DONE 2026-06-02 via quick task 260602-d6a (commit fcddefc; `duplicate` lint category, LINT_VERSION 1.4.0). a2/(b)/(c) remain deferred to v1.3 (`.planning/seeds/wiki-quality-heuristics.md`).
-- `2026-06-10-v1-3-source-ingestion-milestone-accept-pdf-olmocr2-youtube-s` — v1.3 "Source Ingestion" milestone assessment (2026-06-10): PDF parsing (olmOCR 2 via Ollama) + YouTube ingestion (creator's `stt` CLI at `~/code/transcript/`, timestamped output) ACCEPTED as next-milestone candidates; both likely sub-cases (not new source types) per the `primary-source-type-extensions` seed framework. Feed into `/gsd-new-milestone`.
+- `2026-06-10-v1-3-source-ingestion-milestone-accept-pdf-olmocr2-youtube-s` — ✅ CONSUMED 2026-06-10: assessment fed into `/gsd-new-milestone`, shaping milestone v1.3 Source Ingestion (Phases 19–21). Moved to `.planning/todos/completed/`.
 
 ### Roadmap Evolution
 
