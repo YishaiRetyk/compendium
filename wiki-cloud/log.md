@@ -590,3 +590,27 @@ report: wiki-cloud/maintenance/lint-report.md
 findings: 72 total (18 errors, 54 warnings, 0 info)
 auto_fixes: 0 applied
 report: wiki-cloud/maintenance/lint-report.md
+
+## [2026-06-10] lint | wiki-cloud health check
+
+findings: 73 total (0 errors, 69 warnings, 4 info)
+auto_fixes: 0 applied
+report: wiki-cloud/maintenance/lint-report.md
+
+## [2026-06-10] lint | wiki-cloud health check
+
+findings: 0 total (0 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki-cloud/maintenance/lint-report.md
+
+## [2026-06-10] lint | wiki-cloud health check
+
+findings: 0 total (0 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki-cloud/maintenance/lint-report.md
+
+## [2026-06-10] lint | wiki-cloud health check
+
+findings: 73 total (0 errors, 69 warnings, 4 info)
+auto_fixes: 0 applied
+report: wiki-cloud/maintenance/lint-report.md
