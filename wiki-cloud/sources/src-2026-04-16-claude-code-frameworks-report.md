@@ -10,7 +10,7 @@ summary: "A synthesis of 8 parallel web-research investigations (April 2026) map
   gate), Superpowers (execution discipline), and GSD (context engineering) — with a
   comparative matrix, cross-cutting themes, and a decision guide."
 created_at: 2026-06-09
-updated_at: 2026-06-09
+updated_at: 2026-06-10
 sources: []
 epistemic_status: mixed
 tags:
@@ -36,7 +36,7 @@ example: false
 path: sources/2026/2026-04/2026-04-16-claude-code-frameworks-report.md
 content_hash: "sha256:f47a04313f42b98b4555a3d23ed1e8321c69ab7b7fc378d0c043402fe3e2ff6e"
 ingested_at: 2026-06-09
-source_type: article
+source_type: research-report
 compilation_status: compiled
 compiled_against_hash: "sha256:f47a04313f42b98b4555a3d23ed1e8321c69ab7b7fc378d0c043402fe3e2ff6e"
 compiled_targets:
@@ -133,3 +133,25 @@ A comparative report (April 2026) synthesizing 8 parallel web-research investiga
 - **Content hash:** `sha256:f47a04313f42b98b4555a3d23ed1e8321c69ab7b7fc378d0c043402fe3e2ff6e`
 - **Ingested:** 2026-06-09
 - **Primary sources cited (selected):** Anthropic Engineering (Agent Skills; multi-agent research system), Claude Code platform docs (skills/slash-commands/sub-agents/best-practices), agents.md open standard, obra/superpowers + Jesse Vincent's launch post, gsd-build/get-shit-done + USER-GUIDE, github/spec-kit + spec-driven manifesto, Pulumi and Medium framework comparisons, dev.to skills-stack post.
+
+## References
+
+<!-- r<n> = positional index into "## Sources by Topic" of the raw source -->
+<!-- raw source: sources/2026/2026-04/2026-04-16-claude-code-frameworks-report.md -->
+<!-- positional numbering: sequential across topic groups (r1-r9 = Building blocks, r10-r15 = Frameworks) -->
+
+- r1:: [Anthropic Engineering: Equipping agents for the real world with Agent Skills](https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills) — accessed 2026-06-10 — status: registry
+- r2:: [Skill authoring best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices) — accessed 2026-06-10 — status: registry
+- r3:: [Slash commands docs](https://code.claude.com/docs/en/slash-commands) — accessed 2026-06-10 — status: registry
+- r4:: [Subagents docs](https://code.claude.com/docs/en/sub-agents) — accessed 2026-06-10 — status: registry
+- r5:: [Claude Code best practices (CLAUDE.md)](https://code.claude.com/docs/en/best-practices) — accessed 2026-06-10 — status: registry
+- r6:: [agents.md open standard](https://agents.md/) — accessed 2026-06-10 — status: registry
+- r7:: [How we built our multi-agent research system](https://www.anthropic.com/engineering/multi-agent-research-system) — accessed 2026-06-10 — status: registry
+- r8:: [Stop bloating your CLAUDE.md (alexop.dev)](https://alexop.dev/posts/stop-bloating-your-claude-md-progressive-disclosure-ai-coding-tools/) — accessed 2026-06-10 — status: registry
+- r9:: [Writing a good CLAUDE.md (HumanLayer)](https://www.humanlayer.dev/blog/writing-a-good-claude-md) — accessed 2026-06-10 — status: registry
+- r10:: [obra/superpowers](https://github.com/obra/superpowers) (also: https://blog.fsck.com/2025/10/09/superpowers/) — accessed 2026-06-10 — status: registry
+- r11:: [gsd-build/get-shit-done](https://github.com/gsd-build/get-shit-done) (also: https://github.com/gsd-build/get-shit-done/blob/main/docs/USER-GUIDE.md) — accessed 2026-06-10 — status: registry
+- r12:: [github/spec-kit](https://github.com/github/spec-kit) (also: https://github.com/github/spec-kit/blob/main/spec-driven.md) — accessed 2026-06-10 — status: registry
+- r13:: [Pulumi: Superpowers, GSD, gstack comparison](https://www.pulumi.com/blog/claude-code-orchestration-frameworks/) — accessed 2026-06-10 — status: registry
+- r14:: [Medium: Superpowers vs BMAD vs SpecKit vs GSD](https://medium.com/@richardhightower/the-great-framework-showdown-superpowers-vs-bmad-vs-speckit-vs-gsd-360983101c10) — accessed 2026-06-10 — status: registry
+- r15:: [dev.to: Combining Superpowers + gstack + GSD](https://dev.to/imaginex/a-claude-code-skills-stack-how-to-combine-superpowers-gstack-and-gsd-without-the-chaos-44b3) — accessed 2026-06-10 — status: registry
