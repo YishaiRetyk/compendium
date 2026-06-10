@@ -91,8 +91,8 @@ Full phase details: [milestones/v1.2-ROADMAP.md](milestones/v1.2-ROADMAP.md)
 Plans:
 **Wave 1**
 
-- [ ] 19-01-PLAN.md — Extension contract (source-types.md) + routing table row + frontmatter enum + ingest Pass 0
-- [ ] 19-02-PLAN.md — Provenance #r<n> locator + audit-claims.sh derived-report selector + audit.md documentation
+- [x] 19-01-PLAN.md — Extension contract (source-types.md) + routing table row + frontmatter enum + ingest Pass 0
+- [x] 19-02-PLAN.md — Provenance #r<n> locator + audit-claims.sh derived-report selector + audit.md documentation
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -314,6 +314,6 @@ The following are intentionally deferred until real usage demands them, captured
 | 16. Reference Extraction | v1.2 | 5/5 | Complete    | 2026-06-05 |
 | 17. Workflow Extraction | v1.2 | 4/4 | Complete    | 2026-06-07 |
 | 18. Skills Overlay | v1.2 | 3/3 | Complete    | 2026-06-08 |
-| 19. Extension Contract + Research-Report Type | v1.3 | 0/TBD | Not started | - |
+| 19. Extension Contract + Research-Report Type | v1.3 | 2/4 | In Progress|  |
 | 20. PDF Ingestion | v1.3 | 0/TBD | Not started | - |
 | 21. Video/YouTube Ingestion | v1.3 | 0/TBD | Not started | - |
