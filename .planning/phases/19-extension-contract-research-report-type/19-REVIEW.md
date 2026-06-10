@@ -1,191 +1,164 @@
 ---
 phase: 19-extension-contract-research-report-type
-reviewed: 2026-06-11T00:00:00Z
+reviewed: 2026-06-10T22:59:09Z
 depth: standard
-files_reviewed: 28
+files_reviewed: 29
 files_reviewed_list:
   - AGENTS.md
-  - CLAUDE.md
   - bin/audit-claims.sh
   - bin/lint.sh
+  - CLAUDE.md
   - schema/reference/frontmatter.md
   - schema/reference/provenance.md
   - schema/reference/source-types.md
   - schema/workflows/audit.md
   - schema/workflows/ingest.md
-  - wiki-cloud/decisions/dr-2026-06-10-source-type-contract.md
-  - wiki-cloud/sources/src-2026-06-09-pdf-to-text-llm-ingestion-sota.md
-  - wiki-cloud/sources/src-2026-04-16-claude-code-frameworks-report.md
-  - wiki-cloud/log.md
-  - wiki-cloud/index.md
-  - wiki-cloud/entities/claude-code.md
-  - wiki-cloud/entities/gsd.md
-  - wiki-cloud/entities/spec-kit.md
-  - wiki-cloud/entities/superpowers.md
-  - wiki-cloud/entities/omnidocbench.md
-  - wiki-cloud/entities/olmocr.md
-  - wiki-cloud/concepts/subagents.md
-  - wiki-cloud/concepts/vlm-ocr-hallucination.md
+  - wiki-cloud/comparisons/claude-code-orchestration-frameworks.md
+  - wiki-cloud/comparisons/ocr-pipeline-vs-vlm-ingestion.md
   - wiki-cloud/concepts/progressive-disclosure.md
   - wiki-cloud/concepts/spec-driven-development.md
+  - wiki-cloud/concepts/subagents.md
+  - wiki-cloud/concepts/vlm-ocr-hallucination.md
+  - wiki-cloud/decisions/dr-2026-06-10-source-type-contract.md
+  - wiki-cloud/entities/claude-code.md
+  - wiki-cloud/entities/gsd.md
+  - wiki-cloud/entities/olmocr.md
+  - wiki-cloud/entities/omnidocbench.md
+  - wiki-cloud/entities/spec-kit.md
+  - wiki-cloud/entities/superpowers.md
+  - wiki-cloud/index.md
+  - wiki-cloud/log.md
   - wiki-cloud/overviews/agent-skills.md
-  - wiki-cloud/comparisons/ocr-pipeline-vs-vlm-ingestion.md
-  - wiki-cloud/comparisons/claude-code-orchestration-frameworks.md
   - wiki-cloud/overviews/pdf-text-extraction-for-llm-ingestion.md
+  - wiki-cloud/sources/src-2026-04-16-claude-code-frameworks-report.md
+  - wiki-cloud/sources/src-2026-06-09-pdf-to-text-llm-ingestion-sota.md
 findings:
-  critical: 2
-  warning: 8
-  info: 4
+  critical: 0
+  warning: 7
+  info: 7
   total: 14
 status: issues_found
 ---
 
-# Phase 19: Code Review Report
+# Phase 19: Code Review Report (re-review, post-19-05 gap closure)
 
-**Reviewed:** 2026-06-11
+**Reviewed:** 2026-06-10T22:59:09Z
 **Depth:** standard
-**Files Reviewed:** 28
+**Files Reviewed:** 29
 **Status:** issues_found
 
 ## Summary
 
-Phase 19 added a source-type extension contract, the `#r<n>` locator + `derived-report` audit selector, D-08/D-09 lint checks (v1.9.0), and a `|direct|` → `|derived|` sweep across 14 pages. The schema files are internally consistent, the `#r<n>` resolver was verified to resolve correctly against both raw bibliographies (12 and 15 bullets, positional alignment confirmed against the `## References` registries), and the prose sweep was correctly scoped (primary-source markers untouched).
+This re-review covers the final Phase 19 state: the source-type extension contract, the `research-report` type, `#r<n>` locator + `_resolve_ref`, D-08/D-09 lint enforcement, the `derived-report` audit selector, the 114-marker sweep (including the 19-05 table-cell gap closure), the retro-classification of two report sources, and the decision record.
 
-However, the phase's central deliverable — the anti-epistemic-laundering guarantee — is broken at HEAD. Markdown tables escape pipes as `\|`, so table-cell markers read `\|direct\|`. The sweep's grep/sed targeted only unescaped `|direct|`, leaving **11 live `direct` markers citing the two research-report sources** in the two comparison pages. Worse, the D-08 lint check shares the same blind spot: `PROV_RE` captures the support type as `direct\` (trailing backslash), so `support_type == 'direct'` never fires on table markers. Verified empirically: `bin/lint.sh --dry-run` reports **0 errors** against a tree containing 11 D-08 violations. The decision record's claim "All 103 `|direct|` markers ... were rewritten" and the 19-03 summary's "residual = 0 confirmed" are both false — the true pre-sweep total was 114.
+What was verified to work (empirically, in a sandboxed repo copy — no working-tree mutation):
 
-## Critical Issues
+- D-08 flags both prose `|direct|` and table-cell `\|direct\|` markers citing a research-report source on topic pages (2/2 injected markers caught), and the `support_type.rstrip('\\')` normalization in `bin/lint.sh:1143` is correct.
+- D-09 rejects unknown `source_type` values; both retro-classified source pages parse and validate; `bin/lint.sh --dry-run --category provenance` is clean on the current tree (sweep complete for the two classified reports — zero residual `|direct|`/`\|direct\|` markers cite them).
+- `_resolve_ref` correctly resolves `#r1`–`#r12` against `## Source Citations` and `#r1`–`#r15` against `## Sources by Topic` in the real raw sources, including out-of-range → `None` → `insufficient-locator`.
+- AGENTS.md and CLAUDE.md are byte-identical; routing-table row, frontmatter enum, provenance locator table, ingest classification step, and audit workflow doc are mutually consistent; lint routing category passes.
 
-### CR-01: D-08 lint gate is blind to escaped-pipe markers in markdown tables (BLOCKER)
-
-**File:** `bin/lint.sh:449-454` (PROV_RE), `bin/lint.sh:1147-1156` (D-08 check)
-**Issue:** Inside markdown table cells, provenance markers are written with escaped pipes: `[prov:<id>#sec:x\|direct\|2026-06-09]`. `PROV_RE` (`[^|\]]+` for locator and support_type) treats the backslash as a content character, capturing the support type as `'direct\'` and the locator as `'sec:x\'`. The D-08 comparison `support_type == 'direct'` is therefore always false for table markers, and the anti-laundering gate silently passes in exactly the context (comparison tables) where the wiki's own pages use it. Verified:
-
-```
->>> PROV_RE groups on a real table row from claude-code-orchestration-frameworks.md:48
-('src-2026-04-16-claude-code-frameworks-report', 'sec:comparative-matrix\\', 'direct\\', '2026-06-09')
-```
-
-`bin/lint.sh --dry-run --category provenance` returns 0 errors despite 11 live violations (CR-02). The same `PROV_RE` byte-copy lives in `bin/audit-claims.sh:173-178`, where the worklist's `support_type` field will carry `direct\` for these claims (the locator survives because `_slugify` strips the backslash).
-**Fix:** Normalize escaped pipes before matching in the provenance scan (the scan uses `findall`, no positional offsets needed):
-
-```python
-prov_matches = PROV_RE.findall(mask_markdown(body).replace('\\|', '|'))
-```
-
-or strip trailing backslashes from the captured groups before comparison: `support_type = support_type.rstrip('\\')` (apply the same normalization to `locator`). Apply the identical fix to the copied symbols in `bin/audit-claims.sh` (per the script's own "re-copy on drift" contract, `bin/audit-claims.sh:144-153`). Add a table-cell `\|direct\|` case to whatever hard-negative test exercised D-08.
-
-### CR-02: 11 unswept `\|direct\|` markers citing research-report sources remain on dependent pages (BLOCKER)
-
-**File:** `wiki-cloud/comparisons/claude-code-orchestration-frameworks.md:48`, `wiki-cloud/comparisons/ocr-pipeline-vs-vlm-ingestion.md:48-52`
-**Issue:** The retro-classification sweep converted 103 prose markers but missed all 11 escaped table-cell markers (1 in the frameworks comparison table, 10 across five rows of the OCR comparison table — two markers per row on lines 48-52). These are live epistemic-laundering defects under the phase's own D-08 rule: claims citing `source_type: research-report` sources with `direct` support. Consequently:
-- `wiki-cloud/decisions/dr-2026-06-10-source-type-contract.md:70` ("All 103 `|direct|` markers across 14 dependent wiki pages ... were rewritten to `|derived|`") is factually wrong — the pre-sweep total was 114, and 11 remain.
-- `.planning/phases/.../19-03-SUMMARY.md` ("binding acceptance criterion (residual = 0) confirmed after sweep") is wrong; the residual grep used the unescaped pattern and could not see table markers.
-**Fix:** Rewrite the 11 table markers to `\|derived\|`:
-
-```bash
-sed -i 's/\\|direct\\|/\\|derived\\|/g' \
-  wiki-cloud/comparisons/claude-code-orchestration-frameworks.md \
-  wiki-cloud/comparisons/ocr-pipeline-vs-vlm-ingestion.md
-```
-
-(scoped to the report-citing markers — in these two files every `\|direct\|` cites a research-report source, verified by grep). Correct the count claim in the decision record (`103` → `114`, or state "103 prose + 11 table markers").
+However, the review found that the phase's headline verification mechanism is largely hollow in practice (WR-01: 71% of the new audit tier's claims have unresolvable locators), the 19-05 table-cell fix is incomplete in `bin/audit-claims.sh` (WR-02: locator not normalized, only support_type), and the D-08 gate has three enforcement gaps (WR-03, WR-04, WR-07). No Critical findings (no security, data-loss, or crash defects); review is read-only and no source files were modified.
 
 ## Warnings
 
-### WR-01: D-08 exemption for source pages is over-broad — exempts cross-citations, not just self-citations
+### WR-01: 71% of derived-report audit-tier claims are unresolvable — `#sec:` locators do not match raw-source heading slugs
 
-**File:** `bin/lint.sh:1148-1149`
-**Issue:** The check skips any page with `fm.get('type') == 'source'`. The stated intent (comment, and DR §4) is that "source summary pages self-cite with direct (correct)". But the implementation also exempts a source page citing a *different* research-report source with `|direct|` — which is the same laundering defect the rule exists to catch (e.g. a future article-type source summary whose contradiction note cites a research-report directly).
-**Fix:** Exempt only the self-citation case:
+**File:** `wiki-cloud/entities/spec-kit.md:42-55`, `wiki-cloud/entities/superpowers.md:41-53`, `wiki-cloud/entities/gsd.md`, `wiki-cloud/entities/olmocr.md:48,56`, `wiki-cloud/concepts/subagents.md`, `wiki-cloud/concepts/progressive-disclosure.md`, `wiki-cloud/concepts/spec-driven-development.md`, `wiki-cloud/concepts/vlm-ocr-hallucination.md:43-46`, `wiki-cloud/comparisons/claude-code-orchestration-frameworks.md:9-48`, `wiki-cloud/comparisons/ocr-pipeline-vs-vlm-ingestion.md:50,52,62`, `wiki-cloud/overviews/agent-skills.md:69-70`, `wiki-cloud/overviews/pdf-text-extraction-for-llm-ingestion.md:46-47,63,65`, `wiki-cloud/entities/claude-code.md`
+**Issue:** Empirical run of `bin/audit-claims.sh --select derived-report --sample 200` (sandboxed copy of HEAD): **78 of 110 tier-5 claims resolve to `insufficient-locator`**. The `#sec:` names were authored as short slugs at ingest, but `_resolve_sec` requires an exact match against the slugified raw heading. Examples: `#sec:spec-kit` vs heading `### Spec Kit (github/spec-kit)` → slug `spec-kit-githubspec-kit`; `#sec:gsd` vs `### GSD / Get-Shit-Done (gsd-build/get-shit-done)`; `#sec:hallucination-caveat` vs `## VLM Hallucination Caveat` → `vlm-hallucination-caveat`; `#sec:self-hosted` vs `## Self-Hosted / Local Tier`; `#sec:commercial` vs `## Cloud / Commercial Tier`; `#sec:comparative-matrix` vs `## Part III — Comparative Matrix`. Only `#sec:executive-summary`, `#sec:three-camps`, `#sec:paradigm-comparison`, `#sec:olmocr`, `#sec:omnidocbench`, `#sec:recommendations` (32 claims) resolve. The locator mismatches predate Phase 19, but the phase's central deliverable — faithfulness auditing of secondary-source claims via the `derived-report` tier — silently degrades to `insufficient-locator` for ~3/4 of its targets, and the phase shipped without detecting this. The same broken slugs also exist on the two source summary pages (`#sec:refuted` vs `## Refuted Claims`, etc.), though summary-page claims are excluded from audit selection.
+**Fix:** One UPDATE-op sweep correcting the `#sec:` names to the actual heading slugs (or, cheaper and more robust: relax `_resolve_sec` to also match when the target slug is a hyphen-token subsequence/prefix of the heading slug, e.g. match `spec-kit` against `spec-kit-githubspec-kit` — keep exact match as first preference). Add a verification step to the audit workflow: after classifying a tier, assert resolvable-locator ratio above a floor.
 
+### WR-02: 19-05 table-cell normalization is incomplete in `bin/audit-claims.sh` — locator keeps the trailing backslash
+
+**File:** `bin/audit-claims.sh:529-534` (claim_tuples_for_page), `bin/audit-claims.sh:812-815`
+**Issue:** The gap-closure fix added `support_type.rstrip('\\')` (group 3) but did not normalize the **locator** (group 2). For a table-cell marker `[prov:<id>#<loc>\|derived\|<date>]`, `PROV_RE`'s group 2 (`[^|\]]+`) captures `<loc>\` with the trailing backslash. Empirically observed in the sandbox run: findings carry `locator: "#sec:comparative-matrix\"` and `"#sec:hallucination-caveat\"`. Consequences: (a) `#sec:` locators only survive by accident (`_slugify` strips the backslash); (b) `#para<n>`, `#p<n>`, `#r<n>`, and `#t` locators in table cells will ALWAYS fail their digit/format validation (`'3\\'.isdigit()` → False) and degrade to `insufficient-locator` — so the `#r<n>` convention this phase introduced is unusable inside any table cell; (c) the un-normalized locator is emitted in the findings JSON, worklist, and audit-report.md, and is the join key for `--apply-verdicts` matching, so a verdict file with clean locators will not match a backslash-suffixed finding key.
+**Fix:** In `claim_tuples_for_page`, normalize at extraction time (one site fixes all consumers):
 ```python
-if fm.get('type') == 'source' and fm.get('id') == source_id:
-    continue  # self-citation of own raw source is correctly direct
+sid, loc = m.group(1), m.group(2).rstrip('\\')
+```
+(`resolve_locator` could additionally defensively `loc = loc.rstrip('\\')`.)
+
+### WR-03: D-08 exemption is type-wide, not self-citation-only — a source page citing a DIFFERENT research-report with `|direct|` is not flagged
+
+**File:** `bin/lint.sh:1148-1157`
+**Issue:** The skip condition is `if fm.get('type') != 'source':` — every `type: source` page is exempt from D-08 for ALL markers, not just self-citations. Empirically verified: appending `[prov:src-2026-06-09-pdf-to-text-llm-ingestion-sota#sec:olmocr|direct|2026-06-09]` to the body of `src-2026-04-16-claude-code-frameworks-report.md` (a different source's summary) produces zero findings. This is exactly the cross-report laundering channel the anti-laundering note in `schema/reference/source-types.md` warns about ("Two reports citing each other can manufacture false consensus"). The DR (line 65) describes the exemption as "outside `wiki-cloud/sources/`", which also does not match the implemented type-based predicate.
+**Fix:** Restrict the exemption to genuine self-citation:
+```python
+if not (fm.get('type') == 'source' and fm.get('id') == source_id):
+    src_fm = source_registry.get(source_id)
+    ...
 ```
 
-### WR-02: D-08 under-enforces the documented "derived-only" MUST — bare and inferred/tentative markers pass
+### WR-04: D-08 enforces less than the schema mandates — only `direct` is flagged; omitted/`inferred`/`tentative` support types on report citations pass
 
-**File:** `bin/lint.sh:1152-1156`; contract in `schema/reference/source-types.md:65` and `schema/workflows/audit.md` ("the only valid support type for research-report sources")
-**Issue:** The schema mandates "ALL claims extracted from a research-report source MUST use `support_type: derived`". The lint check only flags `support_type == 'direct'`. A basic-form marker `[prov:<report-id>#sec:x]` (no support type — the schema's documented basic form), or `|inferred|` / `|tentative|`, passes silently. No such markers exist today, so the hole is latent, but the gate does not enforce the contract it claims to enforce.
-**Fix:** Flag any non-`derived` support type (including empty) on research-report citations from non-source pages, or narrow the schema text to match the implemented scope ("`direct` is an error") if bare markers are intentionally tolerated.
+**File:** `bin/lint.sh:1153`; `schema/reference/source-types.md:41,65`; `schema/workflows/ingest.md:53`
+**Issue:** The contract says `support_type: derived` is MANDATORY for research-report claims ("derived only" in the retro-fit table; "every claim MUST carry `support_type: derived`" in ingest.md). The lint check only errors on `support_type == 'direct'`. A bare marker `[prov:<report-id>#sec:x]` (no support type), or `|inferred|`/`|tentative|`, evades the gate entirely while still violating the documented mandate. No such markers exist in the wiki today (verified by grep), so this is a prospective evasion hole, not a current defect — but the gate's purpose is to catch exactly the markers a future ingest writes carelessly.
+**Fix:** Flag any report-citing marker whose support type is not `derived` (treat empty/missing as a violation too, or as a separate lower-severity finding if a softer rollout is preferred). At minimum, document in `source-types.md` that lint enforces only the `direct` case.
 
-### WR-03: `_resolve_ref` docstring promises priority-order header search; implementation is document-order
+### WR-05: Spec contradiction — source-summary self-citations use `|direct|` but the authoritative contract says "ALL claims ... MUST use derived" with no carve-out
 
-**File:** `bin/audit-claims.sh:423-443`
-**Issue:** The docstring says "Searches candidate headers in order: ## Source Citations, ## Sources by Topic, ## Sources, ## References (first match wins)" — implying candidate priority. The implementation compiles one alternation and takes `header_re.search(text)`, i.e. the first matching header *by document position*. A raw source containing an early non-bibliography `## Sources` section before its real `## Source Citations` block would silently bind `#r<n>` to the wrong section and return wrong passages (a faithfulness-audit correctness risk, not a crash). Both current raw sources happen to have exactly one matching header, so the defect is latent. Secondary limitations worth a comment: only h2 (`## `) headers are recognized (an `# References` h1 or `### References` h3 bibliography degrades to `insufficient-locator`), and only column-0 `- ` bullets count (numbered `1.` bibliographies degrade too — consistent with source-types.md's "nth bullet" wording, but worth stating).
-**Fix:** Iterate candidates in priority order:
+**File:** `schema/reference/source-types.md:65,94-101`; `schema/workflows/ingest.md:53`; `wiki-cloud/sources/src-2026-06-09-pdf-to-text-llm-ingestion-sota.md:59-104`; `wiki-cloud/sources/src-2026-04-16-claude-code-frameworks-report.md:60-117`
+**Issue:** Both retro-classified summary pages carry dozens of `|direct|` markers in `## Key Takeaways` / `## Extracted Claims`; lint deliberately exempts them and the DR asserts they "correctly remain `|direct|`" (a summary claim IS directly stated in the report). But `source-types.md` §5 — which declares "If you find a discrepancy between this file and AGENTS.md, this file wins" — says "ALL claims extracted from a research-report source MUST use `support_type: derived` ... Using `support_type: direct` on a research-report source is an epistemic-laundering error", and the ingest checklist (item 4) and the ingest.md granularity row repeat the unconditional rule. An agent following the authoritative docs on the next research-report ingest will author the source summary with `derived` markers, contradicting the established convention; an agent auditing the existing summaries against the contract will flag them as violations. The carve-out currently lives only in a lint code comment and the DR.
+**Fix:** Add one sentence to `source-types.md` §5 Provenance (and the ingest.md row): "Exception: the source summary page's own claims self-cite the report with `direct` — `direct` describes the claim-to-cited-source relation; the laundering rule applies to all OTHER pages."
 
-```python
-for name in ('Source Citations', 'Sources by Topic', 'Sources', 'References'):
-    m = re.search(rf'^##\s+{re.escape(name)}\s*$', text, re.MULTILINE | re.IGNORECASE)
-    if m:
-        break
-else:
-    return None
-```
+### WR-06: `--select` values are not validated — a typo (or stale help text) silently selects zero claims
 
-or fix the docstring to say "first matching header in document order".
+**File:** `bin/audit-claims.sh:50-51` (usage), `bin/audit-claims.sh:635-636,654-658`
+**Issue:** `selector_active(name)` is a bare membership test against the user CSV; an unknown selector name is silently ignored, and `--select derived_report` (underscore) or `--select derived` selects nothing with no warning — the run completes "successfully" with `Selected 0, skipped 0`. The committed `wiki-local/maintenance/audit-state.md`/`audit-report.md` show the most recent real run selected 0 of 0 claims at `--sample 5`, consistent with this hazard. Compounding it, the `--select` help text was not updated for this phase: it still reads "Subset of selectors: stale,epistemic,recency,fanout (default: all four)" — the new `derived-report` selector is undiscoverable from `--help` and the "all four" claim is now false (the default is five).
+**Fix:** Validate in the python block: `unknown = set(SELECT) - set(RANK); if unknown: print(f"ERROR: unknown selector(s): {sorted(unknown)}", file=sys.stderr); sys.exit(1)`. Update the usage text to `stale,epistemic,recency,fanout,derived-report (default: all five)`.
 
-### WR-04: `--select` help text and rank comment not updated for the 5th selector
+### WR-07: Retro-classification missed a third report-shaped source — `src-2026-05-04-financial-ai-repo-comparison-report` stays `article` with `|direct|` downstream markers
 
-**File:** `bin/audit-claims.sh:50-51` (usage: "Subset of selectors: stale,epistemic,recency,fanout (default: all four)"), `bin/audit-claims.sh:665-666` (comment: "Priority-rank order: stale(1) -> epistemic(2) -> recency(3) -> fanout(4)")
-**Issue:** The default `SELECT` (line 71) and `RANK` (line 631) gained `derived-report`, but the user-facing `--help` still lists four selectors and says "default: all four". An operator reading `--help` cannot discover `derived-report`, the selector the phase shipped.
-**Fix:** Update usage to `stale,epistemic,recency,fanout,derived-report (default: all five)` and extend the rank-order comment with `-> derived-report(5)`.
-
-### WR-05: provenance.md Support Types table now contradicts the research-report mandate
-
-**File:** `schema/reference/provenance.md:60-67`
-**Issue:** The phase added the `#r<n>` locator row and degradation note to provenance.md but left the Support Types table untouched. `direct` is defined as "Claim is directly stated in the source" — which literally describes a verbatim claim quoted from a research-report, yet using `direct` there is now a lint *error*. `derived` is defined only as "Synthesized from multiple parts of the source or across sources", with no mention of the new mandatory-for-secondary-sources semantics. provenance.md is the file the routing table sends agents to for support types (and source-types.md's See Also defers to it for "support_type values"), so an agent following the router will author exactly the markers D-08 rejects.
-**Fix:** Add a sentence/cross-reference to the Support Types section: claims citing `source_type: research-report` (secondary) sources MUST use `derived` regardless of how directly the report states them — see `schema/reference/source-types.md`.
-
-### WR-06: 13 of 14 swept pages did not get `updated_at` bumped
-
-**File:** `wiki-cloud/entities/{claude-code,gsd,spec-kit,superpowers,omnidocbench,olmocr}.md`, `wiki-cloud/concepts/{subagents,progressive-disclosure,spec-driven-development}.md`, `wiki-cloud/overviews/{agent-skills,pdf-text-extraction-for-llm-ingestion}.md`, `wiki-cloud/comparisons/{ocr-pipeline-vs-vlm-ingestion,claude-code-orchestration-frameworks}.md` (frontmatter `updated_at: 2026-06-09`)
-**Issue:** `schema/reference/frontmatter.md:44` defines `updated_at` as "ISO 8601 date when the page was last modified". All 14 pages were modified on 2026-06-10 by the sweep, but only `vlm-ocr-hallucination.md` (which also had an `epistemic_status` change) was bumped. Besides the schema violation, lint's stale-claim check uses `updated_at` as the `checked_at` fallback (`bin/lint.sh:1440-1445`), so the stale metadata feeds the decay math.
-**Fix:** Set `updated_at: 2026-06-10` on the 13 remaining swept pages (can ride along with the CR-02 fix commit).
-
-### WR-07: log.md tail is internally inconsistent — leaked test-run entries and scoped runs logged as full health checks
-
-**File:** `wiki-cloud/log.md:594-641`
-**Issue:** Two defects in the committed activity log:
-1. The final entry (line 638, `[2026-06-11] lint ... findings: 1 total (1 errors ...) report: wiki-cloud/maintenance/lint-report.md`) does not match the committed `lint-report.md` (last run 2026-06-10, 73 findings, 0 errors). This looks like the D-08 hard-negative test run (inject a `|direct|` marker, lint, revert) whose log append was committed while its report was reverted — the log's last word on wiki health is a phantom error pointing at a report that disproves it.
-2. Five near-duplicate `[2026-06-10] lint | wiki-cloud health check` entries (lines 594-618) alternate `73 total` / `0 total` — the `0 total` entries are category-scoped runs recorded with the same "wiki-cloud health check" title as full runs, misrepresenting wiki health to any reader of the log.
-**Fix:** Remove (or annotate as test runs) the phantom 2026-06-11 single-error entry and the scoped-run `0 total` entries; going forward, do not let `--category` runs append full-health-check log entries, and run negative tests with `--dry-run` so no log/report mutation occurs.
-
-### WR-08: The 14-page marker sweep itself was never logged
-
-**File:** `wiki-cloud/log.md:624-630`
-**Issue:** AGENTS.md §9 requires every wiki mutation to go through a structured operation "with mandatory logging". The log records UPDATE entries only for the two source pages (retro-classification + References registries). The sweep that rewrote 103 markers across 14 dependent pages — the largest content mutation in the phase — has no log entry at all; a future agent reading the log cannot discover why every report-citing marker changed on 2026-06-10.
-**Fix:** Append one UPDATE (or `lint`-style batch) entry summarizing the sweep: source ids, 14 affected pages, `|direct|` → `|derived|`, reason (D-08 retro-classification).
+**File:** `wiki-cloud/sources/src-2026-05-04-financial-ai-repo-comparison-report.md:32,65` (out of listed scope, found by cross-reference); downstream `|direct|` markers at `wiki-cloud/overviews/financial-ai-repository-landscape.md:48-59`, `wiki-cloud/entities/tradingagents.md:42-53`, `wiki-cloud/entities/openbb.md:41-52`
+**Issue:** The page self-describes as "an LLM-authored synthesis of public repository documentation" — matching the §5 classification rule for `research-report` ("AI-synthesized report ... a report that synthesizes primary sources") word-for-word — yet it retains `source_type: article`, `epistemic_status: sourced`, and at least 10 downstream `|direct|` markers: precisely the laundering pattern D-08 exists to block, currently invisible to the gate because classification is the check's trigger. The DR says "the two existing AI deep-research reports" were retro-classified; if this third one was deliberately deferred, no deferral is recorded in the DR or the source-types sub-case registry. (The `src-2026-05-04-*-investigation` sources were spot-checked and are genuine primary repository inspections — `article` is correct for them.)
+**Fix:** Either retro-classify it (`source_type: research-report`, sweep its `|direct|` markers to `|derived|`, backfill `## References` if the raw source has a bibliography) or record the explicit deferral decision in the DR / sub-case registry so the gap is visible.
 
 ## Info
 
-### IN-01: Redundant local `import re` in `_resolve_ref`
+### IN-01: Stale priority-rank comment in audit-claims.sh
 
-**File:** `bin/audit-claims.sh:434`
-**Issue:** `re` is already imported at module top (line 137); the function-local `import re` is dead weight and inconsistent with every other resolver in the file.
-**Fix:** Delete the line.
+**File:** `bin/audit-claims.sh:665-666`
+**Issue:** "Priority-rank order: stale(1) -> epistemic(2) -> recency(3) -> fanout(4)" omits `derived-report(5)`, added one screen above.
+**Fix:** Append `-> derived-report(5)`.
 
-### IN-02: Vault-roadmap references embedded in a template-public schema file
+### IN-02: `_resolve_ref` nits — shadowed import, misleading docstring, truncated multi-line bullets
 
-**File:** `schema/reference/source-types.md:45,49-51`
-**Issue:** "Phases 20 and 21 finalize the pdf and video rows", "(Phase 20)", "Pairs with 999.5 drift machinery" reference this vault's private `.planning/` roadmap. `schema/` ships in the public template (the neutrality rule explicitly covers "examples in schema docs"); these references are meaningless to template consumers and leak development-process internals. Not slugs, so `check-neutrality.sh` won't catch them.
-**Fix:** Replace with neutral wording ("a future evaluation finalizes...", "deferred pending drift machinery") or strip at release time.
+**File:** `bin/audit-claims.sh:423-443`
+**Issue:** (a) `import re` inside the function shadows the module-level import (harmless, but inconsistent with every other resolver). (b) Docstring says "Searches candidate headers in order: ... (first match wins)" — actual behavior is first-in-document wins via a single alternation regex, not priority order across header names; a stray early `## Sources` section would beat a later `## References` bibliography. (c) `^- (.+)` returns only the first line of a bullet; wrapped/multi-line bibliography entries are silently truncated.
+**Fix:** Drop the inner import; reword the docstring ("first matching header in document order"); optionally capture continuation lines.
 
-### IN-03: Decision record wording defects
+### IN-03: D-09 enum check lets `source_type: ""` pass
 
-**File:** `wiki-cloud/decisions/dr-2026-06-10-source-type-contract.md:48,76-81`
-**Issue:** (a) "The mechanical defense is three-layered:" is followed by four numbered layers. (b) "PDF verdict: article sub-case" drops the qualifier from the authoritative table, which says "sub-case of `article` or `paper` (provisional)" — the DR presents a seeded provisional verdict as settled.
-**Fix:** "four-layered" (or merge two layers); "PDF verdict: provisional article/paper sub-case, finalized by the PDF walk-through".
+**File:** `bin/lint.sh:1098-1102`
+**Issue:** `if st and st not in VALID_SOURCE_TYPES` — an explicitly empty `source_type: ""` passes both the missing-field check (`'source_type' in fm` is True) and the enum check (falsy `st` short-circuits). Matches the pre-existing `compilation_status` idiom, so consistent, but it leaves a typo-adjacent hole D-09 was meant to close.
+**Fix:** `if st not in VALID_SOURCE_TYPES:` for source pages (empty string then errors), or explicitly flag empty values.
 
-### IN-04: ingest.md granularity table still lists generic "report" as an article/paper sub-case
+### IN-04: DR overstates the PDF/video verdicts as settled
 
-**File:** `schema/workflows/ingest.md` (Claim Granularity table, first row)
-**Issue:** The first row reads "article, paper, report, technical doc — sub-cases of `article` or `paper`" while a new `research-report` row sits three rows below. An agent classifying an AI-synthesized report could match the word "report" in row 1 and pick atomic-`direct` extraction instead of the derived-only row.
-**Fix:** Rename the row-1 term to "primary report / technical doc" or add "(not research-report — see below)".
+**File:** `wiki-cloud/decisions/dr-2026-06-10-source-type-contract.md:48`
+**Issue:** "(PDF verdict: article sub-case; video: transcript sub-case)" — the authoritative registry (`schema/reference/source-types.md:49-53`) marks both rows **provisional** ("sub-case of `article` or `paper` (provisional)"), with Phases 20/21 finalizing. The DR reads as if the verdicts are final.
+**Fix:** Add "(provisional, finalized in Phases 20/21)" to the DR sentence.
+
+### IN-05: Worklist `support_type` taken from the FIRST marker on a multi-marker line
+
+**File:** `bin/audit-claims.sh:811-815`
+**Issue:** `mprov = PROV_RE.search(line_text)` always grabs the first marker, even when the claim tuple being processed corresponds to a later marker on the same line (multi-marker lines exist, e.g. `wiki-cloud/comparisons/ocr-pipeline-vs-vlm-ingestion.md:62` has two markers). The worklist/verifier `support_type` can therefore belong to a different marker than `(source_id, locator)`. Pre-existing, but the new `derived-report` tier samples these lines.
+**Fix:** Carry the matched support type through `claim_tuples_for_page` (it already iterates `PROV_RE.finditer`; add `m.group(3)` to the tuple).
+
+### IN-06: AGENTS.md inclusion-audit baseline not re-stamped after adding the routing row
+
+**File:** `AGENTS.md:7-8`
+**Issue:** Baseline reads `287 lines @ 2026-06-05`; the file is now 288 lines after the source-types routing row. Within the lint AUDIT drift tolerance (no finding fires), but the comment's own instruction is to justify the line and update the baseline.
+**Fix:** Re-stamp `<!-- inclusion-audit: 288 lines @ 2026-06-11 -->` in both AGENTS.md and CLAUDE.md (the row is dispatch-class, so it passes the inclusion test).
+
+### IN-07: D-08 is single-tier — wiki-local topic pages citing a cloud research-report are never checked
+
+**File:** `bin/lint.sh:94,1022,1130-1157`
+**Issue:** Lint walks only `WIKI_DIR` (default `wiki-cloud/`); a `wiki-local/` topic page citing a `wiki-cloud/` research-report with `|direct|` is invisible to D-08 in default runs, and running `bin/lint.sh wiki-local/` would instead produce false "Broken prov ref" errors because the source registry would then contain only local source pages. Inherited single-tier lint architecture (pre-existing), but D-08's anti-laundering guarantee is therefore cloud-tier-only — worth a one-line scope note in the DR or `schema/workflows/lint.md`.
+**Fix:** Document the scope limit, or (larger change) build the source registry across both tiers the way `bin/audit-claims.sh` already does.
 
 ---
 
-_Reviewed: 2026-06-11_
+_Reviewed: 2026-06-10T22:59:09Z_
 _Reviewer: Claude (gsd-code-reviewer)_
 _Depth: standard_
