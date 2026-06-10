@@ -98,3 +98,30 @@ All concerns addressed inline in the plans (no replan):
 | `derived-report` selector wording | MEDIUM | Plan 02's audit.md paragraph reworded: selector = "claims citing research-report sources" regardless of support type; malformed `direct` markers intentionally included for visibility |
 | Brittle `grep -c "r[0-9]*::"` | LOW | Replaced with anchored `grep -Ec '^- r[0-9]+::'` in Plan 04 acceptance/verification and VALIDATION.md |
 | Premature "Acquisition only" lock-in | LOW | Plan 01's pdf/video candidate rows marked *provisional* with a note that Phases 20/21 finalize verdict and dimensions via contract walk-through |
+
+---
+
+## Codex Re-Review — Validation Pass (2026-06-10, Round 2)
+
+All 7 Round-1 concerns verdict: **RESOLVED**. Codex confirms the D-08/D-09 coupling logic is now sound and Plan 04's final full lint + residual grep is the right end-to-end gate.
+
+### New Issues (Round 2)
+
+| # | Severity | Finding | Orchestrator verification |
+|---|----------|---------|---------------------------|
+| R2-1 | MEDIUM | Plan 03 Task 1 still says D-08 "will emit errors" before the sweep — stale under fixed sequencing (D-08 is vacuous until Plan 04 sets the frontmatter) | Confirmed — stale note at end of Task 1 action |
+| R2-2 | MEDIUM | Plan 04 acceptance `grep "UPDATE.*src-2026-06-09" wiki-cloud/log.md` cannot match: the UPDATE header and `source:` line are separate lines | Confirmed — header line has page title, source ID is on the next block line |
+| R2-3 | MEDIUM | D-08 negative test is not a hard gate: `\|\| echo "OK"` always exits 0; should `exit 1` on unexpected lint success and grep for the D-08 error text | Confirmed |
+| R2-4 | LOW | Negative test locator `#sec-1` isn't the documented `#sec:<name>` syntax | Confirmed (cosmetic — D-08 keys on support type) |
+| R2-5 | LOW | `git checkout <file>` is a broad revert for test cleanup | Accepted as-is (Plan 04 doesn't otherwise edit that file) |
+| R2-6 | LOW | ROADMAP "Plans: 4 plans (3 waves)" appears twice | **False positive** — artifact of the validation prompt including the phase section twice; the file has exactly one occurrence |
+| R2-7 | LOW | agent-skills percentage inconsistent: 4/22 (~18%) vs 2/22 (9%) in Plan 03 | Confirmed — and ground truth is **3/23 (~13%)** (0 PDF-citing + 3 frameworks-citing of 23 total markers); conclusion (stays `sourced`) unchanged |
+
+### Additional findings from orchestrator ground-truth verification (not visible to Codex)
+
+| # | Severity | Finding |
+|---|----------|---------|
+| GT-1 | HIGH | Plan 03 lists `wiki-cloud/concepts/agent-skills.md` and `wiki-cloud/entities/subagents.md` — **both paths are wrong**. Actual: `wiki-cloud/overviews/agent-skills.md`, `wiki-cloud/concepts/subagents.md`. Wrong paths appear in frontmatter `files_modified`, task `<files>`, sed file lists, and read_first. sed would exit non-zero / skip; Plan 04's negative test `>>` to the nonexistent concepts/ path would silently create a stray file |
+| GT-2 | INFO | Canonical pre-sweep count re-confirmed live: 97 report-citing `\|direct\|` markers across the four page directories; agent-skills.md has 0 PDF-citing markers, so it belongs only in the frameworks sed list |
+
+### Residual Risk (Codex): MEDIUM — drops to LOW once R2-2 and R2-3 are fixed. Orchestrator adds GT-1 as a must-fix before execution.
