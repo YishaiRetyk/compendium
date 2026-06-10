@@ -8,7 +8,7 @@ summary: "The two competing paradigms for turning PDFs into Markdown: traditiona
   page images — contrasted on accuracy, cost, determinism, layout handling, and the
   hallucination failure mode."
 created_at: 2026-06-09
-updated_at: 2026-06-09
+updated_at: 2026-06-11
 sources:
 - src-2026-06-09-pdf-to-text-llm-ingestion-sota
 epistemic_status: mixed
@@ -45,11 +45,11 @@ Prefer a deterministic extraction pipeline when documents are born-digital or st
 
 | Dimension | Extraction / OCR-to-Markdown pipeline | Native multimodal VLM ingestion |
 |---|---|---|
-| How it works | Layout model → OCR → reconstruct Markdown (multi-stage) [prov:src-2026-06-09-pdf-to-text-llm-ingestion-sota#sec:paradigm-comparison\|direct\|2026-06-09] | Feed page image → model emits Markdown directly (single forward pass) [prov:src-2026-06-09-pdf-to-text-llm-ingestion-sota#sec:three-camps\|direct\|2026-06-09] |
-| Strength | Deterministic, structured, cheap; strong on standard layouts (papers, financial reports) [prov:src-2026-06-09-pdf-to-text-llm-ingestion-sota#sec:three-camps\|direct\|2026-06-09] | Generalizes to slides, handwriting, unconventional formats; one model does everything [prov:src-2026-06-09-pdf-to-text-llm-ingestion-sota#sec:three-camps\|direct\|2026-06-09] |
-| Weakness | Brittle on unseen layouts; multi-stage error compounding [prov:src-2026-06-09-pdf-to-text-llm-ingestion-sota#sec:paradigm-comparison\|direct\|2026-06-09] | Hallucinates on degraded input — defaults to linguistic priors instead of pixels [prov:src-2026-06-09-pdf-to-text-llm-ingestion-sota#sec:hallucination-caveat\|direct\|2026-06-09] |
-| Best on OmniDocBench | MinerU leads English text edit-distance at 0.15 [prov:src-2026-06-09-pdf-to-text-llm-ingestion-sota#sec:three-camps\|direct\|2026-06-09] | Specialized VLMs now lead overall end-to-end [prov:src-2026-06-09-pdf-to-text-llm-ingestion-sota#sec:omnidocbench\|direct\|2026-06-09] |
-| Determinism | Reproducible, no hallucination [prov:src-2026-06-09-pdf-to-text-llm-ingestion-sota#sec:three-camps\|direct\|2026-06-09] | Non-deterministic; can emit plausible-but-wrong text [prov:src-2026-06-09-pdf-to-text-llm-ingestion-sota#sec:hallucination-caveat\|direct\|2026-06-09] |
+| How it works | Layout model → OCR → reconstruct Markdown (multi-stage) [prov:src-2026-06-09-pdf-to-text-llm-ingestion-sota#sec:paradigm-comparison\|derived\|2026-06-09] | Feed page image → model emits Markdown directly (single forward pass) [prov:src-2026-06-09-pdf-to-text-llm-ingestion-sota#sec:three-camps\|derived\|2026-06-09] |
+| Strength | Deterministic, structured, cheap; strong on standard layouts (papers, financial reports) [prov:src-2026-06-09-pdf-to-text-llm-ingestion-sota#sec:three-camps\|derived\|2026-06-09] | Generalizes to slides, handwriting, unconventional formats; one model does everything [prov:src-2026-06-09-pdf-to-text-llm-ingestion-sota#sec:three-camps\|derived\|2026-06-09] |
+| Weakness | Brittle on unseen layouts; multi-stage error compounding [prov:src-2026-06-09-pdf-to-text-llm-ingestion-sota#sec:paradigm-comparison\|derived\|2026-06-09] | Hallucinates on degraded input — defaults to linguistic priors instead of pixels [prov:src-2026-06-09-pdf-to-text-llm-ingestion-sota#sec:hallucination-caveat\|derived\|2026-06-09] |
+| Best on OmniDocBench | MinerU leads English text edit-distance at 0.15 [prov:src-2026-06-09-pdf-to-text-llm-ingestion-sota#sec:three-camps\|derived\|2026-06-09] | Specialized VLMs now lead overall end-to-end [prov:src-2026-06-09-pdf-to-text-llm-ingestion-sota#sec:omnidocbench\|derived\|2026-06-09] |
+| Determinism | Reproducible, no hallucination [prov:src-2026-06-09-pdf-to-text-llm-ingestion-sota#sec:three-camps\|derived\|2026-06-09] | Non-deterministic; can emit plausible-but-wrong text [prov:src-2026-06-09-pdf-to-text-llm-ingestion-sota#sec:hallucination-caveat\|derived\|2026-06-09] |
 
 ## Detailed Comparison
 

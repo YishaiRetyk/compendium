@@ -8,7 +8,7 @@ summary: "Head-to-head comparison of the three dominant Claude Code orchestratio
   (context engineering) — on constraint, workflow, artifacts, context strategy,
   parallelism, and verification, plus where they agree, diverge, and compose."
 created_at: 2026-06-09
-updated_at: 2026-06-09
+updated_at: 2026-06-11
 sources:
 - src-2026-04-16-claude-code-frameworks-report
 epistemic_status: mixed
@@ -45,7 +45,7 @@ Choose by the constraint you most need: Spec Kit for mixed-tool teams and long-l
 
 | Axis | Spec Kit | Superpowers | GSD |
 |---|---|---|---|
-| Origin | GitHub (official), Sep 2025 [prov:src-2026-04-16-claude-code-frameworks-report#sec:comparative-matrix\|direct\|2026-06-09] | Jesse Vincent (obra), Oct 2025 | TÂCHES, Dec 2025 |
+| Origin | GitHub (official), Sep 2025 [prov:src-2026-04-16-claude-code-frameworks-report#sec:comparative-matrix\|derived\|2026-06-09] | Jesse Vincent (obra), Oct 2025 | TÂCHES, Dec 2025 |
 | Primary constraint | The spec gate | Process discipline (TDD) | Context engineering |
 | Mental model | Specs are truth; code is regenerable | Brainstorm → plan → TDD → review, mandatory | Fresh subagent contexts; atomic plans on disk |
 | Workflow | constitution → specify → clarify → plan → tasks → analyze → implement | brainstorm → write-plan → execute-plan + ~14 skills | discuss → (ui/ai) → plan → execute → review → verify → ship |
