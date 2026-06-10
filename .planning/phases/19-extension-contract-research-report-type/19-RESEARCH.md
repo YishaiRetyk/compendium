@@ -529,7 +529,7 @@ No network egress, no user-supplied data paths, no credential handling in this p
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Bibliography registry entry count for PDF SOTA report**
    - What we know: 12 bullet entries in `## Source Citations`; one bullet has two comma-separated URLs (Mistral OCR news + pricing)
