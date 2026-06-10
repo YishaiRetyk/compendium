@@ -47,6 +47,7 @@ These four operations are the wiki's mutation vocabulary. Layered on top is the 
 > | Authoring a wiki page (type rules, section order) | `schema/reference/page-types.md` |
 > | Checking required frontmatter fields | `schema/reference/frontmatter.md` |
 > | Adding `[prov:]` or `[epistemic::]` markers | `schema/reference/provenance.md` |
+> | Adding/evaluating a new source type | `schema/reference/source-types.md` |
 > | Lint workflow + decay/staleness auto-fix math + CI severity/JSON contract | `schema/workflows/lint.md` |
 > | Creating cross-references (wikilinks) | `schema/reference/wikilinks.md` |
 > | Determining `wiki-cloud/` vs `wiki-local/` placement | `schema/reference/privacy.md` |
