@@ -5,7 +5,7 @@ type: decision
 status: active
 summary: "Formalizes the 5-dimension source-type extension contract in schema/reference/source-types.md and adds source_type: research-report as the first worked secondary instance, with derived-only provenance, citation registries, and lint enforcement against epistemic laundering."
 created_at: 2026-06-10
-updated_at: 2026-06-10
+updated_at: 2026-06-11
 sources: []
 epistemic_status: sourced
 tags:
@@ -53,7 +53,7 @@ Fully implemented as the contract's worked secondary instance:
 
 - **RPT-01:** `source_type: research-report` added to the frontmatter enum in `schema/reference/frontmatter.md`
 - **RPT-02:** Citation registry convention: a body `## References` block with `r<n>::` keyed entries (URL, title, access date, promotion status) — no new frontmatter field
-- **RPT-03:** `derived`-only provenance enforced by lint D-08: `[prov:<report>#...|direct|...]` on a research-report source is an error
+- **RPT-03:** `derived`-only provenance enforced by lint D-08: a `|direct|` provenance marker on a research-report source is an error
 - **RPT-04:** `bin/audit-claims.sh` gains a 5th priority selector (`derived-report`) and `#r<n>` locator resolver for positional bibliography lookup
 - **RPT-05:** Model C promotion path: when a cited source earns promotion, the human acquires it; the earning claim is re-pointed from `derived` to `direct`; the registry entry is marked `promoted → <new-source-id>`
 - **RPT-06:** Retro-classification of the two existing AI deep-research reports: `source_type: article` → `research-report`; citation registries backfilled; no new claims extracted (D-14)
@@ -67,7 +67,7 @@ LINT_VERSION bumped 1.8.0 → 1.9.0. Two new checks:
 
 **4. Claims sweep**
 
-All 103 `|direct|` markers across 14 dependent wiki pages (entities, concepts, comparisons, overviews) citing the two research-report sources were rewritten to `|derived|`. Source summary self-citations are excluded (they correctly remain `|direct|` — a source summary cites its own raw source).
+All 114 `|direct|` markers (103 prose markers + 11 table-cell `\|direct\|` markers) across 14 dependent wiki pages (entities, concepts, comparisons, overviews) citing the two research-report sources were rewritten to `|derived|`. The Plan 03 sweep corrected the 103 prose markers; a gap-closure pass (Plan 05) corrected the 11 table-cell markers that the original sweep's unescaped grep pattern missed. Source summary self-citations are excluded (they correctly remain `|direct|` — a source summary cites its own raw source).
 
 ## Why
 
@@ -93,7 +93,7 @@ The design lineage is `.planning/seeds/research-report-ingest.md` (LOCKED): "sep
 ## Consequences
 
 - `bin/lint.sh` LINT_VERSION bumped to 1.9.0; D-08 and D-09 checks are now CI-enforced
-- All report-citing `|direct|` markers in 14 wiki pages changed to `|derived|`; `vlm-ocr-hallucination.md` re-graded to `mixed` (its primary-sourced claims were outweighed by derived ones after the sweep)
+- All 114 report-citing `|direct|` markers (103 prose + 11 table-cell) in 14 wiki pages changed to `|derived|`; `vlm-ocr-hallucination.md` re-graded to `mixed` (its primary-sourced claims were outweighed by derived ones after the sweep)
 - `schema/reference/source-types.md` is the new evaluation contract for Phases 20 (PDF) and 21 (video ingestion)
 - Citation registries are the natural future trigger for 999.5 External Source Drift detection (explicitly deferred from v1.3)
 - `bin/audit-claims.sh` gains a 5th selector (`derived-report`, rank 5) for targeted faithfulness audits of secondary-source claims

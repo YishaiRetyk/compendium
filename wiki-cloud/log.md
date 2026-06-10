@@ -640,3 +640,21 @@ report: wiki-cloud/maintenance/lint-report.md
 findings: 1 total (1 errors, 0 warnings, 0 info)
 auto_fixes: 0 applied
 report: wiki-cloud/maintenance/lint-report.md
+
+## [2026-06-11] UPDATE | OCR Pipeline vs VLM Ingestion
+
+source: src-2026-06-09-pdf-to-text-llm-ingestion-sota
+result: rewrote 10 table-cell \|direct\| markers to \|derived\| (escaped-pipe blind spot from Plan 03 sweep; RPT-03 gap closure)
+reason: table-cell markdown escapes pipes as \|; Plan 03 grep pattern targeted unescaped |direct| and missed these markers
+
+## [2026-06-11] UPDATE | Claude Code Orchestration Frameworks
+
+source: src-2026-04-16-claude-code-frameworks-report
+result: rewrote 1 table-cell \|direct\| marker to \|derived\| (escaped-pipe blind spot from Plan 03 sweep; RPT-03 gap closure)
+reason: same table-cell pipe-escaping blind spot as ocr-pipeline-vs-vlm-ingestion.md
+
+## [2026-06-11] UPDATE | Source-Type Extension Contract + research-report Secondary Source Type
+
+source: dr-2026-06-10-source-type-contract
+result: corrected pre-sweep total count from 103 to 114 (103 prose + 11 table-cell); added gap-closure note to Claims sweep paragraph
+reason: original count was produced by the same unescaped grep used in the sweep; actual total was 114
