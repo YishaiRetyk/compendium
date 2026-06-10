@@ -11,18 +11,18 @@ Design lineage: `.planning/seeds/research-report-ingest.md` (design LOCKED — R
 
 ### Extension Contract (EXT)
 
-- [ ] **EXT-01**: A source-type extension contract exists in `schema/reference/` defining the 5-dimension recipe (acquisition / locator / extraction granularity / drift / epistemic default) and the primary-vs-secondary axis (primary → `direct`, secondary → `derived`)
-- [ ] **EXT-02**: The contract encodes the decision rule: a new `source_type` is justified only if it changes at least one of the 5 dimensions; otherwise the candidate is documented as a sub-case of an existing type
-- [ ] **EXT-03**: Existing source types are retro-fit as contract instances (a table mapping each current type across the 5 dimensions), with `research-report` as the worked secondary instance — the contract is extracted from real cases, not invented in a vacuum
+- [x] **EXT-01**: A source-type extension contract exists in `schema/reference/` defining the 5-dimension recipe (acquisition / locator / extraction granularity / drift / epistemic default) and the primary-vs-secondary axis (primary → `direct`, secondary → `derived`)
+- [x] **EXT-02**: The contract encodes the decision rule: a new `source_type` is justified only if it changes at least one of the 5 dimensions; otherwise the candidate is documented as a sub-case of an existing type
+- [x] **EXT-03**: Existing source types are retro-fit as contract instances (a table mapping each current type across the 5 dimensions), with `research-report` as the worked secondary instance — the contract is extracted from real cases, not invented in a vacuum
 
 ### Research-Report Type (RPT)
 
-- [ ] **RPT-01**: `source_type: research-report` is added to the frontmatter enum and ingest Pass-0 classification, marking AI deep-research artifacts (Claude/ChatGPT/Perplexity) as synthesized secondary sources
-- [ ] **RPT-02**: The ingest convention preserves the report's bibliography intact in the immutable raw source and captures it as an addressable citation registry in the source summary
-- [ ] **RPT-03**: Claims extracted from a research report carry second-order provenance — `support_type: derived` (never `direct`), with locators reusing the report's own reference anchors
-- [ ] **RPT-04**: Research-report claims default to a lower epistemic tier (`mixed`/`tentative`) and are flagged as priority targets for `bin/audit-claims.sh` (anti-epistemic-laundering defense)
-- [ ] **RPT-05**: Any citation-registry entry is promotable to a first-class source when a claim earns it (Model C hybrid promotion path, documented)
-- [ ] **RPT-06**: The two already-ingested deep-research reports (PDF-extraction SOTA, Claude Code frameworks) are retro-classified under the new type with citation registries backfilled
+- [x] **RPT-01**: `source_type: research-report` is added to the frontmatter enum and ingest Pass-0 classification, marking AI deep-research artifacts (Claude/ChatGPT/Perplexity) as synthesized secondary sources
+- [x] **RPT-02**: The ingest convention preserves the report's bibliography intact in the immutable raw source and captures it as an addressable citation registry in the source summary
+- [x] **RPT-03**: Claims extracted from a research report carry second-order provenance — `support_type: derived` (never `direct`), with locators reusing the report's own reference anchors
+- [x] **RPT-04**: Research-report claims default to a lower epistemic tier (`mixed`/`tentative`) and are flagged as priority targets for `bin/audit-claims.sh` (anti-epistemic-laundering defense)
+- [x] **RPT-05**: Any citation-registry entry is promotable to a first-class source when a claim earns it (Model C hybrid promotion path, documented)
+- [x] **RPT-06**: The two already-ingested deep-research reports (PDF-extraction SOTA, Claude Code frameworks) are retro-classified under the new type with citation registries backfilled
 
 ### PDF Ingestion (PDF)
 
@@ -69,15 +69,15 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| EXT-01 | Phase 19 | Pending |
-| EXT-02 | Phase 19 | Pending |
-| EXT-03 | Phase 19 | Pending |
-| RPT-01 | Phase 19 | Pending |
-| RPT-02 | Phase 19 | Pending |
-| RPT-03 | Phase 19 | Pending |
-| RPT-04 | Phase 19 | Pending |
-| RPT-05 | Phase 19 | Pending |
-| RPT-06 | Phase 19 | Pending |
+| EXT-01 | Phase 19 | Complete |
+| EXT-02 | Phase 19 | Complete |
+| EXT-03 | Phase 19 | Complete |
+| RPT-01 | Phase 19 | Complete |
+| RPT-02 | Phase 19 | Complete |
+| RPT-03 | Phase 19 | Complete |
+| RPT-04 | Phase 19 | Complete |
+| RPT-05 | Phase 19 | Complete |
+| RPT-06 | Phase 19 | Complete |
 | PDF-01 | Phase 20 | Pending |
 | PDF-02 | Phase 20 | Pending |
 | PDF-03 | Phase 20 | Pending |

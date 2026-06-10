@@ -318,6 +318,6 @@ The following are intentionally deferred until real usage demands them, captured
 | 16. Reference Extraction | v1.2 | 5/5 | Complete    | 2026-06-05 |
 | 17. Workflow Extraction | v1.2 | 4/4 | Complete    | 2026-06-07 |
 | 18. Skills Overlay | v1.2 | 3/3 | Complete    | 2026-06-08 |
-| 19. Extension Contract + Research-Report Type | v1.3 | 5/5 | Complete   | 2026-06-10 |
+| 19. Extension Contract + Research-Report Type | v1.3 | 5/5 | Complete    | 2026-06-10 |
 | 20. PDF Ingestion | v1.3 | 0/TBD | Not started | - |
 | 21. Video/YouTube Ingestion | v1.3 | 0/TBD | Not started | - |
