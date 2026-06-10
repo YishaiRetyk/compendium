@@ -75,43 +75,57 @@ Full phase details: [milestones/v1.2-ROADMAP.md](milestones/v1.2-ROADMAP.md)
 ## Phase Details
 
 ### Phase 19: Extension Contract + Research-Report Type
+
 **Goal**: The schema has a formal, reusable extension contract for adding source types, and the `research-report` type is fully implemented as the contract's worked secondary instance
 **Depends on**: Nothing (first v1.3 phase; v1.3 editing targets are modular `schema/reference/*.md` + `schema/workflows/*.md` files, not the pre-extraction monolith)
 **Requirements**: EXT-01, EXT-02, EXT-03, RPT-01, RPT-02, RPT-03, RPT-04, RPT-05, RPT-06
 **Success Criteria** (what must be TRUE):
+
   1. An agent reading `schema/reference/` can find a single source-type extension contract that lists the 5 dimensions and the primary-vs-secondary axis, and can use it to evaluate whether any new candidate justifies a new type or is a sub-case
   2. The contract includes a retro-fit table mapping all current source types across the 5 dimensions, so a reader can see how existing types are instances of the same contract
   3. An agent ingesting an AI deep-research report finds `source_type: research-report` in the frontmatter enum and Pass-0 classification, knows to preserve the bibliography in the raw source, and captures it as an addressable citation registry in the source summary
   4. Claims extracted from a research report carry `support_type: derived` (never `direct`) and a lower epistemic default (`mixed`/`tentative`), making the second-order-ness visible in every provenance marker
   5. The two existing AI deep-research reports already in `sources/` have been retro-classified with `source_type: research-report` and their citation registries backfilled in their source summary pages
+
 **Plans**: 4 plans (2 waves)
 Plans:
+**Wave 1**
+
 - [ ] 19-01-PLAN.md — Extension contract (source-types.md) + routing table row + frontmatter enum + ingest Pass 0
 - [ ] 19-02-PLAN.md — Provenance #r<n> locator + audit-claims.sh derived-report selector + audit.md documentation
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 19-03-PLAN.md — bin/lint.sh D-08/D-09/version + 97-marker sweep in 14 dependent pages
 - [ ] 19-04-PLAN.md — Source summary retro-classification + citation registries + log + DR
 
 ### Phase 20: PDF Ingestion
+
 **Goal**: PDF documents can be acquired via a documented pipeline and ingested as a sub-case of an existing source type, with page-anchored provenance and honest epistemic handling for degraded scans
 **Depends on**: Phase 19 (extension contract defines the evaluation rule applied to confirm PDF is a sub-case, not a new type)
 **Requirements**: PDF-01, PDF-02, PDF-03, PDF-04
 **Success Criteria** (what must be TRUE):
+
   1. An agent can find a documented PDF acquisition pipeline in `schema/` — running olmOCR 2 via the local Ollama instance produces a Markdown file with `<!-- page: N -->` markers ready for standard ingest
   2. A source summary page for a PDF document records the extraction tool and model version in frontmatter, and every claim uses `#p<N>` locators pointing to the correct page
   3. When a PDF is a degraded or scanned document, the convention specifies spot-verification steps and/or mandates a lower epistemic default — an agent does not silently treat VLM-extracted text as high-confidence
   4. One real PDF artifact has been acquired via the pipeline, ingested, and its wiki pages are in `sources/` with page-anchored provenance; the original PDF co-exists as a bundle asset alongside `source.md`
+
 **Plans**: TBD
 **UI hint**: no
 
 ### Phase 21: Video/YouTube Ingestion
+
 **Goal**: YouTube videos can be acquired via a documented pipeline and ingested as a sub-case of the transcript source type, with timestamp-anchored provenance and a clear drift stance
 **Depends on**: Phase 19 (extension contract defines the evaluation rule confirming video is a transcript sub-case)
 **Requirements**: VID-01, VID-02, VID-03, VID-04
 **Success Criteria** (what must be TRUE):
+
   1. An agent can find a documented video acquisition pipeline in `schema/` describing yt-dlp + timestamped STT to produce a speaker-labeled transcript ready for standard ingest (tool-generic in template-public docs; the local STT tool is the worked instance in `.planning/` notes)
   2. A source summary page for a YouTube video records `url`, `channel`, `title`, `publish_date`, and `duration` in frontmatter, and every claim uses `#t<start>-<end>` locators that resolve to the transcript
   3. The convention explicitly states the drift stance for videos: immutable once published; concern is deletion/link-rot, not content change; no drift machinery is needed or implemented
   4. One real YouTube video has been acquired via the pipeline, ingested, and its wiki pages are in `sources/` with timestamp-anchored provenance
+
 **Plans**: TBD
 **UI hint**: no
 
