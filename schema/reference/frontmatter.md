@@ -64,13 +64,15 @@ path: sources/YYYY/YYYY-MM/YYYY-MM-DD-slug/source.md
 url: "https://..."                  # Original URL if applicable
 content_hash: "sha256:abc123..."    # SHA-256 hash for staleness detection
 ingested_at: YYYY-MM-DD            # When source was processed
-source_type: article|paper|transcript|journal|data|image
+source_type: article|paper|transcript|journal|data|image|research-report
 
 # Compilation tracking
 compilation_status: pending         # pending | partial | compiled | stale
 compiled_against_hash: ""           # SHA-256 of source content at last compilation
 compiled_targets: []                # Wiki page IDs that received compiled claims
 ```
+
+Semantics for each `source_type` value and the extension decision rule → `schema/reference/source-types.md`.
 
 ### Compilation Tracking Fields (Source Summary Pages)
 
