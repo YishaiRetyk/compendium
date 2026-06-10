@@ -30,6 +30,7 @@ Every factual claim in wiki pages SHOULD have an inline provenance marker linkin
 | Paragraph | `#para<number>` | `#para3` | Specific paragraphs |
 | Timestamp | `#t<start>-<end>` | `#t00:12:10-00:12:48` | Audio/video transcripts |
 | Image | `#img<number>` | `#img2` | Figures, diagrams |
+| Reference | `#r<number>` | `#r7` | research-report bibliography entries |
 
 ### Page-marker convention
 
@@ -51,6 +52,8 @@ Markdown-native raw sources lose the page boundaries a PDF carries, so a `#p<n>`
 **Slice semantics:** `#p8` resolves from the `<!-- page: 8 -->` marker to the line before `<!-- page: 9 -->`; `#p12-14` spans the `<!-- page: 12 -->` marker to the `<!-- page: 15 -->` marker (exclusive upper bound -- the slice ends just before the `page: 15` marker, so the range covers pages 12, 13, and 14). The lower marker is inclusive, the next-page marker is exclusive.
 
 **Optional, with a documented fallback:** markers are never required. When present, `#p` resolves to a bounded passage; when absent, a `#p` locator degrades to the audit's first-class `insufficient-locator` verdict (NOT an error). This is additive -- it imposes nothing on existing sources, and unmarked paginated sources are not errors (D-06). The fallback nudges authors toward `#sec:`/`#para` locators for markdown-native sources that have no real pages.
+
+**Graceful degradation for `#r<n>`:** When a source has no bibliography section, `#r<n>` resolves to `insufficient-locator` (NOT an error), matching the `#p` page-marker precedent. Authors citing sources without bibliographies should prefer `#sec:` or `#para` locators instead.
 
 **Document-now / helper-later (D-07):** the curator hand-marks sources today; any auto-insertion helper (e.g. PDF-to-markdown page-break detection at ingest) is deferred to a later version. The audit consumes the markers read-only; ingest gains zero new logic from this convention.
 
@@ -75,6 +78,7 @@ The `checked_at` field records the ISO 8601 date when the provenance link was la
 - Hinton expressed concerns about AI safety risks [prov:src-2026-03-20-hinton-interview#t00:12:10-00:12:48|direct|2026-04-08]
 - The learning rate schedule uses warmup followed by inverse square root decay [prov:src-2026-03-15-vaswani-attention#sec:training|direct|2026-04-08]
 - RNNs struggle with long-range dependencies due to vanishing gradients [prov:src-2026-04-02-lstm-survey#sec:limitations|direct|2026-04-08]
+- Research synthesis claim: `[prov:<report-slug>#r7|derived|<date>]`
 ```
 
 ### Bad vs. Good Provenance Examples

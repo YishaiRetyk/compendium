@@ -68,7 +68,7 @@ EOF
 # --- Defaults ---
 SINCE=""
 SAMPLE="20"
-SELECT="stale,epistemic,recency,fanout"
+SELECT="stale,epistemic,recency,fanout,derived-report"
 FORMAT="report"
 EMIT_WORKLIST="0"
 APPLY_VERDICTS=""
@@ -420,6 +420,29 @@ def _resolve_page(raw_text, lo, hi):
     return '\n'.join(lines[start:end]).strip() or None
 
 
+def _resolve_ref(text, n):
+    """Return the Nth bullet in the first bibliography section found.
+    Searches candidate headers in order: ## Source Citations, ## Sources by Topic,
+    ## Sources, ## References (first match wins). Positional numbering is
+    sequential across topic groups. Returns None if not found or N out of range."""
+    import re
+    header_re = re.compile(
+        r'^##\s+(Source Citations|Sources by Topic|Sources|References)\s*$',
+        re.MULTILINE | re.IGNORECASE
+    )
+    bullet_re = re.compile(r'^- (.+)', re.MULTILINE)
+    m = header_re.search(text)
+    if not m:
+        return None
+    after_header = text[m.end():]
+    next_h = re.search(r'^##\s', after_header, re.MULTILINE)
+    section = after_header[:next_h.start()] if next_h else after_header
+    bullets = bullet_re.findall(section)
+    if not bullets or n < 1 or n > len(bullets):
+        return None
+    return bullets[n - 1]
+
+
 def resolve_locator(raw_source_text, locator):
     """Return (passage | None, verdict_override | None).
 
@@ -458,6 +481,9 @@ def resolve_locator(raw_source_text, locator):
             if not a.isdigit() or not b.isdigit():
                 return None, None
             return _resolve_page(raw_source_text, int(a), int(b)), None
+        if loc.startswith('#r') and loc[2:].isdigit():
+            n = int(loc[2:])
+            return _resolve_ref(raw_source_text, n), None
     except Exception:
         return None, None
     # unknown / malformed locator
@@ -602,7 +628,7 @@ for fpath, fm, body, err in all_pages:
 high_fanout_paths = {id_to_relpath[pid] for pid in high_fanout_ids if pid in id_to_relpath}
 
 # --- Classify each claim into selector buckets; assign best (lowest) rank. ---
-RANK = {'stale': 1, 'epistemic': 2, 'recency': 3, 'fanout': 4}
+RANK = {'stale': 1, 'epistemic': 2, 'recency': 3, 'fanout': 4, 'derived-report': 5}
 selected = {}  # key (rel,line,sid,loc) -> (rank, tuple, selectors)
 
 
@@ -624,6 +650,11 @@ for rel, line, sid, loc, line_text, fm in all_claims:
             hits.append('recency')
     if selector_active('fanout') and rel in high_fanout_paths:
         hits.append('fanout')
+    if selector_active('derived-report'):
+        entry = source_registry.get(sid, {})
+        src_fm = entry.get('fm', {}) if isinstance(entry, dict) else {}
+        if src_fm.get('source_type') == 'research-report':
+            hits.append('derived-report')
     if not hits:
         continue
     best_rank = min(RANK[h] for h in hits)
