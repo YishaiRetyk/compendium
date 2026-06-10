@@ -87,7 +87,7 @@ Full phase details: [milestones/v1.2-ROADMAP.md](milestones/v1.2-ROADMAP.md)
   4. Claims extracted from a research report carry `support_type: derived` (never `direct`) and a lower epistemic default (`mixed`/`tentative`), making the second-order-ness visible in every provenance marker
   5. The two existing AI deep-research reports already in `sources/` have been retro-classified with `source_type: research-report` and their citation registries backfilled in their source summary pages
 
-**Plans**: 4 plans (3 waves)
+**Plans**: 5 plans (4 waves)
 Plans:
 **Wave 1**
 
@@ -101,6 +101,10 @@ Plans:
 **Wave 3** *(blocked on Wave 2 — 19-04 needs 19-03's D-09 enum live before setting `source_type: research-report`; its final gate proves D-08 non-vacuously)*
 
 - [x] 19-04-PLAN.md — Source summary retro-classification + citation registries + log + DR + phase-final combined lint gate
+
+**Wave 4 (gap closure)** *(blocked on Wave 3 — closes verification failures SC-4 + D-08 gate blind spot for table-cell markers)*
+
+- [ ] 19-05-PLAN.md — Fix 11 escaped-pipe \|direct\| markers in comparison files + normalize PROV_RE support_type in lint.sh/audit-claims.sh + D-08 table-cell regression test
 
 ### Phase 20: PDF Ingestion
 
