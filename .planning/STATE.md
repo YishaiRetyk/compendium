@@ -1,17 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.2
-milestone_name: Schema Architecture
-status: Awaiting next milestone
-stopped_at: Phase 18 context gathered
-last_updated: "2026-06-08T20:01:07.412Z"
-last_activity: 2026-06-08 — Milestone v1.2 completed and archived
+milestone: v1.3
+milestone_name: Source Ingestion
+status: planning
+last_updated: "2026-06-10T11:59:38.318Z"
+last_activity: 2026-06-10
 progress:
-  total_phases: 11
-  completed_phases: 4
-  total_plans: 15
-  completed_plans: 15
-  percent: 36
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -21,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-04)
 
 **Core value:** The wiki is a persistent, compounding artifact -- cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested.
-**Current focus:** v1.2 Schema Architecture — milestone complete (Phases 15–18). Next: `/gsd-complete-milestone`. (Backlog Phase 999.1 is SUPERSEDED — do not plan against it.)
+**Current focus:** v1.3 Source Ingestion — defining requirements. Scope: source-type extension contract + research-report ingest (seed LOCKED) + PDF (olmOCR 2) + YouTube (stt). 999.5 drift deferred. (Backlog Phase 999.1 is SUPERSEDED — do not plan against it.)
 
 ## Current Position
 
-Phase: Milestone v1.2 complete
+Phase: Not started (defining requirements)
 Plan: —
-Status: Awaiting next milestone
-Last activity: 2026-06-08 — Milestone v1.2 completed and archived
+Status: Defining requirements
+Last activity: 2026-06-10 — Milestone v1.3 started
 
 ### v1.2 Phase Summary
 

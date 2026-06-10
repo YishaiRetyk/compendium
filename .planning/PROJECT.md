@@ -14,7 +14,7 @@ The wiki is a persistent, compounding artifact — cross-references are already 
 
 **Cumulative:** v1.0 MVP (Phases 1–6, shipped 2026-04-15) + v1.1 Shareability (Phases 7–13.2, shipped 2026-06-02) + v1.1.1 Graph Integrity (Phase 14, shipped 2026-06-04) + v1.2 Schema Architecture (Phases 15–18, shipped 2026-06-08). 73 plans total across 4 milestones.
 
-**Active milestone:** None — v1.2 complete. Next milestone via `/gsd-new-milestone`. Live backlog (do not plan against superseded 999.1/999.2/999.7): 999.3 (template placeholder system, partially folded as the deferred Phase D/`WIZ`), 999.4 (now delivered as v1.2 itself), 999.5 (external source drift detection), 999.6 (observed GTD review patterns).
+**Active milestone:** v1.3 Source Ingestion (started 2026-06-10) — see Current Milestone below. Live backlog (do not plan against superseded 999.1/999.2/999.7): 999.3 (template placeholder system, partially folded as the deferred Phase D/`WIZ`), 999.5 (external source drift detection — explicitly deferred from v1.3), 999.6 (observed GTD review patterns).
 
 **Deferred to backlog:** Obsidian plugin distribution, one-command installer (`curl|bash`), hosted docs site, brownfield `--apply` mode, Phase D Wizard/Template fold-in (`WIZ`) — all carried forward.
 
@@ -34,6 +34,21 @@ The wiki is a persistent, compounding artifact — cross-references are already 
 **Design constraints held throughout:** markdown-authoritative; `AGENTS.md ≡ CLAUDE.md` byte-equality (pre-commit `sync-claude --check`); wizard pipeline preserved; always-loaded safety core stays resident (provenance requirement, MUST-NOT list verbatim, write-back-mandatory, structured-op vocabulary — privacy dissolved into the harness permission by Phase 15); CI gates unchanged in behavior (extraction relocated text, not logic).
 
 </details>
+
+## Current Milestone: v1.3 Source Ingestion
+
+**Goal:** Formalize three new source ingestion paths — AI deep-research reports, PDFs, and YouTube videos — as schema conventions plus documented acquisition pipelines, designed once via a shared source-type extension contract.
+
+**Target features:**
+- **Source-type extension contract** — the 5-dimension recipe (acquisition / locator / extraction / drift / epistemics) + primary/secondary axis designed once, so each new source type is an instance of the contract rather than a one-off (per `.planning/notes/2026-05-31-milestone-grouping-proposal.md` "Source Ingestion" cluster)
+- **Research-report ingest** — `source_type: research-report` for AI deep-research artifacts (Claude/ChatGPT/Perplexity), bibliography preserved as provenance; design LOCKED in `.planning/seeds/research-report-ingest.md`; ships first
+- **PDF ingestion** — acquisition via olmOCR 2 (local Ollama model `richardyoung/olmocr2:7b-q8`, the wiki's own SOTA-report recommendation); reuses the `<!-- page: N -->` / `#p` locator; likely an article/paper sub-case convention, not a new type; includes VLM-hallucination epistemic guidance for degraded scans
+- **YouTube video ingestion** — acquisition via the external `stt` CLI (`~/code/transcript/`: faster-whisper large-v3 + IVRIT Hebrew, pyannote diarization, yt-dlp, timestamped speaker-labeled output); reuses the `#t<start>-<end>` locator; likely a `transcript` sub-case
+
+**Key constraints:**
+- Acquisition tooling stays *outside* this repo (stt is its own project; olmocr2 runs via Ollama) — the milestone ships conventions, frontmatter metadata, docs, and at most thin glue
+- Human-curates-sources role division preserved: no web-research operation; the four-op vocabulary (ingest/query/lint/reflect) stays intact
+- 999.5 External Source Drift explicitly deferred — research-report URL bibliographies are its natural trigger, but it remains backlog
 
 ## Requirements
 
@@ -159,6 +174,9 @@ This document evolves at phase transitions and milestone boundaries.
 2. Core Value check — still the right priority?
 3. Audit Out of Scope — reasons still valid?
 4. Update Context with current state
+
+---
+*Last updated: 2026-06-10 — Milestone **v1.3 Source Ingestion** started. Scope: source-type extension contract (5-dimension recipe) + research-report ingest type (seed design LOCKED, ships first) + PDF ingestion (olmOCR 2 via Ollama, `#p` locator reuse) + YouTube video ingestion (external `stt` CLI with timestamped output, `#t` locator reuse). 999.5 drift detection explicitly deferred. Decision context captured in `.planning/todos/pending/2026-06-10-v1-3-source-ingestion-milestone-accept-pdf-olmocr2-youtube-s.md` + seeds `research-report-ingest` / `primary-source-type-extensions`. Next: requirements → roadmap.*
 
 ---
 *Last updated: 2026-06-08 — **Milestone v1.2 Schema Architecture SHIPPED + ARCHIVED.** Phases 15–18 complete (15 plans); 28/28 requirements Complete. The 1,689-line AGENTS.md/CLAUDE.md monolith reduced to a ~287-line resident core via an inclusion test, the rest extracted to `schema/reference/*.md` + `schema/workflows/*.md`; asymmetric two-dir privacy (`wiki-cloud/`/`wiki-local/`) enforced as a harness permission; thin drift-gated `.claude/skills/` overlay added. Archived to `.planning/milestones/v1.2-*`; ROADMAP collapsed (Backlog preserved); `REQUIREMENTS.md` removed for a fresh next-milestone; RETROSPECTIVE updated; git tag `v1.2`. Open items at close (5) acknowledged as pre-existing deferrals — see STATE.md Deferred Items. Next: `/gsd-new-milestone`.*
