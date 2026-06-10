@@ -6,6 +6,7 @@
 - ✅ **v1.1 Shareability** — Phases 7–13.2 (shipped 2026-06-02) — [archive](milestones/v1.1-ROADMAP.md)
 - ✅ **v1.1.1 Graph Integrity** — Phase 14 (shipped 2026-06-04) — [archive](milestones/v1.1.1-ROADMAP.md)
 - ✅ **v1.2 Schema Architecture** — Phases 15–18 (shipped 2026-06-08) — [archive](milestones/v1.2-ROADMAP.md)
+- 🚧 **v1.3 Source Ingestion** — Phases 19–21 (started 2026-06-10)
 
 ## Phases
 
@@ -62,6 +63,52 @@ Applied the spec's own §7 progressive-disclosure principle to itself — the al
 Full phase details: [milestones/v1.2-ROADMAP.md](milestones/v1.2-ROADMAP.md)
 
 </details>
+
+## v1.3 Source Ingestion (Phases 19–21)
+
+**Goal:** Formalize three new source ingestion paths — AI deep-research reports, PDFs, and YouTube videos — as schema conventions plus documented acquisition pipelines, designed once via a shared source-type extension contract.
+
+- [ ] **Phase 19: Extension Contract + Research-Report Type** - Define the 5-dimension source-type extension contract extracted from real cases, with `research-report` as the worked secondary instance; implement the full `source_type: research-report` convention including second-order provenance, epistemic defaults, and retro-classification of the two existing AI reports
+- [ ] **Phase 20: PDF Ingestion** - Document the PDF acquisition pipeline (olmOCR 2 via Ollama), define the PDF sub-case convention with page-anchored provenance and VLM-hallucination guidance, and validate end-to-end with a real PDF artifact
+- [ ] **Phase 21: Video/YouTube Ingestion** - Document the video acquisition pipeline (yt-dlp + timestamped STT), define the video-as-transcript sub-case convention with timestamp-anchored provenance and drift stance, and validate end-to-end with a real YouTube video
+
+## Phase Details
+
+### Phase 19: Extension Contract + Research-Report Type
+**Goal**: The schema has a formal, reusable extension contract for adding source types, and the `research-report` type is fully implemented as the contract's worked secondary instance
+**Depends on**: Nothing (first v1.3 phase; v1.3 editing targets are modular `schema/reference/*.md` + `schema/workflows/*.md` files, not the pre-extraction monolith)
+**Requirements**: EXT-01, EXT-02, EXT-03, RPT-01, RPT-02, RPT-03, RPT-04, RPT-05, RPT-06
+**Success Criteria** (what must be TRUE):
+  1. An agent reading `schema/reference/` can find a single source-type extension contract that lists the 5 dimensions and the primary-vs-secondary axis, and can use it to evaluate whether any new candidate justifies a new type or is a sub-case
+  2. The contract includes a retro-fit table mapping all current source types across the 5 dimensions, so a reader can see how existing types are instances of the same contract
+  3. An agent ingesting an AI deep-research report finds `source_type: research-report` in the frontmatter enum and Pass-0 classification, knows to preserve the bibliography in the raw source, and captures it as an addressable citation registry in the source summary
+  4. Claims extracted from a research report carry `support_type: derived` (never `direct`) and a lower epistemic default (`mixed`/`tentative`), making the second-order-ness visible in every provenance marker
+  5. The two existing AI deep-research reports already in `sources/` have been retro-classified with `source_type: research-report` and their citation registries backfilled in their source summary pages
+**Plans**: TBD
+
+### Phase 20: PDF Ingestion
+**Goal**: PDF documents can be acquired via a documented pipeline and ingested as a sub-case of an existing source type, with page-anchored provenance and honest epistemic handling for degraded scans
+**Depends on**: Phase 19 (extension contract defines the evaluation rule applied to confirm PDF is a sub-case, not a new type)
+**Requirements**: PDF-01, PDF-02, PDF-03, PDF-04
+**Success Criteria** (what must be TRUE):
+  1. An agent can find a documented PDF acquisition pipeline in `schema/` — running olmOCR 2 via the local Ollama instance produces a Markdown file with `<!-- page: N -->` markers ready for standard ingest
+  2. A source summary page for a PDF document records the extraction tool and model version in frontmatter, and every claim uses `#p<N>` locators pointing to the correct page
+  3. When a PDF is a degraded or scanned document, the convention specifies spot-verification steps and/or mandates a lower epistemic default — an agent does not silently treat VLM-extracted text as high-confidence
+  4. One real PDF artifact has been acquired via the pipeline, ingested, and its wiki pages are in `sources/` with page-anchored provenance; the original PDF co-exists as a bundle asset alongside `source.md`
+**Plans**: TBD
+**UI hint**: no
+
+### Phase 21: Video/YouTube Ingestion
+**Goal**: YouTube videos can be acquired via a documented pipeline and ingested as a sub-case of the transcript source type, with timestamp-anchored provenance and a clear drift stance
+**Depends on**: Phase 19 (extension contract defines the evaluation rule confirming video is a transcript sub-case)
+**Requirements**: VID-01, VID-02, VID-03, VID-04
+**Success Criteria** (what must be TRUE):
+  1. An agent can find a documented video acquisition pipeline in `schema/` describing yt-dlp + timestamped STT to produce a speaker-labeled transcript ready for standard ingest (tool-generic in template-public docs; the local STT tool is the worked instance in `.planning/` notes)
+  2. A source summary page for a YouTube video records `url`, `channel`, `title`, `publish_date`, and `duration` in frontmatter, and every claim uses `#t<start>-<end>` locators that resolve to the transcript
+  3. The convention explicitly states the drift stance for videos: immutable once published; concern is deletion/link-rot, not content change; no drift machinery is needed or implemented
+  4. One real YouTube video has been acquired via the pipeline, ingested, and its wiki pages are in `sources/` with timestamp-anchored provenance
+**Plans**: TBD
+**UI hint**: no
 
 ## Backlog
 
@@ -245,4 +292,6 @@ The following are intentionally deferred until real usage demands them, captured
 | 16. Reference Extraction | v1.2 | 5/5 | Complete    | 2026-06-05 |
 | 17. Workflow Extraction | v1.2 | 4/4 | Complete    | 2026-06-07 |
 | 18. Skills Overlay | v1.2 | 3/3 | Complete    | 2026-06-08 |
-
+| 19. Extension Contract + Research-Report Type | v1.3 | 0/TBD | Not started | - |
+| 20. PDF Ingestion | v1.3 | 0/TBD | Not started | - |
+| 21. Video/YouTube Ingestion | v1.3 | 0/TBD | Not started | - |

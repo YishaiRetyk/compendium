@@ -69,29 +69,29 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| EXT-01 | TBD | Pending |
-| EXT-02 | TBD | Pending |
-| EXT-03 | TBD | Pending |
-| RPT-01 | TBD | Pending |
-| RPT-02 | TBD | Pending |
-| RPT-03 | TBD | Pending |
-| RPT-04 | TBD | Pending |
-| RPT-05 | TBD | Pending |
-| RPT-06 | TBD | Pending |
-| PDF-01 | TBD | Pending |
-| PDF-02 | TBD | Pending |
-| PDF-03 | TBD | Pending |
-| PDF-04 | TBD | Pending |
-| VID-01 | TBD | Pending |
-| VID-02 | TBD | Pending |
-| VID-03 | TBD | Pending |
-| VID-04 | TBD | Pending |
+| EXT-01 | Phase 19 | Pending |
+| EXT-02 | Phase 19 | Pending |
+| EXT-03 | Phase 19 | Pending |
+| RPT-01 | Phase 19 | Pending |
+| RPT-02 | Phase 19 | Pending |
+| RPT-03 | Phase 19 | Pending |
+| RPT-04 | Phase 19 | Pending |
+| RPT-05 | Phase 19 | Pending |
+| RPT-06 | Phase 19 | Pending |
+| PDF-01 | Phase 20 | Pending |
+| PDF-02 | Phase 20 | Pending |
+| PDF-03 | Phase 20 | Pending |
+| PDF-04 | Phase 20 | Pending |
+| VID-01 | Phase 21 | Pending |
+| VID-02 | Phase 21 | Pending |
+| VID-03 | Phase 21 | Pending |
+| VID-04 | Phase 21 | Pending |
 
 **Coverage:**
 - v1.3 requirements: 17 total
-- Mapped to phases: 0 (roadmap pending)
-- Unmapped: 17 ⚠️ (expected — roadmap not yet created)
+- Mapped to phases: 17 (Phase 19: 9, Phase 20: 4, Phase 21: 4)
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-06-10*
-*Last updated: 2026-06-10 after initial definition*
+*Last updated: 2026-06-10 after roadmap creation (traceability filled)*

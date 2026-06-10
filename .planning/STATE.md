@@ -3,10 +3,10 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Source Ingestion
 status: planning
-last_updated: "2026-06-10T11:59:38.318Z"
+last_updated: "2026-06-10T12:00:00.000Z"
 last_activity: 2026-06-10
 progress:
-  total_phases: 0
+  total_phases: 3
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -17,28 +17,33 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-06-04)
+See: .planning/PROJECT.md (updated 2026-06-10)
 
 **Core value:** The wiki is a persistent, compounding artifact -- cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested.
-**Current focus:** v1.3 Source Ingestion — defining requirements. Scope: source-type extension contract + research-report ingest (seed LOCKED) + PDF (olmOCR 2) + YouTube (stt). 999.5 drift deferred. (Backlog Phase 999.1 is SUPERSEDED — do not plan against it.)
+**Current focus:** v1.3 Source Ingestion — roadmap created. Phases 19–21 defined. Next: `/gsd-plan-phase 19`. (Backlog Phase 999.1 is SUPERSEDED — do not plan against it.)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: Not started (roadmap created, ready to plan Phase 19)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-06-10 — Milestone v1.3 started
+Status: Ready to plan Phase 19
+Last activity: 2026-06-10 — Roadmap created for v1.3 Source Ingestion (Phases 19–21, 17/17 requirements mapped)
 
-### v1.2 Phase Summary
+### v1.3 Phase Summary
 
 | Phase | Name | Requirements | Status |
 |-------|------|--------------|--------|
-| 15 | Privacy Architecture | PRIV-01..07 (7 reqs) | ✓ Complete (2026-06-04) |
-| 16 | Reference Extraction | REF-01..10 (10 reqs) | ✓ Complete (2026-06-05) |
-| 17 | Workflow Extraction | WF-01..09 (9 reqs) | ✓ Complete (2026-06-07) |
-| 18 | Skills Overlay | SKILL-01..02 (2 reqs) | ✓ Complete (2026-06-08) |
+| 19 | Extension Contract + Research-Report Type | EXT-01..03, RPT-01..06 (9 reqs) | Not started |
+| 20 | PDF Ingestion | PDF-01..04 (4 reqs) | Not started |
+| 21 | Video/YouTube Ingestion | VID-01..04 (4 reqs) | Not started |
 
-**Total:** 28 requirements across 4 phases. 100% mapped.
+**Total:** 17 requirements across 3 phases. 100% mapped.
+
+### Progress Bar
+
+```
+v1.3 Source Ingestion: [                    ] 0% (0/3 phases complete)
+```
 
 ## Deferred Items
 
@@ -68,6 +73,8 @@ Items acknowledged and deferred at the v1.2 milestone close (2026-06-08):
 These 5 items were the open-artifact-audit findings at v1.2 close; all are pre-existing acknowledged deferrals (carried from v1.1/v1.1.1). Acknowledged and milestone closed.
 
 Phase D (`WIZ`) deferred from v1.2 scope per 2026-06-04 design review — WIZ-01 blocked on resolving Phase-8 minimalism conflict; WIZ-02 observation-gated. Tracked in REQUIREMENTS.md Backlog and ROADMAP.md 999.3.
+
+v1.3 explicit deferrals (2026-06-10): 999.5 External Source Drift detection deferred by scoping decision; `repository` source type (SI.3) deferred (pairs with 999.5 drift machinery); multimodal frame capture for slide-heavy videos deferred until a concrete need surfaces; Model B auto-promotion deferred (over-engineered; Model C hybrid promotion path ships instead).
 
 ## v1.1 Shareability — Archived 2026-06-02
 
@@ -179,6 +186,13 @@ Phase 12.2 closure: 5/5 plans complete; WGATE-01..04 → Complete; verifier PASS
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
+- [v1.3 Roadmap 2026-06-10] Phase 19 combines EXT + RPT: the extension contract is extracted from real cases using `research-report` as the worked instance — designing EXT alone (without RPT) risks premature abstraction per the grouping proposal's explicit warning. The coupling is genuine; they ship together.
+- [v1.3 Roadmap 2026-06-10] Phase 20 (PDF) and Phase 21 (VID) are independent of each other once Phase 19 provides the extension contract. Both depend on Phase 19 for the decision-rule evaluation confirming they are sub-cases, not new types.
+- [v1.3 Roadmap 2026-06-10] PDF is a sub-case of an existing type (article/paper), not a new type — the `<!-- page: N -->` / `#p` locator already exists; acquisition is the only new dimension. VID is a sub-case of `transcript`, not a new type — `#t<start>-<end>` already exists.
+- [v1.3 Roadmap 2026-06-10] Phase numbering continues from 18 → starts at 19 (no reset); 3 phases for 17 requirements (standard granularity, lean but correct given tight natural delivery boundaries).
+- [v1.3 Roadmap 2026-06-10] PDF-04 and VID-04 are human-checkpoint gates: each requires the human to supply/choose a real PDF and a real YouTube video respectively. Plan accordingly (autonomous: false for those checkpoints).
+- [v1.3 Roadmap 2026-06-10] 999.5 External Source Drift explicitly deferred from v1.3; research-report citation registries (RPT-02) are its natural future trigger per the seed design.
+- [v1.3 Roadmap 2026-06-10] `stt` CLI may be referenced as the worked local instance in `.planning/` notes and REQUIREMENTS.md; template-public docs (schema/reference/, docs/) stay tool-generic (per VID-01 requirement and neutrality constraint).
 - [v1.2 Roadmap 2026-06-04] Privacy Architecture (Phase 15) gates Reference Extraction (Phase 16) — §13 must be rewritten to asymmetric two-dir form before it can be extracted; PRIV-07 feeds REF-06 directly.
 - [v1.2 Roadmap 2026-06-04] Phase D (WIZ) deferred from v1.2 scope — WIZ-01 blocked on Phase-8 minimalism conflict; WIZ-02 observation-gated; both tracked as Backlog 999.3.
 - [v1.2 Roadmap 2026-06-04] Inclusion test (ambient / unscriptable-unacceptable-miss / dispatch) governs core composition, not a line target; ~145 lines is expected output of applying the test.
@@ -365,9 +379,12 @@ Recent decisions affecting current work:
 
 - Phase 09.1 inserted after Phase 09: Progressive Disclosure Extraction (URGENT) — extract §4 worked examples + §16 appendices from AGENTS.md/CLAUDE.md to reduce spec size while preserving §1 authority, byte-equality, wizard render, manual-setup walkthrough, and Codex agent-parity. Research backing at .planning/notes/research-progressive-disclosure-framework-comparison.md; open questions at .planning/research/questions.md; deferred workflow/operations skill extraction seeded at .planning/seeds/workflows-operations-to-skills.md.
 - v1.2 roadmap created 2026-06-04: Phases 15 (Privacy Architecture) → 16 (Reference Extraction) → 17 (Workflow Extraction) → 18 (Skills Overlay). Continued numbering from Phase 14. 28/28 requirements mapped. Phase D (WIZ) confirmed deferred.
+- v1.3 roadmap created 2026-06-10: Phases 19 (Extension Contract + Research-Report Type) → 20 (PDF Ingestion) → 21 (Video/YouTube Ingestion). Continued numbering from Phase 18. 17/17 requirements mapped. EXT+RPT co-shipped in Phase 19 (contract extracted from real cases; designing EXT alone risks premature abstraction). PDF-04 and VID-04 are human-checkpoint gates requiring the human to supply real artifacts.
 
 ### Blockers/Concerns
 
+- PDF-04 and VID-04 each require a human checkpoint: the human must supply a real PDF and a real YouTube video for the end-to-end validation runs. Plan these as `autonomous: false` checkpoints.
+- Phase 20 and Phase 21 both depend on Phase 19 for the extension contract decision-rule evaluation confirming they are sub-cases. Do not start Phase 20 until EXT-01/EXT-02 are complete.
 - Phase 15 gates Phase 16: §13 must be in its asymmetric two-dir form before reference extraction can proceed. Do not start Phase 16 until PRIV-07 is confirmed complete.
 - Phase 16 gates Phase 17: routing table + `schema/reference/*.md` files must exist before workflow files can reference them (particularly the §6 consumer-split decay/staleness portion that folds into `workflows/lint.md`).
 - REF-09 open question: whether to extend `bin/sync-claude.sh` with `--check-tree` drift guard over the new `schema/reference|workflows/*.md` tree now (v1.2) or defer to v1.3. Decide during Phase 16 planning.
@@ -389,10 +406,10 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-06-08T06:12:46.870Z
-Stopped at: Phase 18 context gathered
-Resume file: .planning/phases/18-skills-overlay/18-CONTEXT.md
+Last session: 2026-06-10T12:00:00.000Z
+Stopped at: v1.3 roadmap created (Phases 19–21)
+Resume file: .planning/ROADMAP.md
 
 ## Operator Next Steps
 
-- Start the next milestone with /gsd-new-milestone
+- Plan Phase 19 with `/gsd-plan-phase 19`
