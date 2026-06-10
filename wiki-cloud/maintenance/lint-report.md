@@ -5,7 +5,7 @@ type: overview
 status: active
 summary: "Wiki health-check findings from most recent lint run."
 created_at: 2026-04-30
-updated_at: 2026-06-10
+updated_at: 2026-06-11
 sources: []
 epistemic_status: sourced
 tags:
@@ -23,8 +23,8 @@ neutrality_exempt: true
 
 # Lint Report
 
-**Last run:** 2026-06-10
-**Total findings:** 73
+**Last run:** 2026-06-11
+**Total findings:** 77
 **Auto-fixes applied:** 0
 
 ## Errors (0)
@@ -111,10 +111,14 @@ neutrality_exempt: true
 - **wiki-cloud/sources/src-2026-05-06-anthropic-claude-cookbook-skills-introduction.md** | possible duplicate of "Building Custom Skills for Claude (claude-cookbooks notebook 03)" (src-2026-05-06-anthropic-claude-cookbook-skills-custom-development); same type=source; consider MERGE (§9). Survivor by inbound-link count (4 vs 5).
 
 
-## Info (4)
+## Info (8)
 
 ### Drift
-- **.obsidian/** | EXTERNAL: No .obsidian/ directory found -- Obsidian vault may not be configured
+- **wiki-cloud/.obsidian/app.json** | EXTERNAL: Non-markdown file in wiki-cloud/ (may cause Obsidian issues)
+- **wiki-cloud/.obsidian/appearance.json** | EXTERNAL: Non-markdown file in wiki-cloud/ (may cause Obsidian issues)
+- **wiki-cloud/.obsidian/core-plugins.json** | EXTERNAL: Non-markdown file in wiki-cloud/ (may cause Obsidian issues)
+- **wiki-cloud/.obsidian/graph.json** | EXTERNAL: Non-markdown file in wiki-cloud/ (may cause Obsidian issues)
+- **wiki-cloud/.obsidian/workspace.json** | EXTERNAL: Non-markdown file in wiki-cloud/ (may cause Obsidian issues)
 
 ### Gap
 - **maturity** | Sparse coverage check skipped: wiki needs 5+ domains with 3+ having 2+ sources (currently 2 domains, 1 meet threshold)

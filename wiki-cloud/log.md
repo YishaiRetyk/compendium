@@ -658,3 +658,15 @@ reason: same table-cell pipe-escaping blind spot as ocr-pipeline-vs-vlm-ingestio
 source: dr-2026-06-10-source-type-contract
 result: corrected pre-sweep total count from 103 to 114 (103 prose + 11 table-cell); added gap-closure note to Claims sweep paragraph
 reason: original count was produced by the same unescaped grep used in the sweep; actual total was 114
+
+## [2026-06-11] lint | wiki-cloud health check
+
+findings: 0 total (0 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki-cloud/maintenance/lint-report.md
+
+## [2026-06-11] lint | wiki-cloud health check
+
+findings: 77 total (0 errors, 69 warnings, 8 info)
+auto_fixes: 0 applied
+report: wiki-cloud/maintenance/lint-report.md
