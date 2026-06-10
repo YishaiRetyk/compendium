@@ -68,7 +68,7 @@ Full phase details: [milestones/v1.2-ROADMAP.md](milestones/v1.2-ROADMAP.md)
 
 **Goal:** Formalize three new source ingestion paths — AI deep-research reports, PDFs, and YouTube videos — as schema conventions plus documented acquisition pipelines, designed once via a shared source-type extension contract.
 
-- [ ] **Phase 19: Extension Contract + Research-Report Type** - Define the 5-dimension source-type extension contract extracted from real cases, with `research-report` as the worked secondary instance; implement the full `source_type: research-report` convention including second-order provenance, epistemic defaults, and retro-classification of the two existing AI reports
+- [x] **Phase 19: Extension Contract + Research-Report Type** - Define the 5-dimension source-type extension contract extracted from real cases, with `research-report` as the worked secondary instance; implement the full `source_type: research-report` convention including second-order provenance, epistemic defaults, and retro-classification of the two existing AI reports (completed 2026-06-10)
 - [ ] **Phase 20: PDF Ingestion** - Document the PDF acquisition pipeline (olmOCR 2 via Ollama), define the PDF sub-case convention with page-anchored provenance and VLM-hallucination guidance, and validate end-to-end with a real PDF artifact
 - [ ] **Phase 21: Video/YouTube Ingestion** - Document the video acquisition pipeline (yt-dlp + timestamped STT), define the video-as-transcript sub-case convention with timestamp-anchored provenance and drift stance, and validate end-to-end with a real YouTube video
 
@@ -100,7 +100,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 — 19-04 needs 19-03's D-09 enum live before setting `source_type: research-report`; its final gate proves D-08 non-vacuously)*
 
-- [ ] 19-04-PLAN.md — Source summary retro-classification + citation registries + log + DR + phase-final combined lint gate
+- [x] 19-04-PLAN.md — Source summary retro-classification + citation registries + log + DR + phase-final combined lint gate
 
 ### Phase 20: PDF Ingestion
 
@@ -314,6 +314,6 @@ The following are intentionally deferred until real usage demands them, captured
 | 16. Reference Extraction | v1.2 | 5/5 | Complete    | 2026-06-05 |
 | 17. Workflow Extraction | v1.2 | 4/4 | Complete    | 2026-06-07 |
 | 18. Skills Overlay | v1.2 | 3/3 | Complete    | 2026-06-08 |
-| 19. Extension Contract + Research-Report Type | v1.3 | 3/4 | In Progress|  |
+| 19. Extension Contract + Research-Report Type | v1.3 | 4/4 | Complete   | 2026-06-10 |
 | 20. PDF Ingestion | v1.3 | 0/TBD | Not started | - |
 | 21. Video/YouTube Ingestion | v1.3 | 0/TBD | Not started | - |
