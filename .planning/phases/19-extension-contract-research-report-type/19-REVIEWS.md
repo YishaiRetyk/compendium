@@ -83,3 +83,18 @@ Single reviewer (Codex) — no cross-reviewer consensus available. Findings belo
 ### Divergent Views
 
 N/A — single reviewer.
+
+---
+
+## Resolution (2026-06-10)
+
+All concerns addressed inline in the plans (no replan):
+
+| Concern | Severity | Fix |
+|---------|----------|-----|
+| Wave 2 ordering circular | HIGH | Plan 19-04 moved to Wave 3 with `depends_on: 19-03`; sequencing rationale added to both plans' objectives; Plan 04 Task 2 gained a phase-final combined gate (full lint + zero-residual grep + D-08 negative test); Plan 03's vacuous-D-08 status made explicit; ROADMAP wave annotation updated to 3 waves |
+| Marker count inconsistency (168 vs 97) | MEDIUM | Plan 03 Task 2 now declares the live grep as canonical (97 at planning time; CONTEXT's 168 superseded), captures the pre-sweep count, and binds acceptance to residual count 0 |
+| r9 dual-URL fidelity | MEDIUM | Plan 04 registry spec now requires BOTH Mistral URLs in the r9 entry, read verbatim from the raw source bullet; acceptance criterion added |
+| `derived-report` selector wording | MEDIUM | Plan 02's audit.md paragraph reworded: selector = "claims citing research-report sources" regardless of support type; malformed `direct` markers intentionally included for visibility |
+| Brittle `grep -c "r[0-9]*::"` | LOW | Replaced with anchored `grep -Ec '^- r[0-9]+::'` in Plan 04 acceptance/verification and VALIDATION.md |
+| Premature "Acquisition only" lock-in | LOW | Plan 01's pdf/video candidate rows marked *provisional* with a note that Phases 20/21 finalize verdict and dimensions via contract walk-through |
