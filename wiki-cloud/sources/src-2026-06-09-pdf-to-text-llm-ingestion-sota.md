@@ -10,7 +10,7 @@ summary: "Synthesized deep-research report on PDF-to-Markdown extraction and LLM
   commercial tiers, the VLM hallucination failure mode, and a concrete pipeline
   recommendation. 22 of 25 sampled claims survived 3-vote adversarial verification."
 created_at: 2026-06-09
-updated_at: 2026-06-09
+updated_at: 2026-06-10
 sources: []
 epistemic_status: mixed
 tags:
@@ -39,7 +39,7 @@ example: false
 path: sources/2026/2026-06/2026-06-09-pdf-to-text-llm-ingestion-sota.md
 content_hash: "sha256:b4ee5d61bc68de0086827e67d1aead71dff84caf89f4b6bbdc4212ef2ee13c1e"
 ingested_at: 2026-06-09
-source_type: article
+source_type: research-report
 compilation_status: compiled
 compiled_against_hash: "sha256:b4ee5d61bc68de0086827e67d1aead71dff84caf89f4b6bbdc4212ef2ee13c1e"
 compiled_targets:
@@ -115,3 +115,22 @@ A synthesized deep-research report (5 search angles, 21 sources fetched, 99 clai
 - **Content hash:** `sha256:b4ee5d61bc68de0086827e67d1aead71dff84caf89f4b6bbdc4212ef2ee13c1e`
 - **Ingested:** 2026-06-09
 - **Underlying primary sources (verified):** OmniDocBench (github.com/opendatalab/OmniDocBench; arXiv 2412.07626), olmOCR / olmOCR 2 (olmocr.allenai.org/blog; allenai.org/blog/olmocr-2; arXiv 2502.18443, 2510.19817; github.com/allenai/olmocr/tree/main/olmocr/bench), "Seeing is Believing? Mitigating OCR Hallucinations in Multimodal LLMs" (arXiv 2506.20168, NeurIPS 2025), Mistral OCR (mistral.ai/news/mistral-ocr, mistral.ai/pricing), Artificial Analysis OCR aggregator, CodeSOTA OCR landscape, Jimmy Song open-source PDF-to-Markdown deep-dive (Sept 2025).
+
+## References
+
+<!-- r<n> = positional index into "## Source Citations" of the raw source -->
+<!-- raw source: sources/2026/2026-06/2026-06-09-pdf-to-text-llm-ingestion-sota.md -->
+<!-- positional numbering: 1 bullet = 1 registry entry (r9 is the dual-URL Mistral bullet; both URLs recorded in the one entry) -->
+
+- r1:: [OmniDocBench](https://github.com/opendatalab/OmniDocBench) — accessed 2026-06-10 — status: registry
+- r2:: [OmniDocBench arXiv (CVPR 2025)](https://arxiv.org/html/2412.07626v2) — accessed 2026-06-10 — status: registry
+- r3:: [olmOCR — Ai2 blog](https://olmocr.allenai.org/blog) — accessed 2026-06-10 — status: registry
+- r4:: [olmOCR 2 — Ai2 blog](https://allenai.org/blog/olmocr-2) — accessed 2026-06-10 — status: registry
+- r5:: [olmOCR arXiv](https://arxiv.org/abs/2502.18443) — accessed 2026-06-10 — status: registry
+- r6:: [olmOCR 2 arXiv](https://arxiv.org/abs/2510.19817) — accessed 2026-06-10 — status: registry
+- r7:: [olmOCR-Bench GitHub](https://github.com/allenai/olmocr/tree/main/olmocr/bench) — accessed 2026-06-10 — status: registry
+- r8:: ["Seeing is Believing?" arXiv (NeurIPS 2025)](https://arxiv.org/html/2506.20168v2) — accessed 2026-06-10 — status: registry
+- r9:: [Mistral OCR](https://mistral.ai/news/mistral-ocr/) (also: https://mistral.ai/pricing/) — accessed 2026-06-10 — status: registry
+- r10:: [Artificial Analysis OCR aggregator](https://artificialanalysis.ai/agents/ocr) — accessed 2026-06-10 — status: registry
+- r11:: [CodeSOTA OCR landscape](https://www.codesota.com/ocr) — accessed 2026-06-10 — status: registry
+- r12:: [Jimmy Song PDF-to-Markdown deep-dive](https://jimmysong.io/blog/pdf-to-markdown-open-source-deep-dive/) — accessed 2026-06-10 — status: registry
