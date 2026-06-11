@@ -46,7 +46,7 @@ When a new source-type candidate is evaluated, a row is appended here with the v
 
 | Candidate | Verdict | Dimensions That Change | Convention Doc | Notes |
 |-----------|---------|----------------------|----------------|-------|
-| `pdf` | sub-case of `article` or `paper` (provisional) | Acquisition (provisional) | (Phase 20) | Page locators (`#p`) already exist; VLM hallucination guidance added at Phase 20; Phase 20 walk-through finalizes verdict and dimension assessment |
+| `pdf` | sub-case (format-orthogonal; any parent type) | Acquisition (always); Epistemic Default (degraded input only) | `schema/reference/pdf-ingestion.md` | Acquisition-path sub-case applicable to any document type; content classifies normally at Pass 0 (article/paper/data/...) and the PDF convention layers on. `#p` page locators + page markers already exist; claims stay `support_type: direct`; degraded scans get `tentative` + spot-verification (D-08). |
 | `video` | sub-case of `transcript` (provisional) | Acquisition (provisional) | (Phase 21) | Timestamp locators (`#t`) already exist; Phase 21 walk-through finalizes verdict and dimension assessment |
 | `repository` | pending | — | — | Pairs with 999.5 drift machinery (commit-SHA staleness); deferred |
 

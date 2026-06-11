@@ -66,6 +66,13 @@ content_hash: "sha256:abc123..."    # SHA-256 hash for staleness detection
 ingested_at: YYYY-MM-DD            # When source was processed
 source_type: article|paper|transcript|journal|data|image|research-report
 
+# PDF sub-case fields — present ONLY when the source was acquired from a PDF.
+# OMIT all four entirely on non-PDF sources (do NOT leave them empty). See schema/reference/pdf-ingestion.md.
+extraction_tool: olmocr
+extraction_model: "richardyoung/olmocr2:7b-q8"
+extraction_date: YYYY-MM-DD
+original_asset: original.pdf
+
 # Compilation tracking
 compilation_status: pending         # pending | partial | compiled | stale
 compiled_against_hash: ""           # SHA-256 of source content at last compilation
