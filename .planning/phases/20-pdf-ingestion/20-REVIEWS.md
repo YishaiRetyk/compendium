@@ -1,202 +1,159 @@
 ---
 phase: 20
 reviewers: [claude, codex]
-reviewed_at: 2026-06-11T18:18:23+03:00
-review_round: 3
+reviewed_at: 2026-06-11T18:45:50+03:00
+review_round: 4
 plans_reviewed: [20-01-PLAN.md, 20-02-PLAN.md, 20-03-PLAN.md, 20-04-PLAN.md]
 ---
 
-# Cross-AI Plan Review — Phase 20 (Round 3)
+# Cross-AI Plan Review — Phase 20 (Round 4)
 
 ## Claude Review
 
-All verification is done. The plans' factual claims almost all check out against the repo — with one significant exception in Plan 04's audit assertions, which I confirmed at source level. Here is the review:
+# Cross-AI Plan Review — Phase 20: PDF Ingestion (Round 4)
+
+**Review method:** Since rounds 1–3 already reshaped the design, this round focused on independently verifying the factual claims the plans now rest on, directly against the repo. Results of that probe:
+
+| Claim | Verified |
+|---|---|
+| `LINT_VERSION="1.9.1"` at `bin/lint.sh:13`; `--ci`/`--dry-run`/`--category` flags; CI exit-1-on-error vs default exit-0 | ✅ exact |
+| Unscoped `--ci` red today: "18 pre-existing crossref errors" | ✅ ran it — exactly 18 errors, all crossref, none phase-related |
+| `WIKI_ROOT` env override (`WIKI_DIR="${WIKI_ROOT:-wiki-cloud/}"` at lint.sh:94); findings print to **stderr** | ✅ |
+| `SOURCE_EXTRA_FIELDS` / 7-value `VALID_SOURCE_TYPES` / `type==source` conditional block shape / decision-page `trigger_type: schema-update` validation | ✅ |
+| `ingest.sh`: `FORCE=0` + `--force` + `[ "${FORCE:-0}" != "1" ]` convention, `--contributor` short-circuit, cwd-relative `DEST_DIR="sources/..."`, asset-check insertion point between L279 and the L281 `mkdir` | ✅ |
+| `audit-claims.sh`: `--since`/`--sample`/`--format json` exist; findings carry `source_id` **and** `verdict`; worklist is verdict-less; recency selector diffs `base...HEAD` (committed changes only → post-commit ordering is mandatory) | ✅ |
+| `check-sources-cloud-safe.sh` scope = exactly the two checks Plan 04 states (frontmatter `local_only` + `sources/local-only/` dir) | ✅ |
+| `schema/AGENTS.template.md` routing table genuinely missing the `source-types.md` row (Phase 19 drift) | ✅ confirmed |
+| Fixture Regeneration Rule command in `schema/fixtures/README.md` matches Plan 02 verbatim; `tests/phase-08/test_canonical_byte_equality.sh` exists | ✅ |
+| `inclusion-audit: 288 lines` == actual `wc -l` of AGENTS.md (288) → Plan 02's equality acceptance check is semantically correct | ✅ |
+| Provisional `pdf` row at `source-types.md:49`; retro-fit grep count = exactly 7 and stays 7 after the edit; provenance marker grammar at the cited lines; `ps2pdf` present | ✅ |
+
+This is an unusually well-grounded plan set. The remaining findings below are execution-clarity issues, not design flaws.
 
 ---
 
-# Cross-AI Plan Review — Phase 20: PDF Ingestion (Round 3)
+## 20-01-PLAN.md (pdf-extract.sh + test harness)
 
-**Reviewer note on method:** I verified the plans' load-bearing factual claims directly against the repo rather than reviewing prose alone. Confirmed true: `bin/lint.sh` `--ci`/`--dry-run`/`--category` compose with meaningful exit codes; unscoped `--ci --dry-run` **is** red today (exit 1, crossref) while `--category yaml` is green — the round-2 scoped-gate posture is accurate; `WIKI_ROOT` override exists (`lint.sh:94`) and Plan 03's fixture layout matches it; `bin/ingest.sh --contributor` exists and short-circuits git resolution; `bin/check-sources-cloud-safe.sh` exists; the AGENTS.md inclusion-audit baseline (288) equals today's line count; `schema/AGENTS.template.md` really does lack the source-types row (the Phase 19 drift claim is true); the provisional `pdf` row sits at `source-types.md:49` exactly as quoted; the 7-row retro-fit grep count is exactly 7 today and won't collide with §4 registry rows; `--emit-worklist` does write `audit-report.md` + `audit-state.md`; and `ingest.sh` writes only the bundle, so the temp-cwd test isolation is sound. **One critical claim does not hold** — see Plan 04.
+**Summary:** Solid. The argv-limit fix (`--rawfile` + `-d @file`), per-page timeout, null-response guards, namespaced env vars, and the committed `ps2pdf` fixture are all correctly specified and consistent with the verified environment.
 
----
+**Concerns:**
+- **LOW — Cold-model-load vs the 300s default timeout.** The first `/api/generate` call loads a 9.5 GB model; on a CPU-bound or memory-pressured host that load + first inference can exceed `PDF_EXTRACT_TIMEOUT=300`, aborting page 1 with a misleading "timed out" error. The override exists; the usage text should mention that the *first* page includes model load and may need a higher value (or the runbook in Plan 02 should).
+- **LOW — Commit shape unspecified.** Plan 02 mandates "ONE `schema:` commit" and Plan 04 names its `ingest()`/`reflect()` commits, but Plans 01 and 03 never state their commit prefixes/grouping. Given "one commit per logical operation" is a hard repo rule and commit-shape ambiguity generated fixes in earlier rounds, say it explicitly (e.g., Plan 01 = one commit; is `tests:`/`schema:`/something else the right prefix for new tooling?).
+- **INFO — Aggregator swallows SKIP context.** `run_test` redirects test output to `/dev/null`, so a model-unreachable SKIP inside the marker test surfaces as a bare `PASS:` line. Accepted by design in round 3 (SKIP-exit-0 counts as PASS), but it means "5/5 passed" on a model-less machine is indistinguishable from a live-exercised run. A one-line comment in `run.sh` noting this would prevent a future false confidence read.
 
-## Plan 20-01 — pdf-extract.sh + test harness
+**Strengths:** marker-emission contract (always emit, even for blank pages, abort only on null/error) is exactly right for a provenance system; temp-output-then-`mv` prevents structurally-valid partial files; two-stage preflight (server + model tag) is the correct spoofing mitigation.
 
-### Summary
-A well-grounded tooling plan. The Ollama invocation design (HTTP `/api/generate`, file-based payload I/O via `--rawfile` + `-d @file`, two-stage preflight, null-response guards, atomic temp-output-then-move, same-loop-variable marker emission) addresses every realistic failure mode of the extraction loop, and the prior review rounds' fixes (argv limit, `grep -c || true`, model-tag probe) are all technically correct. The committed-fixture decision closes the "loop untested until Wave 3" gap properly.
+## 20-02-PLAN.md (convention doc + registry + routing)
 
-### Strengths
-- The `--rawfile`/`-d @file` payload path is the correct fix for the MAX_ARG_STRLEN problem; the acceptance criteria (`! grep -q -- '--arg img'`) mechanically prevent regression to the broken form.
-- Fail-loud-per-page with mandatory marker emission for *empty* (but not *null*) pages is exactly the right distinction for a provenance system — a blank page keeps slices aligned; a failed call aborts rather than writing `null` under a valid marker.
-- The aggregator's SKIP-for-unauthored-tests design keeps the suite green across the Wave-1→Wave-2 window with an honest skip count as the signal — clean solution to the "aggregator references future tests" problem.
-- Marker-count-vs-`pdfinfo` sanity check catches off-by-one/blank-page drift (Pitfall 3) deterministically, independent of model output quality.
+**Summary:** Complete and correct. The setup-parity chain (template edit → fixture regen → byte-equality test, all one commit) closes the last CI trap, and I verified every link in that chain exists.
 
-### Concerns
-- **MEDIUM — No timeout on the per-page model call.** `curl -fsS` has no `--max-time`. A wedged Ollama server (or a cold model load on a slow machine) hangs the script — and therefore the live test, and therefore `run.sh` — indefinitely. The preflight `/api/tags` probe doesn't protect against a hang mid-generation.
-- **MEDIUM — Live-test cost on every suite run.** On this machine (model + fixture present), every `tests/phase-20/run.sh` invocation runs 2 real 7B-VLM inferences. The phase's own sampling contract runs the aggregator per wave merge and per phase gate, and Plan 03 reruns it; that's potentially minutes of inference per verification cycle. The assertion itself is loop-deterministic (marker count, not content), so repeated live runs add latency without adding signal after the first pass.
-- **LOW — Generic environment-variable names.** `MODEL`, `DPI`, `PROMPT`, `OUT` as env-overridable defaults are collision-prone (`MODEL` especially is commonly set in CI/agent environments) and would silently change behavior. 
-- **LOW — Raw-PDF-bytes fixture generation is fiddly.** Hand-computing xref byte offsets in inline python is the most error-prone way to make a 2-page PDF. `ps2pdf` is present on this machine (verified); two lines of PostScript piped through it is far simpler, and since the fixture is committed once, generation tooling portability doesn't matter.
-- **LOW — TDD ordering inconsistency.** Task 2 is marked `tdd="true"` with a RED→GREEN note ("run the test before Task 1's script exists"), but it's sequenced *after* Task 1. Cosmetic, but an executor following task order can't actually observe RED.
+**Concerns:**
+- **LOW — "plain `| ... |` blockquote format" is self-contradictory and factually off.** The template's routing rows carry the same `> |` blockquote prefix as AGENTS.md (verified). The word "plain" could nudge an executor into dropping the `> ` prefix, silently corrupting the table — and nothing gates it (the fixture regenerates from whatever the template says, and acceptance only greps for the filename). The `read_first` step mitigates this, but fix the wording: "matching the surrounding `> | ... |` blockquote rows."
+- **LOW — Top-5 lint print window (shared with Plan 03).** Verified: lint prints only the **top 5** findings to stderr; in dry-run nothing else carries finding content. Plan 02's own gates use exit codes (fine), but be aware any content-grep on lint output anywhere in this phase sees at most 5 lines.
 
-### Suggestions
-- Add `--max-time` (e.g., 300s/page, env-overridable) to the generation curl, and a corresponding note in `usage()`.
-- Namespace the env overrides (`PDF_EXTRACT_MODEL`, `PDF_EXTRACT_DPI`, …) or make flags the only override surface.
-- Add a cheap live-test bypass (`PDF_EXTRACT_SKIP_LIVE=1` → SKIP path) so routine suite runs don't pay 2 inferences; keep the live path as the default for wave gates.
-- Generate the fixture with `ps2pdf` instead of hand-rolled PDF objects; keep the `pdfinfo` Pages:2 verification either way.
+**Strengths:** the neutrality treatment (abstract `<concept-slug>`/`<overview-slug>` placeholders for the wiki's own pages, "the derived support type" prose so the negative grep stays meaningful) is precise; the `^\| .pdf.`-anchored "no longer provisional" grep correctly excludes the still-provisional `video` row; the 7-row retro-fit count assertion is robust (confirmed `research-report` appears only in §3, so the count can't drift to 8).
 
-### Risk: **LOW**
+## 20-03-PLAN.md (lint check + --asset + four tests)
 
----
+**Summary:** The conditional-check shape, bare-filename guard, and `--asset` precondition ordering are all correct against the verified source. The test design correctly avoids the exit-code trap (default-mode lint always exits 0 — verified) and the stderr-capture trap.
 
-## Plan 20-02 — pdf-ingestion.md + schema wiring
+**Concerns:**
+- **LOW — Content assertions ride on the top-5 findings window.** For a single-page fixture tree this is sound (any finding for the only page must appear in the top 5), but it's an implicit invariant: if a fixture-authoring slip produces 6+ findings, the *target* finding ('extraction' / 'bare co-located') can be pushed out of the printed window and Variant A/C fail for an opaque reason. Add a comment in the test (or assert total finding count first) so a future maintainer debugging a red variant knows only 5 lines print.
+- **LOW — `$FIXTURE_PAGE_NAME` referenced in the Variant B assertion is never defined in the plan.** Trivial for the executor to infer, but worth one sentence.
+- **LOW — Commit shape unspecified** (same as Plan 01): lint.sh bump (`lint(scope):` per conventions?) vs ingest.sh `--asset` vs four tests — one logical operation or two/three? State it.
 
-### Summary
-The strongest plan of the four. It encodes every locked decision (D-01..D-09) into concrete, greppable artifacts, mirrors the Phase 19 worked-instance structure deliberately, and its trickiest constraints — neutrality of template-public surfaces while *referencing* real wiki pages, the inclusion-audit baseline update, and the AGENTS.template.md drift repair — are all handled with verified-correct mechanics. The "write 'the derived support type' in prose so the negative grep stays meaningful" instruction is the kind of detail that makes acceptance criteria actually trustworthy.
+**Strengths:** Variant C exercising the path-component guard makes the new lint branch non-vacuous in three directions (missing-field fires, compliant is silent, path violation fires); the before/after `git status --porcelain` comparison is the right isolation proof; the `--contributor` bypass for non-git temp cwd matches the verified `resolve_contributor` behavior exactly.
 
-### Strengths
-- The abstract-placeholder treatment of the wiki's own overview/concept slugs (read for content, never embed the slug) resolves the genuine tension between D-04 ("cite the wiki's own SOTA overview") and the neutrality MUST-NOT — with a negative grep to enforce it.
-- The provisional-row negative grep is correctly anchored to the table row (`! grep -E '^\| .pdf.' … | grep -q provisional`) so the still-provisional `video` row can't break it — and I verified the current row shapes make this anchor valid.
-- The inclusion-audit acceptance criterion (`grep -oP 'inclusion-audit: \K[0-9]+'` == `wc -l`) is satisfiable: the baseline is exactly in sync today (288/288), so the only delta is the row being added.
-- The template drift repair (adding both the missing Phase 19 `source-types.md` row and the new row to `AGENTS.template.md`) fixes a real, verified gap rather than an assumed one.
-- `extraction_date`-vs-`ingested_at` is resolved *and the rationale is recorded in the shipped doc*, not just in planning artifacts — closing the research open question durably.
+## 20-04-PLAN.md (E2E validation + DR)
 
-### Concerns
-- **LOW — Commit granularity is underspecified.** Task 1 (file), Task 2 (three edits), Task 3 (routing + sync + template) read as separately verifiable units, but the project rule is one commit per logical operation. If Tasks 1–3 commit separately, the window between Task 1's and Task 3's commits has `pdf-ingestion.md` existing without a routing row — the routing category's inverse orphan-file check is warning-severity (Phase 17 design), so this shouldn't go red, but the plan never states whether this is one `schema:` commit or three.
-- **LOW — Line-number anchors will drift.** Several edit anchors are cited to specific lines (frontmatter.md L67/L69, ingest.md L18). The content anchors given alongside them are sufficient; executors should trust those over the numbers.
+**Summary:** The round-3 post-commit audit redesign is verified correct (the recency selector really does diff committed changes only, and findings really do carry `source_id`+`verdict`). Two residual defects remain, both fixable with a sentence each.
 
-### Suggestions
-- State explicitly that Tasks 1–3 land as a single `schema:` commit (the natural reading of "one logical operation," and it makes the routing-points-at-existing-file guarantee trivial).
+**Concerns:**
+- **MEDIUM — The optional completeness check counts claims the audit structurally never samples.** Verified at the source: `audit-claims.sh` **skips `type: source` pages entirely** when building the claim universe ("source summaries are registry entries, not audited claims"). Task 2 step 4 authors `#p`-anchored claims **on the source summary page**, and step 10's completeness check counts `[prov:<source-id>#p` markers "across the new wiki pages." If that count includes the summary page's own claims, findings will *always* be fewer than markers, and the plan's instruction — "if the findings count is LOWER, raise `--sample` and re-run rather than weakening the assertion" — becomes an unsatisfiable loop. Scope the marker count to **non-source topic pages only**, and add a sentence noting the summary-page exclusion.
+- **MEDIUM — Crossref-delta baseline is captured too late.** Step 7 says "capture the crossref error count before and after the ingest," but step 7 executes after steps 4–5 have already authored the new pages into the working tree — a sequential executor has no clean way to get the "before" count at that point (today's baseline is 18, but the plan rightly avoids hardcoding it). Move the baseline capture to the top of Task 2 (or immediately after the Task 1 checkpoint), alongside the step-6 `PRE_REF` capture.
+- **LOW — Verify-block placeholders.** The `<automated>` block uses `$PRE_REF` and `<source-id>` literally; run verbatim it fails. The comment acknowledges substitution, but the executor contract for `<automated>` blocks is usually "runnable as-is" — consider marking those two lines as requiring substitution more explicitly.
 
-### Risk: **LOW**
+**Strengths:** the post-commit audit ordering with parent-of-ingest-commit `PRE_REF` re-derivation is exactly right per the verified `git diff base...HEAD` selector; the "STOP and request a replacement, never wiki-local fallback" privacy posture correctly preserves PDF-04; treating the `wiki-local/maintenance/` audit writes as expected uncommitted control-plane state matches observed repo behavior (those files are dirty in the working tree right now from a prior audit run); the irreversibility framing on the binary-in-git-history decision is the right emphasis for the human checkpoint.
 
 ---
 
-## Plan 20-03 — conditional lint check + ingest --asset + four tests
+## Cross-Cutting Suggestions
 
-### Summary
-Solid enforcement plan with correct anti-pattern guards (no `SOURCE_EXTRA_FIELDS` append, no enum addition), correct data-then-check ordering, and a genuinely defensive `--asset` design (all preconditions validated before any tree mutation). I verified the things this plan stakes its tests on: the `WIKI_ROOT` override exists and the fixture layout (`$TMP/sources/`) matches lint's scan-root semantics; `--contributor` short-circuits the git pipeline that would otherwise kill the temp-cwd test; and ingest.sh writes nothing outside the bundle, so the isolation and before/after-porcelain assertions are sound.
+1. **Plan 04, step 10:** restrict the completeness count to topic pages (`grep -rl '\[prov:<source-id>#p' wiki-cloud/{entities,concepts,overviews,comparisons}/` shape), and state that summary-page claims are by-design outside the audit universe.
+2. **Plan 04, Task 2:** add "capture crossref baseline" as an explicit step 0/1 action next to nothing-yet-authored state.
+3. **Plans 01 + 03:** one sentence each on commit prefix + grouping.
+4. **Plan 02, Task 3 step 4:** reword "plain" → "the same `> |` blockquote row format as the surrounding table."
+5. **Plan 01 or 02 runbook:** one line documenting that the first page pays the model cold-load inside `PDF_EXTRACT_TIMEOUT`.
 
-### Strengths
-- The bare-co-located-filename guard on `original_asset` (with its own test variant C) closes a real convention hole that suffix-only matching would have left.
-- Output-content-based lint assertions (with the explicit "default-mode lint always exits 0" warning, verified accurate) instead of exit-code assertions — and variant B's zero-yaml-findings-overall check prevents a fixture-authoring bug from masking the real assertion.
-- The `--asset` precondition block runs before `mkdir -p` — no partial bundles — and the explicit existence-vs-`--force` check (rather than `cp` flag semantics) is correct for GNU cp's overwrite-by-default behavior.
-- The before/after `git status --porcelain` comparison (rather than absolute cleanliness) is robust to the already-dirty worktree, which is in fact dirty right now.
+## Risk Assessment
 
-### Concerns
-- **LOW — Redundant guard clause.** `if '/' in oa or oa.startswith('..')` — the second condition is unreachable for any path that the first doesn't already catch (`../x.pdf` contains `/`); only a pathological bare `..something.pdf` hits it. Harmless, but the comment shouldn't imply it carries weight.
-- **LOW — `FORCE` variable convention assumed.** The snippet uses `[ "${FORCE:-0}" != "1" ]`; the plan hedges correctly, but the executor must confirm how `bin/ingest.sh` actually represents `--force` (the interfaces block lists `FORCE` as a state var without its value convention) and match it rather than introduce a parallel convention.
-- **LOW — Variant B page-name grep is slightly brittle.** `! echo "$OUTPUT" | grep -q "$FIXTURE_PAGE_NAME"` depends on lint's output never echoing scanned-file names outside findings. Scoped to `--category yaml` this holds today, but a future verbose line would false-fail the test. Anchoring on the finding prefix (e.g., `\[error\].*$FIXTURE_PAGE_NAME`) would be more precise.
+**Overall: LOW.**
 
-### Suggestions
-- In variant B's assertion, match the finding-line shape rather than the bare page name.
-- Have the lint test invoke with `--dry-run` as well — it writes `$TMP/maintenance/lint-report.md` otherwise (harmless in a temp dir, but `--dry-run` makes the test's read-only intent explicit).
-
-### Risk: **LOW**
-
----
-
-## Plan 20-04 — end-to-end validation ingest
-
-### Summary
-The checkpoint design, privacy handling (irreversible-binary-in-git framing, no-wiki-local-fallback rule), cloud-safe mechanical backstop, and DR task are all well-constructed. However, the plan's machine verification of the phase's core promise — that `#p` locators on the new source actually resolve — is broken in two confirmed ways: the worklist-based "no insufficient-locator" assertion is structurally vacuous, and the audit-before-commit sequencing means the selection assertion will likely fail spuriously. This is the same class of defect (vacuous gate) that Phase 19's verification cycle caught in D-08, and it's in the step the plan explicitly labels as its round-2 anti-vacuity fix.
-
-### Strengths
-- Task 1's checkpoint is unusually well-specified: page-count range check, size sanity with the "binary in git history is effectively permanent" framing, and an explicit skip path.
-- The "STOP and request a replacement — never a wiki-local fallback" rule correctly distinguishes privacy-safe from requirement-satisfying (a wiki-local ingest would pass privacy and fail PDF-04).
-- `check-sources-cloud-safe.sh` as a post-ingest mechanical backstop (verified to exist) doubles as the first compatibility test of that guard against a binary-asset bundle — good dual use.
-- The crossref *delta* check (after ≤ before) rather than an absolute gate is the right call given the verified-red pre-existing crossref backlog.
-- The DR task records the `extraction_date` rationale and is wired into index/log — closing the research open questions visibly.
-
-### Concerns
-- **HIGH — The worklist `verdict` assertion is vacuous (confirmed at source).** `--emit-worklist` entries contain `path, line, source_id, locator, claim, passage, support_type, privacy` — **no `verdict` key** (`audit-claims.sh` header: "emit-worklist (JSON, no verdict)"). Claims whose locator fails to resolve hit `add_finding('insufficient-locator', …); continue` *before* `worklist.append` — they never appear in the worklist at all. Therefore `jq '[.[] | select(.source_id == $sid and .verdict == "insufficient-locator")] | length == 0'` **can never fail**, for any input, ever. The failure it's meant to catch manifests as *absence* from the worklist, which the companion `length > 0` check doesn't detect either: one resolvable claim out of twenty passes both assertions while nineteen locators are broken.
-- **HIGH — Audit-before-commit sequencing defeats the selection assertion.** The recency selector resolves changed pages via `git diff --name-only {base_ref}...HEAD` (`audit-claims.sh:582`) — **committed changes only**. The plan runs VERIFY at step 6 with `PRE_REF = HEAD` taken pre-commit, and COMMIT at step 9. At step 6, `PRE_REF...HEAD` is empty; the new pages get no recency hit, and clean `sourced`/`direct` claims hit none of the other selectors (not stale, not low-epistemic, not derived-report). The worklist will most likely contain zero entries for the new source and the `length > 0` assertion fails — a false negative that invites the executor to "fix" the assertion, compounding the vacuity above.
-- **MEDIUM — The crossref delta check may require out-of-scope-looking edits.** New pages sharing domains/tags with existing pages can create *new* "missing cross-reference" errors that are only resolvable by adding backlinks to *existing* pages. That's a normal part of the merge pass, but the plan should say so, or an executor may read the delta failure as a regression rather than as "finish the merge."
-- **LOW — `$PRE_REF` and `<source-id>` placeholders in the `<automated>` verify block** require executor substitution and a shell where `PRE_REF` survives; a fresh verification session re-deriving `PRE_REF` post-commit needs `git log` archaeology. State how to re-derive it (e.g., the commit before the `ingest(<slug>)` commit).
-
-### Suggestions
-- **Rework step 6 into a findings-based, post-commit check.** Concretely: commit the ingest (step 9) first, *then* run `bash bin/audit-claims.sh --since "$PRE_REF" --sample 100 --format json` and assert over **findings** (which carry both `source_id` and `verdict` per record — verified): (a) `[.[] | select(.source_id == $sid)] | length > 0` (selection happened — recency now fires because the commit exists), and (b) `[.[] | select(.source_id == $sid and .verdict == "insufficient-locator")] | length == 0`. In no-verifier mode, resolvable claims yield the `insufficient`/"verifier not run" placeholder, so (a)+(b) together are exactly "selected and all locators resolved," non-vacuously. If a pre-push audit is wanted, run it after the commit but before push — the ordering constraint is commit-then-audit, not push-then-audit.
-- Optionally add a stronger completeness check that doesn't depend on selectors at all: count `[prov:<sid>#p` markers across the new wiki pages and compare against the source-scoped findings count — proves no claim escaped the sample.
-- Add one sentence to step 7 noting that resolving new crossref errors by backlinking existing pages is part of the merge pass, not scope creep.
-
-### Risk: **MEDIUM-HIGH** as written (the phase's only end-to-end requirement is machine-verified by an assertion pair that cannot fail for the right reason and will fail for the wrong one). Drops to **LOW** with the contained step-6 rework — nothing else in the plan depends on it.
-
----
-
-## Overall Risk Assessment: **MEDIUM**
-
-Plans 01–03 are execution-ready: their claims are verified against the repo down to flag semantics and line anchors, dependency ordering is sound (Wave 1 plans touch disjoint files; Plan 03's tests consume both Wave 1 outputs; Wave 3 is correctly human-gated), scope matches the milestone's "thin glue" constraint with no creep, and the security/threat treatment (argv-safe JSON assembly, basename-derived destinations, fail-closed privacy) is proportionate. The phase achieves PDF-01..03 as planned.
-
-The single material defect is Plan 04's verification step for PDF-04: a structurally vacuous worklist assertion plus an audit/commit ordering error — ironically in the exact spot the plan marks as its round-2 anti-vacuity fix. The fix is small and fully specified above (findings-based `--format json` assertions, run post-commit). I recommend one more revision pass on Plan 04 only; Plans 01–03 need no further review rounds — the four LOW/MEDIUM suggestions there (curl timeout, namespaced env vars, live-test bypass, ps2pdf fixture) can be applied at execution time without re-review.
+The plans achieve all four phase requirements with full coverage (PDF-01: Plans 01+02; PDF-02: Plans 02+03; PDF-03: Plan 02; PDF-04: Plans 03+04), honor every locked decision D-01..D-12, and — unusually for round 4 — every load-bearing factual claim I probed checked out exactly (including the "18 crossref errors" count, the template drift, the audit selector's commit-only diff, and the inclusion-audit baseline semantics). The two MEDIUM findings are confined to Plan 04's verification *procedure* (an unsatisfiable optional check and a too-late baseline capture); neither threatens the deliverables themselves, and both are one-sentence fixes. No dependency-ordering, scope-creep, or security issues remain. I'd consider these plans ready for execution after the two Plan 04 amendments.
 
 ---
 
 ## Codex Review
 
-**Summary**
+## Summary
 
-The plans are strong overall: they respect the Phase 19 contract, keep PDF as a format-orthogonal sub-case, avoid the `source_type: pdf` trap, and include unusually good safeguards around argv limits, missing Ollama models, lint scoping, and neutrality. I would not execute them unchanged, though. Two issues need correction first: Plan 02 changes `schema/AGENTS.template.md` but does not regenerate `schema/fixtures/canonical-AGENTS.md`, which will break setup-parity CI; Plan 04’s audit step runs before the ingest commit even though `audit-claims.sh --since` selects changed pages via `git diff <ref>...HEAD`, so uncommitted new pages will not be selected.
+The plans are strong and unusually well-reviewed. They line up with the Phase 20 goals, preserve the “PDF as sub-case” boundary, avoid adding a `pdf` source type, and include good sequencing around lint, routing, neutrality, and human-gated PDF validation. Remaining risks are mostly around test signal quality, shell-script edge cases, and Plan 04’s operational complexity.
 
-**Strengths**
+## Strengths
 
-- Good architecture fit: PDF is correctly modeled as an acquisition-path sub-case, not a new enum.
-- The `pdf-extract.sh` design handles the real argv-size failure mode by using `--rawfile` and `-d @file`.
-- Lint enforcement is conditional and avoids making existing source pages red.
-- `ingest.sh --asset` is scoped to pure file I/O, preserving the script charter.
-- Plans correctly avoid unscoped full-lint gates where known crossref backlog exists.
-- Plan 04 correctly treats human cloud-safety confirmation as a blocking checkpoint.
-- Audit plan correctly avoids the invalid `--select <source-id>` idea and uses worklist filtering.
+- Clear dependency split: tooling/docs in wave 1, enforcement/tests in wave 2, real ingest in wave 3.
+- Good preservation of v1.2 progressive-disclosure discipline: `pdf-ingestion.md` is authoritative, `source-types.md` remains a lean pointer.
+- Strong avoidance of known pitfalls: no `ollama run`, no unconditional frontmatter fields, no `pdf` enum value.
+- Solid local-model hardening in `pdf-extract.sh`: file-based base64 payloads, `curl -fsS`, timeout, model preflight, null/error response guards.
+- Good privacy posture for PDF-04: human confirmation remains primary; mechanical cloud-safe guard is not overstated.
+- Good lint sequencing: conditional check should not fire on existing sources.
 
-**Concerns**
+## Concerns
 
-- **HIGH — Plan 02:** `schema/AGENTS.template.md` is edited, but `schema/fixtures/canonical-AGENTS.md` is not listed or regenerated. Existing setup-parity tests explicitly require fixture regeneration after template changes.
-- **HIGH — Plan 04:** The source-scoped audit assertion is ordered before commit. `audit-claims.sh --since` uses committed `HEAD` diffs, so new uncommitted wiki pages may not enter the recency selector at all.
-- **MEDIUM — Plan 04:** Wiki authoring should explicitly read `schema/reference/page-types.md`, `schema/reference/log-format.md`, and `schema/reference/privacy.md`; the current read list is too light for creating source/topic pages and log/index entries.
-- **MEDIUM — Plan 01:** The marker-count test can pass even if OCR returns empty text under every marker. That proves alignment, not useful Markdown extraction.
-- **MEDIUM — Plan 01/04:** Live Ollama calls have no timeout or max-duration guard. A bad page/model/server state can hang local execution or CI-like environments with Ollama present.
-- **LOW — Plan 03:** The lint fixture test is output-grep based. JSON output with `--ci --format json` would be less brittle and avoid default-mode exit-code confusion.
-- **LOW — Plan 04:** `check-sources-cloud-safe.sh` only mechanically checks raw source Markdown frontmatter and `sources/local-only/`; it does not inspect binary PDF content. The plan mostly knows this, but its wording slightly overstates the guard.
+- **MEDIUM: Aggregator hides in-test skips.** `tests/phase-20/run.sh` counts any test exit 0 as PASS, so model-gated skips inside `test_pdf_extract_markers.sh` appear as passed. That weakens the “5/5 passed, 0 skipped” claim.
+- **MEDIUM: Plan 01 fixture test may be flaky or slow.** A real 7B VLM call in a default test can be slow, hardware-sensitive, and OCR-output-sensitive. The bypass helps, but it also reduces signal unless CI/local gates explicitly distinguish live vs skipped.
+- **MEDIUM: `pdf-extract.sh` image cleanup is fragile.** Reusing `$TMP/page` and selecting `ls "$TMP"/page-*.png | head -1` can pick stale files if `pdftoppm` ever leaves more than one output or a failed iteration leaves residue before abort. Safer to render each page into a per-page prefix or clear matching files before render.
+- **LOW: `base64 -w0` is GNU-specific.** This repo appears Linux-oriented, but the runbook should name that expectation or use a portable fallback if macOS support matters.
+- **MEDIUM: Plan 03 lint test may depend on incomplete fixture frontmatter.** It says “full required base fields” but does not prescribe exact minimal valid YAML. If authored loosely, unrelated yaml findings can make the test noisy.
+- **LOW: `original_asset` path guard may reject valid-looking but unusual filenames inconsistently.** It rejects `/` and startswith `..`, but not names like `..scan.pdf`. That is probably acceptable as a filename, but the convention should be clear that only path traversal/components are banned.
+- **MEDIUM: Plan 04 is operationally dense.** It combines acquisition, classification, source-summary authoring, topic-page merge, lint delta checks, commit, audit, index/log updates, DR, and human verification. Correct, but high cognitive load and easy to partially complete.
+- **LOW: Plan 04 crossref delta check is underspecified.** “Before and after” needs a precise capture point before new pages are authored, otherwise the comparison can be accidentally taken too late.
 
-**Suggestions**
+## Suggestions
 
-- Add `schema/fixtures/canonical-AGENTS.md` to Plan 02 `files_modified`, regenerate it with `bin/init-wizard.sh`, and run `tests/phase-08/test_canonical_byte_equality.sh`.
-- In Plan 04, either run the audit after the ingest commit using `PRE_REF` as the previous commit, or add a temporary/staged selection mechanism. As written, the “new source was selected” assertion is not reliable.
-- Add a fixture OCR content assertion in Plan 01: for the 2-page sample PDF, require non-marker body text and ideally a fuzzy match for “Phase 20 fixture page”.
-- Add `curl --max-time` or a script-level timeout option to `pdf-extract.sh`; use it in tests.
-- Prefer JSON lint assertions in Plan 03, and add negative `--asset` tests for missing asset, `source.md` basename, existing asset without `--force`, and no partial bundle.
-- In Plan 04, explicitly keep `wiki-local/maintenance/*` audit mutations uncommitted unless the repo’s established local practice says otherwise.
-- Keep the validation ingest small: source summary plus the minimum topic-page updates needed to prove `#p|direct` provenance.
+- Make in-test skips machine-readable: have tests emit `SKIP:` and let `run.sh` detect that status, or add a separate required live gate command for Plan 01/04.
+- In `pdf-extract.sh`, render with a unique prefix per page, e.g. `$TMP/page-$N`, and select exactly one matching PNG; fail if zero or more than one.
+- Add one explicit fixture YAML block to Plan 03 so the lint test cannot accidentally fail for unrelated required-field omissions.
+- Add a lightweight static test for `pdf-extract.sh` request construction that does not invoke Ollama, so CI still validates the argv-limit fix.
+- In Plan 04, split the pre-ingest baseline instructions into an explicit step before authoring pages: capture yaml/crossref counts and `PRE_REF` before any content mutation.
+- Treat the DR as a separate reflect commit, as the plan suggests; it keeps the ingest commit focused and easier to audit.
 
-**Risk Assessment**
+## Risk Assessment
 
-Overall risk is **MEDIUM**. The design is sound and the plans are unusually complete, but Plan 02 has a likely CI failure and Plan 04 has a concrete audit-ordering bug. After fixing those, Plan 20-01 is medium risk because of local-model runtime behavior, Plan 20-02 becomes low risk, Plan 20-03 is low-to-medium risk, and Plan 20-04 remains medium because it depends on a human-supplied PDF and real OCR quality.
+**Overall risk: MEDIUM.** The architecture and sequencing are sound, and the plans should achieve PDF-01 through PDF-04. The remaining risk is not conceptual; it is execution risk from shell edge cases, test skip semantics, and the complexity of the real ingest/audit workflow in Plan 04. The phase is safe to proceed with after tightening the test signal and `pdf-extract.sh` page-render handling.
 
 ---
 
 ## Consensus Summary
 
-Both reviewers rate the phase **MEDIUM** overall and agree Plans 01–03 are close to execution-ready while Plan 04's verification step needs one more revision pass. Two HIGH concerns survive round 3 — one shared, one Codex-only but verified against the repo by the orchestrator.
+Both reviewers judge the plan set sound and execution-ready after small amendments — no design flaws, no dependency-ordering, scope, or security issues. Claude rates overall risk **LOW** (every load-bearing factual claim probed against the repo checked out exactly); Codex rates it **MEDIUM**, driven by execution risk in shell edge cases and Plan 04's operational density, not by architecture.
 
 ### Agreed Strengths
 
-- **PDF as a format-orthogonal sub-case, not a new enum** — both reviewers confirm the plans respect the Phase 19 extension contract and avoid the `source_type: pdf` trap.
-- **The `--rawfile` + `-d @file` payload path in `pdf-extract.sh`** correctly solves the argv-size (MAX_ARG_STRLEN) failure mode, with acceptance criteria that prevent regression.
-- **Scoped lint gates** — plans correctly avoid unscoped full-lint gates given the verified-red pre-existing crossref backlog.
-- **Plan 04's human checkpoint and privacy handling** — the blocking cloud-safety confirmation, the irreversible-binary-in-git framing, and the no-wiki-local-fallback rule are well-constructed.
-- **`ingest.sh --asset` defensive design** — preconditions validated before any tree mutation, scoped to pure file I/O.
+- **Dependency split and sequencing** — tooling/docs → enforcement/tests → real ingest waves are correct, and the lint conditional-check sequencing won't fire on existing sources (both).
+- **`pdf-extract.sh` hardening** — file-based base64 payloads / `--rawfile` argv-limit fix, per-page timeout, model preflight, null/error response guards all called out as correct by both reviewers.
+- **PDF-04 privacy posture** — human confirmation primary, mechanical cloud-safe guard not overstated; "STOP and request replacement, never wiki-local fallback" (both).
+- **Sub-case boundary discipline** — no `pdf` enum value, `pdf-ingestion.md` authoritative with `source-types.md` a lean pointer, progressive-disclosure preserved (both).
 
 ### Agreed Concerns
 
-1. **HIGH (both) — Plan 04 audit-before-commit ordering bug.** `audit-claims.sh --since` selects changed pages via `git diff <ref>...HEAD` (committed changes only). Plan 04 runs the source-scoped audit at step 6, before the ingest commit at step 9, so the new pages never enter the recency selector and the "new source was selected" assertion fails spuriously. Fix: commit first, then audit with `PRE_REF` = the commit before the ingest commit.
-2. **MEDIUM (both) — No timeout on live Ollama calls.** `curl -fsS` in `pdf-extract.sh` has no `--max-time`; a wedged server or cold model load hangs the script, the live test, and the whole suite indefinitely. Add an env-overridable `--max-time` (e.g., 300s/page).
-3. **MEDIUM (both, different angles) — Live-test signal/cost.** Claude: every suite run pays 2 real 7B-VLM inferences for a loop-deterministic assertion (add a `PDF_EXTRACT_SKIP_LIVE=1` bypass). Codex: the marker-count assertion passes even if OCR returns empty text under every marker (add a non-marker body-text / fuzzy content assertion for the fixture).
+1. **Plan 04: crossref-delta baseline captured too late** (Claude MEDIUM / Codex LOW). Step 7's "before" count has no clean capture point once steps 4–5 have authored pages. Both prescribe the same fix: an explicit baseline-capture step at the top of Task 2 (alongside `PRE_REF`), before any content mutation.
+2. **Test aggregator hides in-test SKIPs** (Codex MEDIUM / Claude INFO). `run.sh` counts SKIP-exit-0 as PASS, so "5/5 passed" on a model-less machine is indistinguishable from a live run. Accepted by design in round 3, but both want the signal made visible — machine-readable `SKIP:` detection (Codex) or at minimum a comment in `run.sh` (Claude).
 
 ### Divergent Views
 
-- **Plan 04 worklist assertion vacuity (Claude HIGH, source-verified; Codex called the same mechanism a strength).** Claude confirmed at source that `--emit-worklist` entries carry no `verdict` key and that `insufficient-locator` claims are excluded from the worklist before append — so the `select(.verdict == "insufficient-locator") | length == 0` assertion can never fail, for any input. Codex praised the worklist-filtering approach without checking the emitted shape. **Claude's source-level finding should win**: rework step 6 to findings-based `--format json` assertions run post-commit (selection `length > 0` + `insufficient-locator == 0`).
-- **Plan 02 canonical fixture regeneration (Codex HIGH; Claude rated Plan 02 LOW/strongest).** Codex flagged that Plan 02 edits `schema/AGENTS.template.md` without regenerating `schema/fixtures/canonical-AGENTS.md`. **Verified real by the orchestrator**: `tests/phase-08/test_canonical_byte_equality.sh` asserts byte-equality of the wizard render against that fixture, so the template edit breaks setup-parity CI unless the fixture is regenerated and listed in `files_modified`. This should be treated as an agreed HIGH despite single-reviewer origin.
-- **Plan 03 lint-test assertion shape** — Codex prefers `--ci --format json` assertions outright; Claude finds output-grep acceptable but suggests anchoring variant B on the finding-line prefix. Compatible; either tightening works.
-- **Plan 04 read list** — Codex (MEDIUM) wants `page-types.md`, `log-format.md`, `privacy.md` added to the authoring read list; Claude did not raise it.
-
-### Recommended Action
-
-Re-plan **Plan 04** (step 6 rework: commit-then-audit, findings-based assertions) and patch **Plan 02** (add `schema/fixtures/canonical-AGENTS.md` regeneration + byte-equality test to the task and `files_modified`). Plans 01/03 suggestions (curl timeout, live-test bypass, fixture content assertion, namespaced env vars) can be applied during the same pass or at execution time.
+- **Plan 04 completeness check counts unsampled claims** (Claude MEDIUM, source-verified; Codex silent). `audit-claims.sh` skips `type: source` pages, but step 10 counts `#p` markers across all new pages including the source summary — making the "raise `--sample` and re-run" instruction an unsatisfiable loop. Claude's fix: scope the marker count to non-source topic pages only. This is the highest-priority unique finding.
+- **`pdf-extract.sh` page-image cleanup fragility** (Codex MEDIUM; Claude silent). `ls "$TMP"/page-*.png | head -1` can pick stale files if `pdftoppm` leaves residue. Codex's fix: per-page render prefix, fail if zero or >1 matches.
+- **Commit-shape gaps in Plans 01 and 03** (Claude LOW ×2; Codex silent). Neither plan states its commit prefix/grouping despite the one-commit-per-operation hard rule.
+- **Fixture/wording precision** — Claude flags Plan 02's "plain `| ... |`" wording (should say blockquote `> |` rows) and the undefined `$FIXTURE_PAGE_NAME`; Codex flags Plan 03's unprescribed fixture YAML and the GNU-specific `base64 -w0`. Different items, same theme: pin down executor-facing literals.
+- **Overall risk**: LOW (Claude) vs MEDIUM (Codex) — the gap is entirely about execution/operational risk in Plan 04 and shell scripting, not design.
