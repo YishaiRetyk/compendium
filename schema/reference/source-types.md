@@ -62,9 +62,11 @@ Rows marked *provisional* are seeded pre-evaluations; the owning phase finalizes
 
 The key distinguishing feature: the source has its own bibliography / reference list, and its claims are the synthesis of that bibliography, not direct observation.
 
-**Provenance.** ALL claims extracted from a research-report source MUST use `support_type: derived`. Using `support_type: direct` on a research-report source is an epistemic-laundering error (lint enforces this as an error). Locator conventions:
+**Provenance.** ALL claims extracted from a research-report source MUST use `support_type: derived`. Any other support type (`direct`, `inferred`, `tentative`, or omitted) on a research-report citation is an epistemic-laundering error (lint enforces this as an error). Locator conventions:
 - `#r<n>` for bibliography-specific claims (the nth bullet in the bibliography section, positionally numbered top-to-bottom).
 - `#sec:` or `#para` for body claims.
+
+**Exception — source summary self-citation.** The report's OWN source summary page (`type: source` with the same page `id` as the cited source) self-cites with `support_type: direct`: there `direct` describes the claim-to-cited-source relation — the claim IS directly stated in the report. The derived mandate and the lint gate apply to every OTHER page citing the report, including other source summary pages (two reports citing each other is the false-consensus channel, not self-citation).
 
 **Citation registry.** The source summary page's `## References` block captures the bibliography as an addressable registry. Each entry uses the `r<n>::` Dataview inline field key:
 
@@ -98,7 +100,7 @@ When a citation is promoted to a first-class source: append `| promoted → <new
 1. Save the raw report with bibliography intact to `sources/YYYY/YYYY-MM/YYYY-MM-DD-<slug>/source.md` (raw source is immutable — never strip the bibliography).
 2. Assign `source_type: research-report` in the source summary page's frontmatter.
 3. Add `## References` block to the source summary with `r<n>::` keyed entries for each bibliography entry.
-4. Extract claims with `support_type: derived` and `#r<n>` or `#sec:`/`#para` locators.
+4. Extract claims with `support_type: derived` and `#r<n>` or `#sec:`/`#para` locators (exception: the source summary page's own claims self-cite the report with `direct` — see the self-citation exception under Provenance above).
 5. Set `epistemic_status: mixed` on the source summary and dependent pages by default.
 
 ## See Also
