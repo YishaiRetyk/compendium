@@ -10,7 +10,7 @@ set -euo pipefail
 # Lint rule-set semver per CI-08 / D-26. Bump MAJOR on breaking changes
 # (removed category, changed severity semantics). MINOR on non-breaking
 # additions. PATCH on bug fixes. --require-version X.Y.Z is a minimum check.
-LINT_VERSION="1.9.0"
+LINT_VERSION="1.9.1"
 
 usage() {
     cat <<'EOF'
@@ -1096,7 +1096,14 @@ if should_run('yaml'):
             if cs and cs not in VALID_COMPILATION:
                 add_finding('error', 'yaml', rel, f"Invalid compilation_status: '{cs}'")
             st = fm.get('source_type', '')
-            if st and st not in VALID_SOURCE_TYPES:
+            if not st:
+                # absent field already errors via the missing-fields check above;
+                # an explicitly EMPTY value must not slip through the enum check
+                if 'source_type' in fm:
+                    add_finding('error', 'yaml', rel,
+                                f"Empty source_type (expected one of: "
+                                f"{', '.join(sorted(VALID_SOURCE_TYPES))})")
+            elif st not in VALID_SOURCE_TYPES:
                 add_finding('error', 'yaml', rel,
                             f"Invalid source_type: '{st}' (expected one of: "
                             f"{', '.join(sorted(VALID_SOURCE_TYPES))})")
@@ -1145,16 +1152,25 @@ if should_run('provenance'):
                 add_finding('error', 'provenance', rel,
                             f'Broken prov ref: {source_id} not found in {wiki_dir}sources/')
             else:
-                # D-08: derived-never-direct for research-report sources
-                # source summary pages self-cite with direct (correct) — skip them
-                if fm.get('type') != 'source':
+                # D-08: derived-never-direct for research-report sources.
+                # Exemption is SELF-citation only: a source summary page citing
+                # its OWN report uses direct (the claim IS directly stated
+                # there). A source page citing a DIFFERENT research-report is
+                # checked like any other page — the cross-report false-consensus
+                # channel source-types.md warns about. The mandate is
+                # support_type=derived, so any other value (direct, inferred,
+                # tentative, or omitted) on a report citation is a violation.
+                self_citation = (fm.get('type') == 'source'
+                                 and fm.get('id') == source_id)
+                if not self_citation:
                     src_fm = source_registry.get(source_id)
                     if isinstance(src_fm, dict) and src_fm.get('source_type') == 'research-report':
-                        if support_type == 'direct':
+                        if support_type != 'derived':
+                            shown = support_type if support_type else '(omitted)'
                             add_finding('error', 'provenance', rel,
                                         f'Epistemic laundering: [prov:{source_id}#...] '
-                                        f'uses support_type=direct on a research-report source '
-                                        f'(secondary sources must use derived)')
+                                        f'uses support_type={shown} on a research-report source '
+                                        f'(claims citing a research-report must use derived)')
 
 # ---------------------------------------------------------------------------
 # Shared normalization helper (D-02: used by linkres + reconciled orphan/gap)
