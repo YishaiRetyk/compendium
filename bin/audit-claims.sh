@@ -47,8 +47,9 @@ Options:
   --since <ref>          Recency base ref (default: last_audit_commit from
                          audit-state.md; fallback: wiki-wide selection).
   --sample N             Max claims to audit after priority-rank (default 20).
-  --select <csv>         Subset of selectors: stale,epistemic,recency,fanout
-                         (default: all four).
+  --select <csv>         Subset of selectors: stale,epistemic,recency,fanout,
+                         derived-report (default: all five). Unknown names
+                         are an error, not silently ignored.
   --format json|report   Output format (default: report).
   --emit-worklist        Emit the resolved {claim,passage,...} worklist as JSON
                          to stdout (no verdict). local_only passages are withheld
@@ -308,16 +309,37 @@ def _strip_frontmatter(raw_text):
 
 
 def _resolve_sec(raw_text, name):
+    """Resolve a #sec:<name> locator against the raw source's ATX headings.
+    Exact slug match is preferred; fallback is a contiguous hyphen-token
+    subsequence match (a short authored slug matches a longer heading slug
+    that contains its tokens in order, e.g. a two-token name against a
+    heading slug carrying extra prefix/suffix tokens). First match in
+    document order wins within each tier."""
     target = _slugify(name)
+    target_tokens = [t for t in target.split('-') if t]
     lines = raw_text.splitlines()
     start = None
     start_level = None
+    fallback = None
+    fallback_level = None
     for i, line in enumerate(lines):
         m = ATX_RE.match(line)
-        if m and _slugify(m.group(2)) == target:
+        if not m:
+            continue
+        slug = _slugify(m.group(2))
+        if slug == target:
             start = i
             start_level = len(m.group(1))
             break
+        if fallback is None and target_tokens:
+            heading_tokens = [t for t in slug.split('-') if t]
+            n = len(target_tokens)
+            if any(heading_tokens[j:j + n] == target_tokens
+                   for j in range(len(heading_tokens) - n + 1)):
+                fallback = i
+                fallback_level = len(m.group(1))
+    if start is None:
+        start, start_level = fallback, fallback_level
     if start is None:
         return None
     # slice to the line before the next heading of same-or-higher level
@@ -421,23 +443,32 @@ def _resolve_page(raw_text, lo, hi):
 
 
 def _resolve_ref(text, n):
-    """Return the Nth bullet in the first bibliography section found.
-    Searches candidate headers in order: ## Source Citations, ## Sources by Topic,
-    ## Sources, ## References (first match wins). Positional numbering is
-    sequential across topic groups. Returns None if not found or N out of range."""
-    import re
+    """Return the Nth bullet in the first bibliography-style section in
+    DOCUMENT order (whichever of ## Source Citations / Sources by Topic /
+    Sources / References appears first in the text wins — the header list is
+    an alternation, not a priority order). Positional numbering is sequential
+    across topic sub-groups. Wrapped bullets include their indented
+    continuation lines. Returns None if not found or N out of range."""
     header_re = re.compile(
         r'^##\s+(Source Citations|Sources by Topic|Sources|References)\s*$',
         re.MULTILINE | re.IGNORECASE
     )
-    bullet_re = re.compile(r'^- (.+)', re.MULTILINE)
     m = header_re.search(text)
     if not m:
         return None
     after_header = text[m.end():]
     next_h = re.search(r'^##\s', after_header, re.MULTILINE)
     section = after_header[:next_h.start()] if next_h else after_header
-    bullets = bullet_re.findall(section)
+    bullets = []
+    open_bullet = False
+    for line in section.splitlines():
+        if line.startswith('- '):
+            bullets.append(line[2:].strip())
+            open_bullet = True
+        elif open_bullet and line[:1] in (' ', '\t') and line.strip():
+            bullets[-1] += ' ' + line.strip()
+        else:
+            open_bullet = False
     if not bullets or n < 1 or n > len(bullets):
         return None
     return bullets[n - 1]
@@ -448,8 +479,9 @@ def resolve_locator(raw_source_text, locator):
 
     PROV_RE captures the locator WITHOUT its leading '#' (e.g. 'sec:introduction',
     'p8', 'img2'); normalize to the canonical '#'-prefixed form so callers may
-    pass either shape."""
-    loc = locator.strip()
+    pass either shape. Defensively strip a trailing backslash (table-cell
+    \\|...\\| escape residue) in case a caller passes an un-normalized locator."""
+    loc = locator.strip().rstrip('\\')
     if not loc.startswith('#'):
         loc = '#' + loc
     try:
@@ -517,8 +549,13 @@ def read_raw_source(source_id):
 # claim tuples. A "claim" = a body line containing >=1 [prov:] marker (§6).
 # ----------------------------------------------------------------------------
 def claim_tuples_for_page(fpath, body):
-    """Yield (rel_path, line_no, source_id, locator, line_text) for each [prov:]
-    on each body line. Multiple markers on one line -> multiple tuples."""
+    """Yield (rel_path, line_no, source_id, locator, support_type, line_text)
+    for each [prov:] on each body line. Multiple markers on one line ->
+    multiple tuples, each carrying ITS OWN support_type (group 3), not the
+    first marker's. Locator and support_type are normalized at extraction so
+    every consumer (findings, worklist, --apply-verdicts join key) sees the
+    clean form: table-cell \\|...\\| escapes inject a trailing backslash into
+    groups 2 and 3, which is stripped here."""
     rel = os.path.relpath(fpath, REPO_ROOT)
     out = []
     if not body:
@@ -527,11 +564,13 @@ def claim_tuples_for_page(fpath, body):
     # here are body-relative; that is sufficient and deterministic for findings.
     for idx, line in enumerate(body.splitlines(), start=1):
         for m in PROV_RE.finditer(line):
-            sid, loc = m.group(1), m.group(2)
+            sid = m.group(1)
+            loc = m.group(2).rstrip('\\')
+            stype = (m.group(3) or '').rstrip('\\')
             # canonicalize locator to the '#'-prefixed form (PROV_RE drops the #)
             if not loc.startswith('#'):
                 loc = '#' + loc
-            out.append((rel, idx, sid, loc, line))
+            out.append((rel, idx, sid, loc, stype, line))
     return out
 
 
@@ -549,7 +588,7 @@ def git_diff_changed_pages(base_ref):
 
 
 # Build the universe of claim tuples once.
-all_claims = []  # list of (rel, line, sid, loc, line_text, fm)
+all_claims = []  # list of (rel, line, sid, loc, stype, line_text, fm)
 for fpath, fm, body, err in all_pages:
     if fm is None or body is None:
         continue
@@ -631,12 +670,20 @@ high_fanout_paths = {id_to_relpath[pid] for pid in high_fanout_ids if pid in id_
 RANK = {'stale': 1, 'epistemic': 2, 'recency': 3, 'fanout': 4, 'derived-report': 5}
 selected = {}  # key (rel,line,sid,loc) -> (rank, tuple, selectors)
 
+# Fail fast on unknown selector names: a typo would otherwise silently select
+# zero claims and the run would complete "successfully" with nothing audited.
+unknown_selectors = set(SELECT) - set(RANK)
+if unknown_selectors:
+    print(f"ERROR: unknown selector(s): {', '.join(sorted(unknown_selectors))} "
+          f"(valid: {', '.join(sorted(RANK))})", file=sys.stderr)
+    sys.exit(1)
+
 
 def selector_active(name):
     return name in SELECT
 
 
-for rel, line, sid, loc, line_text, fm in all_claims:
+for rel, line, sid, loc, stype, line_text, fm in all_claims:
     key = (rel, line, sid, loc)
     hits = []
     if selector_active('stale') and sid in drifted_sources:
@@ -660,10 +707,10 @@ for rel, line, sid, loc, line_text, fm in all_claims:
     best_rank = min(RANK[h] for h in hits)
     prev = selected.get(key)
     if prev is None or best_rank < prev[0]:
-        selected[key] = (best_rank, (rel, line, sid, loc, line_text, fm), hits)
+        selected[key] = (best_rank, (rel, line, sid, loc, stype, line_text, fm), hits)
 
-# Priority-rank order: stale(1) -> epistemic(2) -> recency(3) -> fanout(4),
-# tie-break by (rel, line) for determinism.
+# Priority-rank order: stale(1) -> epistemic(2) -> recency(3) -> fanout(4)
+# -> derived-report(5), tie-break by (rel, line) for determinism.
 ordered = sorted(
     selected.values(),
     key=lambda v: (v[0], v[1][0], v[1][1]),
@@ -762,7 +809,7 @@ findings.append({
     'rationale': f'selected={len(capped)} skipped={skipped_count} (total pre-cap={total_selected}, sample={SAMPLE})',
 })
 
-for rank, (rel, line, sid, loc, line_text, fm), hits in capped:
+for rank, (rel, line, sid, loc, stype, line_text, fm), hits in capped:
     raw_text, reason = read_raw_source(sid)
     if raw_text is None:
         # missing raw / path-escape / no registry entry -> insufficient-locator
@@ -807,12 +854,10 @@ for rank, (rel, line, sid, loc, line_text, fm), hits in capped:
     # Admitted (cloud_safe-effective, OR local_only with --allow-local). The
     # worklist carries the passage + claim text (the egress surface). effective_priv
     # is the structural claim privacy (wiki-local/ path-prefix predicate).
-    # support_type is the third [prov:] field when present (PROV_RE group 3).
-    support_type = ''
-    mprov = PROV_RE.search(line_text)
-    if mprov and mprov.group(3):
-        support_type = mprov.group(3)
-        support_type = (support_type or '').rstrip('\\')  # table-cell \|...\| escapes inject trailing backslash
+    # support_type is THIS marker's third [prov:] field, carried through the
+    # claim tuple (normalized at extraction) — not re-extracted from the line,
+    # which would grab the FIRST marker's support_type on multi-marker lines.
+    support_type = stype
     worklist.append({
         'path': rel, 'line': line, 'source_id': sid, 'locator': loc,
         'claim': line_text.strip(), 'passage': passage,
