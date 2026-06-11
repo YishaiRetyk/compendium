@@ -7,11 +7,11 @@ summary: "Deep reinforcement-learning trading framework with technical-indicator
   as first-class RL state inputs (MACD, Bollinger, RSI, CCI, DX, SMA, VIX, turbulence)
   and a single fundamentals example using a static WRDS-derived CSV."
 created_at: 2026-05-04
-updated_at: 2026-05-04
+updated_at: 2026-06-11
 sources:
 - src-2026-05-04-financial-ai-repo-comparison-report
 - src-2026-05-04-finrl-investigation
-epistemic_status: sourced
+epistemic_status: mixed
 tags:
 - reinforcement-learning
 - trading-research
@@ -37,12 +37,12 @@ FinRL is the deep-reinforcement-learning trading framework in this comparison. T
 
 ## Key Facts
 
-- FinRL is organized around market environments, DRL agents, and financial applications [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|direct|2026-05-04] [epistemic:: sourced]
-- The report notes that current project positioning treats this repository as the original educational and research framework while pointing production-oriented users to FinRL-X/FinRL-Trading [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|direct|2026-05-04] [epistemic:: sourced]
+- FinRL is organized around market environments, DRL agents, and financial applications [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|derived|2026-05-04] [epistemic:: sourced]
+- The report notes that current project positioning treats this repository as the original educational and research framework while pointing production-oriented users to FinRL-X/FinRL-Trading [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|derived|2026-05-04] [epistemic:: sourced]
 - Technical indicators are first-class engineered features for the RL state: `finrl/config.py` ships a default `INDICATORS` list (`macd`, `boll_ub`, `boll_lb`, `rsi_30`, `cci_30`, `dx_30`, `close_30_sma`, `close_60_sma`); `FeatureEngineer.add_technical_indicator` is implemented across the data processors via `stockstats` (and `talib` in the Sinopac processor) [prov:src-2026-05-04-finrl-investigation#sec:technical-analysis|direct|2026-05-04] [epistemic:: sourced]
 - Fundamentals are present as a single example only: `finrl/applications/stock_trading/fundamental_stock_trading.py` consumes a Compustat/WRDS-derived static CSV and computes ratios in-line (OPM, NPM, ROA, ROE, EPS, BPS, DPS, current ratio, quick ratio); no fundamentals module, `add_fundamental_indicator` method, or DCF/comparables logic is shipped [prov:src-2026-05-04-finrl-investigation#sec:fundamental-analysis|direct|2026-05-04] [epistemic:: sourced]
-- Its strengths are statistically trainable policies, reproducible experiments, backtest framing, and usefulness for reinforcement-learning research [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|direct|2026-05-04] [epistemic:: sourced]
-- Its weaknesses are an older coupled architecture, not being the recommended production path, reinforcement-learning overfitting and data-leakage risks, and less natural-language explainability than LLM agents [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|direct|2026-05-04] [epistemic:: sourced]
+- Its strengths are statistically trainable policies, reproducible experiments, backtest framing, and usefulness for reinforcement-learning research [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|derived|2026-05-04] [epistemic:: sourced]
+- Its weaknesses are an older coupled architecture, not being the recommended production path, reinforcement-learning overfitting and data-leakage risks, and less natural-language explainability than LLM agents [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|derived|2026-05-04] [epistemic:: sourced]
 - Training data is fetched live from external market-data APIs at runtime via per-provider processors under `finrl/meta/data_processors/` (Yahoo via `yfinance`, Alpaca, WRDS/TAQ, CCXT, EODHD, JoinQuant/Tushare, QuantConnect, Sinopac, IBKR); no OHLCV bundle ships with the repo [prov:src-2026-05-04-finrl-investigation#sec:data-sources|direct|2026-05-04] [epistemic:: sourced]
 - RL agents are trained from scratch with random initialization, not fine-tuned: `agent.get_model(name)` at `finrl/agents/stablebaselines3/models.py:108-123` returns a brand-new SB3 instance; `*.load` calls appear only in backtest and paper-trading inference scripts, never in training [prov:src-2026-05-04-finrl-investigation#sec:training-paradigm|direct|2026-05-04] [epistemic:: sourced]
 - Supported algorithms are A2C, DDPG, PPO, TD3, SAC across three swappable backends (Stable-Baselines3, ElegantRL, RLlib) selectable via `drl_lib`; transfer learning and curriculum learning are absent from the standard pipeline [prov:src-2026-05-04-finrl-investigation#sec:training-paradigm|direct|2026-05-04] [epistemic:: sourced]
@@ -51,9 +51,9 @@ FinRL is the deep-reinforcement-learning trading framework in this comparison. T
 
 ## Detail
 
-FinRL fills the formal reinforcement-learning trading experiment role. It is stronger than LLM-agent frameworks when the research question is whether a policy can learn from market states under a defined reward and environment. It is weaker for natural-language explanation and qualitative synthesis [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:overlapping-purpose-tradeoffs|direct|2026-05-04] [epistemic:: sourced]
+FinRL fills the formal reinforcement-learning trading experiment role. It is stronger than LLM-agent frameworks when the research question is whether a policy can learn from market states under a defined reward and environment. It is weaker for natural-language explanation and qualitative synthesis [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:overlapping-purpose-tradeoffs|derived|2026-05-04] [epistemic:: sourced]
 
-The report treats FinRL as complementary to Financial-Models-Numerical-Methods for learning. The notebook collection explains classical financial model mechanics, while FinRL provides an end-to-end sequential decision pipeline [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:overlapping-purpose-tradeoffs|direct|2026-05-04] [epistemic:: sourced]
+The report treats FinRL as complementary to Financial-Models-Numerical-Methods for learning. The notebook collection explains classical financial model mechanics, while FinRL provides an end-to-end sequential decision pipeline [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:overlapping-purpose-tradeoffs|derived|2026-05-04] [epistemic:: sourced]
 
 ### Direct repository inspection (2026-05-04)
 

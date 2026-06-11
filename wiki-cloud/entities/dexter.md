@@ -7,11 +7,11 @@ summary: "Autonomous financial research agent specialized for fundamentals-and-v
   work — financial statements, key ratios, SEC filing item retrieval, analyst estimates,
   insider trades, and a DCF valuation skill — with no technical-analysis surface."
 created_at: 2026-05-04
-updated_at: 2026-05-04
+updated_at: 2026-06-11
 sources:
 - src-2026-05-04-financial-ai-repo-comparison-report
 - src-2026-05-04-dexter-investigation
-epistemic_status: sourced
+epistemic_status: mixed
 tags:
 - financial-ai
 - autonomous-agent
@@ -38,18 +38,18 @@ Dexter is a TypeScript autonomous financial research agent specialized for funda
 
 ## Key Facts
 
-- Dexter decomposes complex financial questions into research steps, gathers data through tools, checks its work, and iterates toward an answer [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|direct|2026-05-04] [epistemic:: sourced]
-- The report identifies Dexter's strongest fit as analyst-style research synthesis rather than systematic backtesting or portfolio execution [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|direct|2026-05-04] [epistemic:: sourced]
-- Dexter's reported strengths include a human-facing research loop, scratchpad JSONL logs, an evaluation harness, and modern LLM provider support [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|direct|2026-05-04] [epistemic:: sourced]
+- Dexter decomposes complex financial questions into research steps, gathers data through tools, checks its work, and iterates toward an answer [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|derived|2026-05-04] [epistemic:: sourced]
+- The report identifies Dexter's strongest fit as analyst-style research synthesis rather than systematic backtesting or portfolio execution [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|derived|2026-05-04] [epistemic:: sourced]
+- Dexter's reported strengths include a human-facing research loop, scratchpad JSONL logs, an evaluation harness, and modern LLM provider support [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|derived|2026-05-04] [epistemic:: sourced]
 - Dexter's finance-specific tool surface is FA-only: `key-ratios`, `fundamentals` (income/balance/cash-flow), `filings` (10-K/10-Q/8-K item retrieval), `analyst-estimates`, `earnings`, `financial-segments`, `insider-trades`, plus a full `skills/dcf` valuation skill with sector-WACC adjustments at `src/skills/dcf/sector-wacc.md` [prov:src-2026-05-04-dexter-investigation#sec:fundamental-analysis|direct|2026-05-04] [epistemic:: sourced]
 - Dexter ships no technical-analysis functionality: no indicator computation, no signal generation, no chart-pattern detection; `stock-price.ts` returns raw OHLCV verbatim from the Financial Datasets API [prov:src-2026-05-04-dexter-investigation#sec:technical-analysis|direct|2026-05-04] [epistemic:: sourced]
-- Its reported weaknesses are dependence on LLM judgment and external APIs, less rigor than quantitative backtesting, and the limits of single-agent planning [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|direct|2026-05-04] [epistemic:: sourced]
+- Its reported weaknesses are dependence on LLM judgment and external APIs, less rigor than quantitative backtesting, and the limits of single-agent planning [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|derived|2026-05-04] [epistemic:: sourced]
 
 ## Detail
 
-Dexter fills the "autonomous financial research Q&A" role in the compared set. It is useful when the output is an explained answer to a financial question, with supporting tool traces and a research loop that can gather market or company information. The report explicitly contrasts this with systems intended for systematic backtesting, reinforcement-learning policy training, or reusable data-provider infrastructure [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|direct|2026-05-04] [epistemic:: sourced]
+Dexter fills the "autonomous financial research Q&A" role in the compared set. It is useful when the output is an explained answer to a financial question, with supporting tool traces and a research loop that can gather market or company information. The report explicitly contrasts this with systems intended for systematic backtesting, reinforcement-learning policy training, or reusable data-provider infrastructure [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|derived|2026-05-04] [epistemic:: sourced]
 
-Compared with Anthropic Financial Services, Dexter is more app-like and owns the interactive agent loop itself. Compared with OpenBB, it is an agent that consumes financial data rather than a generalized data access layer [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:overlapping-purpose-tradeoffs|direct|2026-05-04] [epistemic:: sourced]
+Compared with Anthropic Financial Services, Dexter is more app-like and owns the interactive agent loop itself. Compared with OpenBB, it is an agent that consumes financial data rather than a generalized data access layer [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:overlapping-purpose-tradeoffs|derived|2026-05-04] [epistemic:: sourced]
 
 ### Direct repository inspection (2026-05-04)
 

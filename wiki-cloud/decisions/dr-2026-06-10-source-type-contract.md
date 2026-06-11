@@ -56,14 +56,14 @@ Fully implemented as the contract's worked secondary instance:
 - **RPT-03:** `derived`-only provenance enforced by lint D-08: a `|direct|` provenance marker on a research-report source is an error
 - **RPT-04:** `bin/audit-claims.sh` gains a 5th priority selector (`derived-report`) and `#r<n>` locator resolver for positional bibliography lookup
 - **RPT-05:** Model C promotion path: when a cited source earns promotion, the human acquires it; the earning claim is re-pointed from `derived` to `direct`; the registry entry is marked `promoted → <new-source-id>`
-- **RPT-06:** Retro-classification of the two existing AI deep-research reports: `source_type: article` → `research-report`; citation registries backfilled; no new claims extracted (D-14)
+- **RPT-06:** Retro-classification of the two existing AI deep-research reports: `source_type: article` → `research-report`; citation registries backfilled; no new claims extracted (D-14). A third report-shaped source (the 2026-05-04 financial-AI repository comparison, an LLM-authored synthesis) was missed by the phase and retro-classified in a 2026-06-11 review follow-up — its 46 downstream `|direct|` markers across 8 pages swept to `|derived|`; no `## References` registry (the raw source has no bibliography — graceful degradation applies)
 
 **3. Lint enforcement (D-08/D-09)**
 
 LINT_VERSION bumped 1.8.0 → 1.9.0. Two new checks:
 
-- **D-08:** Error if any wiki page outside `wiki-cloud/sources/` cites a `research-report` source with `|direct|` support type (anti-laundering gate)
-- **D-09:** Error if `source_type` has an unknown value (closes the typo-bypass hole)
+- **D-08:** Error if any wiki page other than the report's OWN source summary (self-citation) cites a `research-report` source with a support type other than `derived` (anti-laundering gate). Initially shipped flagging only `|direct|` with a type-wide source-page exemption; hardened 2026-06-11 (LINT_VERSION 1.9.1) after code review: the exemption is now self-citation-only (cross-report citations are checked) and any non-`derived` support type — including omitted — is flagged
+- **D-09:** Error if `source_type` has an unknown or empty value (closes the typo-bypass hole; empty-string handling added 2026-06-11)
 
 **4. Claims sweep**
 

@@ -8,11 +8,11 @@ summary: "Multi-agent LLM trading research framework, orchestrated via LangGraph
   (statements via Alpha Vantage) agents plus news, sentiment, bull/bear, risk, and
   trader roles."
 created_at: 2026-05-04
-updated_at: 2026-05-04
+updated_at: 2026-06-11
 sources:
 - src-2026-05-04-financial-ai-repo-comparison-report
 - src-2026-05-04-tradingagents-investigation
-epistemic_status: sourced
+epistemic_status: mixed
 tags:
 - financial-ai
 - llm-agents
@@ -39,18 +39,18 @@ TradingAgents is the LLM trading-decision research framework in this set, orches
 
 ## Key Facts
 
-- TradingAgents models a trading firm with role-specialized LLM agents for fundamentals, sentiment, news, technical analysis, bullish and bearish research, trading, risk management, and portfolio management [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|direct|2026-05-04] [epistemic:: sourced]
-- The report identifies it as the most direct LLM trading-decision project in the compared set [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|direct|2026-05-04] [epistemic:: sourced]
+- TradingAgents models a trading firm with role-specialized LLM agents for fundamentals, sentiment, news, technical analysis, bullish and bearish research, trading, risk management, and portfolio management [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|derived|2026-05-04] [epistemic:: sourced]
+- The report identifies it as the most direct LLM trading-decision project in the compared set [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|derived|2026-05-04] [epistemic:: sourced]
 - The market_analyst agent at `tradingagents/agents/analysts/market_analyst.py` is bound to `get_stock_data` and `get_indicators`, computing 11 named indicators (`close_50_sma`, `close_200_sma`, `close_10_ema`, `macd`, `macds`, `macdh`, `rsi`, `boll`/`boll_ub`/`boll_lb`, `atr`, `vwma`) via `stockstats` or Alpha Vantage in real Python code, not LLM prompts [prov:src-2026-05-04-tradingagents-investigation#sec:technical-analysis|direct|2026-05-04] [epistemic:: sourced]
 - The fundamentals_analyst agent at `tradingagents/agents/analysts/fundamentals_analyst.py` is bound to `get_fundamentals`, `get_balance_sheet`, `get_cashflow`, and `get_income_statement`, backed by Alpha Vantage `OVERVIEW`/`BALANCE_SHEET`/`CASH_FLOW`/`INCOME_STATEMENT` endpoints with look-ahead-bias filtering on `fiscalDateEnding`; no DCF or comparables model code is shipped [prov:src-2026-05-04-tradingagents-investigation#sec:fundamental-analysis|direct|2026-05-04] [epistemic:: sourced]
-- Its strengths are a richer deliberative structure than Dexter for trading-specific decisions, explicit risk and portfolio-manager layers, configurable debates, and persistent memory [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|direct|2026-05-04] [epistemic:: sourced]
-- Its weaknesses are high variance, LLM cost, causal-validation difficulty, and the risk that debate creates persuasive narratives without statistical edge [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|direct|2026-05-04] [epistemic:: sourced]
+- Its strengths are a richer deliberative structure than Dexter for trading-specific decisions, explicit risk and portfolio-manager layers, configurable debates, and persistent memory [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|derived|2026-05-04] [epistemic:: sourced]
+- Its weaknesses are high variance, LLM cost, causal-validation difficulty, and the risk that debate creates persuasive narratives without statistical edge [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|derived|2026-05-04] [epistemic:: sourced]
 
 ## Detail
 
-TradingAgents is intended for research into LLM committees and structured financial debate. It differs from Dexter by focusing on trading decisions rather than general financial research Q&A, and it differs from FinRL by using LLM deliberation rather than trained reinforcement-learning policies [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:overlapping-purpose-tradeoffs|direct|2026-05-04] [epistemic:: sourced]
+TradingAgents is intended for research into LLM committees and structured financial debate. It differs from Dexter by focusing on trading decisions rather than general financial research Q&A, and it differs from FinRL by using LLM deliberation rather than trained reinforcement-learning policies [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:overlapping-purpose-tradeoffs|derived|2026-05-04] [epistemic:: sourced]
 
-The report treats TradingAgents as qualitatively broad and naturally explainable, but also nondeterministic and difficult to validate causally. That makes it useful for studying LLM-based decision formation, not sufficient as a standalone evidence of trading edge [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:overlapping-purpose-tradeoffs|direct|2026-05-04] [epistemic:: sourced]
+The report treats TradingAgents as qualitatively broad and naturally explainable, but also nondeterministic and difficult to validate causally. That makes it useful for studying LLM-based decision formation, not sufficient as a standalone evidence of trading edge [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:overlapping-purpose-tradeoffs|derived|2026-05-04] [epistemic:: sourced]
 
 ### Direct repository inspection (2026-05-04)
 

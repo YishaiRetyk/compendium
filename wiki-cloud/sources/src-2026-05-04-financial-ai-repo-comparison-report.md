@@ -6,9 +6,9 @@ status: active
 summary: "Comparison report mapping six finance-related open-source repositories by
   purpose, method, user, and overlapping tradeoffs."
 created_at: 2026-05-04
-updated_at: 2026-05-04
+updated_at: 2026-06-11
 sources: []
-epistemic_status: sourced
+epistemic_status: mixed
 tags:
 - financial-ai
 - repository-comparison
@@ -29,7 +29,7 @@ path: sources/2026/2026-05/2026-05-04-financial-ai-repo-comparison-report.md
 url: ""
 content_hash: "sha256:a483dc9eb9b8bcd3513d2dd9ca699b041fb552869b3db64b91836d01ccf05900"
 ingested_at: 2026-05-04
-source_type: article
+source_type: research-report
 compilation_status: compiled
 compiled_against_hash: "sha256:a483dc9eb9b8bcd3513d2dd9ca699b041fb552869b3db64b91836d01ccf05900"
 compiled_targets:
@@ -64,9 +64,11 @@ This report compares six finance-related open-source repositories as a layered e
 
 Compiled into [[dexter|Dexter]], [[financial-models-numerical-methods|Financial-Models-Numerical-Methods]], [[openbb|OpenBB]], [[anthropic-financial-services|Anthropic Financial Services]], [[tradingagents|TradingAgents]], [[finrl|FinRL]], [[financial-ai-repository-landscape|Financial AI Repository Landscape]], and [[financial-ai-repository-tradeoffs|Financial AI Repository Tradeoffs]]. The report itself is an LLM-authored synthesis of public repository documentation, so downstream claims should be refreshed when repository READMEs or project positioning materially change.
 
+Retro-classified `source_type: article` → `research-report` on 2026-06-11 (post-Phase-19 review follow-up): the page matches the research-report classification rule (AI-synthesized report). The raw source has no bibliography section, so no `## References` registry exists — `#r<n>` locators are not usable for this source (graceful degradation per `schema/reference/source-types.md`); claims use `#sec:` locators. Downstream claims swept to `support_type: derived` in the same change.
+
 ## Source Metadata
 
-- **Source type:** article
+- **Source type:** research-report
 - **Authors:** OpenAI Codex
 - **Published:** 2026-05-04
 - **Path:** `sources/2026/2026-05/2026-05-04-financial-ai-repo-comparison-report.md`

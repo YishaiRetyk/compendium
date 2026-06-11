@@ -670,3 +670,27 @@ report: wiki-cloud/maintenance/lint-report.md
 findings: 77 total (0 errors, 69 warnings, 8 info)
 auto_fixes: 0 applied
 report: wiki-cloud/maintenance/lint-report.md
+
+## [2026-06-11] UPDATE | Financial AI and Quant Finance Repository Comparison Report
+
+source: src-2026-05-04-financial-ai-repo-comparison-report
+result: source_type article → research-report; epistemic_status sourced → mixed; no ## References block (raw source has no bibliography — graceful degradation, #sec: locators only)
+reason: post-Phase-19 code review (WR-07) found this LLM-authored synthesis matches the research-report classification rule but was missed by the RPT-06 retro-classification
+
+## [2026-06-11] UPDATE | Financial AI downstream pages (8-page sweep)
+
+source: src-2026-05-04-financial-ai-repo-comparison-report
+result: swept 46 |direct| markers to |derived| across dexter, openbb, tradingagents, finrl, anthropic-financial-services, financial-models-numerical-methods, financial-ai-repository-tradeoffs, financial-ai-repository-landscape; re-graded 6 entity pages epistemic_status sourced → mixed (half their markers now derived)
+reason: derived-never-direct mandate (D-08) applies once the source is classified research-report; sweep lands atomically with the classification flip to keep lint green
+
+## [2026-06-11] UPDATE | Source-Type Extension Contract + research-report Secondary Source Type
+
+source: dr-2026-06-10-source-type-contract
+result: recorded the third-report retro-classification under RPT-06; updated D-08/D-09 descriptions to the hardened 1.9.1 behavior (self-citation-only exemption, non-derived flagged, empty source_type flagged); marked PDF/video sub-case verdicts provisional (finalized in Phases 20/21)
+reason: code review found the DR overstated settled verdicts and described a D-08 exemption that did not match the implementation
+
+## [2026-06-11] UPDATE | Claude Code (entity) + Claude Code Frameworks report locator fix
+
+source: src-2026-04-16-claude-code-frameworks-report
+result: corrected 5 unresolvable #sec: locators (3 on the entity page, 2 self-citations on the source summary) to match the raw heading slug
+reason: audit derived-report tier could not resolve the authored slug against the raw source heading (dot-collapsing in slugify); locator now token-matches

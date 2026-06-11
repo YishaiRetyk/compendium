@@ -7,11 +7,11 @@ summary: "Open-source financial data platform that exposes data via Python, REST
   CLI, MCP, and Excel, and also ships native technical-analysis and fundamental-analysis
   router modules."
 created_at: 2026-05-04
-updated_at: 2026-05-04
+updated_at: 2026-06-11
 sources:
 - src-2026-05-04-financial-ai-repo-comparison-report
 - src-2026-05-04-openbb-investigation
-epistemic_status: sourced
+epistemic_status: mixed
 tags:
 - financial-data
 - data-infrastructure
@@ -38,18 +38,18 @@ OpenBB is the financial-data infrastructure layer in this comparison, exposing d
 
 ## Key Facts
 
-- OpenBB is open-source tooling for integrating proprietary, licensed, and public financial data into downstream applications such as AI copilots and dashboards [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|direct|2026-05-04] [epistemic:: sourced]
-- It exposes financial data through Python, CLI, Workspace and Excel integrations, MCP servers, and REST APIs [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|direct|2026-05-04] [epistemic:: sourced]
+- OpenBB is open-source tooling for integrating proprietary, licensed, and public financial data into downstream applications such as AI copilots and dashboards [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|derived|2026-05-04] [epistemic:: sourced]
+- It exposes financial data through Python, CLI, Workspace and Excel integrations, MCP servers, and REST APIs [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|derived|2026-05-04] [epistemic:: sourced]
 - A dedicated `technical` extension at `openbb_platform/extensions/technical/openbb_technical/technical_router.py` ships indicator endpoints (`bbands`, `macd`, `sma`/`hma`/`zlma`, `atr`, `obv`, `vwap`, `aroon`, `fisher`, `adosc`, `fib`, `demark`, `relative_rotation`) as real Python implementations, installable as `openbb-technical` [prov:src-2026-05-04-openbb-investigation#sec:technical-analysis|direct|2026-05-04] [epistemic:: sourced]
 - A dedicated `fundamental` submodule under the `equity` extension ships statement, growth, ratios, metrics, EPS, dividends, filings, transcript, and ESG endpoints; ratio formulas are largely delegated to upstream providers, and no DCF endpoint is shipped natively [prov:src-2026-05-04-openbb-investigation#sec:fundamental-analysis|direct|2026-05-04] [epistemic:: sourced]
-- Its strengths are breadth of integrations, Python and REST surfaces, MCP relevance for agents, and a large community [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|direct|2026-05-04] [epistemic:: sourced]
-- Its weaknesses are that data normalization and provider credential management remain hard, the enterprise UI is separate, and financial reasoning must be built on top [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|direct|2026-05-04] [epistemic:: stale] (the "financial reasoning must be built on top" portion is superseded by the 2026-05-04 inspection findings — OpenBB ships TA indicator endpoints and basic FA endpoints natively)
+- Its strengths are breadth of integrations, Python and REST surfaces, MCP relevance for agents, and a large community [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|derived|2026-05-04] [epistemic:: sourced]
+- Its weaknesses are that data normalization and provider credential management remain hard, the enterprise UI is separate, and financial reasoning must be built on top [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|derived|2026-05-04] [epistemic:: stale] (the "financial reasoning must be built on top" portion is superseded by the 2026-05-04 inspection findings — OpenBB ships TA indicator endpoints and basic FA endpoints natively)
 
 ## Detail
 
-OpenBB is the strongest candidate for a centralized data layer when building a serious financial research stack. The report warns against scattering data-fetch logic across agents and recommends centralizing provider access through OpenBB or an equivalent data layer when provider breadth, shared credentials, and multiple downstream consumers matter [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:overlapping-purpose-tradeoffs|direct|2026-05-04] [epistemic:: sourced]
+OpenBB is the strongest candidate for a centralized data layer when building a serious financial research stack. The report warns against scattering data-fetch logic across agents and recommends centralizing provider access through OpenBB or an equivalent data layer when provider breadth, shared credentials, and multiple downstream consumers matter [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:overlapping-purpose-tradeoffs|derived|2026-05-04] [epistemic:: sourced]
 
-OpenBB overlaps with the embedded connectors in Dexter, TradingAgents, and FinRL, but the overlap is infrastructural rather than workflow-level. Embedded connectors are simpler for demos and narrow apps; OpenBB is better suited to reusable platform construction [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:overlapping-purpose-tradeoffs|direct|2026-05-04] [epistemic:: sourced]
+OpenBB overlaps with the embedded connectors in Dexter, TradingAgents, and FinRL, but the overlap is infrastructural rather than workflow-level. Embedded connectors are simpler for demos and narrow apps; OpenBB is better suited to reusable platform construction [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:overlapping-purpose-tradeoffs|derived|2026-05-04] [epistemic:: sourced]
 
 ### Direct repository inspection (2026-05-04)
 

@@ -8,7 +8,7 @@ summary: "Synthesis of six finance-related repositories as a layered ecosystem s
   LLM trading committees, autonomous fundamentals research, and Claude-native professional
   FA workflows."
 created_at: 2026-05-04
-updated_at: 2026-05-04
+updated_at: 2026-06-11
 sources:
 - src-2026-05-04-financial-ai-repo-comparison-report
 - src-2026-05-04-openbb-investigation
@@ -45,10 +45,10 @@ The six repositories form a layered finance-software landscape: data infrastruct
 
 ## Key Facts
 
-- OpenBB fills the reusable data-infrastructure layer for financial applications and agents, and also ships native TA indicator endpoints and basic FA endpoints (statements, growth, ratios, metrics, EPS, filings, transcripts) [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|direct|2026-05-04] [prov:src-2026-05-04-openbb-investigation#sec:technical-analysis|direct|2026-05-04] [prov:src-2026-05-04-openbb-investigation#sec:fundamental-analysis|direct|2026-05-04] [epistemic:: sourced]
-- Financial-Models-Numerical-Methods fills the educational numerical-finance layer; it ships no TA and no FA — the closest adjacency is an Ornstein-Uhlenbeck pairs-trading example [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|direct|2026-05-04] [prov:src-2026-05-04-fmnm-investigation#sec:technical-analysis|direct|2026-05-04] [epistemic:: sourced]
-- FinRL fills the deep-reinforcement-learning trading research layer with TA indicators as first-class RL state features and a single fundamentals example [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|direct|2026-05-04] [prov:src-2026-05-04-finrl-investigation#sec:technical-analysis|direct|2026-05-04] [epistemic:: sourced]
-- TradingAgents, Dexter, and Anthropic Financial Services each use LLMs for finance work, but at different layers and with different analysis-style focus: TradingAgents for trading decisions with TA + FA tool grounding; Dexter for autonomous research with FA-only tools and a DCF skill; Anthropic Financial Services for Claude workflow packaging with the heaviest set of FA skills [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:high-level-map|direct|2026-05-04] [prov:src-2026-05-04-tradingagents-investigation#sec:fundamental-analysis|direct|2026-05-04] [prov:src-2026-05-04-dexter-investigation#sec:fundamental-analysis|direct|2026-05-04] [prov:src-2026-05-04-anthropic-financial-services-investigation#sec:fundamental-analysis|direct|2026-05-04] [epistemic:: sourced]
+- OpenBB fills the reusable data-infrastructure layer for financial applications and agents, and also ships native TA indicator endpoints and basic FA endpoints (statements, growth, ratios, metrics, EPS, filings, transcripts) [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|derived|2026-05-04] [prov:src-2026-05-04-openbb-investigation#sec:technical-analysis|direct|2026-05-04] [prov:src-2026-05-04-openbb-investigation#sec:fundamental-analysis|direct|2026-05-04] [epistemic:: sourced]
+- Financial-Models-Numerical-Methods fills the educational numerical-finance layer; it ships no TA and no FA — the closest adjacency is an Ornstein-Uhlenbeck pairs-trading example [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|derived|2026-05-04] [prov:src-2026-05-04-fmnm-investigation#sec:technical-analysis|direct|2026-05-04] [epistemic:: sourced]
+- FinRL fills the deep-reinforcement-learning trading research layer with TA indicators as first-class RL state features and a single fundamentals example [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:repo-evaluations|derived|2026-05-04] [prov:src-2026-05-04-finrl-investigation#sec:technical-analysis|direct|2026-05-04] [epistemic:: sourced]
+- TradingAgents, Dexter, and Anthropic Financial Services each use LLMs for finance work, but at different layers and with different analysis-style focus: TradingAgents for trading decisions with TA + FA tool grounding; Dexter for autonomous research with FA-only tools and a DCF skill; Anthropic Financial Services for Claude workflow packaging with the heaviest set of FA skills [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:high-level-map|derived|2026-05-04] [prov:src-2026-05-04-tradingagents-investigation#sec:fundamental-analysis|direct|2026-05-04] [prov:src-2026-05-04-dexter-investigation#sec:fundamental-analysis|direct|2026-05-04] [prov:src-2026-05-04-anthropic-financial-services-investigation#sec:fundamental-analysis|direct|2026-05-04] [epistemic:: sourced]
 
 ## Detail
 
@@ -56,7 +56,7 @@ The report's central synthesis is that these repositories form a stack more than
 
 The major architectural choice is therefore not "which repo is best" in isolation. It is which layer is missing from the intended system: deterministic data access (and basic TA/FA computation), mathematical model understanding, trainable policy experimentation, LLM trading deliberation, autonomous financial Q&A with valuation, or professional workflow packaging [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:bottom-line|derived|2026-05-04] [epistemic:: sourced]
 
-The report's production-facing guidance is to separate concerns: use a real data layer, keep model assumptions explicit, evaluate strategies outside the LLM loop, and treat agent outputs as analyst assistance unless independently validated [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:bottom-line|direct|2026-05-04] [epistemic:: sourced]
+The report's production-facing guidance is to separate concerns: use a real data layer, keep model assumptions explicit, evaluate strategies outside the LLM loop, and treat agent outputs as analyst assistance unless independently validated [prov:src-2026-05-04-financial-ai-repo-comparison-report#sec:bottom-line|derived|2026-05-04] [epistemic:: sourced]
 
 ### Analysis-style refinement (2026-05-04)
 
