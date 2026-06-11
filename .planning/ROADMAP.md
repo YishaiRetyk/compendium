@@ -128,7 +128,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1)*
 
-- [ ] 20-03-PLAN.md — conditional original_asset→*.pdf extraction-field lint check (LINT_VERSION 1.10.0) + bin/ingest.sh --asset + four phase-20 tests
+- [x] 20-03-PLAN.md — conditional original_asset→*.pdf extraction-field lint check (LINT_VERSION 1.10.0) + bin/ingest.sh --asset + four phase-20 tests
 
 **Wave 3** *(blocked on Wave 2 — human-supplied PDF, autonomous: false)*
 
@@ -334,5 +334,5 @@ The following are intentionally deferred until real usage demands them, captured
 | 17. Workflow Extraction | v1.2 | 4/4 | Complete    | 2026-06-07 |
 | 18. Skills Overlay | v1.2 | 3/3 | Complete    | 2026-06-08 |
 | 19. Extension Contract + Research-Report Type | v1.3 | 5/5 | Complete    | 2026-06-10 |
-| 20. PDF Ingestion | v1.3 | 2/4 | In Progress|  |
+| 20. PDF Ingestion | v1.3 | 3/4 | In Progress|  |
 | 21. Video/YouTube Ingestion | v1.3 | 0/TBD | Not started | - |
