@@ -20,16 +20,16 @@ created: 2026-06-11
 | **Framework** | Bash test scripts under `tests/phase-20/` (per-phase `run.sh` aggregator + `lib.sh`; pattern from Phases 07-18) |
 | **Config file** | none — Wave 0 (Plan 01 Task 0) clones `tests/phase-18/{run.sh,lib.sh}` into `tests/phase-20/` |
 | **Quick run command** | `bash tests/phase-20/run.sh` (after Wave 0) |
-| **Full suite command** | `bash tests/phase-20/run.sh && bash bin/lint.sh && bash bin/check-neutrality.sh && bash bin/sync-claude.sh --check` |
+| **Full suite command** | `bash tests/phase-20/run.sh && bash bin/lint.sh --ci && bash bin/check-neutrality.sh && bash bin/sync-claude.sh --check` |
 | **Estimated runtime** | ~15 seconds (model-gated extraction test SKIPs when Ollama unreachable) |
 
 ---
 
 ## Sampling Rate
 
-- **After every task commit:** Run `bash bin/lint.sh` (or `--category` subset) + the relevant `tests/phase-20/test_*.sh`
+- **After every task commit:** Run `bash bin/lint.sh --ci` (or `--ci --category` subset — default mode always exits 0; only --ci/--strict are exit-code-meaningful) + the relevant `tests/phase-20/test_*.sh`
 - **After every plan wave:** Run `bash tests/phase-20/run.sh` + `bash bin/sync-claude.sh --check` + `bash bin/check-neutrality.sh`
-- **Before `/gsd-verify-work`:** Full `bin/lint.sh` green + `tests/phase-20/run.sh` reports 5/5 + PDF-04 human checkpoint signed off
+- **Before `/gsd-verify-work`:** `bin/lint.sh --ci` exits 0 + `tests/phase-20/run.sh` reports 5/5 passed, 0 skipped + PDF-04 human checkpoint signed off
 - **Max feedback latency:** 30 seconds
 
 ---
@@ -42,13 +42,13 @@ created: 2026-06-11
 | 20-01-01 | 01 | 1 | PDF-01 | T-20-01/02/04 | quoted paths; jq -n JSON escaping; Ollama preflight probe; localhost-only | smoke | `bash -n bin/pdf-extract.sh && bash bin/check-neutrality.sh` | ❌ W0 | ⬜ pending |
 | 20-01-02 | 01 | 1 | PDF-01 | — | model-gated; skip-not-fail | integration | `bash tests/phase-20/test_pdf_extract_markers.sh` | ❌ W0 | ⬜ pending |
 | 20-02-01 | 02 | 1 | PDF-01/02/03 | T-20-05 | placeholders only; neutrality gate | content grep | `bash tests/phase-20/test_pdf_convention_doc.sh` + `bash bin/check-neutrality.sh` | ❌ W0 | ⬜ pending |
-| 20-02-02 | 02 | 1 | PDF-02 | T-20-05 | enum untouched; lint green | smoke | `bash bin/lint.sh` | ✅ | ⬜ pending |
-| 20-02-03 | 02 | 1 | PDF-01 | T-20-06/07 | CLAUDE.md byte-sync; routing path validated | smoke | `bash bin/sync-claude.sh --check && bin/lint.sh --category routing` | ✅ | ⬜ pending |
+| 20-02-02 | 02 | 1 | PDF-02 | T-20-05 | enum untouched; lint green | smoke | `bash bin/lint.sh --ci` | ✅ | ⬜ pending |
+| 20-02-03 | 02 | 1 | PDF-01 | T-20-06/07 | CLAUDE.md byte-sync; routing path validated | smoke | `bash bin/sync-claude.sh --check && bash bin/lint.sh --ci --category routing` | ✅ | ⬜ pending |
 | 20-03-01 | 03 | 2 | PDF-02 | T-20-09 | conditional check; str-guard; no eval | unit | `bash tests/phase-20/test_pdf_extraction_fields.sh` | ❌ W0 | ⬜ pending |
 | 20-03-02 | 03 | 2 | PDF-04 | T-20-08 | basename strips traversal; existence check | integration | `bash tests/phase-20/test_ingest_asset_flag.sh` | ❌ W0 | ⬜ pending |
 | 20-03-03 | 03 | 2 | PDF-02/03/04 | T-20-10 | mktemp isolation; real tree untouched | aggregate | `bash tests/phase-20/run.sh` (5/5) | ❌ W0 | ⬜ pending |
-| 20-04-02 | 04 | 3 | PDF-04 | T-20-11/12 | cloud-safe verified; audit resolves #p | manual + audit | `bash bin/lint.sh && bash bin/audit-claims.sh` | partial (human-gated) | ⬜ pending |
-| 20-04-03 | 04 | 3 | PDF-04 | T-20-13 | valid trigger_type; lint green | smoke | `bash bin/lint.sh` | ✅ | ⬜ pending |
+| 20-04-02 | 04 | 3 | PDF-04 | T-20-11/12 | cloud-safe verified; audit resolves #p (scoped, no insufficient-locator) | manual + audit | `bash bin/lint.sh --ci && bash bin/audit-claims.sh` (content-asserted) | partial (human-gated) | ⬜ pending |
+| 20-04-03 | 04 | 3 | PDF-04 | T-20-13 | valid trigger_type; lint green | smoke | `bash bin/lint.sh --ci` | ✅ | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -66,7 +66,7 @@ Wave 0 is folded into Plan 01 Task 0 + Task 2 and Plan 03 Task 3 (the test files
 - [ ] `tests/phase-20/test_pdf_epistemic_tiers.sh` — PDF-03 content grep (Plan 03 Task 3)
 - [ ] `tests/phase-20/test_ingest_asset_flag.sh` — PDF-04 --asset integration (Plan 03 Task 3)
 
-Note: the model-dependent extraction assertion is gated behind a "model available" probe (`curl -sf localhost:11434/api/tags`) and a fixture-present check — it SKIPs (exit 0) on GPU-less CI, mirroring the Phase 13.1 `blocked-on-host-runtime` precedent. The aggregator reports 4/5 FAIL after Plan 01 (the four Plan-03 test files do not yet exist) and 5/5 after Plan 03 — that RED→GREEN gap is the honest Wave-0 signal, not a defect.
+Note: the model-dependent extraction assertion is gated behind a server-reachable probe (`curl -sf localhost:11434/api/tags`) PLUS a model-tag-present probe PLUS a fixture-present check — it SKIPs (exit 0) on GPU-less CI, mirroring the Phase 13.1 `blocked-on-host-runtime` precedent. Cross-AI review fix: not-yet-authored test files SKIP rather than FAIL in the aggregator, so it exits 0 at every commit — it reports `1/1 passed, 4 skipped` after Plan 01 and `5/5 passed, 0 skipped` after Plan 03. The SKIP count (not a FAIL count) is the honest Wave-0 signal; Wave-1 exit gate = lint --ci green + existing tests green individually, Wave-2 exit gate = 0 skipped.
 
 ---
 
