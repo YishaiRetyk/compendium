@@ -10,7 +10,7 @@ set -euo pipefail
 # Lint rule-set semver per CI-08 / D-26. Bump MAJOR on breaking changes
 # (removed category, changed severity semantics). MINOR on non-breaking
 # additions. PATCH on bug fixes. --require-version X.Y.Z is a minimum check.
-LINT_VERSION="1.9.1"
+LINT_VERSION="1.10.0"
 
 usage() {
     cat <<'EOF'
@@ -1107,6 +1107,23 @@ if should_run('yaml'):
                 add_finding('error', 'yaml', rel,
                             f"Invalid source_type: '{st}' (expected one of: "
                             f"{', '.join(sorted(VALID_SOURCE_TYPES))})")
+
+            # D-07: PDF sources (original_asset=*.pdf) require the extraction fields.
+            oa = fm.get('original_asset', '')
+            if isinstance(oa, str) and oa.lower().endswith('.pdf'):
+                if '/' in oa or oa.startswith('..'):
+                    # Review round 2: the convention is a BARE co-located filename;
+                    # /tmp/file.pdf or ../file.pdf must not pass on suffix alone.
+                    add_finding('error', 'yaml', rel,
+                                f"original_asset must be a bare co-located "
+                                f"filename, got: '{oa}'")
+                PDF_EXTRACTION_FIELDS = ['extraction_tool', 'extraction_model',
+                                         'extraction_date', 'original_asset']
+                missing_pdf = [f for f in PDF_EXTRACTION_FIELDS if not fm.get(f)]
+                if missing_pdf:
+                    add_finding('error', 'yaml', rel,
+                                f'PDF source (original_asset=*.pdf) missing '
+                                f'extraction fields: {missing_pdf}')
 
         # Decision record validation (per AGENTS.md section 5 items 15-17)
         if fm.get('type') == 'decision':

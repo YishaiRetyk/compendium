@@ -16,7 +16,7 @@ set -euo pipefail
 
 usage() {
     cat <<'EOF'
-Usage: bin/ingest.sh <source-file> [--slug <slug>] [--force] [--contributor <handle>]
+Usage: bin/ingest.sh <source-file> [--slug <slug>] [--asset <path>] [--force] [--contributor <handle>]
 
 Scaffolds source ingestion by:
   1. Creating dated directory structure in sources/ (UTC date)
@@ -26,6 +26,9 @@ Scaffolds source ingestion by:
 
 Options:
   --slug <slug>           Custom slug for the source directory (default: derived from filename)
+  --asset <path>          Co-locate a bundle asset (e.g. the original PDF,
+                          <path>/original.pdf) alongside source.md in the same
+                          dated bundle dir.
   --force                 Overwrite files in an existing destination directory
   --contributor <handle>  Explicit contributor @handle for the log entry.
                           Auto-detects from git config user.email +
@@ -157,6 +160,7 @@ SLUG_OVERRIDE=""
 SLUG_PROVIDED=0
 FORCE=0
 CONTRIBUTOR=""
+ASSET_FILE=""
 
 while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -171,6 +175,14 @@ while [ "$#" -gt 0 ]; do
             fi
             SLUG_OVERRIDE="$2"
             SLUG_PROVIDED=1
+            shift 2
+            ;;
+        --asset)
+            if [ "$#" -lt 2 ]; then
+                echo "ERROR: --asset requires a value (path to the bundle asset, e.g. original.pdf)" >&2
+                exit 1
+            fi
+            ASSET_FILE="$2"
             shift 2
             ;;
         --force)
@@ -278,6 +290,27 @@ if [ -e "${DEST_DIR}" ]; then
     echo "WARNING: --force specified; overwriting files in ${DEST_DIR}" >&2
 fi
 
+# Validate ALL --asset preconditions BEFORE creating the bundle dir or copying
+# the source (review round 2): an asset-specific failure detected after source.md
+# is written would leave a partial bundle behind. Every check that can fail must
+# run while the tree is still untouched.
+if [ -n "${ASSET_FILE}" ]; then
+    if [ ! -f "${ASSET_FILE}" ]; then
+        echo "ERROR: --asset file not found: ${ASSET_FILE}" >&2
+        exit 1
+    fi
+    ASSET_BASE="$(basename "${ASSET_FILE}")"
+    if [ "${ASSET_BASE}" = "source.md" ]; then
+        echo "ERROR: --asset basename 'source.md' would clobber the ingested source" >&2
+        exit 1
+    fi
+    ASSET_DEST="${DEST_DIR}/${ASSET_BASE}"
+    if [ -e "${ASSET_DEST}" ] && [ "${FORCE:-0}" != "1" ]; then
+        echo "ERROR: asset destination exists: ${ASSET_DEST} (use --force to overwrite)" >&2
+        exit 1
+    fi
+fi
+
 mkdir -p "${DEST_DIR}"
 
 # ---------------------------------------------------------------------------
@@ -310,6 +343,16 @@ if [ "${FORCE:-0}" = "1" ]; then
     cp -f "${SOURCE_FILE}" "${DEST_FILE}"
 else
     cp "${SOURCE_FILE}" "${DEST_FILE}"
+fi
+
+# D-11: co-locate the original asset (e.g. the source PDF) alongside source.md
+# in the same dated bundle dir. Pre-validated above (existence, source.md-basename
+# guard, no-overwrite-without-force) — pure file I/O here, nothing can fail on a
+# precondition. The convention records `original_asset` as a bare co-located
+# filename (${ASSET_BASE}), never an absolute path.
+if [ -n "${ASSET_FILE}" ]; then
+    cp "${ASSET_FILE}" "${ASSET_DEST}"
+    echo "Co-located asset: ${ASSET_DEST}" >&2
 fi
 
 # ---------------------------------------------------------------------------
