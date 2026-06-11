@@ -118,7 +118,22 @@ Plans:
   3. When a PDF is a degraded or scanned document, the convention specifies spot-verification steps and/or mandates a lower epistemic default — an agent does not silently treat VLM-extracted text as high-confidence
   4. One real PDF artifact has been acquired via the pipeline, ingested, and its wiki pages are in `sources/` with page-anchored provenance; the original PDF co-exists as a bundle asset alongside `source.md`
 
-**Plans**: TBD
+**Plans**: 4 plans (3 waves)
+Plans:
+
+**Wave 1**
+
+- [ ] 20-01-PLAN.md — bin/pdf-extract.sh acquisition glue (pdftoppm → Ollama olmOCR 2 → page markers) + tests/phase-20/ harness
+- [ ] 20-02-PLAN.md — authoritative schema/reference/pdf-ingestion.md (convention + runbook) + source-types row + frontmatter fields + ingest pointer + routing row
+
+**Wave 2** *(blocked on Wave 1)*
+
+- [ ] 20-03-PLAN.md — conditional original_asset→*.pdf extraction-field lint check (LINT_VERSION 1.10.0) + bin/ingest.sh --asset + four phase-20 tests
+
+**Wave 3** *(blocked on Wave 2 — human-supplied PDF, autonomous: false)*
+
+- [ ] 20-04-PLAN.md — end-to-end validation ingest of one real PDF (#p-anchored provenance, bundle-co-located asset, audit-verified) + schema-update decision record
+
 **UI hint**: no
 
 ### Phase 21: Video/YouTube Ingestion
@@ -319,5 +334,5 @@ The following are intentionally deferred until real usage demands them, captured
 | 17. Workflow Extraction | v1.2 | 4/4 | Complete    | 2026-06-07 |
 | 18. Skills Overlay | v1.2 | 3/3 | Complete    | 2026-06-08 |
 | 19. Extension Contract + Research-Report Type | v1.3 | 5/5 | Complete    | 2026-06-10 |
-| 20. PDF Ingestion | v1.3 | 0/TBD | Not started | - |
+| 20. PDF Ingestion | v1.3 | 0/4 | Not started | - |
 | 21. Video/YouTube Ingestion | v1.3 | 0/TBD | Not started | - |
