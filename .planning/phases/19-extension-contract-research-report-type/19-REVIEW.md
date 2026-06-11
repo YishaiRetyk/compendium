@@ -37,7 +37,9 @@ findings:
   warning: 7
   info: 7
   total: 14
-status: issues_found
+status: resolved
+resolved_at: 2026-06-11
+fixes_applied: 14
 ---
 
 # Phase 19: Code Review Report (re-review, post-19-05 gap closure)
@@ -156,6 +158,29 @@ if not (fm.get('type') == 'source' and fm.get('id') == source_id):
 **File:** `bin/lint.sh:94,1022,1130-1157`
 **Issue:** Lint walks only `WIKI_DIR` (default `wiki-cloud/`); a `wiki-local/` topic page citing a `wiki-cloud/` research-report with `|direct|` is invisible to D-08 in default runs, and running `bin/lint.sh wiki-local/` would instead produce false "Broken prov ref" errors because the source registry would then contain only local source pages. Inherited single-tier lint architecture (pre-existing), but D-08's anti-laundering guarantee is therefore cloud-tier-only — worth a one-line scope note in the DR or `schema/workflows/lint.md`.
 **Fix:** Document the scope limit, or (larger change) build the source registry across both tiers the way `bin/audit-claims.sh` already does.
+
+---
+
+## Resolution (2026-06-11)
+
+All 14 findings fixed inline and verified:
+
+- **WR-01** — `_resolve_sec` in `bin/audit-claims.sh` relaxed: exact slug match preferred, contiguous hyphen-token subsequence match as fallback. The 3 residual locators that token-matching cannot reach (dot-collapsed heading slug) were corrected on the citing pages. Empirical re-run: 0 of 158 tier-5 claims unresolvable (was 78 of 110).
+- **WR-02** — locator (group 2) and support_type (group 3) now normalized at extraction in `claim_tuples_for_page` (single site fixes findings, worklist, and the `--apply-verdicts` join key); `resolve_locator` also strips defensively. Verified: 0 trailing-backslash locators in a full tier run.
+- **WR-03** — D-08 exemption restricted to genuine self-citation (`type: source` AND `id == source_id`). Verified by injection: a source page citing a different report with `|direct|` now errors.
+- **WR-04** — D-08 now flags ANY non-`derived` support type (direct, inferred, tentative, omitted) on report citations. Verified by injection of a bare marker.
+- **WR-05** — self-citation carve-out documented in `schema/reference/source-types.md` (Provenance + checklist item 4) and the `schema/workflows/ingest.md` granularity row.
+- **WR-06** — unknown `--select` names now exit 1 with the valid list; usage text lists all five selectors.
+- **WR-07** — `src-2026-05-04-financial-ai-repo-comparison-report` retro-classified to `research-report` (no `## References` — raw source has no bibliography, graceful degradation); 46 downstream `|direct|` markers swept to `|derived|` across 8 pages; 6 entity pages re-graded `sourced` → `mixed`; recorded in the DR and `wiki-cloud/log.md`.
+- **IN-01** — rank comment now includes `derived-report(5)`.
+- **IN-02** — shadowed `re` import dropped, docstring corrected to document-order semantics, wrapped bullets capture continuation lines.
+- **IN-03** — explicitly empty `source_type` now errors (D-09).
+- **IN-04** — DR marks the PDF/video sub-case verdicts provisional (finalized in Phases 20/21).
+- **IN-05** — each claim tuple carries its own marker's support_type; the first-marker re-extraction is gone.
+- **IN-06** — inclusion-audit baseline re-stamped (288 lines @ 2026-06-11) in AGENTS.md and CLAUDE.md.
+- **IN-07** — D-08 tier-scope limit documented in `schema/workflows/lint.md` (provenance step).
+
+LINT_VERSION bumped 1.9.0 → 1.9.1. Full lint: 0 errors. Neutrality and sync gates green.
 
 ---
 
