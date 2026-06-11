@@ -10,7 +10,7 @@ summary: "A synthesis of 8 parallel web-research investigations (April 2026) map
   gate), Superpowers (execution discipline), and GSD (context engineering) — with a
   comparative matrix, cross-cutting themes, and a decision guide."
 created_at: 2026-06-09
-updated_at: 2026-06-10
+updated_at: 2026-06-11
 sources: []
 epistemic_status: mixed
 tags:
@@ -88,8 +88,8 @@ A comparative report (April 2026) synthesizing 8 parallel web-research investiga
 
 ### CLAUDE.md / AGENTS.md
 
-- CLAUDE.md loads on every session and every turn; AGENTS.md is the cross-tool open standard (agents.md) used by 60,000+ repos and supported natively by Codex, Cursor, Aider, Jules, Windsurf, Zed, OpenCode — but Claude Code does not yet read AGENTS.md natively (issue #6235), so teams symlink CLAUDE.md → AGENTS.md. [prov:src-2026-04-16-claude-code-frameworks-report#sec:claude-md|direct|2026-06-09] [epistemic:: tentative]
-- Length is the single most important CLAUDE.md variable — Anthropic's diagnostic: "If Claude keeps doing something despite a rule against it, the file is probably too long." Community ceiling <300 lines, ~60 lines as the gold standard (HumanLayer's production root file); the router pattern keeps CLAUDE.md a thin index pointing to deeper docs via `@path` imports. [prov:src-2026-04-16-claude-code-frameworks-report#sec:claude-md|direct|2026-06-09] [epistemic:: sourced]
+- CLAUDE.md loads on every session and every turn; AGENTS.md is the cross-tool open standard (agents.md) used by 60,000+ repos and supported natively by Codex, Cursor, Aider, Jules, Windsurf, Zed, OpenCode — but Claude Code does not yet read AGENTS.md natively (issue #6235), so teams symlink CLAUDE.md → AGENTS.md. [prov:src-2026-04-16-claude-code-frameworks-report#sec:claudemd|direct|2026-06-09] [epistemic:: tentative]
+- Length is the single most important CLAUDE.md variable — Anthropic's diagnostic: "If Claude keeps doing something despite a rule against it, the file is probably too long." Community ceiling <300 lines, ~60 lines as the gold standard (HumanLayer's production root file); the router pattern keeps CLAUDE.md a thin index pointing to deeper docs via `@path` imports. [prov:src-2026-04-16-claude-code-frameworks-report#sec:claudemd|direct|2026-06-09] [epistemic:: sourced]
 
 ### Superpowers
 
