@@ -123,8 +123,8 @@ Plans:
 
 **Wave 1**
 
-- [ ] 20-01-PLAN.md — bin/pdf-extract.sh acquisition glue (pdftoppm → Ollama olmOCR 2 → page markers) + tests/phase-20/ harness
-- [ ] 20-02-PLAN.md — authoritative schema/reference/pdf-ingestion.md (convention + runbook) + source-types row + frontmatter fields + ingest pointer + routing row
+- [x] 20-01-PLAN.md — bin/pdf-extract.sh acquisition glue (pdftoppm → Ollama olmOCR 2 → page markers) + tests/phase-20/ harness
+- [x] 20-02-PLAN.md — authoritative schema/reference/pdf-ingestion.md (convention + runbook) + source-types row + frontmatter fields + ingest pointer + routing row
 
 **Wave 2** *(blocked on Wave 1)*
 
@@ -334,5 +334,5 @@ The following are intentionally deferred until real usage demands them, captured
 | 17. Workflow Extraction | v1.2 | 4/4 | Complete    | 2026-06-07 |
 | 18. Skills Overlay | v1.2 | 3/3 | Complete    | 2026-06-08 |
 | 19. Extension Contract + Research-Report Type | v1.3 | 5/5 | Complete    | 2026-06-10 |
-| 20. PDF Ingestion | v1.3 | 0/4 | Not started | - |
+| 20. PDF Ingestion | v1.3 | 2/4 | In Progress|  |
 | 21. Video/YouTube Ingestion | v1.3 | 0/TBD | Not started | - |

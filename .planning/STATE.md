@@ -4,8 +4,8 @@ milestone: v1.3
 milestone_name: Source Ingestion
 status: executing
 stopped_at: Phase 20 context gathered
-last_updated: "2026-06-11T13:27:40.172Z"
-last_activity: 2026-06-11 -- Phase 20 planning complete
+last_updated: "2026-06-11T17:12:59.734Z"
+last_activity: 2026-06-11 -- Phase 20 execution started
 progress:
   total_phases: 10
   completed_phases: 1
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-10)
 
 **Core value:** The wiki is a persistent, compounding artifact -- cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested.
-**Current focus:** Phase 20 — PDF Ingestion
+**Current focus:** Phase 20 — pdf-ingestion
 
 ## Current Position
 
-Phase: 20
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-06-11 -- Phase 20 planning complete
+Phase: 20 (pdf-ingestion) — EXECUTING
+Plan: 1 of 4
+Status: Executing Phase 20
+Last activity: 2026-06-11 -- Phase 20 execution started
 
 ### v1.3 Phase Summary
 
