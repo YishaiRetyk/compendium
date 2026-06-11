@@ -694,3 +694,9 @@ reason: code review found the DR overstated settled verdicts and described a D-0
 source: src-2026-04-16-claude-code-frameworks-report
 result: corrected 5 unresolvable #sec: locators (3 on the entity page, 2 self-citations on the source summary) to match the raw heading slug
 reason: audit derived-report tier could not resolve the authored slug against the raw source heading (dot-collapsing in slugify); locator now token-matches
+
+## [2026-06-11] lint | wiki-cloud health check
+
+findings: 0 total (0 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki-cloud/maintenance/lint-report.md
