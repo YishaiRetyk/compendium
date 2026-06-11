@@ -165,7 +165,7 @@ if not (fm.get('type') == 'source' and fm.get('id') == source_id):
 
 All 14 findings fixed inline and verified:
 
-- **WR-01** — `_resolve_sec` in `bin/audit-claims.sh` relaxed: exact slug match preferred, contiguous hyphen-token subsequence match as fallback. The 3 residual locators that token-matching cannot reach (dot-collapsed heading slug) were corrected on the citing pages. Empirical re-run: 0 of 158 tier-5 claims unresolvable (was 78 of 110).
+- **WR-01** — `_resolve_sec` in `bin/audit-claims.sh` relaxed: exact slug match preferred, contiguous hyphen-token subsequence match as fallback. The 3 residual locators that token-matching cannot reach (dot-collapsed heading slug) were corrected on the citing pages. Empirical re-run: 0 of 158 tier-5 claims unresolvable (was 78 of 110). The suggested resolvable-ratio floor was also added as a warning-only tripwire (stderr banner + warning finding when <50% of resolution attempts succeed, min 5 attempts; exit code unchanged — review-only contract preserved), documented in `schema/workflows/audit.md`.
 - **WR-02** — locator (group 2) and support_type (group 3) now normalized at extraction in `claim_tuples_for_page` (single site fixes findings, worklist, and the `--apply-verdicts` join key); `resolve_locator` also strips defensively. Verified: 0 trailing-backslash locators in a full tier run.
 - **WR-03** — D-08 exemption restricted to genuine self-citation (`type: source` AND `id == source_id`). Verified by injection: a source page citing a different report with `|direct|` now errors.
 - **WR-04** — D-08 now flags ANY non-`derived` support type (direct, inferred, tentative, omitted) on report citations. Verified by injection of a bare marker.

@@ -809,10 +809,17 @@ findings.append({
     'rationale': f'selected={len(capped)} skipped={skipped_count} (total pre-cap={total_selected}, sample={SAMPLE})',
 })
 
+# Locator-resolution health counters (hollow-audit tripwire). Deliberate skips
+# (non-text, privacy) are excluded from the base: only claims that ATTEMPTED
+# passage resolution count, so the ratio measures locator health, not policy.
+locator_resolved_count = 0
+locator_failed_count = 0
+
 for rank, (rel, line, sid, loc, stype, line_text, fm), hits in capped:
     raw_text, reason = read_raw_source(sid)
     if raw_text is None:
         # missing raw / path-escape / no registry entry -> insufficient-locator
+        locator_failed_count += 1
         add_finding('insufficient-locator', rel, line, sid, loc,
                     f'could not read raw source ({reason}) for {sid}{loc}')
         continue
@@ -822,9 +829,11 @@ for rank, (rel, line, sid, loc, stype, line_text, fm), hits in capped:
                     f'non-text locator {loc} ({sid}) -- skipped')
         continue
     if passage is None:
+        locator_failed_count += 1
         add_finding('insufficient-locator', rel, line, sid, loc,
                     f'no passage extractable for {sid}{loc}')
         continue
+    locator_resolved_count += 1
 
     # --- THE single privacy chokepoint (FAITH-04 / Phase 15 structural predicate):
     #     A claim is effective-local_only iff its page OR any contributing source-summary
@@ -874,6 +883,45 @@ for rank, (rel, line, sid, loc, stype, line_text, fm), hits in capped:
         # output. The deterministic core emits no real verdict; carry the
         # declared-enum `insufficient` placeholder so the finding stays in-enum.
         add_finding('insufficient', rel, line, sid, loc, 'verifier not run')
+
+
+# ----------------------------------------------------------------------------
+# Hollow-audit tripwire. If most sampled claims could not have their cited
+# passage located, the audit is silently checking almost nothing — the exact
+# failure mode that once let a majority-unresolvable tier ship undetected.
+# Review-only contract preserved: a prominent stderr WARNING plus a
+# warning-severity finding; never an error, never a changed exit code.
+# Floor: warn when under half of resolution ATTEMPTS succeed, with a minimum
+# attempt count so tiny samples do not produce noise.
+# ----------------------------------------------------------------------------
+LOCATOR_RATIO_FLOOR = 0.5
+LOCATOR_RATIO_MIN_ATTEMPTS = 5
+locator_attempts = locator_resolved_count + locator_failed_count
+if locator_attempts >= LOCATOR_RATIO_MIN_ATTEMPTS:
+    locator_ratio = locator_resolved_count / locator_attempts
+    if locator_ratio < LOCATOR_RATIO_FLOOR:
+        tripwire_msg = (
+            f'locator-resolution ratio {locator_resolved_count}/{locator_attempts} '
+            f'({locator_ratio:.0%}) is below the {LOCATOR_RATIO_FLOOR:.0%} floor — '
+            f'most sampled claims could not be matched to a source passage, so this '
+            f'audit run is largely hollow. Likely causes: locator/heading drift, '
+            f'renamed sections, or a resolver regression. Inspect the '
+            f'insufficient-locator findings before trusting this run.'
+        )
+        print('!' * 72, file=sys.stderr)
+        print(f'WARNING: {tripwire_msg}', file=sys.stderr)
+        print('!' * 72, file=sys.stderr)
+        findings.append({
+            'severity': 'warning',
+            'category': 'faithfulness',
+            'path': 'wiki-local/maintenance/audit-report.md',
+            'line': 0,
+            'source_id': '',
+            'locator': '',
+            'verdict': 'insufficient-locator',
+            'message': tripwire_msg,
+            'rationale': tripwire_msg,
+        })
 
 
 # ----------------------------------------------------------------------------
