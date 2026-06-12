@@ -19,7 +19,18 @@ findings:
   warning: 5
   info: 4
   total: 10
-status: issues_found
+status: partially_resolved
+resolved:
+  fixed_in: c363426
+  fixed: [CR-01, WR-01, WR-02, WR-04, WR-05]
+  deferred: [WR-03, IN-01, IN-02, IN-03, IN-04]
+  note: >-
+    CR-01 (data loss) + the two real-bug warnings (WR-02 readability-after-write,
+    WR-04 marker false-abort) fixed per human direction, plus WR-01/WR-05 which
+    fell out of the same --asset restructure. CR-01 regression test added; phase-20
+    suite 5/5. WR-03 (dpi numeric validation) and the four INFO items (jq re-parse,
+    echo→printf, ls/SC2012, unused lib helper) deferred — low severity, no data/
+    correctness risk. Run /gsd-code-review-fix 20 to address the remainder.
 ---
 
 # Phase 20: Code Review Report
