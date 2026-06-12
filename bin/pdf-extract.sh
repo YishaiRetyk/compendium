@@ -173,6 +173,12 @@ trap 'rm -rf "$TMP"' EXIT
 OUT_TMP="$TMP/out.md"
 : > "$OUT_TMP"
 
+# Count markers the script itself emits, rather than re-grepping the finished
+# file (WR-04): OCR text is untrusted and a page whose content legitimately
+# contains a `<!-- page:` line would inflate a grep-based count and abort a
+# successful run after all inference is done.
+EMITTED=0
+
 for N in $(seq 1 "$PAGES"); do
     # PER-PAGE output prefix so a stale PNG from a prior iteration can never be
     # picked up if cleanup ever fails or pdftoppm leaves residue.
@@ -220,16 +226,16 @@ for N in $(seq 1 "$PAGES"); do
     # ALWAYS emit the marker even if TEXT is an empty string (a genuinely blank
     # page is legitimate; keeps #p slices aligned). Only null/error responses abort.
     printf '<!-- page: %d -->\n%s\n\n' "$N" "$TEXT" >> "$OUT_TMP"
+    EMITTED=$((EMITTED + 1))
 
     rm -f "$PNG" "$TMP/page.b64" "$TMP/req.json"
 done
 
-# Sanity-check: count emitted markers. `grep -c` exits 1 on zero matches, which
-# would abort under set -e BEFORE the custom error fires -- the `|| true` keeps
-# the count-mismatch diagnostic reachable.
-MARKERS=$(grep -c '^<!-- page:' "$OUT_TMP" || true)
-if [ "$MARKERS" != "$PAGES" ]; then
-    echo "ERROR: marker count ($MARKERS) != page count ($PAGES)" >&2
+# Sanity-check the count of markers the script emitted against the page count.
+# This counts our own loop output (EMITTED), never the OCR text, so document
+# content cannot trip a false mismatch (WR-04).
+if [ "$EMITTED" -ne "$PAGES" ]; then
+    echo "ERROR: emitted marker count ($EMITTED) != page count ($PAGES)" >&2
     exit 1
 fi
 

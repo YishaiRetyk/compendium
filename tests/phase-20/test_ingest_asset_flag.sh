@@ -42,4 +42,37 @@ if [ ! -f "$BUNDLE/original.pdf" ]; then
     exit 1
 fi
 
+# CR-01 regression: a non-Markdown source lands at source.<ext>, so an --asset
+# whose basename collides with that resolved destination (here source.pdf vs a
+# .pdf source) MUST be rejected before any copy -- otherwise the asset silently
+# overwrites the just-copied source (data loss). Assert a non-zero exit AND that
+# the source content survives.
+TMP2=$(mktemp -d); trap 'rm -rf "$TMP" "$TMP2"' EXIT
+printf '%%PDF-1.4 SOURCE-CONTENT\n' > "$TMP2/mydoc.pdf"
+printf '%%PDF-1.4 ASSET-CONTENT\n'  > "$TMP2/source.pdf"
+
+set +e
+COLLIDE_OUT=$( cd "$TMP2" && bash "$REPO_ROOT/bin/ingest.sh" \
+    --slug collide-test \
+    --contributor @phase20-test \
+    --asset "$TMP2/source.pdf" \
+    "$TMP2/mydoc.pdf" 2>&1 )
+COLLIDE_RC=$?
+set -e
+
+if [ "$COLLIDE_RC" -eq 0 ]; then
+    echo "FAIL: --asset basename colliding with source destination should error, but exit was 0" >&2
+    echo "  output: $COLLIDE_OUT" >&2
+    exit 1
+fi
+
+# The source destination must NOT have been written with the asset's bytes.
+# Guard the find against set -e/pipefail: the collision should abort before
+# sources/ is created, so find on a missing tree returns non-zero -- expected.
+COLLIDE_BUNDLE=$( { find "$TMP2/sources" -type d -name '*-collide-test' 2>/dev/null || true; } | head -1)
+if [ -n "$COLLIDE_BUNDLE" ] && grep -q 'ASSET-CONTENT' "$COLLIDE_BUNDLE/source.pdf" 2>/dev/null; then
+    echo "FAIL: collision corrupted the source -- source.pdf holds ASSET-CONTENT (data loss)" >&2
+    exit 1
+fi
+
 echo "PASS: test_ingest_asset_flag.sh"

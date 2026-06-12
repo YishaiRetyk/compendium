@@ -290,35 +290,10 @@ if [ -e "${DEST_DIR}" ]; then
     echo "WARNING: --force specified; overwriting files in ${DEST_DIR}" >&2
 fi
 
-# Validate ALL --asset preconditions BEFORE creating the bundle dir or copying
-# the source (review round 2): an asset-specific failure detected after source.md
-# is written would leave a partial bundle behind. Every check that can fail must
-# run while the tree is still untouched.
-if [ -n "${ASSET_FILE}" ]; then
-    if [ ! -f "${ASSET_FILE}" ]; then
-        echo "ERROR: --asset file not found: ${ASSET_FILE}" >&2
-        exit 1
-    fi
-    ASSET_BASE="$(basename "${ASSET_FILE}")"
-    if [ "${ASSET_BASE}" = "source.md" ]; then
-        echo "ERROR: --asset basename 'source.md' would clobber the ingested source" >&2
-        exit 1
-    fi
-    ASSET_DEST="${DEST_DIR}/${ASSET_BASE}"
-    if [ -e "${ASSET_DEST}" ] && [ "${FORCE:-0}" != "1" ]; then
-        echo "ERROR: asset destination exists: ${ASSET_DEST} (use --force to overwrite)" >&2
-        exit 1
-    fi
-fi
-
-mkdir -p "${DEST_DIR}"
-
-# ---------------------------------------------------------------------------
-# File placement
-# ---------------------------------------------------------------------------
-
-# Derive the original extension. For basenames with a dot, take the last
-# segment; otherwise, no extension. Markdown files always land as source.md.
+# Derive the source destination filename BEFORE asset pre-validation so the
+# collision guard below can compare against the *resolved* destination (CR-01),
+# not a hardcoded basename. Depends only on BASENAME and DEST_DIR (both set).
+# For basenames with a dot, take the last segment; otherwise, no extension.
 case "${BASENAME}" in
     *.*)
         EXT=".${BASENAME##*.}"
@@ -339,6 +314,48 @@ esac
 
 DEST_FILE="${DEST_DIR}/source${EXT}"
 
+# Validate ALL --asset preconditions BEFORE creating the bundle dir or copying
+# the source (review round 2): an asset-specific failure detected after source.md
+# is written would leave a partial bundle behind. Every check that can fail must
+# run while the tree is still untouched.
+if [ -n "${ASSET_FILE}" ]; then
+    if [ ! -f "${ASSET_FILE}" ]; then
+        echo "ERROR: --asset file not found: ${ASSET_FILE}" >&2
+        exit 1
+    fi
+    # Readability is checked here, symmetric with the source-file -r check, so an
+    # unreadable asset fails BEFORE source.md is written rather than leaving a
+    # partial bundle behind (WR-02).
+    if [ ! -r "${ASSET_FILE}" ]; then
+        echo "ERROR: --asset file is not readable: ${ASSET_FILE}" >&2
+        exit 1
+    fi
+    ASSET_BASE="$(basename "${ASSET_FILE}")"
+    ASSET_DEST="${DEST_DIR}/${ASSET_BASE}"
+    # Guard against the *resolved* destination collision, not a hardcoded basename
+    # (CR-01/WR-05): a non-Markdown source lands at source.<ext>, so an asset named
+    # source.<same-ext> would overwrite the just-copied source. One check keyed on
+    # DEST_FILE covers source.md AND every source.<ext> case, and cannot drift from
+    # the naming convention the way the old literal `source.md` check did.
+    if [ "${ASSET_DEST}" = "${DEST_FILE}" ]; then
+        echo "ERROR: --asset basename '${ASSET_BASE}' collides with the ingested source destination (${DEST_FILE})" >&2
+        exit 1
+    fi
+    if [ -e "${ASSET_DEST}" ] && [ "${FORCE:-0}" != "1" ]; then
+        echo "ERROR: asset destination exists: ${ASSET_DEST} (use --force to overwrite)" >&2
+        exit 1
+    fi
+fi
+
+mkdir -p "${DEST_DIR}"
+
+# ---------------------------------------------------------------------------
+# File placement
+# ---------------------------------------------------------------------------
+
+# EXT and DEST_FILE were derived above (before --asset pre-validation) so the
+# collision guard could use the resolved destination.
+
 if [ "${FORCE:-0}" = "1" ]; then
     cp -f "${SOURCE_FILE}" "${DEST_FILE}"
 else
@@ -346,12 +363,18 @@ else
 fi
 
 # D-11: co-locate the original asset (e.g. the source PDF) alongside source.md
-# in the same dated bundle dir. Pre-validated above (existence, source.md-basename
-# guard, no-overwrite-without-force) — pure file I/O here, nothing can fail on a
-# precondition. The convention records `original_asset` as a bare co-located
-# filename (${ASSET_BASE}), never an absolute path.
+# in the same dated bundle dir. Pre-validated above (existence, readability,
+# destination-collision guard, no-overwrite-without-force) — pure file I/O here,
+# nothing can fail on a precondition. The asset copy mirrors the source-copy
+# --force branch (WR-01) so --force applies symmetrically to a read-only
+# existing destination. The convention records `original_asset` as a bare
+# co-located filename (${ASSET_BASE}), never an absolute path.
 if [ -n "${ASSET_FILE}" ]; then
-    cp "${ASSET_FILE}" "${ASSET_DEST}"
+    if [ "${FORCE:-0}" = "1" ]; then
+        cp -f "${ASSET_FILE}" "${ASSET_DEST}"
+    else
+        cp "${ASSET_FILE}" "${ASSET_DEST}"
+    fi
     echo "Co-located asset: ${ASSET_DEST}" >&2
 fi
 
