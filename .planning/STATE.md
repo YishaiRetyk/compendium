@@ -4,14 +4,14 @@ milestone: v1.3
 milestone_name: Source Ingestion
 status: executing
 stopped_at: Phase 20 context gathered
-last_updated: "2026-06-11T17:12:59.734Z"
-last_activity: 2026-06-11 -- Phase 20 execution started
+last_updated: "2026-06-12T14:57:55.298Z"
+last_activity: 2026-06-12
 progress:
   total_phases: 10
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 9
-  completed_plans: 5
-  percent: 10
+  completed_plans: 9
+  percent: 20
 ---
 
 # Project State
@@ -25,17 +25,18 @@ See: .planning/PROJECT.md (updated 2026-06-10)
 
 ## Current Position
 
-Phase: 20 (pdf-ingestion) — EXECUTING
-Plan: 1 of 4
-Status: Executing Phase 20
-Last activity: 2026-06-11 -- Phase 20 execution started
+Phase: 20 (pdf-ingestion) — COMPLETE (4/4 plans)
+Next: Phase 21 (video/YouTube ingestion) — Not started
+Plan: 4 of 4 (complete)
+Status: Phase 20 complete — PDF-04 validated end-to-end and human-verified
+Last activity: 2026-06-12 — Phase 20 finished (real PDF ingested + epistemic refinement pass)
 
 ### v1.3 Phase Summary
 
 | Phase | Name | Requirements | Status |
 |-------|------|--------------|--------|
 | 19 | Extension Contract + Research-Report Type | EXT-01..03, RPT-01..06 (9 reqs) | Complete (2026-06-10) |
-| 20 | PDF Ingestion | PDF-01..04 (4 reqs) | Not started |
+| 20 | PDF Ingestion | PDF-01..04 (4 reqs) | Complete (2026-06-12) |
 | 21 | Video/YouTube Ingestion | VID-01..04 (4 reqs) | Not started |
 
 **Total:** 17 requirements across 3 phases. 100% mapped.
@@ -43,7 +44,7 @@ Last activity: 2026-06-11 -- Phase 20 execution started
 ### Progress Bar
 
 ```
-v1.3 Source Ingestion: [                    ] 0% (0/3 phases complete)
+v1.3 Source Ingestion: [█████████████       ] 67% (2/3 phases complete)
 ```
 
 ## Deferred Items
@@ -180,6 +181,7 @@ Phase 12.2 closure: 5/5 plans complete; WGATE-01..04 → Complete; verifier PASS
 | Phase 12.2 P04 | 25min | 4 tasks | 6 files |
 | Phase 14 P03 | 20min | 3 tasks | 57 files |
 | Phase 15-privacy-architecture P02 | 5min | 2 tasks | 3 files |
+| Phase 20 P20-04 | 25min | 4 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -371,6 +373,8 @@ Recent decisions affecting current work:
 - [Phase ?]: Phase 12.2-04: schema/AGENTS.template.md got the FULL Phase 9 + 12.2 §11.3 CI mode block (closes pre-existing Phase 9 mirror gap)
 - [Phase ?]: Phase 12.2-04: pre-existing AGENTS↔CLAUDE drift from b1c3691 fixed first (Plan 02 deferred-items.md) before §11.3 amendment
 - [Phase ?]: D-09 cloud->local linkres check + cloud deny-profile shipped (PRIV-03/05); LINT_VERSION 1.7.0; .claude/settings.cloud.json fail-open artifact; docs complete from Plan 01
+- [Phase 20]: Phase 20 PDF ingestion validated end-to-end with a real Nature PDF (Robin paper) — olmOCR-2 served as bartowski Q4_K_M GGUF on Ollama 0.30.7 (plan-named richardyoung/olmocr2:7b-q8 broken under Ollama <=0.20 M-RoPE); convention tool-agnostic D-04 so frontmatter records the model actually used
+- [Phase 20]: Human-verify checkpoint (APPROVED-WITH-EDITS) drove an epistemic-refinement UPDATE pass across the four Robin pages — ingested claims are faithful AS reports of the Nature accelerated-article-preview but not independently/clinically validated; author-estimate efficiency numbers downgraded direct->tentative, ABCA1 mechanism marked inferred, benchmark figures scoped to their conditions, preclinical framing added; #p locators preserved
 
 ### Pending Todos
 
@@ -408,9 +412,9 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-06-11T12:40:18.192Z
+Last session: 2026-06-12T14:57:55.289Z
 Stopped at: Phase 20 context gathered
-Resume file: .planning/phases/20-pdf-ingestion/20-CONTEXT.md
+Resume file: None
 
 ## Operator Next Steps
 

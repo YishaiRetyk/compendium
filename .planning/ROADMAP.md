@@ -69,7 +69,7 @@ Full phase details: [milestones/v1.2-ROADMAP.md](milestones/v1.2-ROADMAP.md)
 **Goal:** Formalize three new source ingestion paths — AI deep-research reports, PDFs, and YouTube videos — as schema conventions plus documented acquisition pipelines, designed once via a shared source-type extension contract.
 
 - [x] **Phase 19: Extension Contract + Research-Report Type** - Define the 5-dimension source-type extension contract extracted from real cases, with `research-report` as the worked secondary instance; implement the full `source_type: research-report` convention including second-order provenance, epistemic defaults, and retro-classification of the two existing AI reports (completed 2026-06-10)
-- [ ] **Phase 20: PDF Ingestion** - Document the PDF acquisition pipeline (olmOCR 2 via Ollama), define the PDF sub-case convention with page-anchored provenance and VLM-hallucination guidance, and validate end-to-end with a real PDF artifact
+- [x] **Phase 20: PDF Ingestion** - Document the PDF acquisition pipeline (olmOCR 2 via Ollama), define the PDF sub-case convention with page-anchored provenance and VLM-hallucination guidance, and validate end-to-end with a real PDF artifact (completed 2026-06-12)
 - [ ] **Phase 21: Video/YouTube Ingestion** - Document the video acquisition pipeline (yt-dlp + timestamped STT), define the video-as-transcript sub-case convention with timestamp-anchored provenance and drift stance, and validate end-to-end with a real YouTube video
 
 ## Phase Details
@@ -132,7 +132,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 — human-supplied PDF, autonomous: false)*
 
-- [ ] 20-04-PLAN.md — end-to-end validation ingest of one real PDF (#p-anchored provenance, bundle-co-located asset, audit-verified) + schema-update decision record
+- [x] 20-04-PLAN.md — end-to-end validation ingest of one real PDF (#p-anchored provenance, bundle-co-located asset, audit-verified) + schema-update decision record
 
 **UI hint**: no
 
@@ -334,5 +334,5 @@ The following are intentionally deferred until real usage demands them, captured
 | 17. Workflow Extraction | v1.2 | 4/4 | Complete    | 2026-06-07 |
 | 18. Skills Overlay | v1.2 | 3/3 | Complete    | 2026-06-08 |
 | 19. Extension Contract + Research-Report Type | v1.3 | 5/5 | Complete    | 2026-06-10 |
-| 20. PDF Ingestion | v1.3 | 3/4 | In Progress|  |
+| 20. PDF Ingestion | v1.3 | 4/4 | Complete   | 2026-06-12 |
 | 21. Video/YouTube Ingestion | v1.3 | 0/TBD | Not started | - |
