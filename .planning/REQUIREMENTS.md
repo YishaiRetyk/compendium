@@ -26,9 +26,9 @@ Design lineage: `.planning/seeds/research-report-ingest.md` (design LOCKED — R
 
 ### PDF Ingestion (PDF)
 
-- [ ] **PDF-01**: A documented PDF acquisition pipeline exists: olmOCR 2 (local Ollama) → Markdown with `<!-- page: N -->` page markers, ready for standard ingest
-- [ ] **PDF-02**: The PDF sub-case convention records the original-PDF reference and extraction tool/model in source frontmatter; claims use the existing `#p` page locators
-- [ ] **PDF-03**: VLM-hallucination guidance is written into the convention: degraded/scanned input gets spot-verification steps and/or a lower epistemic default
+- [x] **PDF-01**: A documented PDF acquisition pipeline exists: olmOCR 2 (local Ollama) → Markdown with `<!-- page: N -->` page markers, ready for standard ingest
+- [x] **PDF-02**: The PDF sub-case convention records the original-PDF reference and extraction tool/model in source frontmatter; claims use the existing `#p` page locators
+- [x] **PDF-03**: VLM-hallucination guidance is written into the convention: degraded/scanned input gets spot-verification steps and/or a lower epistemic default
 - [x] **PDF-04**: End-to-end validation: one real PDF acquired → ingested → wiki pages with page-anchored provenance, exercising the bundle convention (original PDF co-located as asset)
 
 ### Video/YouTube Ingestion (VID)
@@ -78,9 +78,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | RPT-04 | Phase 19 | Complete |
 | RPT-05 | Phase 19 | Complete |
 | RPT-06 | Phase 19 | Complete |
-| PDF-01 | Phase 20 | Pending |
-| PDF-02 | Phase 20 | Pending |
-| PDF-03 | Phase 20 | Pending |
+| PDF-01 | Phase 20 | Complete |
+| PDF-02 | Phase 20 | Complete |
+| PDF-03 | Phase 20 | Complete |
 | PDF-04 | Phase 20 | Complete |
 | VID-01 | Phase 21 | Pending |
 | VID-02 | Phase 21 | Pending |

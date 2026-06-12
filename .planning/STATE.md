@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Source Ingestion
-status: executing
-stopped_at: Phase 20 context gathered
-last_updated: "2026-06-12T14:57:55.298Z"
+status: ready_to_plan
+stopped_at: Phase 20 complete (4/4) — ready to discuss Phase 21
+last_updated: 2026-06-12T15:25:47.568Z
 last_activity: 2026-06-12
 progress:
   total_phases: 10
   completed_phases: 2
   total_plans: 9
-  completed_plans: 9
+  completed_plans: 82
   percent: 20
 ---
 
@@ -21,15 +21,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-10)
 
 **Core value:** The wiki is a persistent, compounding artifact -- cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested.
-**Current focus:** Phase 20 — pdf-ingestion
+**Current focus:** Phase 21 — video/YouTube ingestion
 
 ## Current Position
 
-Phase: 20 (pdf-ingestion) — COMPLETE (4/4 plans)
+Phase: 21
 Next: Phase 21 (video/YouTube ingestion) — Not started
-Plan: 4 of 4 (complete)
-Status: Phase 20 complete — PDF-04 validated end-to-end and human-verified
-Last activity: 2026-06-12 — Phase 20 finished (real PDF ingested + epistemic refinement pass)
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-06-12
 
 ### v1.3 Phase Summary
 
@@ -108,7 +108,7 @@ Phase 12.2 closure: 5/5 plans complete; WGATE-01..04 → Complete; verifier PASS
 
 **Velocity:**
 
-- Total plans completed: 47
+- Total plans completed: 51
 - Average duration: -
 - Total execution time: 0 hours
 
@@ -127,6 +127,7 @@ Phase 12.2 closure: 5/5 plans complete; WGATE-01..04 → Complete; verifier PASS
 | 17 | 4 | - | - |
 | 18 | 3 | - | - |
 | 19 | 5 | - | - |
+| 20 | 4 | - | - |
 
 **Recent Trend:**
 
