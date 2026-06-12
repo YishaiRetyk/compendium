@@ -720,3 +720,13 @@ Rationale: validates the PDF format-orthogonal sub-case convention in anger — 
 findings: 0 total (0 errors, 0 warnings, 0 info)
 auto_fixes: 0 applied
 report: wiki-cloud/maintenance/lint-report.md
+
+## [2026-06-12] reflect | PDF sub-case schema decision
+
+Created decision record [[dr-2026-06-11-pdf-ingestion|PDF as Format-Orthogonal Source Sub-Case + First Local-Model Acquisition Script]] (`trigger_type: schema-update`, `affected_pages: []`) capturing the five coupled Phase 20 decisions: PDF as a format-orthogonal acquisition sub-case rather than a new source_type (D-05); lazy-loaded authoritative pdf-ingestion.md + lean registry-row pointer (D-01/D-02); four flat extraction frontmatter fields under conditional lint enforcement, with extraction_date kept distinct from ingested_at (D-06/D-07); tiered VLM-hallucination epistemic policy with support_type staying direct (D-08/D-09); and bin/pdf-extract.sh as the first repo script to invoke a local model, establishing the per-script "no LLM calls" charter (D-10/D-11). Aids Phase 21 (video), which inherits the format-orthogonal pattern. Indexed under Decisions.
+
+## [2026-06-12] lint | wiki-cloud health check
+
+findings: 0 total (0 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki-cloud/maintenance/lint-report.md
