@@ -37,8 +37,8 @@ Drug repurposing — finding new indications for existing drugs — is an attrac
 ## Key Facts
 
 - The history of drug repurposing shows a recurring pattern of long lags between when an insight is documented and when it becomes a treatment (e.g. dabrafenib's otoprotective effect found ~10 years after its molecular action was characterized; ketamine 22 years; leucovorin 5 years; KarXT 13 years). [prov:src-2026-06-12-multi-agent-scientific-discovery#p3|direct|2026-06-12]
-- The [[robin-multi-agent-discovery-system|Robin (Multi-Agent Discovery System)]] demonstration repurposed ripasudil, an approved glaucoma ROCK inhibitor never previously proposed for dry AMD, as an RPE phagocytosis enhancer. [prov:src-2026-06-12-multi-agent-scientific-discovery#p6|direct|2026-06-12]
-- An approved drug's known safety profile is itself a repurposing advantage: ripasudil's clinical approval was cited as favorable for translation over the research compound Y-27632. [prov:src-2026-06-12-multi-agent-scientific-discovery#p6|direct|2026-06-12]
+- The [[robin-multi-agent-discovery-system|Robin (Multi-Agent Discovery System)]] demonstration repurposed ripasudil, an approved glaucoma ROCK inhibitor never previously proposed for dry AMD, as an RPE phagocytosis enhancer in preclinical in-vitro assays (a reported preclinical finding, not a clinically validated dAMD treatment). [prov:src-2026-06-12-multi-agent-scientific-discovery#p6|direct|2026-06-12]
+- An approved drug's known safety profile is itself a repurposing advantage: ripasudil's clinical approval was cited as favorable for translation *relative to* the research compound Y-27632 — a comparative advantage over that research compound, not an absolute safety claim for dAMD use. [prov:src-2026-06-12-multi-agent-scientific-discovery#p6|direct|2026-06-12]
 - The paper frames repurposing as "combinatorial synthesis" — identifying non-obvious connections between disparate fields — and notes the same paradigm is applicable beyond therapeutics (e.g. materials science). [prov:src-2026-06-12-multi-agent-scientific-discovery#p8|direct|2026-06-12]
 
 ## Detail

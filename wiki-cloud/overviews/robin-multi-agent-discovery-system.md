@@ -8,7 +8,7 @@ created_at: 2026-06-12
 updated_at: 2026-06-12
 sources:
 - src-2026-06-12-multi-agent-scientific-discovery
-epistemic_status: sourced
+epistemic_status: mixed
 tags:
 - multi-agent-systems
 - llm-agents
@@ -41,8 +41,8 @@ Robin is a multi-agent LLM system from FutureHouse, presented as the first to au
 - Robin integrates novel hypothesis generation with experimental data analysis in one continuous workflow using specialized [[llm-agent-scientific-discovery|LLM Agents for Scientific Discovery]]. [prov:src-2026-06-12-multi-agent-scientific-discovery#p4|direct|2026-06-12]
 - It coordinates three agents: Crow and Falcon (literature search, built on PaperQA2) and Finch (experimental data analysis of RNA-seq and flow cytometry). [prov:src-2026-06-12-multi-agent-scientific-discovery#p4|direct|2026-06-12]
 - Finch runs 8 independent analysis trajectories per task and synthesizes them into a consensus conclusion via meta-analysis, trading the stochasticity of a single language-agent run for ensemble consistency. [prov:src-2026-06-12-multi-agent-scientific-discovery#p5|direct|2026-06-12]
-- Applied to [[ai-for-drug-repurposing|AI for Drug Repurposing]], Robin identified ripasudil and KL001 as RPE phagocytosis enhancers for dAMD and surfaced ABCA1 upregulation as a candidate mechanism. [prov:src-2026-06-12-multi-agent-scientific-discovery#p3|direct|2026-06-12]
-- The authors report a full run costs about $10.76 (45 Crow + 30 Falcon calls) and claim a ~200-fold reduction in workflow time versus manual research. [prov:src-2026-06-12-multi-agent-scientific-discovery#p5|direct|2026-06-12] [epistemic:: tentative]
+- Applied to [[ai-for-drug-repurposing|AI for Drug Repurposing]], Robin identified ripasudil and KL001 as RPE phagocytosis enhancers for dAMD in preclinical in-vitro assays and surfaced ABCA1 upregulation as a candidate mechanism (these are preclinical findings reported by the paper, not clinically validated treatments). [prov:src-2026-06-12-multi-agent-scientific-discovery#p3|direct|2026-06-12]
+- The authors *estimate* (not from a controlled time-motion study) a ~200-fold reduction in workflow time versus manual research, and report a full run costs about $10.76 for 45 Crow + 30 Falcon calls under the stated configuration (Finch excluded as negligible). [prov:src-2026-06-12-multi-agent-scientific-discovery#p5|tentative|2026-06-12] [epistemic:: tentative]
 
 ## Detail
 
@@ -54,11 +54,11 @@ The orchestration is a **lab-in-the-loop** cycle: Robin proposes disease mechani
 
 ### The dAMD proof of concept
 
-Tasked with dry age-related macular degeneration — the leading cause of irreversible sight loss in developed countries, affecting 1.5 million people with vision-threatening dAMD in the U.S. — Robin reviewed ~151 papers to rank ten candidate disease mechanisms, selected enhancing RPE phagocytosis, then proposed 30 existing drugs for assay testing [prov:src-2026-06-12-multi-agent-scientific-discovery#p4|direct|2026-06-12] [prov:src-2026-06-12-multi-agent-scientific-discovery#p5|direct|2026-06-12]. Experimental rounds confirmed ripasudil (1.89-fold phagocytosis increase, outperforming the research compound Y-27632) and KL001 as hits, and a Robin-proposed follow-up RNA-seq surfaced a 3-fold upregulation of ABCA1 (adjusted p = 2.13×10⁻⁸³) as a candidate mechanism [prov:src-2026-06-12-multi-agent-scientific-discovery#p6|direct|2026-06-12].
+Tasked with dry age-related macular degeneration — the leading cause of irreversible sight loss in developed countries, affecting 1.5 million people with vision-threatening dAMD in the U.S. — Robin reviewed 151 papers to rank ten candidate disease mechanisms and selected enhancing RPE phagocytosis; it then ran a further ~400-paper literature review on RPE phagocytosis and the dry-AMD therapeutic landscape *before* proposing 30 existing drugs for assay testing [prov:src-2026-06-12-multi-agent-scientific-discovery#p4|direct|2026-06-12] [prov:src-2026-06-12-multi-agent-scientific-discovery#p5|direct|2026-06-12]. Experimental rounds confirmed ripasudil (1.89-fold phagocytosis increase, outperforming the research compound Y-27632) and KL001 as hits in these preclinical in-vitro assays, and a Robin-proposed follow-up RNA-seq surfaced a 3-fold upregulation of ABCA1 (adjusted p = 2.13×10⁻⁸³); the magnitude is measured, while the link to dAMD pathology is the paper's mechanistic interpretation rather than proven causality [prov:src-2026-06-12-multi-agent-scientific-discovery#p6|direct|2026-06-12] [epistemic:: inferred].
 
 ### Why the specialized harness matters
 
-Ablation experiments support the architecture rather than a bare frontier model. Replacing the literature agents with OpenAI's o4-mini drove hallucinated references from 0% (Crow) to 44.5 ± 6.37% [prov:src-2026-06-12-multi-agent-scientific-discovery#p7|direct|2026-06-12]. On the BixBench data-analysis panel Finch scored 22.8 ± 1.7% versus 1.6 ± 1.2% for Claude Sonnet 3.7 alone, and a general-purpose baseline (OpenAI Deep Research) produced no assay hits and never suggested ROCK inhibition [prov:src-2026-06-12-multi-agent-scientific-discovery#p7|direct|2026-06-12].
+Ablation experiments support the architecture rather than a bare frontier model. In a Crow-ablation comparison over 15 assay proposals (where Crow produces the final assay reports), the o4-mini substitute hallucinated 44.5 ± 6.37% of its references versus 0% for Crow — a figure scoped to those 15 proposals, not a blanket hallucination rate for all Robin outputs [prov:src-2026-06-12-multi-agent-scientific-discovery#p7|direct|2026-06-12]. On the BixBench data-analysis panel Finch scored 22.8 ± 1.7% versus 1.6 ± 1.2% for Claude Sonnet 3.7 run with no agent harness, no data access, and no code execution (so it is not a clean "same model minus tools" comparison). A June 2025 ChatGPT Deep Research baseline given the same candidate-generation prompt generated 17 unique candidates after de-duplication, none of which were hits in the RPE-SC assay, and never suggested ROCK inhibition [prov:src-2026-06-12-multi-agent-scientific-discovery#p7|direct|2026-06-12].
 
 ## Related Pages
 

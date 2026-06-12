@@ -79,7 +79,7 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[src-2026-05-06-anthropic-claude-cookbook-skills-custom-development|Building Custom Skills for Claude (claude-cookbooks notebook 03)]] — Anthropic claude-cookbooks notebook on custom-Skill upload (skills.create + files_from_dir), display_title workspace-uniqueness, type:'custom' container discriminator, versioning lifecycle, and skill composition (sourced, 2026-05-06)
 - [[src-2026-05-06-ralph-playbook|The Ralph Playbook (Clayton Farr's how-to-ralph-wiggum)]] — Clayton Farr, 2026-05-06 — Long-form synthesis of Geoffrey Huntley's Ralph autonomous-coding-loop technique: 3 phases / 2 prompts / 1 loop, with five proposed enhancements (sourced, 2026-05-06)
 - [[src-2026-06-09-pdf-to-text-llm-ingestion-sota|PDF-to-Text Extraction and LLM PDF Ingestion: State of the Art (2025–2026)]] — Synthesized deep-research report: three-camp taxonomy, extraction-vs-native-vision paradigms, OmniDocBench/olmOCR-Bench, per-page cost, VLM hallucination, pipeline recommendation (mixed, 2026-06-09)
-- [[src-2026-06-12-multi-agent-scientific-discovery|A Multi-Agent System for Automating Scientific Discovery (Robin)]] — Ghareeb et al., Nature (2026) — first end-to-end multi-agent system automating hypothesis generation + data analysis; identified ripasudil/KL001 for dAMD (first PDF-acquired source, born-digital) (sourced, 2026-06-12)
+- [[src-2026-06-12-multi-agent-scientific-discovery|A Multi-Agent System for Automating Scientific Discovery (Robin)]] — Ghareeb et al., Nature (2026) — first end-to-end multi-agent system automating hypothesis generation + data analysis; identified ripasudil/KL001 for dAMD (first PDF-acquired source, born-digital) (mixed, 2026-06-12)
 
 ## Comparisons
 
@@ -94,7 +94,7 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[agent-skills|Agent Skills]] — Filesystem-based capability packages (SKILL.md + bundled code/refs) loaded via three-level progressive disclosure across Claude API, Claude Code, and Claude.ai (sourced, 2026-05-06)
 - [[ralph-loop-creator-skill|Ralph Loop Creator Skill]] — Specification for a custom Agent Skill that scaffolds Ralph prompts, loop scripts, specs, implementation-plan state, AGENTS.md operational guidance, and backpressure checks without running the autonomous loop (mixed, 2026-05-06)
 - [[pdf-text-extraction-for-llm-ingestion|PDF-to-Text Extraction for LLM Ingestion]] — 2025–2026 landscape for PDF-to-Markdown: three-camp taxonomy, paradigm debate, self-hosted vs commercial tiers, and a concrete ingestion-pipeline recommendation (mixed, 2026-06-09)
-- [[robin-multi-agent-discovery-system|Robin (Multi-Agent Discovery System)]] — FutureHouse's multi-agent LLM system automating hypothesis generation + experimental data analysis; demonstrated by discovering ROCK-inhibitor phagocytosis enhancers for dry AMD (sourced, 2026-06-12)
+- [[robin-multi-agent-discovery-system|Robin (Multi-Agent Discovery System)]] — FutureHouse's multi-agent LLM system automating hypothesis generation + experimental data analysis; demonstrated by discovering ROCK-inhibitor phagocytosis enhancers for dry AMD (mixed, 2026-06-12)
 
 ## Decisions
 

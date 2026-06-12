@@ -730,3 +730,9 @@ Created decision record [[dr-2026-06-11-pdf-ingestion|PDF as Format-Orthogonal S
 findings: 0 total (0 errors, 0 warnings, 0 info)
 auto_fixes: 0 applied
 report: wiki-cloud/maintenance/lint-report.md
+
+## [2026-06-12] UPDATE | src-2026-06-12-multi-agent-scientific-discovery (+ robin-multi-agent-discovery-system, llm-agent-scientific-discovery, ai-for-drug-repurposing)
+
+source: src-2026-06-12-multi-agent-scientific-discovery
+result: refined claim epistemics across all four Robin pages per human verification — reframed efficiency/time-on-task numbers as author estimates (support_type direct→tentative on the ~200-fold and 872–937h claims), scoped the $10.76 cost (Finch excluded as negligible), added the 151→~400-paper two-stage nuance, reframed the ABCA1 dAMD link as the paper's mechanistic interpretation (epistemic inferred), softened ripasudil's "favorable" safety to relative-to-Y-27632, qualified KL001 novelty as "to the authors' knowledge", scoped the 44.5% hallucination figure to 15 Crow-ablated assay proposals, added the no-harness/no-data/no-code caveat to the BixBench Sonnet 3.7 baseline, scoped the Deep Research baseline (June 2025 ChatGPT, 17 unique candidates), and added preclinical/in-vitro framing throughout; bumped source + overview epistemic_status sourced→mixed. All #p locators preserved.
+reason: human verification confirmed the claims are faithful AS reports of what the Nature accelerated-article-preview states, but not independently-validated or clinically-validated facts; epistemic framing tightened accordingly.
