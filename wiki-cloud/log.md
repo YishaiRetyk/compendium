@@ -700,3 +700,23 @@ reason: audit derived-report tier could not resolve the authored slug against th
 findings: 0 total (0 errors, 0 warnings, 0 info)
 auto_fixes: 0 applied
 report: wiki-cloud/maintenance/lint-report.md
+
+## [2026-06-12] ingest | A Multi-Agent System for Automating Scientific Discovery (Robin)
+
+First real PDF acquired end-to-end via the Phase 20 pipeline (PDF-04). Acquired with bin/pdf-extract.sh (olmOCR-2 weights over Ollama, 36 pages → <!-- page: N --> markers), ingested with bin/ingest.sh --asset to co-locate the original PDF in the dated bundle dir.
+
+CREATED:
+- src-2026-06-12-multi-agent-scientific-discovery (source summary; source_type: paper; four extraction fields; #p|direct claims; born-digital sourced tier)
+- robin-multi-agent-discovery-system (overview; Robin's three-agent lab-in-the-loop architecture + dAMD proof of concept)
+- llm-agent-scientific-discovery (concept; the paradigm Robin instantiates)
+- ai-for-drug-repurposing (concept; the application area Robin demonstrated)
+UPDATED:
+- index.md (catalog entries for the source + 2 concepts + overview)
+
+Rationale: validates the PDF format-orthogonal sub-case convention in anger — the conditional lint extraction-field check now fires non-vacuously on a real original_asset=*.pdf source; #p page locators resolve against the acquisition's page markers. The Nature paper (Ghareeb et al., doi:10.1038/s41586-026-10652-y) classifies to its parent type `paper`, not a `pdf` source_type.
+
+## [2026-06-12] lint | wiki-cloud health check
+
+findings: 0 total (0 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki-cloud/maintenance/lint-report.md
