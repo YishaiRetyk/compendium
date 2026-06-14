@@ -73,6 +73,15 @@ extraction_model: "richardyoung/olmocr2:7b-q8"
 extraction_date: YYYY-MM-DD
 original_asset: original.pdf
 
+# Video sub-case fields (transcript parent) — present on video-acquired transcript sources.
+# extraction_* are convention-only (NOT lint-enforced — see schema/reference/video-ingestion.md).
+channel: "<channel-name>"
+publish_date: YYYY-MM-DD
+duration: "~12 min"
+extraction_tool: "<stt-tool>"
+extraction_model: "<asr-model>"
+extraction_date: YYYY-MM-DD
+
 # Compilation tracking
 compilation_status: pending         # pending | partial | compiled | stale
 compiled_against_hash: ""           # SHA-256 of source content at last compilation

@@ -47,7 +47,7 @@ When a new source-type candidate is evaluated, a row is appended here with the v
 | Candidate | Verdict | Dimensions That Change | Convention Doc | Notes |
 |-----------|---------|----------------------|----------------|-------|
 | `pdf` | sub-case (format-orthogonal; any parent type) | Acquisition (always); Epistemic Default (degraded input only) | `schema/reference/pdf-ingestion.md` | Acquisition-path sub-case applicable to any document type; content classifies normally at Pass 0 (article/paper/data/...) and the PDF convention layers on. `#p` page locators + page markers already exist; claims stay `support_type: direct`; degraded scans get `tentative` + spot-verification (D-08). |
-| `video` | sub-case of `transcript` (provisional) | Acquisition (provisional) | (Phase 21) | Timestamp locators (`#t`) already exist; Phase 21 walk-through finalizes verdict and dimension assessment |
+| `video` | sub-case of `transcript` | Acquisition (always); Epistemic Default (degraded audio only) | `schema/reference/video-ingestion.md` | Timestamp locators (`#t`) + the `[H:MM:SS]` line grammar already exist; download + STT replaces recorded acquisition. Claims stay `support_type: direct`; degraded audio gets `tentative` + N=3 spot-verification (D-09). |
 | `repository` | pending | — | — | Pairs with 999.5 drift machinery (commit-SHA staleness); deferred |
 
 Rows marked *provisional* are seeded pre-evaluations; the owning phase finalizes verdict and dimension assessment by walking the candidate through the contract.
