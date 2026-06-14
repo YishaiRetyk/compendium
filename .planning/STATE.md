@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Source Ingestion
-status: executing
+status: verifying
 stopped_at: Phase 21 context gathered
-last_updated: "2026-06-14T12:21:49.334Z"
+last_updated: "2026-06-14T14:02:38.969Z"
 last_activity: 2026-06-14
 progress:
   total_phases: 10
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 11
-  completed_plans: 10
-  percent: 20
+  completed_plans: 11
+  percent: 30
 ---
 
 # Project State
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-06-10)
 
 ## Current Position
 
-Phase: 21 (video-youtube-ingestion) — EXECUTING
-Next: Phase 21 (video/YouTube ingestion) — Not started
-Plan: 2 of 2
-Status: Ready to execute
+Phase: 21 (video-youtube-ingestion) — READY FOR VERIFICATION (both plans complete)
+Next: Phase 21 verification / v1.3 milestone close
+Plan: 2 of 2 (both complete)
+Status: Phase complete — ready for verification
 Last activity: 2026-06-14
 
 ### v1.3 Phase Summary
@@ -37,14 +37,14 @@ Last activity: 2026-06-14
 |-------|------|--------------|--------|
 | 19 | Extension Contract + Research-Report Type | EXT-01..03, RPT-01..06 (9 reqs) | Complete (2026-06-10) |
 | 20 | PDF Ingestion | PDF-01..04 (4 reqs) | Complete (2026-06-12) |
-| 21 | Video/YouTube Ingestion | VID-01..04 (4 reqs) | Not started |
+| 21 | Video/YouTube Ingestion | VID-01..04 (4 reqs) | Plans complete (2026-06-14) — ready for verification |
 
 **Total:** 17 requirements across 3 phases. 100% mapped.
 
 ### Progress Bar
 
 ```
-v1.3 Source Ingestion: [█████████████       ] 67% (2/3 phases complete)
+v1.3 Source Ingestion: [███████████████████ ] 97% (3/3 phases authored; phase 21 ready for verification)
 ```
 
 ## Deferred Items
@@ -184,6 +184,7 @@ Phase 12.2 closure: 5/5 plans complete; WGATE-01..04 → Complete; verifier PASS
 | Phase 15-privacy-architecture P02 | 5min | 2 tasks | 3 files |
 | Phase 20 P20-04 | 25min | 4 tasks | 9 files |
 | Phase 21 P01 | 3min | 3 tasks | 8 files |
+| Phase 21 P02 | 85min | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -378,6 +379,10 @@ Recent decisions affecting current work:
 - [Phase 20]: Phase 20 PDF ingestion validated end-to-end with a real Nature PDF (Robin paper) — olmOCR-2 served as bartowski Q4_K_M GGUF on Ollama 0.30.7 (plan-named richardyoung/olmocr2:7b-q8 broken under Ollama <=0.20 M-RoPE); convention tool-agnostic D-04 so frontmatter records the model actually used
 - [Phase 20]: Human-verify checkpoint (APPROVED-WITH-EDITS) drove an epistemic-refinement UPDATE pass across the four Robin pages — ingested claims are faithful AS reports of the Nature accelerated-article-preview but not independently/clinically validated; author-estimate efficiency numbers downgraded direct->tentative, ABCA1 mechanism marked inferred, benchmark figures scoped to their conditions, preclinical framing added; #p locators preserved
 - [Phase ?]: [Phase 21-01] Video ships as new schema/reference/video-ingestion.md (Phase 20 PDF pattern): sub-case of transcript, tool-generic yt-dlp+STT runbook with no bin/ script and no worked-instance name (D-04); single [H:MM:SS] form; N=3 first/middle/last spot-verify; convention-only extraction fields not lint-enforced (D-07).
+- [Phase 21]: [Phase 21-02] VID-04 validated end-to-end: first real YouTube video acquired locally via STT (no SSH tunnel — D-13), committed as a SINGLE .md transcript (no bundle, no asset — D-05); source summary + 4 topic pages with #t|direct provenance; post-commit source-scoped audit confirms every #t locator resolves (0 insufficient-locator)
+- [Phase 21]: [Phase 21-02] Diarization mended at ingest (D-03 branch b): raw 3-speaker pyannote labels (SPEAKER_00/01/02) conflated the two guests and merged Q/A turns; remapped to HOST/HASSABIS/AMODEI/AUDIENCE by content attribution rather than rerun (boundary misalignment a rerun would not fix)
+- [Phase 21]: [Phase 21-02] bin/ingest.sh emits a bundle dir (DEST_DIR/source.md); converted to the flat single-file form D-05 mandates post-ingest. torchcodec 0.10.0 installed into the local STT venv to unblock diarization under torch 2.10 (Rule-3 blocker; env-only, no template-public surface)
+- [Phase 21]: [Phase 21-02] Authored dr-2026-06-14-video-ingestion (Claude's discretion per CONTEXT.md L50) recording video-as-sub-case-of-transcript (D-14) + the four deliberate divergences from the PDF sub-case (no repo script D-04, single-file no asset D-05, plain link-rot D-06, convention-only extraction fields D-07)
 
 ### Pending Todos
 
@@ -415,7 +420,7 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-06-14T12:21:22.726Z
+Last session: 2026-06-14T14:02:28.826Z
 Stopped at: Phase 21 context gathered
 Resume file: None
 
