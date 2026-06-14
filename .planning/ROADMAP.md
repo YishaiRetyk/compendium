@@ -153,7 +153,7 @@ Plans:
 
 **Wave 1**
 
-- [ ] 21-01-PLAN.md — Authoritative video-ingestion.md convention (video-as-sub-case-of-transcript) + source-types.md row finalization + five frontmatter fields + ingest.md pointer + routing-table row (byte-synced CLAUDE.md + template + fixture)
+- [x] 21-01-PLAN.md — Authoritative video-ingestion.md convention (video-as-sub-case-of-transcript) + source-types.md row finalization + five frontmatter fields + ingest.md pointer + routing-table row (byte-synced CLAUDE.md + template + fixture)
 
 **Wave 2** *(blocked on Wave 1 — needs the convention doc to follow; user-supplied URL, autonomous: false)*
 
@@ -345,4 +345,4 @@ The following are intentionally deferred until real usage demands them, captured
 | 18. Skills Overlay | v1.2 | 3/3 | Complete    | 2026-06-08 |
 | 19. Extension Contract + Research-Report Type | v1.3 | 5/5 | Complete    | 2026-06-10 |
 | 20. PDF Ingestion | v1.3 | 4/4 | Complete    | 2026-06-12 |
-| 21. Video/YouTube Ingestion | v1.3 | 0/TBD | Not started | - |
+| 21. Video/YouTube Ingestion | v1.3 | 1/2 | In Progress|  |

@@ -4,13 +4,13 @@ milestone: v1.3
 milestone_name: Source Ingestion
 status: executing
 stopped_at: Phase 21 context gathered
-last_updated: "2026-06-14T11:23:17.978Z"
-last_activity: 2026-06-14 -- Phase 21 planning complete
+last_updated: "2026-06-14T12:21:49.334Z"
+last_activity: 2026-06-14
 progress:
   total_phases: 10
   completed_phases: 2
   total_plans: 11
-  completed_plans: 9
+  completed_plans: 10
   percent: 20
 ---
 
@@ -21,15 +21,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-10)
 
 **Core value:** The wiki is a persistent, compounding artifact -- cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested.
-**Current focus:** Phase 21 — video/YouTube ingestion
+**Current focus:** Phase 21 — video-youtube-ingestion
 
 ## Current Position
 
-Phase: 21
+Phase: 21 (video-youtube-ingestion) — EXECUTING
 Next: Phase 21 (video/YouTube ingestion) — Not started
-Plan: Not started
+Plan: 2 of 2
 Status: Ready to execute
-Last activity: 2026-06-14 -- Phase 21 planning complete
+Last activity: 2026-06-14
 
 ### v1.3 Phase Summary
 
@@ -183,6 +183,7 @@ Phase 12.2 closure: 5/5 plans complete; WGATE-01..04 → Complete; verifier PASS
 | Phase 14 P03 | 20min | 3 tasks | 57 files |
 | Phase 15-privacy-architecture P02 | 5min | 2 tasks | 3 files |
 | Phase 20 P20-04 | 25min | 4 tasks | 9 files |
+| Phase 21 P01 | 3min | 3 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -376,6 +377,7 @@ Recent decisions affecting current work:
 - [Phase ?]: D-09 cloud->local linkres check + cloud deny-profile shipped (PRIV-03/05); LINT_VERSION 1.7.0; .claude/settings.cloud.json fail-open artifact; docs complete from Plan 01
 - [Phase 20]: Phase 20 PDF ingestion validated end-to-end with a real Nature PDF (Robin paper) — olmOCR-2 served as bartowski Q4_K_M GGUF on Ollama 0.30.7 (plan-named richardyoung/olmocr2:7b-q8 broken under Ollama <=0.20 M-RoPE); convention tool-agnostic D-04 so frontmatter records the model actually used
 - [Phase 20]: Human-verify checkpoint (APPROVED-WITH-EDITS) drove an epistemic-refinement UPDATE pass across the four Robin pages — ingested claims are faithful AS reports of the Nature accelerated-article-preview but not independently/clinically validated; author-estimate efficiency numbers downgraded direct->tentative, ABCA1 mechanism marked inferred, benchmark figures scoped to their conditions, preclinical framing added; #p locators preserved
+- [Phase ?]: [Phase 21-01] Video ships as new schema/reference/video-ingestion.md (Phase 20 PDF pattern): sub-case of transcript, tool-generic yt-dlp+STT runbook with no bin/ script and no worked-instance name (D-04); single [H:MM:SS] form; N=3 first/middle/last spot-verify; convention-only extraction fields not lint-enforced (D-07).
 
 ### Pending Todos
 
@@ -413,9 +415,9 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-06-13T20:18:33.329Z
+Last session: 2026-06-14T12:21:22.726Z
 Stopped at: Phase 21 context gathered
-Resume file: .planning/phases/21-video-youtube-ingestion/21-CONTEXT.md
+Resume file: None
 
 ## Operator Next Steps
 

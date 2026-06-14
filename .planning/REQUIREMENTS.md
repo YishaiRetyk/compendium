@@ -33,9 +33,9 @@ Design lineage: `.planning/seeds/research-report-ingest.md` (design LOCKED — R
 
 ### Video/YouTube Ingestion (VID)
 
-- [ ] **VID-01**: A documented video acquisition pipeline exists: yt-dlp + timestamped STT producing speaker-labeled, timestamped transcripts (the creator's local `stt` CLI is the worked instance; template-public docs stay tool-generic)
-- [ ] **VID-02**: The video-as-transcript sub-case convention defines frontmatter metadata (url, channel, title, publish_date, duration); claims use the existing `#t<start>-<end>` locators
-- [ ] **VID-03**: The convention documents the video drift stance: immutable once published; the concern is deletion/link-rot, not content change (no drift machinery)
+- [x] **VID-01**: A documented video acquisition pipeline exists: yt-dlp + timestamped STT producing speaker-labeled, timestamped transcripts (the creator's local `stt` CLI is the worked instance; template-public docs stay tool-generic)
+- [x] **VID-02**: The video-as-transcript sub-case convention defines frontmatter metadata (url, channel, title, publish_date, duration); claims use the existing `#t<start>-<end>` locators
+- [x] **VID-03**: The convention documents the video drift stance: immutable once published; the concern is deletion/link-rot, not content change (no drift machinery)
 - [ ] **VID-04**: End-to-end validation: one real YouTube video acquired via the pipeline → ingested → wiki pages with timestamp-anchored provenance
 
 ## Future Requirements
@@ -82,9 +82,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PDF-02 | Phase 20 | Complete |
 | PDF-03 | Phase 20 | Complete |
 | PDF-04 | Phase 20 | Complete |
-| VID-01 | Phase 21 | Pending |
-| VID-02 | Phase 21 | Pending |
-| VID-03 | Phase 21 | Pending |
+| VID-01 | Phase 21 | Complete |
+| VID-02 | Phase 21 | Complete |
+| VID-03 | Phase 21 | Complete |
 | VID-04 | Phase 21 | Pending |
 
 **Coverage:**
