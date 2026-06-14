@@ -148,7 +148,17 @@ Plans:
   3. The convention explicitly states the drift stance for videos: immutable once published; concern is deletion/link-rot, not content change; no drift machinery is needed or implemented
   4. One real YouTube video has been acquired via the pipeline, ingested, and its wiki pages are in `sources/` with timestamp-anchored provenance
 
-**Plans**: TBD
+**Plans**: 2 plans (2 waves)
+Plans:
+
+**Wave 1**
+
+- [ ] 21-01-PLAN.md — Authoritative video-ingestion.md convention (video-as-sub-case-of-transcript) + source-types.md row finalization + five frontmatter fields + ingest.md pointer + routing-table row (byte-synced CLAUDE.md + template + fixture)
+
+**Wave 2** *(blocked on Wave 1 — needs the convention doc to follow; user-supplied URL, autonomous: false)*
+
+- [ ] 21-02-PLAN.md — End-to-end validation ingest of one real multi-speaker YouTube video (single-file transcript, #t-anchored direct provenance, SPEAKER: labeling path exercised, audit-verified) + schema-update decision record
+
 **UI hint**: no
 
 ## Backlog
