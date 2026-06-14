@@ -760,6 +760,10 @@ auto_fixes: 0 applied
 report: wiki-cloud/maintenance/lint-report.md
 scope: yaml category (the unscoped --ci crossref gate carries a pre-existing backlog out of this phase's scope; the ingest introduced no new crossref errors vs the pre-ingest baseline)
 
+## [2026-06-14] reflect | video sub-case schema decision
+
+Created decision record [[dr-2026-06-14-video-ingestion|Video as Sub-Case of Transcript + Tool-Generic Acquisition (No Repo Script)]] (`trigger_type: schema-update`, `affected_pages: []`) capturing the Phase 21 video-ingestion decisions: video as a sub-case of `transcript` rather than a new source_type, finalizing the provisional registry row (D-14); lazy-loaded authoritative video-ingestion.md + lean registry-row pointer (carried from Phase 20 D-01/D-02); and the four deliberate divergences from the PDF sub-case — a tool-generic acquisition contract with no repo script (D-04), a transcript-only single .md commit with no co-located asset (D-05), a plain link-rot stance with no drift machinery (D-06/VID-03), and convention-only extraction fields that are deliberately not lint-enforced (D-07); plus the tiered epistemic policy with claim-level hedging and support_type staying direct (D-09/D-10/D-11). Alternatives Considered maps the declined options (info-json/thumbnail bundle, archive_url/url_dead rot convention, lint-enforced extraction fields, a repo acquisition script, support_type derived). The personal STT tool is described generically (a timestamped STT engine) to keep this template-public DR neutral; only yt-dlp is named. Mirrors and is forward-referenced by the Phase 20 pdf-ingestion DR. Indexed under Decisions.
+
 ## [2026-06-14] lint | wiki-cloud health check
 
 findings: 0 total (0 errors, 0 warnings, 0 info)
