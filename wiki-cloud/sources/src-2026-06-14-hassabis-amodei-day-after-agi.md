@@ -59,7 +59,7 @@ A moderated stage conversation in which [[dario-amodei|Dario Amodei]] (Anthropic
 - Amodei expects a model to do most or all of what software engineers do end-to-end within six to twelve months, with code and AI research as the key drivers of acceleration [prov:src-2026-06-14-hassabis-amodei-day-after-agi#t00:01:12-00:02:44|direct|2026-06-14] [epistemic:: tentative]
 - Hassabis distinguishes verifiable domains (coding, mathematics) from natural science, where you cannot quickly verify an answer and where coming up with the hypothesis is the hardest, possibly missing, capability [prov:src-2026-06-14-hassabis-amodei-day-after-agi#t00:03:00-00:04:15|direct|2026-06-14]
 - Amodei says Anthropic's revenue grew 10x over three years — roughly 100 million in 2023, 1 billion in 2024, 10 billion in 2025 [prov:src-2026-06-14-hassabis-amodei-day-after-agi#t00:06:08-00:07:39|direct|2026-06-14] [epistemic:: tentative]
-- Both reject doomerism but treat misalignment as a real, addressable risk; Amodei cites mechanistic interpretability as Anthropic's research lineage from the start [prov:src-2026-06-14-hassabis-amodei-day-after-agi#t00:25:21-00:26:44|direct|2026-06-14]
+- Both reject doomerism but treat misalignment as a real, addressable risk; Amodei cites mechanistic interpretability as Anthropic's research lineage from the start [prov:src-2026-06-14-hassabis-amodei-day-after-agi#t00:25:21-00:26:44|direct|2026-06-14] [epistemic:: tentative]
 - Amodei's central policy recommendation is not selling advanced chips to geopolitical adversaries, framed as the single biggest lever to buy time [prov:src-2026-06-14-hassabis-amodei-day-after-agi#t00:22:16-00:23:30|direct|2026-06-14] [epistemic:: tentative]
 
 ## Extracted Claims
@@ -75,7 +75,7 @@ A moderated stage conversation in which [[dario-amodei|Dario Amodei]] (Anthropic
 ### On the competitive landscape
 
 - Hassabis attributes Google DeepMind's rebound to its deep research bench plus a restored start-up intensity, citing Gemini 3 and the Gemini App's increasing market share [prov:src-2026-06-14-hassabis-amodei-day-after-agi#t00:04:55-00:05:40|direct|2026-06-14] [epistemic:: tentative]
-- Amodei describes an exponential relationship between a model's cognitive capability and the revenue it can generate, and frames both Anthropic and Google as research-led companies with hard scientific problems as a north star [prov:src-2026-06-14-hassabis-amodei-day-after-agi#t00:06:08-00:07:39|direct|2026-06-14]
+- Amodei describes an exponential relationship between a model's cognitive capability and the revenue it can generate, and frames both Anthropic and Google as research-led companies with hard scientific problems as a north star [prov:src-2026-06-14-hassabis-amodei-day-after-agi#t00:06:08-00:07:39|direct|2026-06-14] [epistemic:: tentative]
 
 ### On the labor market
 
@@ -87,7 +87,7 @@ A moderated stage conversation in which [[dario-amodei|Dario Amodei]] (Anthropic
 
 - Amodei frames his forthcoming risk essay around a scene from Carl Sagan's *Contact* — "how did you get through this technological adolescence without destroying yourselves?" — and names bioterrorism, authoritarian misuse, and labor displacement as concrete worries [prov:src-2026-06-14-hassabis-amodei-day-after-agi#t00:09:44-00:13:16|direct|2026-06-14] [epistemic:: tentative]
 - Hassabis cites AlphaFold and the spin-out Isomorphic as examples of "unequivocal goods" the industry should demonstrate more of, and calls for international cooperation on minimum safety standards for deployment [prov:src-2026-06-14-hassabis-amodei-day-after-agi#t00:19:35-00:21:20|direct|2026-06-14] [epistemic:: tentative]
-- Amodei traces Anthropic's safety work to mechanistic interpretability — "looking inside the model's brain" — and both speakers position themselves as risk-aware but anti-doomer [prov:src-2026-06-14-hassabis-amodei-day-after-agi#t00:25:21-00:26:44|direct|2026-06-14]
+- Amodei traces Anthropic's safety work to mechanistic interpretability — "looking inside the model's brain" — and both speakers position themselves as risk-aware but anti-doomer [prov:src-2026-06-14-hassabis-amodei-day-after-agi#t00:25:21-00:26:44|direct|2026-06-14] [epistemic:: tentative]
 - Hassabis says the safety problem is tractable given time, focus, and collaboration, but fragmentation and racing would make technical safety much harder [prov:src-2026-06-14-hassabis-amodei-day-after-agi#t00:27:00-00:28:11|direct|2026-06-14]
 
 ### On geopolitics and chip policy

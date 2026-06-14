@@ -739,7 +739,7 @@ reason: human verification confirmed the claims are faithful AS reports of what 
 
 ## [2026-06-14] ingest | FULL DISCUSSION: Google's Demis Hassabis, Anthropic's Dario Amodei Debate the World After AGI
 
-First real YouTube video acquired end-to-end via the Phase 21 video pipeline (VID-04). Acquired locally with the tool-generic STT contract (a video downloader + a timestamped speech-to-text engine, D-04/D-13) into a single timestamped transcript; ingested with bin/ingest.sh as a SINGLE .md file (no bundle, no --asset — D-05). The video is multi-speaker (3 speakers), deliberately chosen to exercise the SPEAKER: labeling path (D-03). Raw diarization (SPEAKER_00/01/02) was mended at ingest to meaningful labels — HOST / HASSABIS / AMODEI / AUDIENCE — by attributing each segment from its content (D-03 permits mapping raw labels at ingest); a few question→answer segments the diarizer merged were split at their natural boundary.
+First real YouTube video acquired end-to-end via the Phase 21 video pipeline (VID-04). Acquired locally with the tool-generic STT contract (a video downloader + a timestamped speech-to-text engine, D-04) into a single timestamped transcript; ingested with bin/ingest.sh as a SINGLE .md file (no bundle, no --asset — D-05). The video is multi-speaker (3 speakers), deliberately chosen to exercise the SPEAKER: labeling path (D-03). Raw diarization (SPEAKER_00/01/02) was mended at ingest to meaningful labels — HOST / HASSABIS / AMODEI / AUDIENCE — by attributing each segment from its content (D-03 permits mapping raw labels at ingest); a few question→answer segments the diarizer merged were split at their natural boundary.
 
 CREATED:
 - src-2026-06-14-hassabis-amodei-day-after-agi (source summary; source_type: transcript video sub-case; five video fields title/channel/publish_date/duration from yt-dlp + watch-page cross-check, VID-02; #t|direct claims; sourced tier with claim-level hedging on proper nouns/numbers, D-09)
@@ -767,5 +767,12 @@ Created decision record [[dr-2026-06-14-video-ingestion|Video as Sub-Case of Tra
 ## [2026-06-14] lint | wiki-cloud health check
 
 findings: 0 total (0 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki-cloud/maintenance/lint-report.md
+scope: yaml category — the unscoped wiki-health total is 0 errors / 69 warnings / 9 info (a pre-existing contradiction/crossref/red-link backlog out of this phase's scope, including the new `google-deepmind` red link from demis-hassabis.md). This phase introduced no new errors and no new crossref errors vs the pre-ingest baseline.
+
+## [2026-06-14] lint | wiki-cloud health check
+
+findings: 78 total (0 errors, 69 warnings, 9 info)
 auto_fixes: 0 applied
 report: wiki-cloud/maintenance/lint-report.md

@@ -38,8 +38,8 @@ The AI self-improvement loop is the cycle in which models good at coding and AI 
 
 ## Key Facts
 
-- Amodei's mechanism: models good at coding and AI research produce the next generation and speed up development, creating a loop that increases the rate of model development [prov:src-2026-06-14-hassabis-amodei-day-after-agi#t00:01:12-00:02:44|direct|2026-06-14]
-- Physical bottlenecks limit the loop: chip manufacture and model training time cannot be sped up by AI [prov:src-2026-06-14-hassabis-amodei-day-after-agi#t00:01:12-00:02:44|direct|2026-06-14]
+- Amodei's mechanism: models good at coding and AI research produce the next generation and speed up development, creating a loop that increases the rate of model development [prov:src-2026-06-14-hassabis-amodei-day-after-agi#t00:01:12-00:02:44|direct|2026-06-14] [epistemic:: tentative]
+- Physical bottlenecks limit the loop: chip manufacture and model training time cannot be sped up by AI [prov:src-2026-06-14-hassabis-amodei-day-after-agi#t00:01:12-00:02:44|direct|2026-06-14] [epistemic:: tentative]
 - Hassabis: fully closing the loop without a human may require AGI itself in messy, hard-to-verify ("NP-hard") domains [prov:src-2026-06-14-hassabis-amodei-day-after-agi#t00:08:15-00:09:20|direct|2026-06-14] [epistemic:: tentative]
 - Hassabis adds physical AI and robotics — hardware in the loop — as factors that limit self-improvement speed [prov:src-2026-06-14-hassabis-amodei-day-after-agi#t00:08:15-00:09:20|direct|2026-06-14]
 
