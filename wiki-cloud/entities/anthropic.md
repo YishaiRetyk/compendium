@@ -69,6 +69,7 @@ Anthropic's existing Claude Code plugin marketplace [[anthropic-financial-servic
 - [[claude-code|Claude Code]]
 - [[claude-api|Claude API]]
 - [[anthropic-financial-services|Anthropic Financial Services]]
+- [[dario-amodei|Dario Amodei]] — co-founder and CEO
 
 ## Sources
 

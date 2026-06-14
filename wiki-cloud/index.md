@@ -41,6 +41,8 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[spec-kit|Spec Kit]] — GitHub's official spec-driven-development toolkit (CLI "Specify"); tool-agnostic across 20+ agents, spec is the version-controlled source of truth (mixed, 2026-06-09)
 - [[superpowers|Superpowers]] — Jesse Vincent's Claude Code framework enforcing a mandatory brainstorm→plan→implement→review skill chain with a SessionStart re-priming hook (mixed, 2026-06-09)
 - [[gsd|GSD (Get-Shit-Done)]] — TÂCHES' context-engineering orchestrator: every task in a fresh 200K subagent context, coordinated via a .planning/ artifact tree (mixed, 2026-06-09)
+- [[demis-hassabis|Demis Hassabis]] — Co-founder and CEO of Google DeepMind; took the more cautious side on AGI timelines in a 2026 stage debate (sourced, 2026-06-14)
+- [[dario-amodei|Dario Amodei]] — Co-founder and CEO of Anthropic; took the faster side on AGI timelines and reiterated his no-chips-to-adversaries policy (sourced, 2026-06-14)
 
 ## Concepts
 
@@ -59,6 +61,8 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[subagents|Subagents]] — Isolated Claude instances with their own context window; process 100K tokens and return a distilled summary, keeping the parent context clean (mixed, 2026-06-09)
 - [[llm-agent-scientific-discovery|LLM Agents for Scientific Discovery]] — Paradigm of coordinated LLM agents automating the scientific method (hypothesis generation, experiment planning, data analysis) in a human-in-the-loop cycle (sourced, 2026-06-12)
 - [[ai-for-drug-repurposing|AI for Drug Repurposing]] — Using LLM/agentic systems to surface non-obvious new indications for existing drugs by connecting insights already in the literature (sourced, 2026-06-12)
+- [[agi-timelines|AGI Timelines]] — How soon AI will match human capability across domains; Amodei (faster) vs Hassabis (cautious) agree on direction, differ on timescale (mixed, 2026-06-14)
+- [[ai-self-improvement-loop|AI Self-Improvement Loop]] — Models good at coding and AI research help build the next generation, compressing the development cycle; its closure rate sets AGI timelines (mixed, 2026-06-14)
 
 ## Sources
 
@@ -80,6 +84,7 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[src-2026-05-06-ralph-playbook|The Ralph Playbook (Clayton Farr's how-to-ralph-wiggum)]] — Clayton Farr, 2026-05-06 — Long-form synthesis of Geoffrey Huntley's Ralph autonomous-coding-loop technique: 3 phases / 2 prompts / 1 loop, with five proposed enhancements (sourced, 2026-05-06)
 - [[src-2026-06-09-pdf-to-text-llm-ingestion-sota|PDF-to-Text Extraction and LLM PDF Ingestion: State of the Art (2025–2026)]] — Synthesized deep-research report: three-camp taxonomy, extraction-vs-native-vision paradigms, OmniDocBench/olmOCR-Bench, per-page cost, VLM hallucination, pipeline recommendation (mixed, 2026-06-09)
 - [[src-2026-06-12-multi-agent-scientific-discovery|A Multi-Agent System for Automating Scientific Discovery (Robin)]] — Ghareeb et al., Nature (2026) — first end-to-end multi-agent system automating hypothesis generation + data analysis; identified ripasudil/KL001 for dAMD (first PDF-acquired source, born-digital) (mixed, 2026-06-12)
+- [[src-2026-06-14-hassabis-amodei-day-after-agi|FULL DISCUSSION: Google's Demis Hassabis, Anthropic's Dario Amodei Debate the World After AGI]] — DRM News, 2026-01-20 — YouTube transcript (video sub-case) on AGI timelines, the self-improvement loop, jobs, chip policy, and AI-safety risk; first video-acquired transcript with mended multi-speaker labels (sourced, 2026-06-14)
 
 ## Comparisons
 

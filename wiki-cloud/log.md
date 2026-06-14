@@ -736,3 +736,32 @@ report: wiki-cloud/maintenance/lint-report.md
 source: src-2026-06-12-multi-agent-scientific-discovery
 result: refined claim epistemics across all four Robin pages per human verification — reframed efficiency/time-on-task numbers as author estimates (support_type direct→tentative on the ~200-fold and 872–937h claims), scoped the $10.76 cost (Finch excluded as negligible), added the 151→~400-paper two-stage nuance, reframed the ABCA1 dAMD link as the paper's mechanistic interpretation (epistemic inferred), softened ripasudil's "favorable" safety to relative-to-Y-27632, qualified KL001 novelty as "to the authors' knowledge", scoped the 44.5% hallucination figure to 15 Crow-ablated assay proposals, added the no-harness/no-data/no-code caveat to the BixBench Sonnet 3.7 baseline, scoped the Deep Research baseline (June 2025 ChatGPT, 17 unique candidates), and added preclinical/in-vitro framing throughout; bumped source + overview epistemic_status sourced→mixed. All #p locators preserved.
 reason: human verification confirmed the claims are faithful AS reports of what the Nature accelerated-article-preview states, but not independently-validated or clinically-validated facts; epistemic framing tightened accordingly.
+
+## [2026-06-14] ingest | FULL DISCUSSION: Google's Demis Hassabis, Anthropic's Dario Amodei Debate the World After AGI
+
+First real YouTube video acquired end-to-end via the Phase 21 video pipeline (VID-04). Acquired locally with the tool-generic STT contract (a video downloader + a timestamped speech-to-text engine, D-04/D-13) into a single timestamped transcript; ingested with bin/ingest.sh as a SINGLE .md file (no bundle, no --asset — D-05). The video is multi-speaker (3 speakers), deliberately chosen to exercise the SPEAKER: labeling path (D-03). Raw diarization (SPEAKER_00/01/02) was mended at ingest to meaningful labels — HOST / HASSABIS / AMODEI / AUDIENCE — by attributing each segment from its content (D-03 permits mapping raw labels at ingest); a few question→answer segments the diarizer merged were split at their natural boundary.
+
+CREATED:
+- src-2026-06-14-hassabis-amodei-day-after-agi (source summary; source_type: transcript video sub-case; five video fields title/channel/publish_date/duration from yt-dlp + watch-page cross-check, VID-02; #t|direct claims; sourced tier with claim-level hedging on proper nouns/numbers, D-09)
+- demis-hassabis (entity; Google DeepMind CEO, cautious-timeline position)
+- dario-amodei (entity; Anthropic CEO, faster-timeline position + no-chips-to-adversaries policy)
+- agi-timelines (concept; the central debate axis — Amodei faster vs Hassabis cautious, agree on direction)
+- ai-self-improvement-loop (concept; the coding/AI-research loop whose closure rate sets the timeline)
+UPDATED:
+- anthropic (added Dario Amodei backlink in Related Pages)
+- index.md (catalog entries for the source + 2 entities + 2 concepts)
+
+Rationale: validates the video-as-sub-case-of-transcript convention in anger (VID-04) — the [H:MM:SS] SPEAKER: grammar (D-01) resolves under the existing audit TS_RE with zero resolver change; #t timestamp locators resolve against the committed transcript. yt-dlp metadata (title/channel/upload_date 20260120→ISO 2026-01-20/duration 1871s→31:11) was cross-checked against the YouTube watch page before authoring. A torchcodec dependency missing from the local STT venv blocked the diarization pass on first run and was installed (pinned to the torch-2.10-compatible build) before re-transcribing from the already-downloaded audio. The committed transcript is the durable record; the url is a courtesy pointer that may rot (D-06).
+
+## [2026-06-14] lint | wiki-cloud health check
+
+findings: 0 total (0 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki-cloud/maintenance/lint-report.md
+scope: yaml category (the unscoped --ci crossref gate carries a pre-existing backlog out of this phase's scope; the ingest introduced no new crossref errors vs the pre-ingest baseline)
+
+## [2026-06-14] lint | wiki-cloud health check
+
+findings: 0 total (0 errors, 0 warnings, 0 info)
+auto_fixes: 0 applied
+report: wiki-cloud/maintenance/lint-report.md
