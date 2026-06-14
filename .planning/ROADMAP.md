@@ -345,4 +345,4 @@ The following are intentionally deferred until real usage demands them, captured
 | 18. Skills Overlay | v1.2 | 3/3 | Complete    | 2026-06-08 |
 | 19. Extension Contract + Research-Report Type | v1.3 | 5/5 | Complete    | 2026-06-10 |
 | 20. PDF Ingestion | v1.3 | 4/4 | Complete    | 2026-06-12 |
-| 21. Video/YouTube Ingestion | v1.3 | 2/2 | Complete   | 2026-06-14 |
+| 21. Video/YouTube Ingestion | v1.3 | 2/2 | Complete    | 2026-06-14 |

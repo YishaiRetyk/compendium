@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Source Ingestion
-status: verifying
-stopped_at: Phase 21 context gathered
-last_updated: "2026-06-14T14:02:38.969Z"
+status: milestone_complete
+stopped_at: Phase 21 complete (2/2), verified — v1.3 Source Ingestion milestone complete
+last_updated: 2026-06-14T14:26:20.854Z
 last_activity: 2026-06-14
 progress:
-  total_phases: 10
+  total_phases: 3
   completed_phases: 3
   total_plans: 11
   completed_plans: 11
-  percent: 30
+  percent: 100
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-10)
 
 **Core value:** The wiki is a persistent, compounding artifact -- cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested.
-**Current focus:** Phase 21 — video-youtube-ingestion
+**Current focus:** v1.3 Source Ingestion complete (Phases 19–21 verified) — ready to close milestone
 
 ## Current Position
 
-Phase: 21 (video-youtube-ingestion) — READY FOR VERIFICATION (both plans complete)
-Next: Phase 21 verification / v1.3 milestone close
+Phase: 21 — Video/YouTube Ingestion (complete, verified 2026-06-14)
+Next: Close v1.3 milestone (/gsd-complete-milestone) or start the next milestone (/gsd-new-milestone)
 Plan: 2 of 2 (both complete)
-Status: Phase complete — ready for verification
+Status: Milestone complete — all v1.3 phases verified
 Last activity: 2026-06-14
 
 ### v1.3 Phase Summary
@@ -37,14 +37,14 @@ Last activity: 2026-06-14
 |-------|------|--------------|--------|
 | 19 | Extension Contract + Research-Report Type | EXT-01..03, RPT-01..06 (9 reqs) | Complete (2026-06-10) |
 | 20 | PDF Ingestion | PDF-01..04 (4 reqs) | Complete (2026-06-12) |
-| 21 | Video/YouTube Ingestion | VID-01..04 (4 reqs) | Plans complete (2026-06-14) — ready for verification |
+| 21 | Video/YouTube Ingestion | VID-01..04 (4 reqs) | Complete (verified 2026-06-14) |
 
 **Total:** 17 requirements across 3 phases. 100% mapped.
 
 ### Progress Bar
 
 ```
-v1.3 Source Ingestion: [███████████████████ ] 97% (3/3 phases authored; phase 21 ready for verification)
+v1.3 Source Ingestion: [████████████████████] 100% (3/3 phases complete + verified)
 ```
 
 ## Deferred Items
@@ -108,7 +108,7 @@ Phase 12.2 closure: 5/5 plans complete; WGATE-01..04 → Complete; verifier PASS
 
 **Velocity:**
 
-- Total plans completed: 51
+- Total plans completed: 53
 - Average duration: -
 - Total execution time: 0 hours
 
@@ -128,6 +128,7 @@ Phase 12.2 closure: 5/5 plans complete; WGATE-01..04 → Complete; verifier PASS
 | 18 | 3 | - | - |
 | 19 | 5 | - | - |
 | 20 | 4 | - | - |
+| 21 | 2 | - | - |
 
 **Recent Trend:**
 
