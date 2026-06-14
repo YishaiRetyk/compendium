@@ -28,7 +28,9 @@ findings:
   warning: 5
   info: 4
   total: 9
-status: issues_found
+status: fixed
+fixes_applied: 2026-06-14T18:00:00Z
+fixes_summary: "5/5 warnings resolved (commit fix(21)); 4 info deferred (out of default --fix scope)"
 ---
 
 # Phase 21: Code Review Report
@@ -116,6 +118,27 @@ The defects below are documentation/traceability and convention-conformance issu
 
 ---
 
+## Fixes Applied (2026-06-14)
+
+Applied via `/gsd-code-review fix 21` (default scope: Critical + Warning). Committed as `fix(21): apply code review warnings`.
+
+| Finding | Disposition | What changed |
+|---------|-------------|--------------|
+| WR-01 | ✅ Fixed | `schema/reference/source-types.md` video row: spot-verification citation `(D-09)` → `(D-10)` (D-09 is the hedging mandate; D-10 is the spot-verification divergence, per authoritative `video-ingestion.md`). |
+| WR-02 | ✅ Fixed | `wiki-cloud/log.md` ingest entry: `(D-04/D-13)` → `(D-04)`. D-13 is a planning-internal CONTEXT decision (local execution), unresolvable from the public wiki and not the tool-generic-contract decision. |
+| WR-03 | ✅ Fixed | Added the scope qualifier (with true counts) to the second `2026-06-14 lint` log entry, and regenerated `wiki-cloud/maintenance/lint-report.md` via a full `bin/lint.sh` run so the standalone report shows honest wiki health: **0 errors / 69 warnings / 9 info (78 total)** instead of the scoped "0 total". |
+| WR-04 | ◑ Accounting fixed; page deferred | The `google-deepmind` red link is permitted by the schema; it is no longer masked — the regenerated report and qualified log entry now surface it explicitly. A dedicated `google-deepmind` entity page was **not** authored (content authoring is beyond review-fix scope) — recommended as a follow-up ingest/query. |
+| WR-05 | ✅ Fixed (option a) | Added the missing `[epistemic:: tentative]` markers on the STT-failure-surface claims (mechanistic-interpretability / proper-noun / technical-term claims) in `src-2026-06-14-hassabis-amodei-day-after-agi.md` (L62/78/90) and `ai-self-improvement-loop.md` (L41/42), conforming the data to the categorical D-09 mandate. Softening D-09 to a judgment-based rule (option b) was **not** taken — that is an authoritative-schema change that warrants a deliberate reflect/decision-record, not a silent review-fix edit. |
+
+**Info findings IN-01…IN-04** were not addressed — the default `--fix` scope is Critical + Warning. Re-run with `--all` to include them, or address individually:
+- IN-01 first-mention-only wikilink repeats (3 pages)
+- IN-02 `duration` clock-format vs documented `~N min`
+- IN-03 `## Source Metadata` body/frontmatter duplication
+- IN-04 confirm the WF-08 inclusion-audit re-run
+
+---
+
 _Reviewed: 2026-06-14T17:10:00Z_
 _Reviewer: Claude (gsd-code-reviewer)_
+_Fixes applied: 2026-06-14T18:00:00Z (Claude)_
 _Depth: standard_
