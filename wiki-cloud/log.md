@@ -777,6 +777,20 @@ findings: 78 total (0 errors, 69 warnings, 9 info)
 auto_fixes: 0 applied
 report: wiki-cloud/maintenance/lint-report.md
 
+## [2026-06-17] ingest | Interpretable Context Methodology: Folder Structure as Agent Architecture
+
+Ingested the ICM arXiv paper (Van Clief & McDermott, arXiv:2603.16021v2 [cs.AI], 18 Mar 2026; 21 pages). Born-digital PDF acquired via the PDF runbook's tool-agnostic generic contract (D-04): extracted with `pdftotext` (poppler 24.02.0) in a per-page loop that prepends `<!-- page: N -->` markers, NOT the olmOCR worked instance — for a born-digital paper the embedded text layer is authoritative, so a VLM-OCR pass would only add hallucination risk (and the plan-named `richardyoung/olmocr2` model is broken under current Ollama). Single-column reading order verified clean, no column interleaving. Scaffolded with `bin/ingest.sh --asset` (extracted markdown as source.md, original PDF co-located as 2603.16021v2.pdf). Born-digital → `sourced` default per the tiered epistemic policy; no spot-verification mandate.
+
+CREATED:
+- src-2026-06-17-interpretable-context-methodology (source summary; source_type: paper, PDF sub-case; four extraction_* fields with extraction_tool: pdftotext / extraction_model: poppler-24.02.0; #p|direct claims; epistemic_status mixed — architecture sourced, practitioner-experience claims tentative, efficacy unmeasured)
+- interpretable-context-methodology (concept; filesystem-as-orchestrator method, five-layer context hierarchy, stage contracts, multi-pass-compilation analogy, scope boundaries)
+- context-engineering (concept; the previously-missing hub — Karpathy coinage, Lance Martin write/select/compress/isolate, Willison, lost-in-the-middle, MCP distinction)
+UPDATED:
+- progressive-disclosure (added ICM as a third independent instance of the principle at folder granularity — Key Fact bullet + TL;DR clause + Related Pages links to ICM and context-engineering; added the ICM source to frontmatter + body Sources)
+- index.md (catalog entries: 2 concepts + 1 source)
+
+Rationale: ICM slots into the existing AI-agent-orchestration cluster (progressive-disclosure, subagents, the Claude Code orchestration frameworks). Its "layered context loading" is progressive disclosure applied at folder granularity, which motivated both the cross-reference UPDATE and the creation of the `context-engineering` concept page as the shared conceptual root (the term was already a tag on progressive-disclosure and subagents but had no page). Quantitative/practitioner claims (52-member community, the 30/33 U-shape, three no-coding users) are graded tentative because the paper itself flags them as self-reported and un-instrumented, and the central scoped-context-improves-quality claim is explicitly unmeasured (no controlled comparison). Second PDF-acquired source overall, and the first to use pdftotext rather than the olmOCR pipeline (exercising the D-04 tool-agnostic contract for born-digital input).
+
 ## [2026-07-03] ingest | open-gsd/gsd-core — GSD Core repository snapshot
 
 First repository acquired end-to-end via the Phase 22 repository pipeline (REPO-06). Acquired with `bin/repo-snapshot.sh` (shallow clone → metadata harvest → README + Excerpts skeleton) into a snapshot bundle, then curated: badge shields and star-history embed trimmed (noted inline), five code excerpts added under `## Excerpts` with exact `path:Lnn-Lnn` headings so every `#path:` claim is offline-resolvable (D-04).

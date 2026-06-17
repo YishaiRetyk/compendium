@@ -6,7 +6,7 @@ status: active
 summary: "Skeleton index — ingested content will appear here organized by knowledge
   domain."
 created_at: 2026-04-15
-updated_at: 2026-06-12
+updated_at: 2026-06-17
 sources: []
 epistemic_status: sourced
 tags:
@@ -63,6 +63,8 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[ai-for-drug-repurposing|AI for Drug Repurposing]] — Using LLM/agentic systems to surface non-obvious new indications for existing drugs by connecting insights already in the literature (sourced, 2026-06-12)
 - [[agi-timelines|AGI Timelines]] — How soon AI will match human capability across domains; Amodei (faster) vs Hassabis (cautious) agree on direction, differ on timescale (mixed, 2026-06-14)
 - [[ai-self-improvement-loop|AI Self-Improvement Loop]] — Models good at coding and AI research help build the next generation, compressing the development cycle; its closure rate sets AGI timelines (mixed, 2026-06-14)
+- [[context-engineering|Context Engineering]] — The discipline of filling an LLM's context window with the right information, structured so the model can use it; named by Karpathy (2025) as a broader frame than prompt engineering, with write/select/compress/isolate strategies (mixed, 2026-06-17)
+- [[interpretable-context-methodology|Interpretable Context Methodology]] — Replaces framework-level agent orchestration with filesystem structure: numbered folders as stages, markdown CONTEXT.md files as stage contracts, one agent reading the right files at each step; a five-layer context hierarchy for sequential human-reviewed workflows (mixed, 2026-06-17)
 
 ## Sources
 
@@ -85,6 +87,7 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[src-2026-06-09-pdf-to-text-llm-ingestion-sota|PDF-to-Text Extraction and LLM PDF Ingestion: State of the Art (2025–2026)]] — Synthesized deep-research report: three-camp taxonomy, extraction-vs-native-vision paradigms, OmniDocBench/olmOCR-Bench, per-page cost, VLM hallucination, pipeline recommendation (mixed, 2026-06-09)
 - [[src-2026-06-12-multi-agent-scientific-discovery|A Multi-Agent System for Automating Scientific Discovery (Robin)]] — Ghareeb et al., Nature (2026) — first end-to-end multi-agent system automating hypothesis generation + data analysis; identified ripasudil/KL001 for dAMD (first PDF-acquired source, born-digital) (mixed, 2026-06-12)
 - [[src-2026-06-14-hassabis-amodei-day-after-agi|FULL DISCUSSION: Google's Demis Hassabis, Anthropic's Dario Amodei Debate the World After AGI]] — DRM News, 2026-01-20 — YouTube transcript (video sub-case) on AGI timelines, the self-improvement loop, jobs, chip policy, and AI-safety risk; first video-acquired transcript with mended multi-speaker labels (sourced, 2026-06-14)
+- [[src-2026-06-17-interpretable-context-methodology|Interpretable Context Methodology: Folder Structure as Agent Architecture]] — Van Clief & McDermott, arXiv:2603.16021v2 [cs.AI], March 2026 — ICM as filesystem-native orchestration for sequential, human-reviewed workflows; born-digital PDF extracted via pdftotext (tool-agnostic D-04 contract, no OCR needed) (mixed, 2026-06-17)
 - [[src-2026-07-03-gsd-core-repo|open-gsd/gsd-core — GSD Core repository snapshot]] — Snapshot at commit `69fef7c0` (branch `next`) — first repository-type source: rename/lineage evidence (get-shit-done → GSD Core under OpenGSD), v1.7.0-rc.1 package metadata, first-party context-rot docs, curated code excerpts with `#path:` anchors (sourced, 2026-07-03)
 
 ## Comparisons

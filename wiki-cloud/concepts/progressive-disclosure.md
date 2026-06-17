@@ -9,7 +9,7 @@ summary: "Three-level loading pattern at the heart of Anthropic Agent Skills. L1
   and scripts are accessed only as needed, with script source code never entering
   context."
 created_at: 2026-05-06
-updated_at: 2026-06-09
+updated_at: 2026-06-17
 sources:
 - src-2026-05-06-anthropic-agent-skills-overview
 - src-2026-05-06-anthropic-agent-skills-best-practices
@@ -17,6 +17,7 @@ sources:
 - src-2026-05-06-anthropic-claude-cookbook-skills-custom-development
 - src-2026-05-06-ralph-playbook
 - src-2026-04-16-claude-code-frameworks-report
+- src-2026-06-17-interpretable-context-methodology
 epistemic_status: mixed
 tags:
 - progressive-disclosure
@@ -42,7 +43,7 @@ example: false
 
 ## TL;DR
 
-Progressive disclosure is the loading discipline Anthropic uses to let many Agent Skills coexist without paying full token cost upfront. Information loads in three levels: Level 1 metadata (the YAML `name` + `description`, always preloaded into the system prompt at ~100 tokens per Skill); Level 2 instructions (the SKILL.md body, read via bash when the Skill is triggered, kept under ~5k tokens); Level 3 resources (additional `.md` references, datasets, scripts — accessed only when explicitly referenced, with script source code executed via bash so it never enters context). The pattern lets a Skill bundle dozens of reference files, comprehensive API docs, or large datasets without context penalty until something is actually read. The same discipline is a general context-engineering principle, not a Skills-only mechanism: the [[src-2026-05-06-ralph-playbook|The Ralph Playbook]] applies it to autonomous coding loops by keeping its always-loaded `AGENTS.md` minimal and deferring status/detail to a separate on-demand file. More broadly, progressive disclosure — originally a Jakob Nielsen UX pattern (1995) — has become the architectural backbone of Claude Code itself, spanning a full load hierarchy from always-loaded CLAUDE.md down to forked [[subagents|subagent]] contexts, and is the unifying principle behind all three [[claude-code-orchestration-frameworks|Claude Code orchestration frameworks]].
+Progressive disclosure is the loading discipline Anthropic uses to let many Agent Skills coexist without paying full token cost upfront. Information loads in three levels: Level 1 metadata (the YAML `name` + `description`, always preloaded into the system prompt at ~100 tokens per Skill); Level 2 instructions (the SKILL.md body, read via bash when the Skill is triggered, kept under ~5k tokens); Level 3 resources (additional `.md` references, datasets, scripts — accessed only when explicitly referenced, with script source code executed via bash so it never enters context). The pattern lets a Skill bundle dozens of reference files, comprehensive API docs, or large datasets without context penalty until something is actually read. The same discipline is a general context-engineering principle, not a Skills-only mechanism: the [[src-2026-05-06-ralph-playbook|The Ralph Playbook]] applies it to autonomous coding loops by keeping its always-loaded `AGENTS.md` minimal and deferring status/detail to a separate on-demand file. More broadly, progressive disclosure — originally a Jakob Nielsen UX pattern (1995) — has become the architectural backbone of Claude Code itself, spanning a full load hierarchy from always-loaded CLAUDE.md down to forked [[subagents|subagent]] contexts, and is the unifying principle behind all three [[claude-code-orchestration-frameworks|Claude Code orchestration frameworks]]. [[interpretable-context-methodology|Interpretable Context Methodology]] pushes the same discipline down to folder granularity — each numbered workflow stage loads only the context layers it needs — making it a structural instance of [[context-engineering|Context Engineering]] rather than a within-context loading trick.
 
 ## Key Facts
 
@@ -61,6 +62,7 @@ Progressive disclosure is the loading discipline Anthropic uses to let many Agen
 - Progressive disclosure originated as a Jakob Nielsen UX pattern (1995); Anthropic elevated it to the architectural backbone of Claude Code — for humans it improves learnability, for LLMs it is an architectural necessity given context rot, attention dilution, and cache economics [prov:src-2026-04-16-claude-code-frameworks-report#sec:progressive-disclosure|derived|2026-06-09] [epistemic:: sourced]
 - The Claude-Code-wide load hierarchy runs top to bottom: enterprise policy → `~/.claude/CLAUDE.md` (always) → `./CLAUDE.md` (always) → subdir CLAUDE.md (lazy on file access) → skill metadata (always, ~100 tokens each) → skill body (on trigger, <5K) → bundled references/scripts (on demand, unbounded) → subagent contexts (forked, compressed on return) [prov:src-2026-04-16-claude-code-frameworks-report#sec:progressive-disclosure|derived|2026-06-09] [epistemic:: sourced]
 - Key anti-pattern — over-reliance on auto-activation: Vercel found skills were never invoked in 56% of test cases, and explicit "IMPORTANT: read X" pointers outperformed pure auto-discovery; other anti-patterns are bloated CLAUDE.md, monolithic mega-prompts, eager `Read all of docs/`, and accepting context rot instead of externalizing state [prov:src-2026-04-16-claude-code-frameworks-report#sec:progressive-disclosure|derived|2026-06-09] [epistemic:: tentative]
+- The discipline generalizes beyond Claude Code: Interpretable Context Methodology applies it at folder granularity, where each numbered workflow stage loads only the context layers it needs, keeping per-stage context at ~2,000–8,000 tokens versus 30,000–50,000 for a monolithic prompt that loads everything. [prov:src-2026-06-17-interpretable-context-methodology#p7|direct|2026-06-17] [epistemic:: sourced]
 
 ## Detail
 
@@ -125,6 +127,8 @@ The report is equally explicit about anti-patterns, the most consequential being
 - [[claude-code|Claude Code]]
 - [[subagents|Subagents]]
 - [[claude-code-orchestration-frameworks|Claude Code Orchestration Frameworks]]
+- [[context-engineering|Context Engineering]] — the broader discipline this loading pattern serves.
+- [[interpretable-context-methodology|Interpretable Context Methodology]] — the same discipline applied at folder granularity.
 
 ## Sources
 
@@ -134,3 +138,4 @@ The report is equally explicit about anti-patterns, the most consequential being
 - [[src-2026-05-06-anthropic-claude-cookbook-skills-custom-development|Building Custom Skills for Claude (claude-cookbooks notebook 03)]] — Anthropic claude-cookbooks, 2026-05-06
 - [[src-2026-05-06-ralph-playbook|The Ralph Playbook (Clayton Farr's how-to-ralph-wiggum)]] — Clayton Farr / Geoffrey Huntley, 2026-05-06
 - [[src-2026-04-16-claude-code-frameworks-report|Claude Code Frameworks & Patterns: A Comparative Report]] — comparative synthesis report, April 2026
+- [[src-2026-06-17-interpretable-context-methodology|Interpretable Context Methodology: Folder Structure as Agent Architecture]] — Van Clief & McDermott, arXiv, March 2026
