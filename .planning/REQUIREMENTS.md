@@ -20,11 +20,11 @@ Design lineage: `.planning/seeds/primary-source-type-extensions.md` Candidate A 
 
 ### External Source Drift Detection (DRIFT)
 
-- [ ] **DRIFT-01**: External drift checks land as an opt-in `--network` extension of lint's existing `drift`/`EXTERNAL:` subcategory — without the flag lint behavior is byte-identical to today; `--ci` continues to default-skip `drift-external`; no core workflow gains a mandatory network dependency
-- [ ] **DRIFT-02**: Repository sources — upstream default-branch HEAD is compared to the recorded `commit_sha` (`git ls-remote`, no clone): drifted → warning, unreachable → warning, current → no finding
-- [ ] **DRIFT-03**: URL-backed sources — recorded `url` frontmatter is reachability-checked (dead/gone → warning, redirect → info); research-report citation registries get a sampled link-rot ratio finding with thresholds
-- [ ] **DRIFT-04**: The drift stance is review-only and documented — findings flow through the standard lint report; no page mutation or auto-re-ingest; follow-up guidance (re-snapshot vs annotate via UPDATE op) lives in `schema/workflows/lint.md`; video sources are excluded per the shipped D-06 link-rot stance; a decision record captures the narrowed "surface, don't mark stale" choice vs the 999.5 sketch
-- [ ] **DRIFT-05**: Real-run validation — `--network` executed over the live wiki (including the Phase-22 repository source and the URL-backed article/report sources); findings triaged and follow-ups logged
+- [x] **DRIFT-01**: External drift checks land as an opt-in `--network` extension of lint's existing `drift`/`EXTERNAL:` subcategory — without the flag lint behavior is byte-identical to today; `--ci` continues to default-skip `drift-external`; no core workflow gains a mandatory network dependency
+- [x] **DRIFT-02**: Repository sources — upstream default-branch HEAD is compared to the recorded `commit_sha` (`git ls-remote`, no clone): drifted → warning, unreachable → warning, current → no finding
+- [x] **DRIFT-03**: URL-backed sources — recorded `url` frontmatter is reachability-checked (dead/gone → warning, redirect → info); research-report citation registries get a sampled link-rot ratio finding with thresholds
+- [x] **DRIFT-04**: The drift stance is review-only and documented — findings flow through the standard lint report; no page mutation or auto-re-ingest; follow-up guidance (re-snapshot vs annotate via UPDATE op) lives in `schema/workflows/lint.md`; video sources are excluded per the shipped D-06 link-rot stance; a decision record captures the narrowed "surface, don't mark stale" choice vs the 999.5 sketch
+- [x] **DRIFT-05**: Real-run validation — `--network` executed over the live wiki (including the Phase-22 repository source and the URL-backed article/report sources); findings triaged and follow-ups logged
 
 ## Future Requirements
 
@@ -63,11 +63,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | REPO-04 | Phase 22 | Complete |
 | REPO-05 | Phase 22 | Complete |
 | REPO-06 | Phase 22 | Complete |
-| DRIFT-01 | Phase 23 | Pending |
-| DRIFT-02 | Phase 23 | Pending |
-| DRIFT-03 | Phase 23 | Pending |
-| DRIFT-04 | Phase 23 | Pending |
-| DRIFT-05 | Phase 23 | Pending |
+| DRIFT-01 | Phase 23 | Complete |
+| DRIFT-02 | Phase 23 | Complete |
+| DRIFT-03 | Phase 23 | Complete |
+| DRIFT-04 | Phase 23 | Complete |
+| DRIFT-05 | Phase 23 | Complete |
 
 **Coverage:**
 - v1.4 requirements: 11 total

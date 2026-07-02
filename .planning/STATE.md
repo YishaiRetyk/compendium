@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Source Lifecycle
-status: phase_22_complete
-stopped_at: Phase 22 complete (3/3 plans, verified + reviewed) — Phase 23 next
+status: milestone_complete
+stopped_at: Phase 23 complete — v1.4 Source Lifecycle milestone complete (11/11 requirements)
 last_updated: 2026-07-03T01:00:00.000Z
 last_activity: 2026-07-03 — Milestone v1.4 Source Lifecycle started (Phases 22–23)
 progress:
   total_phases: 2
-  completed_phases: 1
-  total_plans: 3
-  completed_plans: 3
-  percent: 50
+  completed_phases: 2
+  total_plans: 5
+  completed_plans: 5
+  percent: 100
 ---
 
 # Project State
@@ -26,10 +26,10 @@ See: .planning/PROJECT.md (updated 2026-07-03)
 
 ## Current Position
 
-Phase: 22 — Repository Source Type (complete, verified + reviewed 2026-07-03)
-Next: plan + execute Phase 23 (External Source Drift Detection)
+Phase: 23 — External Source Drift Detection (complete, verified 2026-07-03)
+Next: close milestone v1.4, then start v1.5 Python Migration (staged import — re-baseline first)
 Plan: —
-Status: Phase 22 complete — 6/6 REPO requirements Complete, 0 drift
+Status: Milestone complete — all v1.4 phases verified
 Last activity: 2026-07-03
 
 ### v1.4 Phase Summary
@@ -37,7 +37,7 @@ Last activity: 2026-07-03
 | Phase | Name | Requirements | Status |
 |-------|------|--------------|--------|
 | 22 | Repository Source Type | REPO-01..06 (6 reqs) | ✓ Complete (2026-07-03) |
-| 23 | External Source Drift Detection | DRIFT-01..05 (5 reqs) | Not started (depends on 22) |
+| 23 | External Source Drift Detection | DRIFT-01..05 (5 reqs) | ✓ Complete (2026-07-03) |
 
 **Total:** 11 requirements across 2 phases. 100% mapped.
 

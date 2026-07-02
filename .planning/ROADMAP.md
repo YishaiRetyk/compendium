@@ -84,7 +84,7 @@ Full phase details: [milestones/v1.3-ROADMAP.md](milestones/v1.3-ROADMAP.md)
 **Goal:** Close the source lifecycle loop — formalize the `repository` source type as the extension contract's first *primary* new-type instance (locators, snapshot convention, epistemic split, lint enforcement), then ship external-source drift detection (backlog 999.5) as an opt-in, review-only extension of lint's pre-plumbed `drift-external` subcategory, with repository SHA drift as the pilot case.
 
 - [x] **Phase 22: Repository Source Type** - Justify `source_type: repository` via the extension contract, define `#path:`/`#commit:` locators + the curated-snapshot bundle convention + the within-source epistemic split, enforce via lint/audit, and validate end-to-end with a real repository (completed 2026-07-03)
-- [ ] **Phase 23: External Source Drift Detection** - Extend lint's `drift`/`EXTERNAL:` subcategory with opt-in `--network` checks (repository HEAD-vs-SHA, URL reachability, citation-registry link-rot), review-only with documented follow-up guidance, validated by a real run over the live wiki
+- [x] **Phase 23: External Source Drift Detection** - Extend lint's `drift`/`EXTERNAL:` subcategory with opt-in `--network` checks (repository HEAD-vs-SHA, URL reachability, citation-registry link-rot), review-only with documented follow-up guidance, validated by a real run over the live wiki (completed 2026-07-03)
 
 ## Phase Details
 
@@ -132,7 +132,16 @@ Plans:
   4. The stance is review-only and documented in `schema/workflows/lint.md`: findings report, nothing mutates, follow-up is a human decision (re-snapshot vs annotate via UPDATE op); video sources excluded per D-06; a decision record captures the narrowed "surface, don't auto-mark" choice vs the original 999.5 sketch
   5. A real `--network` run over the live wiki has executed, covering the Phase-22 repository source and the existing URL-backed sources; findings triaged with follow-ups logged
 
-**Plans**: TBD (planned at phase start)
+**Plans**: 2 plans (2 waves)
+Plans:
+
+**Wave 1**
+
+- [x] 23-01-PLAN.md — --network flag + three check families (repo HEAD drift, URL reachability, registry link-rot) + network-free tests (LINT_VERSION 1.12.0)
+
+**Wave 2** *(blocked on Wave 1)*
+
+- [x] 23-02-PLAN.md — lint.md External Source Drift section + DR (surface-don't-mark) + live --network validation run with triage
 
 **UI hint**: no
 
