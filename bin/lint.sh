@@ -10,7 +10,7 @@ set -euo pipefail
 # Lint rule-set semver per CI-08 / D-26. Bump MAJOR on breaking changes
 # (removed category, changed severity semantics). MINOR on non-breaking
 # additions. PATCH on bug fixes. --require-version X.Y.Z is a minimum check.
-LINT_VERSION="1.11.0"
+LINT_VERSION="1.12.0"
 
 usage() {
     cat <<'EOF'
@@ -50,6 +50,14 @@ Options:
                       Precedence: --category (inclusive) applies FIRST; then
                       --skip-category SUBTRACTS. Example:
                         --category stale --skip-category stale -> no findings.
+  --network           OPT-IN external source drift checks (drift-external
+                      subcategory, EXTERNAL: prefix, review-only, severity
+                      <= warning): repository upstream HEAD vs commit_sha
+                      (git ls-remote, no clone), source url reachability
+                      (videos excluded per their link-rot stance), and
+                      research-report citation-registry link-rot ratios.
+                      Without this flag NO network I/O happens; --ci
+                      default-skips drift-external regardless.
   --strict                   CI-06 quality ratchet: fail on PR-added
                              [epistemic:: inferred]/[tentative] claims without
                              matching decision record, and on new (git diff
@@ -100,6 +108,7 @@ FORMAT="text"
 CI_MODE=0
 SKIP_CATEGORIES=""   # colon-separated list
 STRICT_MODE=0
+NETWORK_MODE=0
 COUNT_SKIPS=0
 STAGED_MODE=0
 
@@ -166,6 +175,10 @@ while [ "$#" -gt 0 ]; do
             ;;
         --strict)
             STRICT_MODE=1
+            shift
+            ;;
+        --network)
+            NETWORK_MODE=1
             shift
             ;;
         --count-skips)
@@ -259,6 +272,7 @@ export LINT_FIX="$FIX"
 export LINT_CATEGORY="$CATEGORY"
 export LINT_FORMAT="$FORMAT"
 export LINT_CI_MODE="$CI_MODE"
+export LINT_NETWORK="$NETWORK_MODE"
 export LINT_SKIP_CATEGORIES="$SKIP_CATEGORIES"
 export LINT_STRICT_MODE="$STRICT_MODE"
 export LINT_COUNT_SKIPS="$COUNT_SKIPS"
@@ -2445,6 +2459,112 @@ if should_run('drift') or should_run('all'):
                                 f"git-tracked wiki page exists for it (orphaned "
                                 f"operation artifact -- prior operation skipped "
                                 f"its commit; commit the page or fix the log entry)")
+
+    # --- External source drift (Phase 23, DRIFT-01..03) — OPT-IN via --network ---
+    # Review-only network checks in the drift-external logical subcategory
+    # (EXTERNAL: message prefix; --ci default-skips it per the Phase-9 D-02
+    # contract). Without --network this block is a no-op, so no core workflow
+    # gains a network dependency (999.5 non-goal). Severity never exceeds
+    # warning: upstream movement is surfaced for a HUMAN re-snapshot/annotate
+    # decision — claims cite the immutable ingested snapshot and stay faithful
+    # to it (see schema/workflows/lint.md, External Source Drift).
+    if os.environ.get('LINT_NETWORK') == '1':
+        print("  Check 10g: External source drift (--network)...", file=sys.stderr)
+        import shutil as _shutil
+
+        def _net_run(cmd, timeout_s=20):
+            env = dict(os.environ)
+            env['GIT_TERMINAL_PROMPT'] = '0'
+            try:
+                return subprocess.run(cmd, capture_output=True, text=True,
+                                      timeout=timeout_s, env=env)
+            except subprocess.TimeoutExpired:
+                return None
+
+        _have_git = _shutil.which('git') is not None
+        _have_curl = _shutil.which('curl') is not None
+        if not _have_git or not _have_curl:
+            missing = [t for t, ok in (('git', _have_git), ('curl', _have_curl)) if not ok]
+            add_finding('info', 'drift', '.',
+                        f"EXTERNAL: network drift checks skipped (missing tool: "
+                        f"{', '.join(missing)})")
+
+        def _http_code(url, timeout_s=15):
+            """(status_code_str, num_redirects_int) via curl -sIL; '000' on failure."""
+            r = _net_run(['curl', '-sIL', '-o', os.devnull,
+                          '-w', '%{http_code} %{num_redirects}',
+                          '--max-time', str(timeout_s), url], timeout_s + 5)
+            if r is None or r.returncode != 0 or not r.stdout.strip():
+                return '000', 0
+            parts = r.stdout.strip().split()
+            code = parts[0] if parts else '000'
+            redirects = int(parts[1]) if len(parts) > 1 and parts[1].isdigit() else 0
+            return code, redirects
+
+        _DEAD_CODES = {'000', '404', '410'}
+        _REF_URL_RE = re.compile(r'^\s*-\s*r\d+::\s*\[[^\]]*\]\((https?://[^)\s]+)\)',
+                                 re.MULTILINE)
+        for page_path, page_fm, page_body, page_err in all_pages:
+            if not isinstance(page_fm, dict) or page_fm.get('type') != 'source':
+                continue
+            rel = os.path.relpath(page_path)
+            st = page_fm.get('source_type', '')
+
+            # (1) Repository HEAD drift — git ls-remote, no clone (DRIFT-02)
+            if st == 'repository' and _have_git:
+                repo_url = page_fm.get('repo_url', '')
+                sha = str(page_fm.get('commit_sha', '')).lower()
+                branch = page_fm.get('default_branch', '') or 'HEAD'
+                if repo_url and sha:
+                    ref = 'HEAD' if branch == 'HEAD' else f'refs/heads/{branch}'
+                    r = _net_run(['git', 'ls-remote', repo_url, ref])
+                    if r is None or r.returncode != 0:
+                        add_finding('warning', 'drift', rel,
+                                    f'EXTERNAL: repository unreachable for drift '
+                                    f'check: {repo_url}')
+                    else:
+                        head = r.stdout.split('\t')[0].strip() if r.stdout.strip() else ''
+                        if not head:
+                            add_finding('warning', 'drift', rel,
+                                        f'EXTERNAL: branch {branch} not found '
+                                        f'upstream: {repo_url}')
+                        elif head.lower() != sha:
+                            add_finding('warning', 'drift', rel,
+                                        f'EXTERNAL: repository upstream drifted -- '
+                                        f'{branch} HEAD {head[:12]} != snapshot '
+                                        f'commit {sha[:12]} ({repo_url}); '
+                                        f're-snapshot (new ingest) or annotate')
+                continue  # repo_url reachability covered above; skip generic URL check
+
+            # (2) URL reachability (DRIFT-03) — videos excluded per D-06
+            # (transcript sub-case: the committed transcript is the archive)
+            if st == 'transcript' and page_fm.get('channel'):
+                pass
+            else:
+                url = page_fm.get('url', '') or ''
+                if _have_curl and isinstance(url, str) and url.startswith('http'):
+                    code, redirects = _http_code(url)
+                    if code in _DEAD_CODES:
+                        add_finding('warning', 'drift', rel,
+                                    f'EXTERNAL: source url unreachable '
+                                    f'(HTTP {code}): {url}')
+                    elif redirects > 0:
+                        add_finding('info', 'drift', rel,
+                                    f'EXTERNAL: source url moved ({redirects} '
+                                    f'redirect(s), final HTTP {code}): {url}')
+
+            # (3) Citation-registry link-rot ratio (DRIFT-03)
+            if st == 'research-report' and _have_curl:
+                refs = _REF_URL_RE.findall(page_body or '')
+                sample = refs[:10]  # deterministic first-N sample
+                dead = [u for u in sample if _http_code(u, 12)[0] in _DEAD_CODES]
+                if dead:
+                    sev = 'warning' if len(dead) * 2 >= len(sample) else 'info'
+                    shown = ', '.join(dead[:3]) + (' ...' if len(dead) > 3 else '')
+                    add_finding(sev, 'drift', rel,
+                                f'EXTERNAL: citation-registry link-rot '
+                                f'{len(dead)}/{len(sample)} sampled entries dead: '
+                                f'{shown}')
 
 # ---------------------------------------------------------------------------
 # Check: routing (D-03..D-08, WF-08) — bidirectional schema tree reachability
