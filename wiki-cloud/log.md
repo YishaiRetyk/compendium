@@ -790,3 +790,20 @@ UPDATED:
 - index.md (source catalog entry + refreshed gsd entity line)
 
 Rationale: validates the repository source type in anger (REPO-06) — the extension contract's first PRIMARY new-type instance (D-01: locator, drift, acquisition change unconditionally; epistemics structurally). The `#path:` locators resolve against the Excerpts registry and `#commit:` against Snapshot Metadata via the new audit resolvers (22-02); the upgrade path from report-derived to repository-direct claims (Model C promotion story) is exercised on a real page.
+
+## [2026-07-03] reflect | repository source type schema decision
+
+Created decision record [[dr-2026-07-03-repository-source-type|Repository as a New Primary Source Type (#path/#commit Locators + Excerpt Registry)]] (`trigger_type: schema-update`, `affected_pages: [gsd, src-2026-07-03-gsd-core-repo]`) capturing the Phase 22 decisions: repository as a NEW primary `source_type` — the extension contract's first primary new-type instance and the inverse verdict of the pdf/video sub-case evaluations, reached by the same rule (D-01: locator, drift, acquisition change unconditionally; epistemics structurally); the minimal `#path:`/`#commit:` locator grammar with `#issue:`/`#pr:` deferred (D-02); the curated-snapshot-bundle-never-a-full-clone raw source whose `## Excerpts` registry makes `#path:` audit-resolvable offline (D-03/D-04); `#commit:` valid only for the snapshot's own commit (D-05); lint-required drift-anchor frontmatter repo_url/commit_sha/default_branch (D-06, LINT_VERSION 1.11.0); the within-source epistemic split with support_type staying direct (D-08); the fields-now-machinery-next drift stance (D-07); and mechanical-only acquisition glue (D-09). Alternatives Considered maps the declined options (article/data sub-case, full clone, clone-resolved #path, issue/pr locators now, video-style lint-optional fields). Consequences records the fence-aware `_resolve_path` fix found live on the first ingest. Indexed under Decisions.
+
+## [2026-07-03] lint | wiki-cloud health check
+
+findings: 86 total (0 errors, warnings/info only)
+auto_fixes: 0 applied
+report: wiki-cloud/maintenance/lint-report.md
+scope: full run — 0 errors after the first repository ingest; the delta vs the pre-phase baseline (78) is the designed section-level contradiction-candidate flags on gsd.md (old report-derived vs new repository-direct project facts sharing sections — the supersession is annotated inline) plus crossref suggestions around the new source page. No new errors.
+
+## [2026-07-03] lint | wiki-cloud health check
+
+findings: 86 total (0 errors, 77 warnings, 9 info)
+auto_fixes: 0 applied
+report: wiki-cloud/maintenance/lint-report.md

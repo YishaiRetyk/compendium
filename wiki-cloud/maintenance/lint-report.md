@@ -5,7 +5,7 @@ type: overview
 status: active
 summary: "Wiki health-check findings from most recent lint run."
 created_at: 2026-04-30
-updated_at: 2026-06-14
+updated_at: 2026-07-03
 sources: []
 epistemic_status: sourced
 tags:
@@ -23,15 +23,15 @@ neutrality_exempt: true
 
 # Lint Report
 
-**Last run:** 2026-06-14
-**Total findings:** 78
+**Last run:** 2026-07-03
+**Total findings:** 86
 **Auto-fixes applied:** 0
 
 ## Errors (0)
 
 (none)
 
-## Warnings (69)
+## Warnings (77)
 
 ### Contradiction
 - **wiki-cloud/concepts/progressive-disclosure.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-04-16-claude-code-frameworks-report and src-2026-05-06-anthropic-agent-skills-best-practices (agent review needed)
@@ -65,6 +65,8 @@ neutrality_exempt: true
 - **wiki-cloud/entities/dexter.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-04-dexter-investigation and src-2026-05-04-financial-ai-repo-comparison-report (agent review needed)
 - **wiki-cloud/entities/financial-models-numerical-methods.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-04-financial-ai-repo-comparison-report and src-2026-05-04-fmnm-investigation (agent review needed)
 - **wiki-cloud/entities/finrl.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-04-financial-ai-repo-comparison-report and src-2026-05-04-finrl-investigation (agent review needed)
+- **wiki-cloud/entities/gsd.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-04-16-claude-code-frameworks-report and src-2026-07-03-gsd-core-repo (agent review needed)
+- **wiki-cloud/entities/gsd.md** | Potential contradiction candidate in section "Detail": claims from src-2026-04-16-claude-code-frameworks-report and src-2026-07-03-gsd-core-repo (agent review needed)
 - **wiki-cloud/entities/hack-agentive-stack.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-03-is-this-the-only-skill-left and src-2026-05-04-three-artifacts-build-with-ai (agent review needed)
 - **wiki-cloud/entities/openbb.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-04-financial-ai-repo-comparison-report and src-2026-05-04-openbb-investigation (agent review needed)
 - **wiki-cloud/entities/tradingagents.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-04-financial-ai-repo-comparison-report and src-2026-05-04-tradingagents-investigation (agent review needed)
@@ -76,8 +78,13 @@ neutrality_exempt: true
 - **wiki-cloud/concepts/comprehension-debt.md** | Missing cross-reference: comprehension-debt and jagged-frontier share domains ['ai-assisted-development', 'software-engineering'] and tags ['ai-coding', 'skills'] but lack mutual wikilinks
 - **wiki-cloud/concepts/programming-as-theory-building.md** | Missing cross-reference: programming-as-theory-building and ubiquitous-language share domains ['ai-assisted-development', 'software-engineering'] and tags ['ai-coding', 'software-engineering'] but lack mutual wikilinks
 - **wiki-cloud/concepts/programming-as-theory-building.md** | Missing cross-reference: programming-as-theory-building and src-2026-05-04-three-artifacts-build-with-ai share domains ['ai-assisted-development', 'software-engineering'] and tags ['ai-coding', 'software-engineering'] but lack mutual wikilinks
+- **wiki-cloud/concepts/spec-driven-development.md** | Missing cross-reference: spec-driven-development and src-2026-07-03-gsd-core-repo share domains ['ai-agents', 'software'] and tags ['agentic-frameworks', 'claude-code'] but lack mutual wikilinks
+- **wiki-cloud/concepts/subagents.md** | Missing cross-reference: subagents and src-2026-07-03-gsd-core-repo share domains ['ai-agents', 'software'] and tags ['claude-code', 'context-engineering'] but lack mutual wikilinks
 - **wiki-cloud/concepts/ubiquitous-language.md** | Missing cross-reference: ubiquitous-language and src-2026-05-03-is-this-the-only-skill-left share domains ['ai-assisted-development', 'software-engineering'] and tags ['ai-coding', 'software-engineering'] but lack mutual wikilinks
+- **wiki-cloud/entities/spec-kit.md** | Missing cross-reference: spec-kit and src-2026-07-03-gsd-core-repo share domains ['ai-agents', 'software'] and tags ['agentic-frameworks', 'claude-code'] but lack mutual wikilinks
+- **wiki-cloud/entities/superpowers.md** | Missing cross-reference: superpowers and src-2026-07-03-gsd-core-repo share domains ['ai-agents', 'software'] and tags ['agentic-frameworks', 'claude-code'] but lack mutual wikilinks
 - **wiki-cloud/overviews/domain-driven-design.md** | Missing cross-reference: domain-driven-design and src-2026-05-03-is-this-the-only-skill-left share domains ['ai-assisted-development', 'software-engineering'] and tags ['ai-coding', 'software-engineering'] but lack mutual wikilinks
+- **wiki-cloud/sources/src-2026-04-16-claude-code-frameworks-report.md** | Missing cross-reference: src-2026-04-16-claude-code-frameworks-report and src-2026-07-03-gsd-core-repo share domains ['ai-agents', 'software'] and tags ['agentic-frameworks', 'claude-code', 'gsd'] but lack mutual wikilinks
 - **wiki-cloud/sources/src-2026-05-04-anthropic-financial-services-investigation.md** | Missing cross-reference: src-2026-05-04-anthropic-financial-services-investigation and src-2026-05-04-dexter-investigation share domains ['financial-ai', 'software'] and tags ['financial-ai', 'repository-investigation'] but lack mutual wikilinks
 - **wiki-cloud/sources/src-2026-05-04-anthropic-financial-services-investigation.md** | Missing cross-reference: src-2026-05-04-anthropic-financial-services-investigation and src-2026-05-04-openbb-investigation share domains ['financial-ai', 'software'] and tags ['financial-ai', 'repository-investigation'] but lack mutual wikilinks
 - **wiki-cloud/sources/src-2026-05-04-anthropic-financial-services-investigation.md** | Missing cross-reference: src-2026-05-04-anthropic-financial-services-investigation and src-2026-05-04-tradingagents-investigation share domains ['financial-ai', 'software'] and tags ['financial-ai', 'repository-investigation'] but lack mutual wikilinks
@@ -88,6 +95,7 @@ neutrality_exempt: true
 - **wiki-cloud/sources/src-2026-05-06-anthropic-agent-skills-overview.md** | Missing cross-reference: src-2026-05-06-anthropic-agent-skills-overview and src-2026-05-06-anthropic-claude-cookbook-skills-introduction share domains ['ai-agents', 'software'] and tags ['agent-skills', 'claude-api'] but lack mutual wikilinks
 - **wiki-cloud/sources/src-2026-05-06-anthropic-agent-skills-quickstart.md** | Missing cross-reference: src-2026-05-06-anthropic-agent-skills-quickstart and src-2026-05-06-anthropic-claude-cookbook-skills-custom-development share domains ['ai-agents', 'software'] and tags ['agent-skills', 'claude-api'] but lack mutual wikilinks
 - **wiki-cloud/sources/src-2026-05-06-anthropic-claude-cookbook-skills-custom-development.md** | Missing cross-reference: src-2026-05-06-anthropic-claude-cookbook-skills-custom-development and src-2026-05-06-anthropic-claude-cookbook-skills-introduction share domains ['ai-agents', 'software'] and tags ['agent-skills', 'anthropic-sdk', 'claude-api', 'claude-cookbooks', 'jupyter-notebook', 'python'] but lack mutual wikilinks
+- **wiki-cloud/sources/src-2026-07-03-gsd-core-repo.md** | Missing cross-reference: src-2026-07-03-gsd-core-repo and claude-code-orchestration-frameworks share domains ['ai-agents', 'software'] and tags ['agentic-frameworks', 'claude-code', 'gsd'] but lack mutual wikilinks
 
 ### Drift
 - **sources/2026/2026-04/2026-04-09-thinking-fast-and-slow-part1/source.md** | Raw source has no wiki source summary page
