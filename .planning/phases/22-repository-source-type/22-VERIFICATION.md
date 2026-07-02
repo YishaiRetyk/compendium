@@ -10,8 +10,8 @@ overrides_applied: 0
 
 **Phase Goal:** Code repositories can be acquired via a documented snapshot pipeline and ingested as a first-class primary source type, with file/line-anchored provenance that the audit can actually resolve.
 **Verified:** 2026-07-03
-**Status:** PASSED
-**Re-verification:** No — initial verification (one live defect found and fixed during validation, see SC-3 note)
+**Status:** PASSED (re-verified post-review — see the Review Round addendum at the bottom)
+**Re-verification:** Yes — the xhigh code review (22-REVIEW.md) proved the initial SC-6 "10/10 locators resolve" partially hollow (non-None ≠ usable passage); after the 15-finding fix pass, resolution was re-proven at passage level (worklist: every sampled repo passage substantive, `#sec:readme` 619 chars containing the cited text, `#commit:` passage containing the counted facts)
 
 ---
 
