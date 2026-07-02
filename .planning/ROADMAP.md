@@ -101,7 +101,20 @@ Full phase details: [milestones/v1.3-ROADMAP.md](milestones/v1.3-ROADMAP.md)
   5. Lint enforces the type — D-09 enum extended, conditional required-fields check (`repo_url` + `commit_sha`), LINT_VERSION bumped — and a lint run over the live tree stays clean
   6. One real repository has been acquired via the runbook, ingested, its wiki pages carry `#path`-anchored provenance, and a source-scoped audit run resolves its locators (non-vacuous)
 
-**Plans**: TBD (planned at phase start)
+**Plans**: 3 plans (3 waves)
+Plans:
+
+**Wave 1**
+
+- [ ] 22-01-PLAN.md — repository-ingestion.md convention + source-types/frontmatter/provenance/ingest edits + routing row (byte-synced)
+
+**Wave 2** *(blocked on Wave 1)*
+
+- [ ] 22-02-PLAN.md — lint enum + conditional fields (LINT_VERSION 1.11.0) + audit #path/#commit resolvers (dispatch-order D-11) + bin/repo-snapshot.sh + tests/phase-22 TDD harness
+
+**Wave 3** *(blocked on Wave 2 — network acquisition)*
+
+- [ ] 22-03-PLAN.md — end-to-end validation ingest (gsd-build/get-shit-done) + source-scoped audit + DR + phase-final gates
 
 **UI hint**: no
 

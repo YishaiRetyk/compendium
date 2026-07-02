@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Source Lifecycle
-status: roadmap_created
-stopped_at: Milestone v1.4 defined (requirements + roadmap) — ready to plan Phase 22
+status: phase_22_executing
+stopped_at: Phase 22 planned (3 plans, 3 waves) — executing
 last_updated: 2026-07-03T01:00:00.000Z
 last_activity: 2026-07-03 — Milestone v1.4 Source Lifecycle started (Phases 22–23)
 progress:
   total_phases: 2
   completed_phases: 0
-  total_plans: 0
+  total_plans: 3
   completed_plans: 0
   percent: 0
 ---
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-07-03)
 
 ## Current Position
 
-Phase: 22 — Repository Source Type (not yet planned)
-Next: plan Phase 22, execute, verify; then Phase 23
+Phase: 22 — Repository Source Type (planned: 3 plans, 3 waves)
+Next: execute Phase 22 waves 1-3, verify; then Phase 23
 Plan: —
-Status: Roadmap created; requirements defined (11 REQ-IDs, 100% mapped)
+Status: Executing Phase 22
 Last activity: 2026-07-03
 
 ### v1.4 Phase Summary
