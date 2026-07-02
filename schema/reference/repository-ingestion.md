@@ -40,12 +40,23 @@ The raw source is a **curated snapshot bundle** — explicitly NOT a full clone.
 
     (fenced code block with the quoted lines)
 
+### <path/to/file.py>:L<n>
+
+    (single-line excerpt — equivalent to L<n>-L<n>)
+
 ### <path/to/other-file.md>
 
-    (fenced block quoting the relevant content)
+    (whole-file excerpt: fenced block quoting the relevant content)
 ```
 
 The registry is what makes `#path:` locators **resolvable offline** by `bin/audit-claims.sh` — the same pattern as the research-report `## References` registry. The rule of thumb: **if you anchor a claim to code, quote the code.**
+
+Registry mechanics (the resolver enforces these):
+
+- The registry is the **last** `## Excerpts` section in the snapshot — an `## Excerpts` heading occurring inside embedded README/docs prose cannot hijack it.
+- Excerpt bodies may quote markdown containing `##`/`###` lines **inside their fences** (including nested 4-backtick-over-3-backtick and `~~~` fences) — quoted headings never truncate the registry or match `#sec:` locators.
+- A **whole-file** entry (no declared range) satisfies **path-only** requests ONLY; a range request resolves only against a ranged entry that **contains** it (there is nothing to verify containment against otherwise).
+- **Curation addendum rule:** the raw source is immutable once its claims are in review circulation, with one narrow exception — a same-phase, logged amendment that adds registry entries or metadata lines needed to make already-authored claims resolvable (format repair, never content alteration). Log it as an UPDATE and recompute `content_hash`.
 
 ## 3. Frontmatter Fields (Repository Sources)
 
@@ -54,7 +65,7 @@ Required on every `source_type: repository` source summary (lint enforces all th
 | Field | Meaning |
 |-------|---------|
 | `repo_url` | Canonical repository URL (e.g. `https://github.com/<owner>/<repo>`). Consumed by external drift detection. |
-| `commit_sha` | Full 40-hex commit SHA the snapshot was taken at. The snapshot's identity; the drift comparison anchor. |
+| `commit_sha` | Full 40-hex **lowercase** commit SHA the snapshot was taken at (lint enforces the lowercase form; git emits lowercase natively). The snapshot's identity; the drift comparison anchor. |
 | `default_branch` | The branch whose HEAD the SHA was taken from (e.g. `main`). |
 
 Recommended (omit entirely when unknown — never leave empty):
@@ -78,7 +89,7 @@ Two new locator forms (documented in `schema/reference/provenance.md` Locator Ty
 **Resolution semantics** (`bin/audit-claims.sh`):
 
 - `#path:` resolves against the `## Excerpts` registry: exact path match on an excerpt heading; a line range resolves when it is contained in an excerpt's declared range. No matching excerpt → `insufficient-locator` (NOT an error — the honest-degradation precedent of `#p` without page markers and `#r` without a bibliography).
-- `#commit:` resolves to the `## Snapshot Metadata` passage when the SHA prefix-matches the source's `commit_sha`; any other SHA → `insufficient-locator` (the snapshot documents exactly one commit).
+- `#commit:` resolves to the `## Snapshot Metadata` passage when the SHA prefix-matches the sha on the metadata section's **`- Commit:` line** (the snapshot's own commit — equal to `commit_sha` by construction); any other SHA, including other 40-hex strings that happen to appear in the metadata (a parent commit, an upstream tag), → `insufficient-locator` (the snapshot documents exactly one commit). Facts you intend to anchor with `#commit:` (tree stats, structural observations) must be **written into the metadata section** — a passage cannot support a claim it does not contain.
 
 `#sec:` continues to work for README/docs prose in the snapshot — no new grammar needed there.
 

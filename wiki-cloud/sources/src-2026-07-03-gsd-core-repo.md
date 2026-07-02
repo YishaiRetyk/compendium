@@ -30,7 +30,7 @@ knowledge_domain: software
 example: false
 path: sources/2026/2026-07/2026-07-03-gsd-core-repo/source.md
 url: "https://github.com/open-gsd/gsd-core"
-content_hash: "sha256:141f0587518787ae9108efb37674ba9d5d451489671004a1bc01f8a6a653d940"
+content_hash: "sha256:fe5db8a725b7ca3d455c1cbac32b391569f2db97fd7b52c1546bffc638734b7b"
 ingested_at: 2026-07-03
 source_type: repository
 repo_url: "https://github.com/open-gsd/gsd-core"
@@ -39,7 +39,7 @@ default_branch: next
 license: MIT
 primary_language: JavaScript
 compilation_status: compiled
-compiled_against_hash: "sha256:141f0587518787ae9108efb37674ba9d5d451489671004a1bc01f8a6a653d940"
+compiled_against_hash: "sha256:fe5db8a725b7ca3d455c1cbac32b391569f2db97fd7b52c1546bffc638734b7b"
 compiled_targets:
 - gsd
 ---

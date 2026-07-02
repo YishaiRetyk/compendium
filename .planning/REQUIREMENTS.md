@@ -11,12 +11,12 @@ Design lineage: `.planning/seeds/primary-source-type-extensions.md` Candidate A 
 
 ### Repository Source Type (REPO)
 
-- [ ] **REPO-01**: `source_type: repository` is justified via the extension contract's decision rule (changes ≥1 of the 5 dimensions — here: locator scheme, drift mechanism, acquisition, epistemic handling), recorded in the contract's retro-fit table, and added to the frontmatter enum + ingest Pass-0 classification
-- [ ] **REPO-02**: New locators `#path:<file>[:L<n>[-L<m>]]` and `#commit:<sha>` are documented in the provenance locator table; `bin/audit-claims.sh` resolves `#path:` locators against the snapshot's excerpt registry (absent excerpt → `insufficient-locator`, honest degradation)
-- [ ] **REPO-03**: A documented repository acquisition runbook exists in `schema/reference/` producing a curated snapshot bundle — README + key docs + an addressable excerpt registry + metadata frontmatter (`repo_url`, `commit_sha`, `default_branch`, `license`, `primary_language`) — explicitly NOT a full clone; thin acquisition glue in `bin/` scaffolds the snapshot
-- [ ] **REPO-04**: The convention documents the within-source epistemic split — code/benchmark claims (`#path:`-anchored) at `sourced`, self-descriptive capability claims claim-level `[epistemic:: tentative]` — and assigns `knowledge_domain: software` decay
-- [ ] **REPO-05**: Lint enforces the type — D-09 enum extended with `repository`; conditional required-fields check (repository sources must carry `repo_url` + `commit_sha`); LINT_VERSION bumped
-- [ ] **REPO-06**: End-to-end validation — one real repository acquired via the runbook, ingested, wiki pages carry `#path`-anchored provenance, and a source-scoped audit run is non-vacuous (locators resolve)
+- [x] **REPO-01**: `source_type: repository` is justified via the extension contract's decision rule (changes ≥1 of the 5 dimensions — here: locator scheme, drift mechanism, acquisition, epistemic handling), recorded in the contract's retro-fit table, and added to the frontmatter enum + ingest Pass-0 classification
+- [x] **REPO-02**: New locators `#path:<file>[:L<n>[-L<m>]]` and `#commit:<sha>` are documented in the provenance locator table; `bin/audit-claims.sh` resolves `#path:` locators against the snapshot's excerpt registry (absent excerpt → `insufficient-locator`, honest degradation)
+- [x] **REPO-03**: A documented repository acquisition runbook exists in `schema/reference/` producing a curated snapshot bundle — README + key docs + an addressable excerpt registry + metadata frontmatter (`repo_url`, `commit_sha`, `default_branch`, `license`, `primary_language`) — explicitly NOT a full clone; thin acquisition glue in `bin/` scaffolds the snapshot
+- [x] **REPO-04**: The convention documents the within-source epistemic split — code/benchmark claims (`#path:`-anchored) at `sourced`, self-descriptive capability claims claim-level `[epistemic:: tentative]` — and assigns `knowledge_domain: software` decay
+- [x] **REPO-05**: Lint enforces the type — D-09 enum extended with `repository`; conditional required-fields check (repository sources must carry `repo_url` + `commit_sha`); LINT_VERSION bumped
+- [x] **REPO-06**: End-to-end validation — one real repository acquired via the runbook, ingested, wiki pages carry `#path`-anchored provenance, and a source-scoped audit run is non-vacuous (locators resolve)
 
 ### External Source Drift Detection (DRIFT)
 
@@ -57,12 +57,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| REPO-01 | Phase 22 | Pending |
-| REPO-02 | Phase 22 | Pending |
-| REPO-03 | Phase 22 | Pending |
-| REPO-04 | Phase 22 | Pending |
-| REPO-05 | Phase 22 | Pending |
-| REPO-06 | Phase 22 | Pending |
+| REPO-01 | Phase 22 | Complete |
+| REPO-02 | Phase 22 | Complete |
+| REPO-03 | Phase 22 | Complete |
+| REPO-04 | Phase 22 | Complete |
+| REPO-05 | Phase 22 | Complete |
+| REPO-06 | Phase 22 | Complete |
 | DRIFT-01 | Phase 23 | Pending |
 | DRIFT-02 | Phase 23 | Pending |
 | DRIFT-03 | Phase 23 | Pending |

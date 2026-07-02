@@ -816,8 +816,6 @@ auto_fixes: 0 applied
 report: wiki-cloud/maintenance/lint-report.md
 scope: full run — 0 errors after the first repository ingest; the delta vs the pre-phase baseline (78) is the designed section-level contradiction-candidate flags on gsd.md (old report-derived vs new repository-direct project facts sharing sections — the supersession is annotated inline) plus crossref suggestions around the new source page. No new errors.
 
-## [2026-07-03] lint | wiki-cloud health check
+## [2026-07-03] UPDATE | src-2026-07-03-gsd-core-repo (+ gsd)
 
-findings: 86 total (0 errors, 77 warnings, 9 info)
-auto_fixes: 0 applied
-report: wiki-cloud/maintenance/lint-report.md
+source: src-2026-07-03-gsd-core-repo | result: same-phase curation amendment from the Phase 22 code review — snapshot's embedded README H1 demoted to a comment (so `#sec:readme` resolves to the real preamble passage instead of a hollow 9-char heading), a tree-stats line added to `## Snapshot Metadata` (so the `#commit:`-anchored agent/command-count claims resolve to a passage that contains the counts), `content_hash`/`compiled_against_hash` recomputed on the source summary; on `gsd`, the report-derived "35+ agents / 50+ commands" bullet annotated counts-superseded (34/69 at the snapshot) and the "mechanics remain accurate" sentence scoped to core mechanics | reason: the review's adversarial pass proved two claim families audited as "resolved" while handing the verifier unusable passages (hollow `#sec:readme`; counts absent from the `#commit:` passage) — the wiki's own verify-the-verification-machinery lesson (v1.3 retrospective) applied to the phase that shipped hours earlier. Duplicate 2026-07-03 lint log entry (tool-appended alongside the hand-written one) also removed.

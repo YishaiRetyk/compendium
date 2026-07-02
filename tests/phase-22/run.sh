@@ -7,8 +7,10 @@ cd "$REPO_ROOT"
 PASS=0; FAIL=0; SKIP=0
 run_test() {
     local name="$1"
+    # A missing test file is a FAILURE, not a skip — a renamed/deleted test
+    # must not silently drop out of the suite (Phase 22 review).
     if [ ! -f "$SCRIPT_DIR/$name" ]; then
-        echo "SKIP: $name (not yet authored)"; SKIP=$((SKIP+1)); return 0
+        echo "--- FAIL $name (test file missing) ---"; FAIL=$((FAIL+1)); return 0
     fi
     local OUT rc
     set +e

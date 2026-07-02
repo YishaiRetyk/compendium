@@ -8,10 +8,12 @@
 - License: MIT
 - Primary language: JavaScript
 - Retrieved: 2026-07-02
+- Tree stats at snapshot: 34 agent definition files (`agents/`), 69 command files (`commands/`)
 
 ## README
 
-# GSD Core
+<!-- readme H1 demoted at snapshot: GSD Core -->
+<!-- curation addendum 2026-07-03 (same-phase, logged): H1 demoted so ## README stays a sliceable H2 section; tree-stats line added above so #commit: claims about repo structure resolve to a passage that contains them. See wiki-cloud/log.md. -->
 
 **Git. Ship. Done.**
 

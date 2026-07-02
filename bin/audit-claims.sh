@@ -308,21 +308,59 @@ def _strip_frontmatter(raw_text):
     return raw_text
 
 
+_FENCE_OPEN_RE = re.compile(r'(`{3,}|~{3,})')
+
+
+def _fence_mask_lines(text):
+    """Shared fence tracker for every boundary-scanning resolver (Phase 22
+    review: _resolve_sec/_resolve_ref/_resolve_path/_resolve_commit each need
+    it — quoted markdown inside fenced blocks must never read as a heading or
+    section boundary, or a claim gets verified against text the source merely
+    QUOTES). Returns (lines, fenced) where fenced[i] is True when lines[i] is
+    a fence delimiter or inside a fenced block. CommonMark rules matching
+    bin/lint.sh's _mask_fences: opener = column-0 run of >=3 backticks or
+    tildes (info string allowed); closes ONLY on a same-char run of at least
+    opener length followed by nothing but spaces/tabs (an info-string
+    "closer" does not close; nested shorter fences do not close a longer
+    opener); an unclosed fence extends to EOF."""
+    lines = text.splitlines()
+    fenced = [False] * len(lines)
+    fence_char = None
+    fence_len = 0
+    for i, line in enumerate(lines):
+        if fence_char is None:
+            m = _FENCE_OPEN_RE.match(line)
+            if m:
+                fence_char = m.group(1)[0]
+                fence_len = len(m.group(1))
+                fenced[i] = True
+        else:
+            fenced[i] = True
+            stripped = line.rstrip(' \t')
+            if stripped and set(stripped) == {fence_char} and len(stripped) >= fence_len:
+                fence_char = None
+                fence_len = 0
+    return lines, fenced
+
+
 def _resolve_sec(raw_text, name):
     """Resolve a #sec:<name> locator against the raw source's ATX headings.
     Exact slug match is preferred; fallback is a contiguous hyphen-token
     subsequence match (a short authored slug matches a longer heading slug
     that contains its tokens in order, e.g. a two-token name against a
     heading slug carrying extra prefix/suffix tokens). First match in
-    document order wins within each tier."""
+    document order wins within each tier. Headings inside fenced code blocks
+    are ignored for both matching and slice-end detection (fence-aware)."""
     target = _slugify(name)
     target_tokens = [t for t in target.split('-') if t]
-    lines = raw_text.splitlines()
+    lines, fenced = _fence_mask_lines(raw_text)
     start = None
     start_level = None
     fallback = None
     fallback_level = None
     for i, line in enumerate(lines):
+        if fenced[i]:
+            continue
         m = ATX_RE.match(line)
         if not m:
             continue
@@ -342,9 +380,11 @@ def _resolve_sec(raw_text, name):
         start, start_level = fallback, fallback_level
     if start is None:
         return None
-    # slice to the line before the next heading of same-or-higher level
+    # slice to the line before the next NON-FENCED heading of same-or-higher level
     end = len(lines)
     for j in range(start + 1, len(lines)):
+        if fenced[j]:
+            continue
         m = ATX_RE.match(lines[j])
         if m and len(m.group(1)) <= start_level:
             end = j
@@ -448,20 +488,34 @@ def _resolve_ref(text, n):
     Sources / References appears first in the text wins — the header list is
     an alternation, not a priority order). Positional numbering is sequential
     across topic sub-groups. Wrapped bullets include their indented
-    continuation lines. Returns None if not found or N out of range."""
+    continuation lines. Returns None if not found or N out of range.
+    Fence-aware: a quoted '## References' heading inside a fenced excerpt
+    must neither anchor the section nor terminate it, and quoted bullets
+    inside fences do not count (Phase 22 review)."""
     header_re = re.compile(
         r'^##\s+(Source Citations|Sources by Topic|Sources|References)\s*$',
-        re.MULTILINE | re.IGNORECASE
+        re.IGNORECASE
     )
-    m = header_re.search(text)
-    if not m:
+    lines, fenced = _fence_mask_lines(text)
+    start = None
+    for i, line in enumerate(lines):
+        if not fenced[i] and header_re.match(line):
+            start = i
+            break
+    if start is None:
         return None
-    after_header = text[m.end():]
-    next_h = re.search(r'^##\s', after_header, re.MULTILINE)
-    section = after_header[:next_h.start()] if next_h else after_header
+    end = len(lines)
+    for j in range(start + 1, len(lines)):
+        if not fenced[j] and lines[j].startswith('## '):
+            end = j
+            break
     bullets = []
     open_bullet = False
-    for line in section.splitlines():
+    for k in range(start + 1, end):
+        line = lines[k]
+        if fenced[k]:
+            open_bullet = False
+            continue
         if line.startswith('- '):
             bullets.append(line[2:].strip())
             open_bullet = True
@@ -482,46 +536,54 @@ def _resolve_path(text, spec):
     path-only request, or a range request contained in [a, b]). Passage = the
     heading plus its content up to the next heading. None -> insufficient-locator.
 
-    FENCE-AWARE: excerpt bodies quote file content in fenced blocks, and quoted
-    markdown routinely contains '## '/'### ' lines — those must not read as
-    section/entry boundaries (found live on the first real repository ingest:
-    a CHANGELOG excerpt quoting a heading orphaned every excerpt after it).
-    Boundary detection therefore skips fenced lines; passages return unmasked."""
+    FENCE-AWARE via the shared _fence_mask_lines helper: excerpt bodies quote
+    file content in fenced blocks, and quoted markdown routinely contains
+    '## '/'### ' lines — those must not read as section/entry boundaries
+    (found live on the first real repository ingest: a CHANGELOG excerpt
+    quoting a heading orphaned every excerpt after it). The registry anchors
+    at the LAST non-fenced '## Excerpts' heading (a README that itself
+    contains an '## Excerpts' heading cannot hijack the real registry, which
+    the snapshot convention places last). Containment rules (Phase 22
+    review): a whole-file entry (no declared range) matches PATH-ONLY
+    requests, never range requests; a single-line entry ':L<n>' is valid
+    heading grammar; an inverted request range never resolves."""
     m_spec = re.fullmatch(r'(.+?)(?::L(\d+)(?:-L(\d+))?)?', spec.strip())
     if not m_spec or not m_spec.group(1):
         return None
     want_path = m_spec.group(1)
     want_lo = int(m_spec.group(2)) if m_spec.group(2) else None
     want_hi = int(m_spec.group(3)) if m_spec.group(3) else want_lo
-    lines = text.splitlines()
-    entry_re = re.compile(r'^###\s+(.+?)(?::L(\d+)-L(\d+))?\s*$')
-    in_fence = False
-    in_excerpts = False
+    if want_lo is not None and want_lo > want_hi:
+        return None
+    lines, fenced = _fence_mask_lines(text)
+    excerpts_re = re.compile(r'^##\s+Excerpts\s*$', re.IGNORECASE)
+    section_start = None
+    for i, line in enumerate(lines):
+        if not fenced[i] and excerpts_re.match(line):
+            section_start = i  # keep scanning: LAST wins
+    if section_start is None:
+        return None
+    entry_re = re.compile(r'^###\s+(.+?)(?::L(\d+)(?:-L(\d+))?)?\s*$')
     entries = []          # (line_idx, path, lo|None, hi|None)
     section_end = len(lines)
-    for i, line in enumerate(lines):
-        if line.strip().startswith('```'):
-            in_fence = not in_fence
+    for i in range(section_start + 1, len(lines)):
+        if fenced[i]:
             continue
-        if in_fence:
-            continue
-        if not in_excerpts:
-            if re.match(r'^##\s+Excerpts\s*$', line, re.IGNORECASE):
-                in_excerpts = True
-            continue
-        if re.match(r'^##\s', line):
+        if re.match(r'^##\s', lines[i]):
             section_end = i
             break
-        m = entry_re.match(line)
+        m = entry_re.match(lines[i])
         if m:
-            entries.append((i, m.group(1).strip(),
-                            int(m.group(2)) if m.group(2) else None,
-                            int(m.group(3)) if m.group(3) else None))
+            e_lo = int(m.group(2)) if m.group(2) else None
+            e_hi = int(m.group(3)) if m.group(3) else e_lo
+            entries.append((i, m.group(1).strip(), e_lo, e_hi))
     for j, (idx, path, e_lo, e_hi) in enumerate(entries):
         if path != want_path:
             continue
-        if want_lo is not None and e_lo is not None:
-            if not (e_lo <= want_lo and want_hi <= e_hi):
+        if want_lo is not None:
+            # range request: only a ranged entry that CONTAINS it satisfies
+            # (a whole-file entry has no declared range to verify against)
+            if e_lo is None or not (e_lo <= want_lo and want_hi <= e_hi):
                 continue
         end = entries[j + 1][0] if j + 1 < len(entries) else section_end
         return '\n'.join(lines[idx:end]).strip()
@@ -529,23 +591,38 @@ def _resolve_path(text, spec):
 
 
 def _resolve_commit(text, sha):
-    """Resolve a repository #commit: locator: valid only for the snapshot's own
-    commit (>=7 hex chars, prefix of a 40-hex SHA appearing in the ## Snapshot
-    Metadata section). Passage = the metadata section. Any other SHA -> None
-    (the snapshot documents exactly one commit)."""
+    """Resolve a repository #commit: locator: valid ONLY for the snapshot's own
+    commit — the 40-hex SHA on the '- Commit:' line of the ## Snapshot
+    Metadata section (>=7-hex prefix match). Any other SHA — including other
+    40-hex strings that happen to appear in the metadata (a parent commit, an
+    upstream tag) — returns None: the snapshot documents exactly one commit
+    (Phase 22 review). Fence-aware section slicing via _fence_mask_lines.
+    Passage = the metadata section."""
     sha = sha.strip().lower()
     if not re.fullmatch(r'[0-9a-f]{7,40}', sha):
         return None
-    header_re = re.compile(r'^##\s+Snapshot Metadata\s*$', re.MULTILINE | re.IGNORECASE)
-    m = header_re.search(text)
-    if not m:
+    lines, fenced = _fence_mask_lines(text)
+    header_re = re.compile(r'^##\s+Snapshot Metadata\s*$', re.IGNORECASE)
+    start = None
+    for i, line in enumerate(lines):
+        if not fenced[i] and header_re.match(line):
+            start = i
+            break
+    if start is None:
         return None
-    after = text[m.end():]
-    next_h2 = re.search(r'^##\s', after, re.MULTILINE)
-    section = after[:next_h2.start()] if next_h2 else after
-    for full in re.findall(r'\b[0-9a-f]{40}\b', section.lower()):
-        if full.startswith(sha):
-            return section.strip()
+    end = len(lines)
+    for j in range(start + 1, len(lines)):
+        if not fenced[j] and lines[j].startswith('## '):
+            end = j
+            break
+    section = '\n'.join(lines[start:end]).strip()
+    commit_line_re = re.compile(r'^\s*-\s*Commit:\s*([0-9a-f]{40})\b', re.IGNORECASE)
+    for k in range(start + 1, end):
+        if fenced[k]:
+            continue
+        m = commit_line_re.match(lines[k])
+        if m and m.group(1).lower().startswith(sha):
+            return section
     return None
 
 

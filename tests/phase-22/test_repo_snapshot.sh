@@ -58,8 +58,28 @@ echo "PASS T4: empty ## Excerpts scaffold present"
 # T5: stdout mode (no --dest) emits the same skeleton
 # (capture first: `cmd | grep -q` under pipefail dies of SIGPIPE on early match)
 STDOUT_RUN="$(bash "$REPO_ROOT/bin/repo-snapshot.sh" "file://$UP" 2>/dev/null)"
-printf '%s' "$STDOUT_RUN" | grep -q '^## Snapshot Metadata$' || {
+printf '%s' "$STDOUT_RUN" > "$TMP/stdout-run.md"
+grep -q '^## Snapshot Metadata$' "$TMP/stdout-run.md" || {
     echo "FAIL T5: stdout mode did not emit the skeleton" >&2; exit 1; }
 echo "PASS T5: stdout mode works without --dest"
 
-echo "PASS: test_repo_snapshot -- all 5 cases passed"
+# T6: the README's own H1 is demoted to a comment so '## README' stays a
+# sliceable H2 section (#sec:readme must not resolve hollow — Phase 22 review)
+grep -q '<!-- readme H1 demoted at snapshot: Fixture Project -->' "$OUT" || {
+    echo "FAIL T6: README H1 was not demoted to a comment" >&2; exit 1; }
+if grep -q '^# Fixture Project$' "$OUT"; then
+    echo "FAIL T6: raw README H1 leaked into the snapshot body" >&2; exit 1
+fi
+echo "PASS T6: embedded README H1 demoted (## README section stays sliceable)"
+
+# T7: --dest refuses to clobber an existing (curated) source.md without --force
+set +e
+bash "$REPO_ROOT/bin/repo-snapshot.sh" "file://$UP" --dest "$TMP/bundle" 2>/dev/null
+rc=$?
+set -e
+[ "$rc" -ne 0 ] || { echo "FAIL T7: re-run over an existing source.md must fail without --force" >&2; exit 1; }
+bash "$REPO_ROOT/bin/repo-snapshot.sh" "file://$UP" --dest "$TMP/bundle" --force 2>/dev/null || {
+    echo "FAIL T7: --force overwrite should succeed" >&2; exit 1; }
+echo "PASS T7: --dest clobber guard (fails without --force, succeeds with)"
+
+echo "PASS: test_repo_snapshot -- all 7 cases passed"
