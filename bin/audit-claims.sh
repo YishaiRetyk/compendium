@@ -474,6 +474,62 @@ def _resolve_ref(text, n):
     return bullets[n - 1]
 
 
+def _resolve_path(text, spec):
+    """Resolve a repository #path: locator against the snapshot's ## Excerpts
+    registry (repository-ingestion.md). `spec` is '<file>', '<file>:L<n>', or
+    '<file>:L<n>-L<m>'. An excerpt heading is '### <file>' (whole-file excerpt,
+    matches any request for that path) or '### <file>:L<a>-L<b>' (matches a
+    path-only request, or a range request contained in [a, b]). Passage = the
+    heading plus its content up to the next heading. None -> insufficient-locator."""
+    m_spec = re.fullmatch(r'(.+?)(?::L(\d+)(?:-L(\d+))?)?', spec.strip())
+    if not m_spec or not m_spec.group(1):
+        return None
+    want_path = m_spec.group(1)
+    want_lo = int(m_spec.group(2)) if m_spec.group(2) else None
+    want_hi = int(m_spec.group(3)) if m_spec.group(3) else want_lo
+    header_re = re.compile(r'^##\s+Excerpts\s*$', re.MULTILINE | re.IGNORECASE)
+    m = header_re.search(text)
+    if not m:
+        return None
+    after = text[m.end():]
+    next_h2 = re.search(r'^##\s', after, re.MULTILINE)
+    section = after[:next_h2.start()] if next_h2 else after
+    entry_re = re.compile(r'^###\s+(.+?)(?::L(\d+)-L(\d+))?\s*$', re.MULTILINE)
+    entries = list(entry_re.finditer(section))
+    for i, e in enumerate(entries):
+        if e.group(1).strip() != want_path:
+            continue
+        e_lo = int(e.group(2)) if e.group(2) else None
+        if want_lo is not None and e_lo is not None:
+            e_hi = int(e.group(3))
+            if not (e_lo <= want_lo and want_hi <= e_hi):
+                continue
+        end = entries[i + 1].start() if i + 1 < len(entries) else len(section)
+        return section[e.start():end].strip()
+    return None
+
+
+def _resolve_commit(text, sha):
+    """Resolve a repository #commit: locator: valid only for the snapshot's own
+    commit (>=7 hex chars, prefix of a 40-hex SHA appearing in the ## Snapshot
+    Metadata section). Passage = the metadata section. Any other SHA -> None
+    (the snapshot documents exactly one commit)."""
+    sha = sha.strip().lower()
+    if not re.fullmatch(r'[0-9a-f]{7,40}', sha):
+        return None
+    header_re = re.compile(r'^##\s+Snapshot Metadata\s*$', re.MULTILINE | re.IGNORECASE)
+    m = header_re.search(text)
+    if not m:
+        return None
+    after = text[m.end():]
+    next_h2 = re.search(r'^##\s', after, re.MULTILINE)
+    section = after[:next_h2.start()] if next_h2 else after
+    for full in re.findall(r'\b[0-9a-f]{40}\b', section.lower()):
+        if full.startswith(sha):
+            return section.strip()
+    return None
+
+
 def resolve_locator(raw_source_text, locator):
     """Return (passage | None, verdict_override | None).
 
@@ -490,6 +546,12 @@ def resolve_locator(raw_source_text, locator):
         if loc.startswith('#sec:'):
             name = loc[len('#sec:'):]
             return _resolve_sec(raw_source_text, name), None
+        # #path: MUST be dispatched before #para/#p — it shares the '#p' prefix
+        # and would otherwise be swallowed by the page-range branch (D-11).
+        if loc.startswith('#path:'):
+            return _resolve_path(raw_source_text, loc[len('#path:'):]), None
+        if loc.startswith('#commit:'):
+            return _resolve_commit(raw_source_text, loc[len('#commit:'):]), None
         if loc.startswith('#para'):
             num = loc[len('#para'):]
             if not num.isdigit():

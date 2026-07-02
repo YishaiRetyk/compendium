@@ -10,7 +10,7 @@ set -euo pipefail
 # Lint rule-set semver per CI-08 / D-26. Bump MAJOR on breaking changes
 # (removed category, changed severity semantics). MINOR on non-breaking
 # additions. PATCH on bug fixes. --require-version X.Y.Z is a minimum check.
-LINT_VERSION="1.10.1"
+LINT_VERSION="1.11.0"
 
 usage() {
     cat <<'EOF'
@@ -397,7 +397,7 @@ VALID_STATUS = {'active', 'stale', 'superseded', 'archived'}
 VALID_EPISTEMIC = {'sourced', 'mixed', 'tentative', 'stale'}
 VALID_COMPILATION = {'pending', 'partial', 'compiled', 'stale'}
 VALID_SOURCE_TYPES = {'article', 'paper', 'transcript', 'journal',
-                      'data', 'image', 'research-report'}
+                      'data', 'image', 'research-report', 'repository'}
 
 BASE_FIELDS = [
     'id', 'title', 'type', 'status', 'summary', 'created_at', 'updated_at',
@@ -1152,6 +1152,20 @@ if should_run('yaml'):
                     add_finding('error', 'yaml', rel,
                                 f'PDF source (original_asset=*.pdf) missing '
                                 f'extraction fields: {missing_pdf}')
+
+            # Repository sources require the drift-anchor fields (repository-ingestion.md).
+            # Unlike the video sub-case, the type IS the mechanical trigger — no guessing.
+            if st == 'repository':
+                REPO_REQUIRED_FIELDS = ['repo_url', 'commit_sha', 'default_branch']
+                missing_repo = [f for f in REPO_REQUIRED_FIELDS if not fm.get(f)]
+                if missing_repo:
+                    add_finding('error', 'yaml', rel,
+                                f'Repository source missing required fields: '
+                                f'{missing_repo}')
+                sha = fm.get('commit_sha', '')
+                if sha and not re.fullmatch(r'[0-9a-f]{40}', str(sha)):
+                    add_finding('error', 'yaml', rel,
+                                f"commit_sha must be a full 40-hex SHA, got: '{sha}'")
 
         # Decision record validation (per AGENTS.md section 5 items 15-17)
         if fm.get('type') == 'decision':
