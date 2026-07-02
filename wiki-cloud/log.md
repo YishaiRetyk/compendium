@@ -829,3 +829,9 @@ Created decision record [[dr-2026-07-03-external-source-drift|External Source Dr
 findings: 2 new external findings (both info) + pre-existing local drift backlog; 0 errors
 scope: --dry-run --network --category drift over wiki-cloud/ — the first live run of the Phase 23 checks
 triage: repository source src-2026-07-03-gsd-core-repo verified CURRENT (upstream next HEAD 69fef7c0 == snapshot commit — true negative, independently confirmed via git ls-remote); two `source url moved` infos are benign redirect patterns (github.com repo-rename redirect on the financial-services plugins source; doi.org on the Robin paper source — DOI resolvers redirect by design); zero dead URLs; zero citation-registry rot (sampled registries all alive). No follow-up ops required. Known-noise candidate recorded in the DR: permanent redirectors (doi.org) will always emit a moved-info; skip-list is a future refinement if the noise grows.
+
+## [2026-07-03] lint | wiki-cloud health check
+
+findings: 92 total (0 errors, 83 warnings, 9 info)
+auto_fixes: 0 applied
+report: wiki-cloud/maintenance/lint-report.md

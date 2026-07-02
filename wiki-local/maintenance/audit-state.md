@@ -18,9 +18,9 @@ aliases:
   - Audit State
 has_contradictions: false
 knowledge_domain: ""
-last_audit_commit: 19d24b0
+last_audit_commit: 69e1bd6
 last_audit_at: 2026-07-03
-last_sample_size: 400
+last_sample_size: 60
 ---
 
 # Audit State

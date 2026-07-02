@@ -24,14 +24,14 @@ neutrality_exempt: true
 # Lint Report
 
 **Last run:** 2026-07-03
-**Total findings:** 86
+**Total findings:** 92
 **Auto-fixes applied:** 0
 
 ## Errors (0)
 
 (none)
 
-## Warnings (77)
+## Warnings (83)
 
 ### Contradiction
 - **wiki-cloud/concepts/progressive-disclosure.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-04-16-claude-code-frameworks-report and src-2026-05-06-anthropic-agent-skills-best-practices (agent review needed)
@@ -39,16 +39,22 @@ neutrality_exempt: true
 - **wiki-cloud/concepts/progressive-disclosure.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-04-16-claude-code-frameworks-report and src-2026-05-06-anthropic-claude-cookbook-skills-custom-development (agent review needed)
 - **wiki-cloud/concepts/progressive-disclosure.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-04-16-claude-code-frameworks-report and src-2026-05-06-anthropic-claude-cookbook-skills-introduction (agent review needed)
 - **wiki-cloud/concepts/progressive-disclosure.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-04-16-claude-code-frameworks-report and src-2026-05-06-ralph-playbook (agent review needed)
+- **wiki-cloud/concepts/progressive-disclosure.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-04-16-claude-code-frameworks-report and src-2026-06-17-interpretable-context-methodology (agent review needed)
 - **wiki-cloud/concepts/progressive-disclosure.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-06-anthropic-agent-skills-best-practices and src-2026-05-06-anthropic-agent-skills-overview (agent review needed)
 - **wiki-cloud/concepts/progressive-disclosure.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-06-anthropic-agent-skills-best-practices and src-2026-05-06-anthropic-claude-cookbook-skills-custom-development (agent review needed)
 - **wiki-cloud/concepts/progressive-disclosure.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-06-anthropic-agent-skills-best-practices and src-2026-05-06-anthropic-claude-cookbook-skills-introduction (agent review needed)
 - **wiki-cloud/concepts/progressive-disclosure.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-06-anthropic-agent-skills-best-practices and src-2026-05-06-ralph-playbook (agent review needed)
+- **wiki-cloud/concepts/progressive-disclosure.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-06-anthropic-agent-skills-best-practices and src-2026-06-17-interpretable-context-methodology (agent review needed)
 - **wiki-cloud/concepts/progressive-disclosure.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-06-anthropic-agent-skills-overview and src-2026-05-06-anthropic-claude-cookbook-skills-custom-development (agent review needed)
 - **wiki-cloud/concepts/progressive-disclosure.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-06-anthropic-agent-skills-overview and src-2026-05-06-anthropic-claude-cookbook-skills-introduction (agent review needed)
 - **wiki-cloud/concepts/progressive-disclosure.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-06-anthropic-agent-skills-overview and src-2026-05-06-ralph-playbook (agent review needed)
+- **wiki-cloud/concepts/progressive-disclosure.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-06-anthropic-agent-skills-overview and src-2026-06-17-interpretable-context-methodology (agent review needed)
 - **wiki-cloud/concepts/progressive-disclosure.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-06-anthropic-claude-cookbook-skills-custom-development and src-2026-05-06-anthropic-claude-cookbook-skills-introduction (agent review needed)
 - **wiki-cloud/concepts/progressive-disclosure.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-06-anthropic-claude-cookbook-skills-custom-development and src-2026-05-06-ralph-playbook (agent review needed)
+- **wiki-cloud/concepts/progressive-disclosure.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-06-anthropic-claude-cookbook-skills-custom-development and src-2026-06-17-interpretable-context-methodology (agent review needed)
 - **wiki-cloud/concepts/progressive-disclosure.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-06-anthropic-claude-cookbook-skills-introduction and src-2026-05-06-ralph-playbook (agent review needed)
+- **wiki-cloud/concepts/progressive-disclosure.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-06-anthropic-claude-cookbook-skills-introduction and src-2026-06-17-interpretable-context-methodology (agent review needed)
+- **wiki-cloud/concepts/progressive-disclosure.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-06-ralph-playbook and src-2026-06-17-interpretable-context-methodology (agent review needed)
 - **wiki-cloud/concepts/progressive-disclosure.md** | Potential contradiction candidate in section "Progressive disclosure as a shared design principle (Agent Skills and the Ralph loop)": claims from src-2026-05-06-anthropic-agent-skills-overview and src-2026-05-06-ralph-playbook (agent review needed)
 - **wiki-cloud/entities/anthropic-financial-services.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-04-anthropic-financial-services-investigation and src-2026-05-04-financial-ai-repo-comparison-report (agent review needed)
 - **wiki-cloud/entities/anthropic.md** | Potential contradiction candidate in section "Key Facts": claims from src-2026-05-06-anthropic-agent-skills-best-practices and src-2026-05-06-anthropic-agent-skills-overview (agent review needed)
