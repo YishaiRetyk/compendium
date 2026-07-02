@@ -46,7 +46,7 @@ Items acknowledged and deferred at the v1.3 milestone close (2026-07-03):
 
 | Category | Item | Status |
 |----------|------|--------|
-| todo | `phase-14-lint-mask-fence-edge-cases` — WR-02/03 fence-edge-case hardening for lint markdown masking | Carried from v1.1.1/v1.2 closes; in `.planning/todos/pending/`. Promote as a quick task. |
+| todo (DONE) | `phase-14-lint-mask-fence-edge-cases` — WR-02/03 fence-edge-case hardening for lint markdown masking | ✅ Delivered 2026-07-03 via quick task 260703-m4f (LINT_VERSION 1.10.1); todo moved to `.planning/todos/completed/` |
 | backlog | 999.3 (template placeholder system + Phase D `WIZ`), 999.5 (external source drift detection), 999.6 (observed GTD review patterns) | In `.planning/ROADMAP.md` Backlog |
 | v1.3-deferred | `repository` source type (SI.3 / seed Candidate A — pairs with 999.5 drift machinery); multimodal frame capture for slide-heavy videos; Model B auto-promotion (Model C hybrid shipped instead) | Named in `milestones/v1.3-REQUIREMENTS.md` Future Requirements + Out of Scope |
 | v1.2-deferred | Obsidian plugin distribution; one-command installer; hosted docs site; brownfield `--apply` mode | Carried forward per PROJECT.md |

@@ -10,7 +10,7 @@ set -euo pipefail
 # Lint rule-set semver per CI-08 / D-26. Bump MAJOR on breaking changes
 # (removed category, changed severity semantics). MINOR on non-breaking
 # additions. PATCH on bug fixes. --require-version X.Y.Z is a minimum check.
-LINT_VERSION="1.10.0"
+LINT_VERSION="1.10.1"
 
 usage() {
     cat <<'EOF'
@@ -427,10 +427,38 @@ BARE_LINK_RE  = re.compile(r'\[\[([^\]|\n]+)\]\]')           # bare target, no p
 # that preserve frontmatter and code-fence content byte-for-byte.
 # ---------------------------------------------------------------------------
 
-_FENCE_RE   = re.compile(r'(^|\n)(```|~~~)[^\n]*\n.*?\n\2[ \t]*(?=\n|$)', re.DOTALL)
+_FENCE_OPEN_RE = re.compile(r'(`{3,}|~{3,})')
 _HTMLCOM_RE = re.compile(r'<!--.*?-->', re.DOTALL)
 _INLINE_RE  = re.compile(r'`[^`\n]*`')
 _FM_RE      = re.compile(r'\A---\n.*?\n---\n', re.DOTALL)
+
+def _mask_fences(text):
+    """Length-preserving blank-out of fenced code blocks, line-based per the
+    CommonMark rules the masker cares about (Phase 14 review WR-02/WR-03):
+    an opening fence is a column-0 run of >=3 backticks or tildes (info string
+    allowed after it); the block closes ONLY at a column-0 run of the SAME
+    char, at least opener-length long, followed by nothing but spaces/tabs --
+    an info string on a would-be closer means the line does NOT close (WR-03);
+    an unclosed fence extends to end-of-file (WR-02). Column-0 anchoring
+    (no 0-3 space indent tolerance) deliberately matches the prior behavior."""
+    out = []
+    fence_char = None
+    fence_len = 0
+    for line in text.split('\n'):
+        if fence_char is None:
+            m = _FENCE_OPEN_RE.match(line)
+            if m:
+                fence_char = m.group(1)[0]
+                fence_len = len(m.group(1))
+                out.append(' ' * len(line))
+            else:
+                out.append(line)
+        else:
+            stripped = line.rstrip(' \t')
+            if stripped and set(stripped) == {fence_char} and len(stripped) >= fence_len:
+                fence_char = None
+            out.append(' ' * len(line))
+    return '\n'.join(out)
 
 def mask_markdown(text):
     """Return a length-preserving copy of `text` with YAML frontmatter, fenced code,
@@ -441,7 +469,7 @@ def mask_markdown(text):
     def _blank(m):
         return ''.join('\n' if c == '\n' else ' ' for c in m.group(0))
     masked = _FM_RE.sub(_blank, text)
-    masked = _FENCE_RE.sub(_blank, masked)
+    masked = _mask_fences(masked)
     masked = _HTMLCOM_RE.sub(_blank, masked)
     masked = _INLINE_RE.sub(_blank, masked)
     return masked
