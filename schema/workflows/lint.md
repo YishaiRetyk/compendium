@@ -153,6 +153,28 @@ Placement rules (strict):
 
 - Wiki is empty (no pages beyond `index.md` and `log.md`). Report that the wiki is empty and skip the lint. Log this in `wiki-cloud/log.md`.
 
+## External Source Drift (`--network`, opt-in)
+
+`bin/lint.sh --network` adds review-only checks for whether URL-backed and repository sources have moved or died **upstream**. They live in the `drift` category's `drift-external` logical subcategory (`EXTERNAL: ` message prefix), which `--ci` default-skips — so no CI job and no core workflow ever gains a network dependency, and without the flag lint performs ZERO network I/O.
+
+**Check families:**
+
+| Family | Applies to | Mechanism | Findings |
+|--------|-----------|-----------|----------|
+| Repository HEAD drift | `source_type: repository` | `git ls-remote <repo_url> refs/heads/<default_branch>` (no clone) vs `commit_sha` | drifted → warning; unreachable / branch gone → warning; current → silence |
+| URL reachability | any source with a non-empty `url` (repositories covered by ls-remote; **videos excluded** — the committed transcript is the durable archive and `url` is a courtesy pointer per the video convention's link-rot stance) | `curl -sIL` status | HTTP 404/410/dead-host/timeout → warning; reachable after redirects → info (moved); reachable → silence |
+| Citation-registry link-rot | `source_type: research-report` summaries with a `## References` registry | first-10 deterministic sample of `r<n>::` URLs | ≥50% of sample dead → warning; any dead → info; all alive → silence. One ratio finding per source. |
+
+**Stance — surface, don't mark.** These checks mutate nothing: no `status: stale` flips, no re-ingest, severity never exceeds warning. Claims cite the **immutable ingested snapshot** and remain faithful to it regardless of upstream movement; what drift changes is *currency*, and that is a human decision (see the decision record `dr-2026-07-03-external-source-drift` for why the original backlog sketch's auto-stale-marking was narrowed).
+
+**Follow-up guidance when a finding fires:**
+
+- **Repository drifted** — if currency matters, **re-snapshot**: run the repository acquisition runbook again as a NEW ingest (new source, new `commit_sha`); the old source stays and is superseded normally. If currency does not matter, optionally annotate the source summary (UPDATE op) noting the observed drift date.
+- **URL unreachable** — the ingested raw source is still the evidence; annotate the source summary (UPDATE op) with the observed link-rot if the pointer's death is worth recording. Never delete the `url`.
+- **Registry link-rot** — the report's evidence base is decaying; candidates worth keeping get promoted to first-class sources (the Model C path in `schema/reference/source-types.md`) while they are still fetchable.
+
+**Operational notes:** missing `curl`/`git` degrades to a single info finding; per-request timeouts keep a hung host from stalling the run; `GIT_TERMINAL_PROMPT=0` prevents credential prompts on private/gone repos.
+
 ## See Also
 
 - [AGENTS.md](../../AGENTS.md) — routing-table stub (decay/staleness + lint workflow pointer to this file).
