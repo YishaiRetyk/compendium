@@ -7,6 +7,7 @@
 - ✅ **v1.1.1 Graph Integrity** — Phase 14 (shipped 2026-06-04) — [archive](milestones/v1.1.1-ROADMAP.md)
 - ✅ **v1.2 Schema Architecture** — Phases 15–18 (shipped 2026-06-08) — [archive](milestones/v1.2-ROADMAP.md)
 - ✅ **v1.3 Source Ingestion** — Phases 19–21 (shipped 2026-06-14) — [archive](milestones/v1.3-ROADMAP.md)
+- 🚧 **v1.4 Source Lifecycle** — Phases 22–23 (started 2026-07-03)
 
 ## Phases
 
@@ -77,9 +78,53 @@ Full phase details: [milestones/v1.3-ROADMAP.md](milestones/v1.3-ROADMAP.md)
 
 </details>
 
+## v1.4 Source Lifecycle (Phases 22–23)
+
+**Goal:** Close the source lifecycle loop — formalize the `repository` source type as the extension contract's first *primary* new-type instance (locators, snapshot convention, epistemic split, lint enforcement), then ship external-source drift detection (backlog 999.5) as an opt-in, review-only extension of lint's pre-plumbed `drift-external` subcategory, with repository SHA drift as the pilot case.
+
+- [ ] **Phase 22: Repository Source Type** - Justify `source_type: repository` via the extension contract, define `#path:`/`#commit:` locators + the curated-snapshot bundle convention + the within-source epistemic split, enforce via lint/audit, and validate end-to-end with a real repository
+- [ ] **Phase 23: External Source Drift Detection** - Extend lint's `drift`/`EXTERNAL:` subcategory with opt-in `--network` checks (repository HEAD-vs-SHA, URL reachability, citation-registry link-rot), review-only with documented follow-up guidance, validated by a real run over the live wiki
+
+## Phase Details
+
+### Phase 22: Repository Source Type
+
+**Goal**: Code repositories can be acquired via a documented snapshot pipeline and ingested as a first-class primary source type, with file/line-anchored provenance that the audit can actually resolve
+**Depends on**: Nothing within v1.4 (consumes the Phase 19 extension contract; first primary new-type instance)
+**Requirements**: REPO-01, REPO-02, REPO-03, REPO-04, REPO-05, REPO-06
+**Success Criteria** (what must be TRUE):
+
+  1. An agent reading `schema/reference/source-types.md` finds `repository` in the retro-fit table with the contract evaluation recorded (locator + drift + acquisition + epistemics all change → new primary type, not a sub-case), and `source_type: repository` in the frontmatter enum + ingest Pass-0
+  2. An agent ingesting a repository finds a documented acquisition runbook producing a curated snapshot bundle — README + key docs + an addressable `## Excerpts` registry + metadata frontmatter (`repo_url`, `commit_sha`, `default_branch`, `license`, `primary_language`) — explicitly NOT a full clone; thin glue in `bin/` scaffolds it
+  3. Claims anchor to `#path:<file>[:L<n>[-L<m>]]` / `#commit:<sha>` locators documented in the provenance locator table, and `bin/audit-claims.sh` resolves `#path:` locators against the snapshot's excerpt registry (missing excerpt degrades honestly to `insufficient-locator`)
+  4. The within-source epistemic split is documented and exercised: code/benchmark claims `sourced`, self-descriptive capability claims hedged claim-level `tentative`; `knowledge_domain: software` decay applies
+  5. Lint enforces the type — D-09 enum extended, conditional required-fields check (`repo_url` + `commit_sha`), LINT_VERSION bumped — and a lint run over the live tree stays clean
+  6. One real repository has been acquired via the runbook, ingested, its wiki pages carry `#path`-anchored provenance, and a source-scoped audit run resolves its locators (non-vacuous)
+
+**Plans**: TBD (planned at phase start)
+
+**UI hint**: no
+
+### Phase 23: External Source Drift Detection
+
+**Goal**: The wiki can tell when its URL-backed and repository sources have moved or died upstream — opt-in, review-only, with no new mandatory network dependency anywhere in the core workflows
+**Depends on**: Phase 22 (repository SHA drift is the pilot case; the checker consumes the `commit_sha`/`repo_url` fields Phase 22 defines)
+**Requirements**: DRIFT-01, DRIFT-02, DRIFT-03, DRIFT-04, DRIFT-05
+**Success Criteria** (what must be TRUE):
+
+  1. `bin/lint.sh --network` runs the new external checks; without the flag, lint output over the live tree is byte-identical to pre-phase behavior; `--ci` continues to default-skip `drift-external`
+  2. Repository sources: upstream default-branch HEAD vs recorded `commit_sha` via `git ls-remote` (no clone) → `EXTERNAL:` drift warning on divergence or unreachability, silence when current
+  3. URL-backed sources: dead/gone URLs → warning, redirects → info; research-report citation registries get a sampled link-rot ratio finding with documented thresholds
+  4. The stance is review-only and documented in `schema/workflows/lint.md`: findings report, nothing mutates, follow-up is a human decision (re-snapshot vs annotate via UPDATE op); video sources excluded per D-06; a decision record captures the narrowed "surface, don't auto-mark" choice vs the original 999.5 sketch
+  5. A real `--network` run over the live wiki has executed, covering the Phase-22 repository source and the existing URL-backed sources; findings triaged with follow-ups logged
+
+**Plans**: TBD (planned at phase start)
+
+**UI hint**: no
+
 ## Backlog
 
-> **Live / promotable:** Phases 999.3–999.6 below are the active backlog. Historical entries (superseded / promoted / delivered: 999.1, 999.2, 999.7) are collected under "Archived / Delivered" at the end of this section, retained for traceability only — do not plan against them.
+> **Live / promotable:** Phases 999.3 and 999.6 below are the active backlog. Historical entries (superseded / promoted / delivered: 999.1, 999.2, 999.4, 999.5, 999.7) are retained for traceability only — do not plan against them.
 
 ### Phase 999.3: Template Placeholder System for Published Surfaces (BACKLOG)
 
@@ -125,7 +170,9 @@ Plans:
 
 - [ ] TBD (promote with /gsd-review-backlog when ready)
 
-### Phase 999.5: External Source Drift Detection (BACKLOG)
+### Phase 999.5: External Source Drift Detection (PROMOTED — see v1.4 Phase 23)
+
+> **Promoted 2026-07-03** into milestone v1.4 Source Lifecycle as **Phase 23** (paired with the `repository` source type per this entry's own "best designed together or back-to-back" note — the trigger fired when v1.3 shipped research-report citation registries). Retained for traceability only — do not plan against it. Note: the "marking affected source summaries `stale`" sketch below was consciously narrowed to review-only surfacing at promotion (see the Phase 23 DR).
 
 **Goal:** [Captured for future planning] Extend drift detection from local source-file hash changes to URL-backed sources, marking affected source summaries `stale` when upstream content changes.
 **Origin:** Surfaced 2026-04-24 during roadmap review. Valuable once the wiki contains more live web-backed sources, but lower leverage than local write gating (Phase 12.2), boundary clarification (Phase 12), and claim faithfulness audit (Phase 13).
