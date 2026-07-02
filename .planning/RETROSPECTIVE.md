@@ -171,6 +171,49 @@ A self-applied progressive-disclosure refactor: the always-loaded `AGENTS.md`/`C
 
 ---
 
+## Milestone: v1.3 — Source Ingestion
+
+**Shipped:** 2026-06-14
+**Phases:** 3 (19–21) | **Plans:** 11 | **Commits:** 104 | **Span:** 2026-06-10 → 2026-06-14 (~5 days)
+
+### What Was Built
+
+Three new source ingestion paths designed once via a shared abstraction: the 5-dimension source-type extension contract (acquisition / locator / extraction / drift / epistemics + primary-vs-secondary axis) in `schema/reference/source-types.md`, with `research-report` as the worked secondary instance (second-order `derived`-only provenance, `#r<n>` citation-registry locators, D-08/D-09 lint gates, anti-epistemic-laundering defenses), PDF as an article/paper sub-case (`bin/pdf-extract.sh` olmOCR-2 pipeline, `#p<N>` locators, VLM-hallucination guidance), and video as a transcript sub-case (tool-generic acquisition runbook, `#t` locators, link-rot drift stance). Each phase closed with a real-artifact end-to-end validation ingest.
+
+### What Worked
+
+- **Contract-first, instances-second.** Designing the extension contract from the three real cases (not in a vacuum) and then applying its own decision rule to PDF and video — both landed as *sub-cases*, not new types — kept the type system at 7 entries instead of 9. The contract paid for itself within the same milestone.
+- **Real-artifact validation gates per phase.** Every phase ended with a genuine ingest (retro-classified reports, a real PDF, a real 3-speaker YouTube interview). The video ingest's source-scoped audit (37 claims, 0 `insufficient-locator`) made the `#t` locator convention's correctness non-vacuous.
+- **Verification catching vacuous gates.** The Phase 19 verifier caught that D-08 passed vacuously on table-cell markers (`\|direct\|` escaped-pipe blind spot) and forced a gap-closure wave (19-05) — the second time a "green" gate was proven hollow and fixed before close.
+- **Code review as a first-class phase step.** The Phase 19 review found the headline audit tier was 71% unresolvable (`#sec:` slug mismatches predating the phase) — a silent-degradation defect no test caught. The fix (token-subsequence fallback + resolvable-ratio tripwire) hardened the audit for every future source type.
+
+### What Was Inefficient
+
+- **External model dependency churn mid-phase.** Phase 20 paused when the `richardyoung/olmocr2` Ollama repull produced garbage (M-RoPE bug); the working path moved to a bartowski GGUF on a pinned Ollama version. Acquisition runbooks now note versions, but the phase absorbed a full day of tool triage that wasn't ingestion work.
+- **Diarization stack pinning.** The Phase 21 STT run needed an unplanned `torchcodec==0.10.0` pin to unblock pyannote under torch 2.10 — same class of external-dependency friction.
+- **`gsd phase.complete` mis-advance recurring** (STATE pointed at superseded backlog 999.1 at every phase close) — hand-corrected each time; the tool defect is documented in memory but still costs a correction per phase.
+- **Locator debt discovered late.** The `#sec:` slug mismatches that hollowed the derived-report audit tier were authored at v1.0/v1.1 ingest time but only surfaced when Phase 19 built machinery on top of them. Earlier resolvable-ratio checks would have caught them at authoring time.
+
+### Patterns Established
+
+- **Sub-case-over-new-type default:** a new `source_type` is justified only if it changes ≥1 of the 5 contract dimensions; otherwise document a sub-case convention (PDF, video both confirmed this way).
+- **Acquisition tooling stays outside the repo** — the milestone ships conventions + at most thin glue (`pdf-extract.sh`); heavy tools (STT CLI, Ollama models) live in their own projects and are referenced tool-generically on template-public surfaces.
+- **Tiered epistemic defaults by extraction quality** (clean-born-digital → `sourced`; degraded/VLM-extracted → `tentative` + spot-verification) rather than one blanket trust level.
+- **Hollow-audit tripwire:** when <50% of sampled locators resolve, the audit warns loudly — a meta-check that the verification machinery itself is functioning.
+
+### Key Lessons
+
+- **Verify the verification machinery.** Two independent incidents (vacuous D-08 table-cell gate; 71% unresolvable audit tier) show a green gate can be structurally incapable of failing. Gates need at least one injected-failure proof (non-vacuity check) before they count as shipped.
+- **Second-order sources need mechanical anti-laundering enforcement** — the `derived`-only mandate is only real because lint errors on violations; a documented convention alone would have eroded.
+- **Pin external model/tool versions in runbooks at authoring time** — Ollama model tags and Python-stack versions drifted underneath two of three phases.
+
+### Cost Observations
+
+- Model mix: quality profile restored 2026-06-11 (the `resolve_model_ids: "omit"` defect had silently downgraded all GSD agents to Sonnet before then); Phases 20–21 ran orchestrator-on-Opus.
+- Notable: ~5 calendar days for 3 phases / 11 plans; the dominant unplanned cost was external-tool triage (olmOCR repull, torchcodec pin), not schema or wiki work.
+
+---
+
 ## Cross-Milestone Trends
 
 (To be populated as additional milestones ship.)
@@ -193,15 +236,18 @@ A self-applied progressive-disclosure refactor: the always-loaded `AGENTS.md`/`C
 | v1.1 | Shareability | 2026-06-02 | 15 | 52 | ~48 |
 | v1.1.1 | Graph Integrity | 2026-06-04 | 1 | 3 | ~2 |
 | v1.2 | Schema Architecture | 2026-06-08 | 4 | 15 | ~4 |
+| v1.3 | Source Ingestion | 2026-06-14 | 3 | 11 | ~5 |
 
 ### Recurring Patterns
 
-- **Mechanical enforcement over remembered rules / manual audits** — each milestone has pushed a correctness property into a gate or structure: `requirements-sync --require-complete` (v1.1), `linkres` target validation (v1.1.1), `routing` lint + `gen-skills --check` + privacy-as-harness-permission (v1.2).
+- **Mechanical enforcement over remembered rules / manual audits** — each milestone has pushed a correctness property into a gate or structure: `requirements-sync --require-complete` (v1.1), `linkres` target validation (v1.1.1), `routing` lint + `gen-skills --check` + privacy-as-harness-permission (v1.2), D-08 derived-never-direct + hollow-audit tripwire (v1.3).
 - **Gate-arming with RED test harnesses before a structural change** (v1.1.1 remediation, v1.2 Phases 15/18).
 - **Superseding decision records** capture reversals and rejected alternatives legibly (v1.1.1 piped-links DR, v1.2 privacy + skills DRs).
+- **Design-once, instantiate-N abstractions extracted from real cases** — the v1.3 extension contract was distilled from three concrete candidates, then immediately re-applied to classify two of them as sub-cases.
 
 ### Recurring Inefficiencies
 
 - **Cosmetic/tracking drift surfaced at close** — requirements traceability left `Pending` while checkboxes were flipped (v1.1.1); STATE/MILESTONES auto-fields wrong at close (v1.2). Tracking artifacts lag the real work and need a manual reconciliation pass.
-- **`phase.complete` mis-advances STATE to the superseded backlog 999.1** at phase/milestone close — recurring across v1.1.1 and v1.2; always hand-corrected.
+- **`phase.complete` mis-advances STATE to the superseded backlog 999.1** at phase/milestone close — recurring across v1.1.1, v1.2, and v1.3; always hand-corrected.
 - **Premises/assumptions validated late** — third-party tool behavior (v1.1.1 Obsidian aliases) and script cwd-assumptions (v1.2 `gen-skills.sh`) caught at a gate/review rather than upfront.
+- **External model/tool version churn absorbed mid-phase** — olmOCR Ollama repull breakage and the torchcodec pin (v1.3) each cost unplanned triage; runbooks now record pinned versions, but acquisition-adjacent phases should budget for it.

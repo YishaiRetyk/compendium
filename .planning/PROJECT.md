@@ -10,13 +10,13 @@ The wiki is a persistent, compounding artifact — cross-references are already 
 
 ## Current State
 
-**Shipped:** v1.2 Schema Architecture (2026-06-08) — applied the project's own §7 progressive-disclosure principle to its own spec. The always-loaded `AGENTS.md`/`CLAUDE.md` monolith (**1,689 lines**) was reduced to a ~287-line resident core decided by an inclusion test (ambient / unscriptable-AND-unacceptable-miss / dispatch), with everything else extracted into `schema/reference/*.md` + `schema/workflows/*.md`. Four phases, 15 plans, 28/28 requirements Complete: **Phase 15 Privacy Architecture (`PRIV`)** — replaced per-page §13 privacy with the asymmetric two-directory `wiki-cloud/` / `wiki-local/` model (one-way permeability enforced as a harness `deny`-read permission, not a resident rule); **Phase 16 Reference Extraction (`REF`)** — §4/5/6/7/8/13 → `schema/reference/*.md`, §14/15 → `docs/reference/*.md`, §16 deleted, `IMPORTANT:`-flagged routing table added; **Phase 17 Workflow Extraction (`WF`)** — §9/10/11.1–11.7/12 → `schema/workflows/*.md` (incl. the 182-line brownfield miss), new `routing` lint category (LINT_VERSION 1.8.0) gates path-ref integrity; **Phase 18 Skills Overlay (`SKILL`)** — thin pointer-only `.claude/skills/{ingest,query,lint,reflect}/SKILL.md` routers generated + drift-gated by `bin/gen-skills.sh --check`, zero authoritative content. Byte-equality (`sync-claude --check`), neutrality, and privacy gates all green throughout.
+**Shipped:** v1.3 Source Ingestion (2026-06-14, archived 2026-07-03) — three new source ingestion paths designed once via a shared abstraction. **Phase 19 Extension Contract + Research-Report Type (`EXT`/`RPT`)** — the 5-dimension source-type extension contract (acquisition / locator / extraction / drift / epistemics + primary-vs-secondary axis) in `schema/reference/source-types.md`, with `source_type: research-report` as the worked secondary instance: second-order `derived`-only provenance, `#r<n>` citation-registry locators, `mixed`/`tentative` epistemic defaults, D-08/D-09 lint gates (anti-epistemic-laundering), three report sources retro-classified. **Phase 20 PDF Ingestion (`PDF`)** — `bin/pdf-extract.sh` acquisition glue + `schema/reference/pdf-ingestion.md`; PDF confirmed as an article/paper *sub-case* via the contract's decision rule (`#p<N>` locators, extraction-field frontmatter + conditional lint, VLM-hallucination guidance). **Phase 21 Video/YouTube Ingestion (`VID`)** — `schema/reference/video-ingestion.md`; video as a `transcript` *sub-case* (`#t<start>-<end>` locators, five frontmatter fields, link-rot drift stance). Each phase validated end-to-end on a real artifact. 3 phases, 11 plans, 17/17 requirements Complete.
 
-**Cumulative:** v1.0 MVP (Phases 1–6, shipped 2026-04-15) + v1.1 Shareability (Phases 7–13.2, shipped 2026-06-02) + v1.1.1 Graph Integrity (Phase 14, shipped 2026-06-04) + v1.2 Schema Architecture (Phases 15–18, shipped 2026-06-08). 73 plans total across 4 milestones.
+**Cumulative:** v1.0 MVP (Phases 1–6, shipped 2026-04-15) + v1.1 Shareability (Phases 7–13.2, shipped 2026-06-02) + v1.1.1 Graph Integrity (Phase 14, shipped 2026-06-04) + v1.2 Schema Architecture (Phases 15–18, shipped 2026-06-08) + v1.3 Source Ingestion (Phases 19–21, shipped 2026-06-14). 84 plans total across 5 milestones.
 
-**Active milestone:** v1.3 Source Ingestion (started 2026-06-10) — **all three phases complete + verified (2026-06-14)**: Phase 19 Extension Contract + Research-Report Type (`EXT-01..03`/`RPT-01..06`, 5/5 must-haves after one gap-closure cycle, 2026-06-10), Phase 20 PDF Ingestion (`PDF-01..04`, 2026-06-12), Phase 21 Video/YouTube Ingestion (`VID-01..04`, 4/4 must-haves, 2026-06-14). 17 requirements across 3 phases, all Complete. Next: close the milestone (`/gsd-complete-milestone`) or start the next. Live backlog (do not plan against superseded 999.1/999.2/999.7): 999.3 (template placeholder system, partially folded as the deferred Phase D/`WIZ`), 999.5 (external source drift detection — explicitly deferred from v1.3), 999.6 (observed GTD review patterns).
+**Active milestone:** none — v1.3 closed and archived 2026-07-03. Next-milestone candidates per the v1.3 close: backlog 999.5 (external source drift detection) + the `repository` source type (seed Candidate A) — explicitly deferred from v1.3 with the note to sequence them together; v1.3's research-report citation registries are their named trigger. Live backlog (do not plan against superseded 999.1/999.2/999.7): 999.3 (template placeholder system, partially folded as the deferred Phase D/`WIZ`), 999.5, 999.6 (observed GTD review patterns).
 
-**Deferred to backlog:** Obsidian plugin distribution, one-command installer (`curl|bash`), hosted docs site, brownfield `--apply` mode, Phase D Wizard/Template fold-in (`WIZ`) — all carried forward.
+**Deferred to backlog:** Obsidian plugin distribution, one-command installer (`curl|bash`), hosted docs site, brownfield `--apply` mode, Phase D Wizard/Template fold-in (`WIZ`), multimodal frame capture for slide-heavy videos — all carried forward.
 
 <details>
 <summary>✅ v1.2 Schema Architecture (Phases 15–18) — SHIPPED 2026-06-08</summary>
@@ -35,20 +35,19 @@ The wiki is a persistent, compounding artifact — cross-references are already 
 
 </details>
 
-## Current Milestone: v1.3 Source Ingestion
+<details>
+<summary>✅ v1.3 Source Ingestion (Phases 19–21) — SHIPPED 2026-06-14</summary>
 
-**Goal:** Formalize three new source ingestion paths — AI deep-research reports, PDFs, and YouTube videos — as schema conventions plus documented acquisition pipelines, designed once via a shared source-type extension contract.
+**Goal (delivered):** Formalize three new source ingestion paths — AI deep-research reports, PDFs, and YouTube videos — as schema conventions plus documented acquisition pipelines, designed once via a shared source-type extension contract.
 
-**Target features:**
-- **Source-type extension contract** — the 5-dimension recipe (acquisition / locator / extraction / drift / epistemics) + primary/secondary axis designed once, so each new source type is an instance of the contract rather than a one-off (per `.planning/notes/2026-05-31-milestone-grouping-proposal.md` "Source Ingestion" cluster)
-- **Research-report ingest** — `source_type: research-report` for AI deep-research artifacts (Claude/ChatGPT/Perplexity), bibliography preserved as provenance; design LOCKED in `.planning/seeds/research-report-ingest.md`; ships first
-- **PDF ingestion** — acquisition via olmOCR 2 (local Ollama model `richardyoung/olmocr2:7b-q8`, the wiki's own SOTA-report recommendation); reuses the `<!-- page: N -->` / `#p` locator; likely an article/paper sub-case convention, not a new type; includes VLM-hallucination epistemic guidance for degraded scans
-- **YouTube video ingestion** — acquisition via the external `stt` CLI (`~/code/transcript/`: faster-whisper large-v3 + IVRIT Hebrew, pyannote diarization, yt-dlp, timestamped speaker-labeled output); reuses the `#t<start>-<end>` locator; likely a `transcript` sub-case
+**Phases (all complete):**
+- **Phase 19 — Extension Contract + Research-Report Type (`EXT`/`RPT`):** 5-dimension extension contract with retro-fit table + decision rule (new type only if ≥1 dimension changes); `research-report` as the worked secondary instance (second-order `derived`-only provenance, `#r<n>` locators, D-08/D-09 lint gates LINT_VERSION 1.9.0, hollow-audit tripwire); three report sources retro-classified, 160 downstream markers swept.
+- **Phase 20 — PDF Ingestion (`PDF`):** `bin/pdf-extract.sh` (pdftoppm → Ollama olmOCR 2 → page markers) + `schema/reference/pdf-ingestion.md`; article/paper sub-case, `#p<N>` locators, extraction-field frontmatter (conditional lint, LINT_VERSION 1.10.0), tiered VLM-hallucination epistemics; real-PDF validation ingest.
+- **Phase 21 — Video/YouTube Ingestion (`VID`):** `schema/reference/video-ingestion.md`; transcript sub-case, tool-generic yt-dlp + timestamped-STT runbook, five frontmatter fields, `#t` locators, link-rot drift stance (no drift machinery); real 3-speaker YouTube validation ingest (37 audited claims, 0 insufficient-locator).
 
-**Key constraints:**
-- Acquisition tooling stays *outside* this repo (stt is its own project; olmocr2 runs via Ollama) — the milestone ships conventions, frontmatter metadata, docs, and at most thin glue
-- Human-curates-sources role division preserved: no web-research operation; the four-op vocabulary (ingest/query/lint/reflect) stays intact
-- 999.5 External Source Drift explicitly deferred — research-report URL bibliographies are its natural trigger, but it remains backlog
+**Key constraints held:** acquisition tooling outside the repo (thin glue only); human-curates-sources role division (no web-research operation; four-op vocabulary intact); 999.5 drift explicitly deferred.
+
+</details>
 
 ## Requirements
 
@@ -86,6 +85,15 @@ The wiki is a persistent, compounding artifact — cross-references are already 
 - [x] Complementary-systems boundary decision record — compendium owns durable wiki memory; task / calendar / reminder / inbox layers belong to complementary systems (BOUND-01) — Validated in Phase 12: complementary-systems-boundary-gtd-alignment
 - [x] Three-layer reference doc — task / working-memory / wiki-compiler split with capture/clarify/organize/review routing rules and explicit anti-features (BOUND-02) — Validated in Phase 12: complementary-systems-boundary-gtd-alignment
 - [x] Reviewed-match boundary audit — README + AGENTS.md + docs/ + wiki/decisions/ verified to contain zero "all-in-one PKM/task" framing (BOUND-03) — Validated in Phase 12: complementary-systems-boundary-gtd-alignment
+
+### Validated (v1.3 Source Ingestion — shipped 2026-06-14)
+
+- ✓ 5-dimension source-type extension contract (acquisition / locator / extraction / drift / epistemics + primary-vs-secondary axis) with retro-fit table and sub-case decision rule (`EXT-01..03`) — v1.3 (Phase 19)
+- ✓ `source_type: research-report` — second-order `derived`-only provenance, `#r<n>` citation-registry locators, `mixed`/`tentative` epistemic defaults, D-08/D-09 lint gates, Model C promotion path, three reports retro-classified (`RPT-01..06`) — v1.3 (Phase 19)
+- ✓ PDF ingestion as article/paper sub-case — `bin/pdf-extract.sh` pipeline, `#p<N>` locators, extraction-field frontmatter + conditional lint, VLM-hallucination guidance, real-PDF validation (`PDF-01..04`) — v1.3 (Phase 20)
+- ✓ Video/YouTube ingestion as transcript sub-case — tool-generic acquisition runbook, five frontmatter fields, `#t<start>-<end>` locators, link-rot drift stance, real-video validation (`VID-01..04`) — v1.3 (Phase 21)
+
+Closure: 17/17 v1.3 requirements Complete; `bin/requirements-sync.sh --strict --require-complete` exits 0.
 
 ### Validated (v1.2 Schema Architecture — shipped 2026-06-08)
 
@@ -157,6 +165,8 @@ The v1 is a full starter kit: schema, workflows, conventions, page templates, ex
 | Progressive-disclosure self-refactor (v1.2): extract the spec monolith into `schema/reference/*.md` + `schema/workflows/*.md`, keep a minimal resident core decided by an inclusion test | The always-loaded 1,689-line AGENTS.md/CLAUDE.md violated the project's own §7 principle | ✓ Good — core shrank to ~287 lines; routing-table + `routing` lint category prevent dangling refs |
 | Asymmetric two-directory privacy (`wiki-cloud/` / `wiki-local/`) enforced as a harness permission, not a resident agent rule | Per-page §13 privacy was fragile and bloated the resident core; structural enforcement is stronger than a rule the agent must remember | ✓ Good — privacy dropped from the safety core (Phase 15) |
 | Thin generated `.claude/skills/` overlay (pointer-only bodies, drift-gated) over markdown SOT | Skills add discoverability without forking authority away from markdown | ✓ Good — `gen-skills --check` keeps bodies zero-authoritative; SOT stays in `schema/workflows/*.md` |
+| Source-type extension contract (v1.3): new `source_type` only if ≥1 of 5 dimensions changes; otherwise sub-case convention | Prevents type proliferation; each new ingestion path is an instance of one designed recipe | ✓ Good — PDF and video both landed as sub-cases via the rule; type enum stayed small |
+| Second-order sources get mechanical anti-laundering enforcement (`derived`-only via lint), not convention alone | A documented mandate without a gate erodes; epistemic laundering is the failure mode that would silently corrupt the wiki's trust model | ✓ Good — D-08 catches prose + table-cell violations, self-citation carve-out explicit |
 
 ## Evolution
 
@@ -174,6 +184,9 @@ This document evolves at phase transitions and milestone boundaries.
 2. Core Value check — still the right priority?
 3. Audit Out of Scope — reasons still valid?
 4. Update Context with current state
+
+---
+*Last updated: 2026-07-03 — **Milestone v1.3 Source Ingestion SHIPPED + ARCHIVED.** Phases 19–21 complete (11 plans); 17/17 requirements Complete (`requirements-sync --strict --require-complete` exits 0). The 5-dimension source-type extension contract shipped with `research-report` as the worked secondary instance; PDF and video landed as sub-cases via the contract's own decision rule; each phase validated end-to-end on a real artifact. Archived to `.planning/milestones/v1.3-*`; ROADMAP collapsed (Backlog preserved); `REQUIREMENTS.md` removed for a fresh next-milestone; MILESTONES + RETROSPECTIVE updated; git tag `v1.3` (local only — origin is the public template; never push local main/tags). Pre-close housekeeping: committed the 2026-06-14 post-v1.3 audit run (100-claim sample) + the `resolve_model_ids: false` config fix. Open items at close acknowledged as pre-existing deferrals — see STATE.md Deferred Items (headline carries: `phase-14-lint-mask-fence-edge-cases` todo; backlog 999.3/999.5/999.6; `repository` source type pairing with 999.5). Next: define the next milestone — leading candidate: 999.5 External Source Drift + `repository` source type, per the v1.3 close's explicit "sequence them together" note.*
 
 ---
 *Last updated: 2026-06-14 — Phase 21 (Video/YouTube Ingestion, `VID-01..04`) complete (2/2 plans; verifier 4/4 must-haves), **closing milestone v1.3 Source Ingestion** (Phases 19–21 all done). Shipped: authoritative `schema/reference/video-ingestion.md` defining video as a sub-case of `transcript` (D-14, NOT a new `source_type`) with a tool-generic `yt-dlp` + timestamped-STT acquisition runbook, the five video frontmatter fields (`url`/`title`/`channel`/`publish_date`/`duration`), `#t<start>-<end>` locators with `support_type: direct`, a tiered epistemic policy (clean→`sourced` + claim-level hedging; degraded→`tentative` + N=3 live-url spot-verify), and an explicit link-rot drift stance (the committed transcript is the durable archive; `url` is a courtesy pointer; no drift machinery). Wired into source-types.md row + frontmatter.md + ingest.md Pass-0 + the routing table (byte-synced `AGENTS.md`≡`CLAUDE.md` + template + regenerated fixture). Four deliberate divergences from the Phase-20 PDF sub-case recorded in DR `dr-2026-06-14-video-ingestion`: no repo script (D-04, the worked STT instance is not nameable on template-public surfaces), single-file no-`--asset` transcript (D-05), link-rot stance (D-06), convention-only (non-lint-enforced) extraction fields (D-07). VID-04 validated end-to-end on a real 3-speaker YouTube interview (Hassabis × Amodei) acquired locally via the worked STT instance (no SSH tunnel — D-13): single-file transcript, diarization mended to 4 distinct `SPEAKER:` labels (D-03 path exercised), source summary + 4 topic pages with `#t|direct` provenance + claim-level `[epistemic:: tentative]` hedging; post-commit source-scoped audit selected 37 claims with 0 `insufficient-locator` (non-vacuous proof every `#t` resolves). Two auto-fixed exec deviations: `torchcodec==0.10.0` pinned to unblock diarization under torch 2.10; `bin/ingest.sh` bundle output flattened to the single-file D-05 form. Code review (advisory) 0 blocker / 5 warning / 4 info (doc-traceability — D-09/D-10 cite mismatch, a stale `D-13` log ref, lint "0 total" accounting — tracked in `21-REVIEW.md`). Cross-phase regression gate: prior-phase suites 07/09/10/11/13 confirmed failing identically at the pre-phase base commit (template-release tests on a live vault, lint version drift, the phase-15..19 extraction refactor) — no Phase 21 regression; the suites Phase 21 touches (08/18/20) pass. `gsd phase.complete` again mis-advanced to superseded backlog 999.1; hand-corrected STATE to reflect v1.3 milestone-complete. Next: `/gsd-complete-milestone`.*

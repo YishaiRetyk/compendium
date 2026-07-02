@@ -1,5 +1,28 @@
 # Milestones
 
+## v1.3 Source Ingestion (Shipped: 2026-06-14)
+
+**Phases completed:** 3 phases (19–21), 11 plans
+**Requirements:** 17/17 complete (EXT-01..03, RPT-01..06, PDF-01..04, VID-01..04) — `bin/requirements-sync.sh --strict --require-complete` exits 0
+**Timeline:** 2026-06-10 → 2026-06-14 (~5 days, 104 commits)
+
+**Delivered:** Three new source ingestion paths — AI deep-research reports, PDFs, and YouTube videos — formalized as schema conventions plus documented acquisition pipelines, designed once via a shared 5-dimension source-type extension contract so each new source type is an instance of the contract rather than a one-off.
+
+**Key accomplishments:**
+
+- **Extension Contract + Research-Report Type (Phase 19, `EXT-01..03`/`RPT-01..06`):** The 5-dimension source-type extension contract (acquisition / locator / extraction / drift / epistemics + the primary-vs-secondary axis) in `schema/reference/source-types.md`, extracted from real cases with a retro-fit table. `source_type: research-report` shipped as the worked secondary instance: second-order provenance (`support_type: derived`, never `direct`), `mixed`/`tentative` epistemic defaults, `#r<n>` citation-registry locators with an audit resolver, D-08 (derived-never-direct, self-citation-only exemption) + D-09 (enum) lint gates (LINT_VERSION 1.9.0). Three report-shaped sources retro-classified with citation registries; 160 downstream `|direct|`→`|derived|` markers swept. One verification-driven gap-closure wave (19-05: table-cell `\|direct\|` blind spot) plus a 14-finding review-fix pass (incl. the WR-01 hollow-audit fix: 78/110 unresolvable tier-5 locators → 0, with a resolvable-ratio tripwire added).
+- **PDF Ingestion (Phase 20, `PDF-01..04`):** `bin/pdf-extract.sh` acquisition glue (pdftoppm → Ollama olmOCR 2 → `<!-- page: N -->` markers) + authoritative `schema/reference/pdf-ingestion.md`. PDF confirmed via the contract's decision rule as an article/paper *sub-case*, not a new type: `#p<N>` page locators, extraction tool/model recorded in frontmatter (conditional lint check, LINT_VERSION 1.10.0), tiered VLM-hallucination epistemic guidance for degraded scans, `bin/ingest.sh --asset` bundle support. Validated end-to-end on a real PDF with page-anchored provenance.
+- **Video/YouTube Ingestion (Phase 21, `VID-01..04`):** Authoritative `schema/reference/video-ingestion.md` defining video as a *sub-case* of `transcript` (per the same decision rule): tool-generic yt-dlp + timestamped-STT runbook, five frontmatter fields (`url`/`title`/`channel`/`publish_date`/`duration`), `#t<start>-<end>` locators with `support_type: direct`, tiered epistemic policy, and an explicit link-rot drift stance (committed transcript is the durable archive; no drift machinery). Validated end-to-end on a real 3-speaker YouTube interview; post-ingest source-scoped audit: 37 claims, 0 `insufficient-locator`.
+
+**Known deferred items at close:** the `phase-14-lint-mask-fence-edge-cases` todo (carried from v1.1.1); backlog 999.3 (template placeholders / Phase D `WIZ`), 999.5 (external source drift — explicitly deferred 2026-06-10, citation registries are its named trigger), 999.6 (observed GTD review patterns); `repository` source type (seed Candidate A — pairs with 999.5); multimodal frame capture for slide-heavy videos; Model B auto-promotion (Model C hybrid shipped instead).
+
+**Archives:**
+
+- `milestones/v1.3-ROADMAP.md`
+- `milestones/v1.3-REQUIREMENTS.md`
+
+---
+
 ## v1.2 Schema Architecture (Shipped: 2026-06-08)
 
 **Phases completed:** 4 phases (15–18), 15 plans
