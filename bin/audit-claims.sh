@@ -480,32 +480,51 @@ def _resolve_path(text, spec):
     '<file>:L<n>-L<m>'. An excerpt heading is '### <file>' (whole-file excerpt,
     matches any request for that path) or '### <file>:L<a>-L<b>' (matches a
     path-only request, or a range request contained in [a, b]). Passage = the
-    heading plus its content up to the next heading. None -> insufficient-locator."""
+    heading plus its content up to the next heading. None -> insufficient-locator.
+
+    FENCE-AWARE: excerpt bodies quote file content in fenced blocks, and quoted
+    markdown routinely contains '## '/'### ' lines — those must not read as
+    section/entry boundaries (found live on the first real repository ingest:
+    a CHANGELOG excerpt quoting a heading orphaned every excerpt after it).
+    Boundary detection therefore skips fenced lines; passages return unmasked."""
     m_spec = re.fullmatch(r'(.+?)(?::L(\d+)(?:-L(\d+))?)?', spec.strip())
     if not m_spec or not m_spec.group(1):
         return None
     want_path = m_spec.group(1)
     want_lo = int(m_spec.group(2)) if m_spec.group(2) else None
     want_hi = int(m_spec.group(3)) if m_spec.group(3) else want_lo
-    header_re = re.compile(r'^##\s+Excerpts\s*$', re.MULTILINE | re.IGNORECASE)
-    m = header_re.search(text)
-    if not m:
-        return None
-    after = text[m.end():]
-    next_h2 = re.search(r'^##\s', after, re.MULTILINE)
-    section = after[:next_h2.start()] if next_h2 else after
-    entry_re = re.compile(r'^###\s+(.+?)(?::L(\d+)-L(\d+))?\s*$', re.MULTILINE)
-    entries = list(entry_re.finditer(section))
-    for i, e in enumerate(entries):
-        if e.group(1).strip() != want_path:
+    lines = text.splitlines()
+    entry_re = re.compile(r'^###\s+(.+?)(?::L(\d+)-L(\d+))?\s*$')
+    in_fence = False
+    in_excerpts = False
+    entries = []          # (line_idx, path, lo|None, hi|None)
+    section_end = len(lines)
+    for i, line in enumerate(lines):
+        if line.strip().startswith('```'):
+            in_fence = not in_fence
             continue
-        e_lo = int(e.group(2)) if e.group(2) else None
+        if in_fence:
+            continue
+        if not in_excerpts:
+            if re.match(r'^##\s+Excerpts\s*$', line, re.IGNORECASE):
+                in_excerpts = True
+            continue
+        if re.match(r'^##\s', line):
+            section_end = i
+            break
+        m = entry_re.match(line)
+        if m:
+            entries.append((i, m.group(1).strip(),
+                            int(m.group(2)) if m.group(2) else None,
+                            int(m.group(3)) if m.group(3) else None))
+    for j, (idx, path, e_lo, e_hi) in enumerate(entries):
+        if path != want_path:
+            continue
         if want_lo is not None and e_lo is not None:
-            e_hi = int(e.group(3))
             if not (e_lo <= want_lo and want_hi <= e_hi):
                 continue
-        end = entries[i + 1].start() if i + 1 < len(entries) else len(section)
-        return section[e.start():end].strip()
+        end = entries[j + 1][0] if j + 1 < len(entries) else section_end
+        return '\n'.join(lines[idx:end]).strip()
     return None
 
 

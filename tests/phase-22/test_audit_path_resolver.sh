@@ -56,6 +56,20 @@ UNIQUE_EXCERPT_MARKER = True
 \`\`\`markdown
 UNIQUE_WHOLEFILE_MARKER
 \`\`\`
+
+### docs/guide.md:L5-L9
+
+\`\`\`markdown
+## A heading INSIDE the fenced excerpt (must not truncate the registry)
+
+### Nor this deeper one
+\`\`\`
+
+### docs/after-fenced-heading.md:L1-L3
+
+\`\`\`markdown
+UNIQUE_AFTERFENCE_MARKER
+\`\`\`
 EOF
 
 write_page "$REPO" "wiki-cloud/concepts/repo-claims.md" <<'EOF'
@@ -68,6 +82,7 @@ status: active
 Range claim [prov:src-repo#path:src/alpha.py:L11-L12|direct|2026-07-03]
 Whole-file claim [prov:src-repo#path:docs/whole-file.md|direct|2026-07-03]
 Commit claim [prov:src-repo#commit:0123456|direct|2026-07-03]
+After-fence claim [prov:src-repo#path:docs/after-fenced-heading.md:L1-L2|direct|2026-07-03]
 Missing excerpt [prov:src-repo#path:src/ghost.py:L1-L2|direct|2026-07-03]
 Foreign sha [prov:src-repo#commit:deadbee|direct|2026-07-03]
 Out-of-range [prov:src-repo#path:src/alpha.py:L90-L99|direct|2026-07-03]
@@ -96,6 +111,15 @@ printf '%s' "$wl" | grep -q 'UNIQUE_METADATA_MARKER' || {
     echo "FAIL T3: #commit:0123456 did not resolve to the Snapshot Metadata section" >&2
     echo "$wl" >&2; exit 1; }
 echo "PASS T3: #commit prefix-match resolves to Snapshot Metadata"
+
+# T3b (fence-aware registry): an excerpt whose FENCED content contains '## ' /
+# '### ' lines must not truncate the registry — a LATER excerpt still resolves.
+# (Found live on the first real repository ingest: a CHANGELOG excerpt quoting
+# a markdown heading orphaned every excerpt after it.)
+printf '%s' "$wl" | grep -q 'UNIQUE_AFTERFENCE_MARKER' || {
+    echo "FAIL T3b: excerpt after a fenced markdown-heading excerpt did not resolve (registry truncated)" >&2
+    echo "$wl" >&2; exit 1; }
+echo "PASS T3b: fenced markdown headings inside excerpts do not truncate the registry"
 
 # The worklist run above advanced the audit checkpoint (D-15), which would
 # suppress selection on the next run — reset the control-plane for a fresh run.
