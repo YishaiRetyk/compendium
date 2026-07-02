@@ -26,7 +26,7 @@ Sources are classified as **primary** or **secondary** based on whether wiki cla
 
 **Decision rule:** A new `source_type` is justified only if it changes at least one of the 5 dimensions relative to all existing types. If all 5 dimensions match an existing type, the candidate is documented as a sub-case — a convention note on an existing type — NOT a new enum value.
 
-## 3. Retro-fit Table (All 7 Types)
+## 3. Retro-fit Table (All 8 Types)
 
 All current `source_type` enum values mapped across the 5 dimensions:
 
@@ -39,6 +39,7 @@ All current `source_type` enum values mapped across the 5 dimensions:
 | `data` | primary | downloaded | `#p` or none | bulk-copy or cited stats | static | sourced |
 | `image` | primary | downloaded or captured | `#img<n>` | described content | static | sourced |
 | `research-report` | secondary | AI-generated or third-party aggregated | `#r<n>` for bibliography; `#sec:`, `#para` for body | atomic claims, `support_type: derived` only | static after generation | mixed |
+| `repository` | primary | curated VCS snapshot (clone + harvest) | `#path:<file>[:L<n>[-L<m>]]`, `#commit:<sha>`; `#sec:` for docs prose | atomic claims | **live** upstream; snapshot immutable, drift = HEAD ≠ `commit_sha` | sourced with a within-source split (self-descriptions hedged `tentative`) |
 
 ## 4. Evaluated Candidates Sub-case Registry
 
@@ -48,7 +49,7 @@ When a new source-type candidate is evaluated, a row is appended here with the v
 |-----------|---------|----------------------|----------------|-------|
 | `pdf` | sub-case (format-orthogonal; any parent type) | Acquisition (always); Epistemic Default (degraded input only) | `schema/reference/pdf-ingestion.md` | Acquisition-path sub-case applicable to any document type; content classifies normally at Pass 0 (article/paper/data/...) and the PDF convention layers on. `#p` page locators + page markers already exist; claims stay `support_type: direct`; degraded scans get `tentative` + spot-verification (D-08). |
 | `video` | sub-case of `transcript` | Acquisition (always); Epistemic Default (degraded audio only) | `schema/reference/video-ingestion.md` | Timestamp locators (`#t`) + the `[H:MM:SS]` line grammar already exist; download + STT replaces recorded acquisition. Claims stay `support_type: direct`; degraded audio gets `tentative` + N=3 spot-verification (D-10). |
-| `repository` | pending | — | — | Pairs with 999.5 drift machinery (commit-SHA staleness); deferred |
+| `repository` | **NEW PRIMARY TYPE** (not a sub-case) | Acquisition, Locator, Drift (all unconditionally); Epistemic Default (structurally — within-source split) | `schema/reference/repository-ingestion.md` | The inverse verdict of pdf/video, reached by the same rule: `#path:`/`#commit:` are new locator grammar, and `live` upstream drift is a new value on the drift dimension (every other type is static/published-immutable). Claims stay `support_type: direct`; self-descriptive README claims hedged claim-level `tentative`. Drift detection pairs with the external drift checks (`schema/workflows/lint.md`). |
 
 Rows marked *provisional* are seeded pre-evaluations; the owning phase finalizes verdict and dimension assessment by walking the candidate through the contract.
 

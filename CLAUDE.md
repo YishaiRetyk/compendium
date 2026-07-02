@@ -4,7 +4,7 @@
 > Any LLM agent maintaining this wiki MUST read and follow this document.
 > This file is the router; each linked file listed in the routing table is authoritative for its own sections.
 
-<!-- inclusion-audit: 290 lines @ 2026-06-14 -->
+<!-- inclusion-audit: 291 lines @ 2026-07-03 -->
 <!-- Resident core: justify any added line against the inclusion test (ambient / unscriptable-AND-unacceptable-miss / dispatch) or extract it. Re-run WF-08 and update this baseline. -->
 
 ## 1. Overview and Principles
@@ -50,6 +50,7 @@ These four operations are the wiki's mutation vocabulary. Layered on top is the 
 > | Adding/evaluating a new source type | `schema/reference/source-types.md` |
 > | Ingesting a PDF source (acquisition runbook + sub-case convention) | `schema/reference/pdf-ingestion.md` |
 > | Ingesting a video/YouTube source (acquisition runbook + sub-case convention) | `schema/reference/video-ingestion.md` |
+> | Ingesting a code repository (snapshot runbook + `#path:`/`#commit:` locators) | `schema/reference/repository-ingestion.md` |
 > | Lint workflow + decay/staleness auto-fix math + CI severity/JSON contract | `schema/workflows/lint.md` |
 > | Creating cross-references (wikilinks) | `schema/reference/wikilinks.md` |
 > | Determining `wiki-cloud/` vs `wiki-local/` placement | `schema/reference/privacy.md` |

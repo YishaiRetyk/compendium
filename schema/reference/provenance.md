@@ -31,6 +31,8 @@ Every factual claim in wiki pages SHOULD have an inline provenance marker linkin
 | Timestamp | `#t<start>-<end>` | `#t00:12:10-00:12:48` | Audio/video transcripts |
 | Image | `#img<number>` | `#img2` | Figures, diagrams |
 | Reference | `#r<number>` | `#r7` | research-report bibliography entries |
+| File path | `#path:<file>[:L<n>[-L<m>]]` | `#path:src/parser.py:L10-L25` | repository code/files (line numbers are relative to the source's `commit_sha`; resolves against the snapshot's `## Excerpts` registry) |
+| Commit | `#commit:<sha>` | `#commit:4f2a91c` | repository snapshot-commit claims (≥7 hex chars; must prefix-match the source's `commit_sha`) |
 
 ### Page-marker convention
 
@@ -79,6 +81,7 @@ The `checked_at` field records the ISO 8601 date when the provenance link was la
 - The learning rate schedule uses warmup followed by inverse square root decay [prov:src-2026-03-15-vaswani-attention#sec:training|direct|2026-04-08]
 - RNNs struggle with long-range dependencies due to vanishing gradients [prov:src-2026-04-02-lstm-survey#sec:limitations|direct|2026-04-08]
 - Research synthesis claim: `[prov:<report-slug>#r7|derived|<date>]`
+- Repository code claim: `[prov:<repo-source-slug>#path:src/parser.py:L10-L25|direct|<date>]`
 ```
 
 ### Bad vs. Good Provenance Examples

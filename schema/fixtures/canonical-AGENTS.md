@@ -51,6 +51,7 @@ This file (`CLAUDE.md`) is the canonical agent spec; the wizard selects `AGENTS.
 > | Adding/evaluating a new source type | `schema/reference/source-types.md` |
 > | Ingesting a PDF source (acquisition runbook + sub-case convention) | `schema/reference/pdf-ingestion.md` |
 > | Ingesting a video/YouTube source (acquisition runbook + sub-case convention) | `schema/reference/video-ingestion.md` |
+> | Ingesting a code repository (snapshot runbook + `#path:`/`#commit:` locators) | `schema/reference/repository-ingestion.md` |
 > | Lint workflow + decay/staleness auto-fix math + CI severity/JSON contract | `schema/workflows/lint.md` |
 > | Creating cross-references (wikilinks) | `schema/reference/wikilinks.md` |
 > | Determining `wiki-cloud/` vs `wiki-local/` placement | `schema/reference/privacy.md` |

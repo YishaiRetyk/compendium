@@ -64,7 +64,18 @@ path: sources/YYYY/YYYY-MM/YYYY-MM-DD-slug/source.md
 url: "https://..."                  # Original URL if applicable
 content_hash: "sha256:abc123..."    # SHA-256 hash for staleness detection
 ingested_at: YYYY-MM-DD            # When source was processed
-source_type: article|paper|transcript|journal|data|image|research-report
+source_type: article|paper|transcript|journal|data|image|research-report|repository
+
+# Repository fields — present ONLY on source_type: repository.
+# repo_url + commit_sha + default_branch are REQUIRED (lint enforces);
+# license / primary_language / stars_at_ingest are recommended — OMIT when unknown.
+# See schema/reference/repository-ingestion.md.
+repo_url: "https://github.com/<owner>/<repo>"
+commit_sha: "<40-hex-sha>"
+default_branch: main
+license: "<license-name>"
+primary_language: "<language>"
+stars_at_ingest: 0
 
 # PDF sub-case fields — present ONLY when the source was acquired from a PDF.
 # OMIT all four entirely on non-PDF sources (do NOT leave them empty). See schema/reference/pdf-ingestion.md.
