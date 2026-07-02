@@ -214,6 +214,48 @@ Three new source ingestion paths designed once via a shared abstraction: the 5-d
 
 ---
 
+## Milestone: v1.4 — Source Lifecycle
+
+**Shipped:** 2026-07-03
+**Phases:** 2 (22–23) | **Plans:** 5 | **Span:** one overnight autonomous session (19 commits + housekeeping/consolidation)
+
+### What Was Built
+
+The `repository` source type (the extension contract's first primary new-type instance: `#path:`/`#commit:` locators resolvable via a curated-snapshot Excerpts registry, within-source epistemic split, lint-enforced drift-anchor frontmatter, `bin/repo-snapshot.sh`) and external source drift detection (opt-in `lint --network`: repo HEAD drift, URL reachability, registry link-rot — review-only, surface-don't-mark). Plus, in the same session: the v1.3 close, the thrice-carried fence-masking todo, and the laptop consolidation (ICM ingest cherry-picked; the laptop's independently-planned Python Migration imported as staged v1.5).
+
+### What Worked
+
+- **The pre-plumbed slot paid off.** Phase 9's `drift-external` CI default-skip contract, designed two milestones early, meant external drift landed with zero CI churn — the design slot was waiting for exactly this feature.
+- **The validation ingest found the milestone's own motivation.** Snapshotting the planned target (`gsd-build/get-shit-done`) surfaced a live archived-redirect — real upstream drift caught manually one phase before the detector shipped, then used as the detector's validation narrative.
+- **Adversarial review at xhigh caught a hollow verification.** The 10-angle fan-out proved "10/10 locators resolve" was checking non-None, not usable-passage — two live claim families were audited "resolved" against passages that couldn't support them. The graded review depth (xhigh on the schema-bearing phase, standard on the follow-up with lessons pre-applied) felt right.
+- **Registry-pattern reuse.** The `## Excerpts` registry is the `## References` registry re-instantiated — the second use of the make-locators-resolvable-offline pattern, now clearly a house idiom.
+- **Git-native consolidation.** Divergent laptop/desktop lines shared a base commit; cherry-pick + staged-import (with renumbering and a mandatory re-baseline brief) preserved both machines' work with zero loss and no destructive rsync.
+
+### What Was Inefficient
+
+- **Duplicate milestone bookkeeping across machines.** Both machines independently closed v1.3 and defined a "v1.4" — the divergence cost a renumbering pass and version-collision reconciliation. A "check the other machine before defining a milestone" step (or habitual push/fetch of a shared bare remote) would have prevented it.
+- **The fence-scanning fix was applied one resolver too shallow, twice.** The mid-validation fix went into `_resolve_path` only; the review then proved `_resolve_sec`/`_resolve_ref`/`_resolve_commit` shared the vulnerability. Shared-helper-first should have been the reflex the first time.
+- **Tool-appended log entries duplicated hand-written ones** (the non-dry-run lint appends its own log block) — a phantom second operation in the activity log, caught only by the conventions review angle.
+
+### Patterns Established
+
+- **Surface, don't mark:** network diagnostics never mutate pages; upstream drift changes *currency*, not *faithfulness* to the immutable snapshot; re-snapshot = a NEW ingest.
+- **Same-phase curation-amendment exception** to source immutability: a logged, format-only repair (registry entries / metadata lines) that makes already-authored claims resolvable, with `content_hash` recomputed — never content alteration.
+- **Passage-level verification bar:** a locator "resolving" means the passage can support the claim, not merely that it is non-None.
+- **Staged-milestone import** (`milestones/v<X>-MILESTONE-BRIEF.md` + `-REQUIREMENTS-STAGED.md` + renumbered phase dir) as the shape for adopting planning work from another machine/line.
+
+### Key Lessons
+
+- **Verification machinery needs passage-level assertions, not existence checks** — the third consecutive milestone where a green gate was proven structurally incapable of failing (D-08 vacuity in v1.3, hollow-resolve here). The bar keeps moving down a level; encode it in the next harness from the start.
+- **Fix shared infrastructure at the shared layer on first contact** — a bug found in one sibling of a copied idiom is in all of them.
+- **Two active planning machines need a sync ritual** — the consolidation was cheap this time only because histories shared a recent base and the laptop's work was pure planning.
+
+### Cost Observations
+
+- Single overnight autonomous session (Claude Fable 5) covering close → quick task → define → 2 phases (plan/execute/verify/review) → consolidation → close; the 10-finder review fan-out was the dominant subagent cost and earned it (15 confirmed findings).
+
+---
+
 ## Cross-Milestone Trends
 
 (To be populated as additional milestones ship.)
@@ -237,10 +279,11 @@ Three new source ingestion paths designed once via a shared abstraction: the 5-d
 | v1.1.1 | Graph Integrity | 2026-06-04 | 1 | 3 | ~2 |
 | v1.2 | Schema Architecture | 2026-06-08 | 4 | 15 | ~4 |
 | v1.3 | Source Ingestion | 2026-06-14 | 3 | 11 | ~5 |
+| v1.4 | Source Lifecycle | 2026-07-03 | 2 | 5 | 1 (overnight) |
 
 ### Recurring Patterns
 
-- **Mechanical enforcement over remembered rules / manual audits** — each milestone has pushed a correctness property into a gate or structure: `requirements-sync --require-complete` (v1.1), `linkres` target validation (v1.1.1), `routing` lint + `gen-skills --check` + privacy-as-harness-permission (v1.2), D-08 derived-never-direct + hollow-audit tripwire (v1.3).
+- **Mechanical enforcement over remembered rules / manual audits** — each milestone has pushed a correctness property into a gate or structure: `requirements-sync --require-complete` (v1.1), `linkres` target validation (v1.1.1), `routing` lint + `gen-skills --check` + privacy-as-harness-permission (v1.2), D-08 derived-never-direct + hollow-audit tripwire (v1.3), drift-external opt-in flag + passage-level resolution bar (v1.4).
 - **Gate-arming with RED test harnesses before a structural change** (v1.1.1 remediation, v1.2 Phases 15/18).
 - **Superseding decision records** capture reversals and rejected alternatives legibly (v1.1.1 piped-links DR, v1.2 privacy + skills DRs).
 - **Design-once, instantiate-N abstractions extracted from real cases** — the v1.3 extension contract was distilled from three concrete candidates, then immediately re-applied to classify two of them as sub-cases.

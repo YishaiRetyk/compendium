@@ -1,5 +1,30 @@
 # Milestones
 
+## v1.4 Source Lifecycle (Shipped: 2026-07-03)
+
+**Phases completed:** 2 phases (22–23), 5 plans
+**Requirements:** 11/11 complete (REPO-01..06, DRIFT-01..05) — `bin/requirements-sync.sh --strict --require-complete` exits 0
+**Timeline:** 2026-07-03 → 2026-07-03 (single overnight autonomous session, 19 commits + pre-milestone housekeeping)
+
+**Delivered:** The source lifecycle loop closed — the wiki now knows not just how sources arrive but whether their upstreams have moved or died. `repository` shipped as the extension contract's first *primary* new-type instance, and external source drift detection (backlog 999.5, deferred twice) landed as opt-in, review-only `lint --network` checks in the `drift-external` slot Phase 9 pre-plumbed.
+
+**Key accomplishments:**
+
+- **Repository Source Type (Phase 22, `REPO-01..06`):** `schema/reference/repository-ingestion.md` — curated snapshot bundle (never a full clone) with an `## Excerpts` registry that makes the new `#path:<file>[:L<n>[-L<m>]]`/`#commit:<sha>` locators audit-resolvable offline; within-source epistemic split (code `sourced`, README self-descriptions hedged `tentative`, `support_type` stays `direct`); lint-enforced drift-anchor frontmatter (`repo_url`/`commit_sha`/`default_branch`, LINT_VERSION 1.11.0); `bin/repo-snapshot.sh` mechanical glue. Validated on a real ingest of `open-gsd/gsd-core` — which itself caught **live external drift** (the wiki's documented GSD home was an archived redirect; the project renamed to `@opengsd/gsd-core`), upgrading the `gsd` entity from report-derived to repository-direct claims (the Model C promotion story in anger).
+- **The review that mattered:** a 10-angle adversarial code review (subagent fan-out) found 15 confirmed findings — headline: the phase's own "10/10 locators resolve" verification was partially hollow (non-None ≠ usable passage), and the fence-awareness fix had been applied one resolver too shallow. All 15 fixed: a shared `_fence_mask_lines` layer now protects ALL four audit resolvers from quoted-markdown hijacking; locator grammar closed (whole-file/single-line/inverted-range); the live snapshot repaired via a logged same-phase curation amendment.
+- **External Source Drift Detection (Phase 23, `DRIFT-01..05`):** three check families behind `--network` (LINT_VERSION 1.12.0) — repository HEAD-vs-`commit_sha` via `git ls-remote` (no clone), URL reachability (videos excluded per their settled link-rot stance), citation-registry link-rot ratios. **Surface, don't mark** (DR `dr-2026-07-03-external-source-drift`): the 999.5 sketch's auto-stale-marking consciously narrowed — upstream drift changes currency, not claim faithfulness against the immutable snapshot. Zero network I/O without the flag; `--ci` skip contract intact; network-free test harness (file:// upstreams + curl stub). Live run: the repository source verified current (true negative), 2 benign moved-infos, 0 dead links.
+
+**Also this session (pre/mid-milestone):** v1.3 closed + archived + tagged; the thrice-carried `phase-14-lint-mask-fence-edge-cases` todo delivered (quick task 260703-m4f, LINT_VERSION 1.10.1); **laptop↔desktop consolidation** — the laptop's ICM paper ingest cherry-picked, and its independently-planned "v1.4 Python Migration" (6-cycle cross-AI-reviewed foundation phase) imported as **staged milestone v1.5** (phases renumbered 24–26, mandatory re-baseline brief).
+
+**Known deferred items at close:** CCD (content-change detection beyond reachability) + IPR (`#issue:`/`#pr:` locators) in v1.4 Future Requirements; doi.org-style permanent-redirector skip-list (noise refinement, noted in the DR); cross-phase test-aggregator dedup (naturally superseded by v1.5's pytest conversion); backlog 999.3/999.6 carried.
+
+**Archives:**
+
+- `milestones/v1.4-ROADMAP.md`
+- `milestones/v1.4-REQUIREMENTS.md`
+
+---
+
 ## v1.3 Source Ingestion (Shipped: 2026-06-14)
 
 **Phases completed:** 3 phases (19–21), 11 plans
