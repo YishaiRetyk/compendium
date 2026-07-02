@@ -776,3 +776,17 @@ scope: yaml category — the unscoped wiki-health total is 0 errors / 69 warning
 findings: 78 total (0 errors, 69 warnings, 9 info)
 auto_fixes: 0 applied
 report: wiki-cloud/maintenance/lint-report.md
+
+## [2026-07-03] ingest | open-gsd/gsd-core — GSD Core repository snapshot
+
+First repository acquired end-to-end via the Phase 22 repository pipeline (REPO-06). Acquired with `bin/repo-snapshot.sh` (shallow clone → metadata harvest → README + Excerpts skeleton) into a snapshot bundle, then curated: badge shields and star-history embed trimmed (noted inline), five code excerpts added under `## Excerpts` with exact `path:Lnn-Lnn` headings so every `#path:` claim is offline-resolvable (D-04).
+
+Discovery detour worth recording: the wiki's documented home for GSD (`gsd-build/get-shit-done`, from the April 2026 frameworks report) turned out to be an ARCHIVED redirect stub — the project renamed to `@opengsd/gsd-core` under the OpenGSD org. The live repository was snapshotted instead (commit `69fef7c0`, branch `next`), and the rename/lineage evidence is anchored to the snapshot's own CHANGELOG excerpt. A textbook external-drift case, live, one phase before the drift detector ships.
+
+CREATED:
+- src-2026-07-03-gsd-core-repo (source summary; source_type: repository — FIRST of its type; repo_url/commit_sha/default_branch required fields, license/primary_language recommended; #path:/#commit:/#sec: direct claims; epistemic split exercised — code/metadata claims sourced, README self-descriptions hedged claim-level tentative per D-08)
+UPDATED:
+- gsd (entity; rename/continuation claims with direct primary provenance; TL;DR re-synthesized; solo-author/version/repo-home point-in-time facts marked superseded-in-part with pointers to the new claims; decision_history backlink added)
+- index.md (source catalog entry + refreshed gsd entity line)
+
+Rationale: validates the repository source type in anger (REPO-06) — the extension contract's first PRIMARY new-type instance (D-01: locator, drift, acquisition change unconditionally; epistemics structurally). The `#path:` locators resolve against the Excerpts registry and `#commit:` against Snapshot Metadata via the new audit resolvers (22-02); the upgrade path from report-derived to repository-direct claims (Model C promotion story) is exercised on a real page.

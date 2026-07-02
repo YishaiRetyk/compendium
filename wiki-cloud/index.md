@@ -40,7 +40,7 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[omnidocbench|OmniDocBench]] — Authoritative CVPR 2025 benchmark for diverse PDF document parsing (~1,651 pages, ~10 doc types, end-to-end/task/attribute modes) (mixed, 2026-06-09)
 - [[spec-kit|Spec Kit]] — GitHub's official spec-driven-development toolkit (CLI "Specify"); tool-agnostic across 20+ agents, spec is the version-controlled source of truth (mixed, 2026-06-09)
 - [[superpowers|Superpowers]] — Jesse Vincent's Claude Code framework enforcing a mandatory brainstorm→plan→implement→review skill chain with a SessionStart re-priming hook (mixed, 2026-06-09)
-- [[gsd|GSD (Get-Shit-Done)]] — TÂCHES' context-engineering orchestrator: every task in a fresh 200K subagent context, coordinated via a .planning/ artifact tree (mixed, 2026-06-09)
+- [[gsd|GSD (Get-Shit-Done)]] — Context-engineering orchestrator (originated by TÂCHES, continued as GSD Core under OpenGSD): every task in a fresh 200K subagent context, coordinated via a .planning/ artifact tree (mixed, 2026-07-03)
 - [[demis-hassabis|Demis Hassabis]] — Co-founder and CEO of Google DeepMind; took the more cautious side on AGI timelines in a 2026 stage debate (sourced, 2026-06-14)
 - [[dario-amodei|Dario Amodei]] — Co-founder and CEO of Anthropic; took the faster side on AGI timelines and reiterated his no-chips-to-adversaries policy (sourced, 2026-06-14)
 
@@ -85,6 +85,7 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[src-2026-06-09-pdf-to-text-llm-ingestion-sota|PDF-to-Text Extraction and LLM PDF Ingestion: State of the Art (2025–2026)]] — Synthesized deep-research report: three-camp taxonomy, extraction-vs-native-vision paradigms, OmniDocBench/olmOCR-Bench, per-page cost, VLM hallucination, pipeline recommendation (mixed, 2026-06-09)
 - [[src-2026-06-12-multi-agent-scientific-discovery|A Multi-Agent System for Automating Scientific Discovery (Robin)]] — Ghareeb et al., Nature (2026) — first end-to-end multi-agent system automating hypothesis generation + data analysis; identified ripasudil/KL001 for dAMD (first PDF-acquired source, born-digital) (mixed, 2026-06-12)
 - [[src-2026-06-14-hassabis-amodei-day-after-agi|FULL DISCUSSION: Google's Demis Hassabis, Anthropic's Dario Amodei Debate the World After AGI]] — DRM News, 2026-01-20 — YouTube transcript (video sub-case) on AGI timelines, the self-improvement loop, jobs, chip policy, and AI-safety risk; first video-acquired transcript with mended multi-speaker labels (sourced, 2026-06-14)
+- [[src-2026-07-03-gsd-core-repo|open-gsd/gsd-core — GSD Core repository snapshot]] — Snapshot at commit `69fef7c0` (branch `next`) — first repository-type source: rename/lineage evidence (get-shit-done → GSD Core under OpenGSD), v1.7.0-rc.1 package metadata, first-party context-rot docs, curated code excerpts with `#path:` anchors (sourced, 2026-07-03)
 
 ## Comparisons
 
