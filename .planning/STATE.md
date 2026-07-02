@@ -22,6 +22,7 @@ See: .planning/PROJECT.md (updated 2026-07-03)
 
 **Core value:** The wiki is a persistent, compounding artifact -- cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested.
 **Current focus:** v1.4 Source Lifecycle (Phases 22–23): `repository` source type (first primary instance of the Phase-19 extension contract) + external source drift detection (promoted backlog 999.5, landing in the pre-plumbed `drift-external` lint subcategory). Next: plan Phase 22.
+**Queued next:** v1.5 Python Migration (Phases 24–26) — imported from the laptop 2026-07-03 (its independently-defined "v1.4", renumbered); fully planned first phase (6 plans, 6 cross-AI review cycles); MANDATORY re-baseline at start per `milestones/v1.5-MILESTONE-BRIEF.md`. Laptop↔desktop consolidation 2026-07-03: laptop's ICM ingest cherry-picked; both trees now share one line of record (desktop main).
 
 ## Current Position
 

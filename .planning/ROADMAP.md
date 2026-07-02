@@ -8,6 +8,7 @@
 - ✅ **v1.2 Schema Architecture** — Phases 15–18 (shipped 2026-06-08) — [archive](milestones/v1.2-ROADMAP.md)
 - ✅ **v1.3 Source Ingestion** — Phases 19–21 (shipped 2026-06-14) — [archive](milestones/v1.3-ROADMAP.md)
 - 🚧 **v1.4 Source Lifecycle** — Phases 22–23 (started 2026-07-03)
+- 📦 **v1.5 Python Migration** — Phases 24–26 (STAGED — imported from the laptop 2026-07-03, renumbered from its v1.4/22–24; Phase-24 plan hardened through 6 cross-AI review cycles, ready to execute after v1.4 closes with a MANDATORY re-baseline) — [brief](milestones/v1.5-MILESTONE-BRIEF.md) · [requirements](milestones/v1.5-REQUIREMENTS-STAGED.md) · plans in `phases/24-foundation-package-skeleton-frozen-shared-core-parity-oracle/`
 
 ## Phases
 
@@ -82,7 +83,7 @@ Full phase details: [milestones/v1.3-ROADMAP.md](milestones/v1.3-ROADMAP.md)
 
 **Goal:** Close the source lifecycle loop — formalize the `repository` source type as the extension contract's first *primary* new-type instance (locators, snapshot convention, epistemic split, lint enforcement), then ship external-source drift detection (backlog 999.5) as an opt-in, review-only extension of lint's pre-plumbed `drift-external` subcategory, with repository SHA drift as the pilot case.
 
-- [ ] **Phase 22: Repository Source Type** - Justify `source_type: repository` via the extension contract, define `#path:`/`#commit:` locators + the curated-snapshot bundle convention + the within-source epistemic split, enforce via lint/audit, and validate end-to-end with a real repository
+- [x] **Phase 22: Repository Source Type** - Justify `source_type: repository` via the extension contract, define `#path:`/`#commit:` locators + the curated-snapshot bundle convention + the within-source epistemic split, enforce via lint/audit, and validate end-to-end with a real repository (completed 2026-07-03)
 - [ ] **Phase 23: External Source Drift Detection** - Extend lint's `drift`/`EXTERNAL:` subcategory with opt-in `--network` checks (repository HEAD-vs-SHA, URL reachability, citation-registry link-rot), review-only with documented follow-up guidance, validated by a real run over the live wiki
 
 ## Phase Details
@@ -106,15 +107,15 @@ Plans:
 
 **Wave 1**
 
-- [ ] 22-01-PLAN.md — repository-ingestion.md convention + source-types/frontmatter/provenance/ingest edits + routing row (byte-synced)
+- [x] 22-01-PLAN.md — repository-ingestion.md convention + source-types/frontmatter/provenance/ingest edits + routing row (byte-synced)
 
 **Wave 2** *(blocked on Wave 1)*
 
-- [ ] 22-02-PLAN.md — lint enum + conditional fields (LINT_VERSION 1.11.0) + audit #path/#commit resolvers (dispatch-order D-11) + bin/repo-snapshot.sh + tests/phase-22 TDD harness
+- [x] 22-02-PLAN.md — lint enum + conditional fields (LINT_VERSION 1.11.0) + audit #path/#commit resolvers (dispatch-order D-11) + bin/repo-snapshot.sh + tests/phase-22 TDD harness
 
 **Wave 3** *(blocked on Wave 2 — network acquisition)*
 
-- [ ] 22-03-PLAN.md — end-to-end validation ingest (gsd-build/get-shit-done) + source-scoped audit + DR + phase-final gates
+- [x] 22-03-PLAN.md — end-to-end validation ingest (gsd-build/get-shit-done) + source-scoped audit + DR + phase-final gates
 
 **UI hint**: no
 
