@@ -102,9 +102,9 @@ Re-platform the `bin/` toolchain from Bash to Python behind `.sh` exec-shims (sh
   - [x] 24-04: Characterization-golden backfill + anti-signal rewrite (wave 3)
   - [x] 24-05: CI wiring + parity matrix (wave 4) — 228 sites seam-routed
   - [x] 24-06: Freeze guard + baseline pin + phase-24-freeze tag (wave 5)
-- [ ] **Phase 25: Parallel Migration + Cutover** (1/7 plans; decomposed 2026-07-03) — MIG-01..06, CUT-01, TEST-06
-  - [x] 25-01: brownfield port (MIG-01 — architectural template; wave 1) — completed 2026-07-04; surfaced + fixed the D-09 seam rebase (normalized tree hashing; first live channel comparison)
-  - [ ] 25-02: checkers port (MIG-03; wave 1)
+- [ ] **Phase 25: Parallel Migration + Cutover** (2/7 plans; decomposed 2026-07-03) — MIG-01..06, CUT-01, TEST-06
+  - [x] 25-01: brownfield port (MIG-01 — architectural template; wave 1) — completed 2026-07-04; surfaced + fixed 3 harness/environment defect classes at the first live channel comparison (D-09 rebases ×2 + fixture determinism)
+  - [x] 25-02: checkers port (MIG-03; wave 1) — completed 2026-07-04; 2 impl-assertion rewrites mutation-verified
   - [ ] 25-03: setup/release trio port — gen-skills, release, sync-claude (MIG-04 partial; wave 1)
   - [ ] 25-04: wiki-ops port + retirements — 6 tools incl. repo-snapshot (MIG-05, MIG-06; wave 1)
   - [ ] 25-05: init-wizard port behind preflight shim (MIG-04 complete; wave 1)

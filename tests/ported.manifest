@@ -9,3 +9,6 @@
 # a controlled per-port mutation, see Plan 06). N-4: a non-empty manifest with no pinned freeze baseline
 # makes the oracle FAIL LOUDLY rather than silently fall to HEAD (Plan 03).
 brownfield
+check-neutrality
+check-privacy
+check-sources-cloud-safe

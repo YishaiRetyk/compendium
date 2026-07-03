@@ -1,37 +1,43 @@
 #!/usr/bin/env bash
 # PRIV-05 W1 tripwire (review MEDIUM #1 — moved to Wave 0):
-# check-neutrality.sh source_local_only_wiki() predicate re-keyed from
+# check-neutrality source_local_only_wiki() predicate re-keyed from
 # 'privacy: local_only' frontmatter grep to wiki-local/ path walk.
 # Tests: (i) static-assert dead frontmatter regex is GONE; (ii) function walks wiki-local/;
 # (iii) git-history paths preserved literal; (iv) behavioral: local term in wiki-local/ +
 # PUBLIC_PATH still surfaces as a leak.
-# Today this FAILS (function still greps 'privacy:\s*local_only'; walks 'wiki/', not 'wiki-local/').
+# Post-MIG-03: the static cases (i)–(iii) read the PYTHON module source
+# (src/compendium/check_neutrality.py — the ported source of truth); the bash
+# bin/check-neutrality.sh becomes a thin shim with no scanner internals to grep.
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib.sh"
 
 FAIL=0
 
-NEUTRALITY="$REPO_ROOT/bin/check-neutrality.sh"   # noqa: direct-bin (source-read; inventoried, defer-to-MIG-03)
-test -f "$NEUTRALITY" || { echo "FAIL: bin/check-neutrality.sh missing" >&2; exit 1; }
+NEUTRALITY="$REPO_ROOT/src/compendium/check_neutrality.py"   # noqa: direct-bin (source-read of the ported Python module, post-MIG-03; inventoried as done)
+test -f "$NEUTRALITY" || { echo "FAIL: src/compendium/check_neutrality.py missing" >&2; exit 1; }
 
 # (i) Static: dead frontmatter regex MUST be GONE from the leak-source function
 # The old predicate 'privacy:\s*local_only' is the thing being removed
 if grep -q "privacy:[[:space:]]*local_only" "$NEUTRALITY"; then
-    echo "FAIL (i): bin/check-neutrality.sh still contains 'privacy: local_only' frontmatter regex (W1 tripwire)" >&2
+    echo "FAIL (i): src/compendium/check_neutrality.py still contains 'privacy: local_only' frontmatter regex (W1 tripwire)" >&2
     FAIL=1
 fi
 
 # (ii) Static: function must now walk wiki-local/ (not just wiki/)
 if ! grep -q 'wiki-local' "$NEUTRALITY"; then
-    echo "FAIL (ii): bin/check-neutrality.sh does not reference 'wiki-local' (leak-source predicate not re-keyed)" >&2
+    echo "FAIL (ii): src/compendium/check_neutrality.py does not reference 'wiki-local' (leak-source predicate not re-keyed)" >&2
     FAIL=1
 fi
 
 # (iii) Static: git-history literal paths MUST be preserved (these are DELETED historical pages)
 # These are the known-deleted local_only wiki paths from source_git_history()
 if ! grep -q 'wiki/overviews/personal-decision-patterns.md' "$NEUTRALITY"; then
-    echo "FAIL (iii): bin/check-neutrality.sh no longer contains 'wiki/overviews/personal-decision-patterns.md' (git-history path deleted!)" >&2
+    echo "FAIL (iii): src/compendium/check_neutrality.py no longer contains 'wiki/overviews/personal-decision-patterns.md' (git-history path deleted!)" >&2
+    FAIL=1
+fi
+if ! grep -q 'wiki/sources/src-2026-04-10-personal-decision-journal.md' "$NEUTRALITY"; then
+    echo "FAIL (iii): src/compendium/check_neutrality.py no longer contains 'wiki/sources/src-2026-04-10-personal-decision-journal.md' (git-history path deleted!)" >&2
     FAIL=1
 fi
 
