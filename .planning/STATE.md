@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Python Migration
 status: In progress
-stopped_at: Phase 24 complete (verified + reviewed); Phase 25 needs plan-phase decomposition
-last_updated: 2026-07-03T23:00:00.000Z
-last_activity: 2026-07-03 — Phase 24 shipped: 6/6 plans, 9/9 requirements Complete, 22-finding review applied, freeze baseline re-pinned at 9905bf0
+stopped_at: Phase 25 decomposed into 7 plans (2026-07-03); executing Wave 1 in order 01→06
+last_updated: 2026-07-03T23:30:00.000Z
+last_activity: 2026-07-03 — Phase 25 plan-phase decomposition: 25-CONTEXT + 7 PLAN docs (6 Wave-1 cluster ports + Wave-2 cutover)
 progress:
   total_phases: 3
   completed_phases: 1
-  total_plans: 6
+  total_plans: 13
   completed_plans: 6
-  percent: 33
+  percent: 46
 ---
 
 # Project State
@@ -25,8 +25,8 @@ See: .planning/PROJECT.md (updated 2026-07-03)
 
 ## Current Position
 
-Phase: 24 — COMPLETE (2026-07-03). Next: Phase 25 — Parallel Migration + Cutover
-Plan: Phase 25 plans TBD (needs plan-phase decomposition: ~5-6 Wave-1 cluster ports in isolated worktrees [brownfield MIG-01; lint+audit-claims MIG-02; checkers MIG-03; setup/release MIG-04 — init-wizard recommended as its own plan; wiki-ops MIG-05+06 incl. repo-snapshot per RB-1] + the Wave-2 cutover fan-in CUT-01; TEST-06 grown per cluster)
+Phase: 25 — Parallel Migration + Cutover (IN PROGRESS; decomposed 2026-07-03)
+Plan: 7 plans in `.planning/phases/25-parallel-migration-cutover/` — Wave 1 sequential order: 25-01 brownfield (MIG-01, template) → 25-02 checkers (MIG-03) → 25-03 setup/release trio (MIG-04a) → 25-04 wiki-ops + retirements (MIG-05/06) → 25-05 init-wizard (MIG-04b) → 25-06 lint+audit (MIG-02, long pole); Wave 2: 25-07 cutover (CUT-01). TEST-06 grown per plan. Executed sequentially on main (single-agent; worktree isolation deliberately dropped — see 25-CONTEXT.md)
 Status: The frozen foundation is live: 16-stub package, frozen common/ (6 modules), WIKI_IMPL seam + worktree oracle pinned at phase-24-freeze (= 9905bf0), 38 golden case dirs, 228 call sites seam-routed, per-test manifest (209 rows), CI matrix + local freeze/parity gates in the (now actually installed) pre-commit hook
 Last activity: 2026-07-03
 
