@@ -24,20 +24,20 @@ Design lineage: the 7-agent codebase assessment (2026-06-18) — ~10.2k lines of
 - [x] **TEST-03**: Before any script is ported, its behavior is frozen as a characterization golden (full stdout + exit code + resulting file tree); missing coverage is backfilled first — `validate-op.sh` (zero tests today) and the untested `search.sh` modes get characterization tests before they are touched
 - [x] **TEST-04**: Implementation-asserting tests (e.g. the `hashlib`-not-`sha256sum` grep, the `pdf-extract` `api/generate` body-grep) are quarantined or rewritten to assert behavior, so they neither block nor invert under the Python implementation
 - [x] **TEST-05**: A pytest harness is stood up — `conftest.py` with a `git_repo`/`tmp_path` fixture replicating `make_bare_repo`/`make_fixture_repo`, a golden-tree comparison helper, and `skipif` markers for the Ollama/network tests
-- [ ] **TEST-06**: Net-new pytest unit tests cover the extracted `common/` core and each cluster's modules (e.g. `make_yaml`, `resolve_effective_claim_privacy`, `classify_page`, the lint check functions) — direct module-level coverage that does not exist today
+- [x] **TEST-06**: Net-new pytest unit tests cover the extracted `common/` core and each cluster's modules (e.g. `make_yaml`, `resolve_effective_claim_privacy`, `classify_page`, the lint check functions) — direct module-level coverage that does not exist today
 
 ### Script Migration (MIG) — parity-gated, cluster by cluster
 
-- [ ] **MIG-01**: The brownfield cluster (`brownfield.sh` + the 5 `bin/lib/*.py` modules, promoted into `common/` / `brownfield/`) is ported and parity-green across its phase-10/11 suites, including byte-exact YAML/REPORT fixture output (the `make_yaml` chokepoint) — the lowest-risk large script and the architectural template for the rest
-- [ ] **MIG-02**: `lint.sh` and `audit-claims.sh` are ported together onto the shared `common/` primitives (retiring the byte-copy), parity-green — including the `lint --ci --format json` schema (locked by a golden consumed by `json-to-annotations.py`), the dual-mode exit-code semantics, and the `audit-claims --verifier` STDIN-only / `shell=False` egress security contract preserved verbatim
-- [ ] **MIG-03**: The privacy/neutrality checkers (`check-neutrality.sh`, `check-privacy.sh`, `check-sources-cloud-safe.sh`) are ported, parity-green, preserving their distinct exit-code semantics (exit 2 on violation) and the CI `privacy-leak` / `neutrality` hard gates
-- [ ] **MIG-04**: The setup/release family (`init-wizard.sh`, `gen-skills.sh`, `release.sh`, `sync-claude.sh`) is ported — preserving `init-wizard`'s interactive prompt contract + the wizard-vs-manual byte-equality gate (`setup-parity`), `sync-claude`'s exit-2-on-drift, `gen-skills`'s exit-1-on-drift, and the latency-sensitive pre-commit-hot-path behavior
-- [ ] **MIG-05**: The wiki-operations family (`ingest.sh`, `validate-op.sh`, `search.sh`, `requirements-sync.sh`, `pdf-extract.sh`) is ported, parity-green; external boundaries (poppler, the Ollama HTTP endpoint, git) remain subprocess/HTTP calls in Python
-- [ ] **MIG-06**: `migrate-privacy-dirs.sh` is retired (spent Phase-15 one-off, already executed) and `install-hooks.sh` is left as bash (6-line `git config`); both decisions are recorded
+- [x] **MIG-01**: The brownfield cluster (`brownfield.sh` + the 5 `bin/lib/*.py` modules, promoted into `common/` / `brownfield/`) is ported and parity-green across its phase-10/11 suites, including byte-exact YAML/REPORT fixture output (the `make_yaml` chokepoint) — the lowest-risk large script and the architectural template for the rest
+- [x] **MIG-02**: `lint.sh` and `audit-claims.sh` are ported together onto the shared `common/` primitives (retiring the byte-copy), parity-green — including the `lint --ci --format json` schema (locked by a golden consumed by `json-to-annotations.py`), the dual-mode exit-code semantics, and the `audit-claims --verifier` STDIN-only / `shell=False` egress security contract preserved verbatim
+- [x] **MIG-03**: The privacy/neutrality checkers (`check-neutrality.sh`, `check-privacy.sh`, `check-sources-cloud-safe.sh`) are ported, parity-green, preserving their distinct exit-code semantics (exit 2 on violation) and the CI `privacy-leak` / `neutrality` hard gates
+- [x] **MIG-04**: The setup/release family (`init-wizard.sh`, `gen-skills.sh`, `release.sh`, `sync-claude.sh`) is ported — preserving `init-wizard`'s interactive prompt contract + the wizard-vs-manual byte-equality gate (`setup-parity`), `sync-claude`'s exit-2-on-drift, `gen-skills`'s exit-1-on-drift, and the latency-sensitive pre-commit-hot-path behavior
+- [x] **MIG-05**: The wiki-operations family (`ingest.sh`, `validate-op.sh`, `search.sh`, `requirements-sync.sh`, `pdf-extract.sh`) is ported, parity-green; external boundaries (poppler, the Ollama HTTP endpoint, git) remain subprocess/HTTP calls in Python
+- [x] **MIG-06**: `migrate-privacy-dirs.sh` is retired (spent Phase-15 one-off, already executed) and `install-hooks.sh` is left as bash (6-line `git config`); both decisions are recorded
 
 ### Cutover & Documentation (CUT)
 
-- [ ] **CUT-01**: A decision record documents the migration (shim-and-swap, `common/` consolidation, the two-layer test strategy, the retirements); all `bin/*.sh` references across `schema/`, `docs/`, `CLAUDE.md`/`AGENTS.md`, and `.claude/settings.local.json` are verified accurate post-migration (and `AGENTS.md ≡ CLAUDE.md` byte-equality held)
+- [x] **CUT-01**: A decision record documents the migration (shim-and-swap, `common/` consolidation, the two-layer test strategy, the retirements); all `bin/*.sh` references across `schema/`, `docs/`, `CLAUDE.md`/`AGENTS.md`, and `.claude/settings.local.json` are verified accurate post-migration (and `AGENTS.md ≡ CLAUDE.md` byte-equality held)
 - [ ] **CUT-02** *(terminal, deferrable)*: The existing black-box CLI/characterization tests are converted onto the established pytest harness, the bash test suite is retired, and a single `pytest` entrypoint runs the full suite in parallel — depends on all MIG phases being parity-green; cleanly cut if timeline slips (the system ships complete without it, with tests still running via the instrumented-bash oracle)
 
 ## Future Requirements
@@ -80,14 +80,14 @@ Which phases cover which requirements. Filled during roadmap creation. Phase num
 | TEST-03 | Phase 24 | Complete |
 | TEST-04 | Phase 24 | Complete |
 | TEST-05 | Phase 24 | Complete |
-| MIG-01 | Phase 25 (Wave 1 — brownfield) | Pending |
-| MIG-02 | Phase 25 (Wave 1 — lint + audit-claims) | Pending |
-| MIG-03 | Phase 25 (Wave 1 — checkers) | Pending |
-| MIG-04 | Phase 25 (Wave 1 — setup/release) | Pending |
-| MIG-05 | Phase 25 (Wave 1 — wiki-ops) | Pending |
-| MIG-06 | Phase 25 (Wave 1 — folded into wiki-ops) | Pending |
-| TEST-06 | Phase 25 (spans all Wave-1 cluster plans; grown alongside each port) | Pending |
-| CUT-01 | Phase 25 (Wave 2 — cutover fan-in) | Pending |
+| MIG-01 | Phase 25 (Wave 1 — brownfield) | Complete |
+| MIG-02 | Phase 25 (Wave 1 — lint + audit-claims) | Complete |
+| MIG-03 | Phase 25 (Wave 1 — checkers) | Complete |
+| MIG-04 | Phase 25 (Wave 1 — setup/release) | Complete |
+| MIG-05 | Phase 25 (Wave 1 — wiki-ops) | Complete |
+| MIG-06 | Phase 25 (Wave 1 — folded into wiki-ops) | Complete |
+| TEST-06 | Phase 25 (spans all Wave-1 cluster plans; grown alongside each port) | Complete |
+| CUT-01 | Phase 25 (Wave 2 — cutover fan-in) | Complete |
 | CUT-02 | Phase 26 (terminal, deferrable) | Pending |
 
 **Coverage:**

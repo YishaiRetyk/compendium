@@ -1,6 +1,6 @@
 # 25-05 SUMMARY — init-wizard port (MIG-04 complete)
 
-**Status:** Complete (2026-07-04)
+**Status:** Complete (2026-07-03)
 
 ## What shipped
 

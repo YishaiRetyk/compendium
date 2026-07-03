@@ -1,6 +1,6 @@
 # 25-04 SUMMARY — wiki-ops port + retirements (MIG-05, MIG-06)
 
-**Status:** Complete (2026-07-04)
+**Status:** Complete (2026-07-03)
 
 ## What shipped
 

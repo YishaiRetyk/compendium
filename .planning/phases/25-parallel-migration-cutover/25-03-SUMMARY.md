@@ -1,6 +1,6 @@
 # 25-03 SUMMARY — setup/release trio port (MIG-04 partial)
 
-**Status:** Complete (2026-07-04)
+**Status:** Complete (2026-07-03)
 
 ## What shipped
 

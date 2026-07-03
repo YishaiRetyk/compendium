@@ -1,6 +1,6 @@
 # 25-01 SUMMARY — brownfield port (MIG-01)
 
-**Status:** Complete (2026-07-04)
+**Status:** Complete (2026-07-03)
 **Commits:** D-09 seam rebase (K1) + baseline re-pin (K2) + the port commit (see git log `fix(25):` / `chore(25):` / `feat(25): port brownfield`)
 
 ## What shipped

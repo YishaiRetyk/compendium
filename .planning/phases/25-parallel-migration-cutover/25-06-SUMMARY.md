@@ -1,6 +1,6 @@
 # 25-06 SUMMARY — lint + audit-claims port (MIG-02, the long pole)
 
-**Status:** Complete (2026-07-04)
+**Status:** Complete (2026-07-03)
 
 ## What shipped
 

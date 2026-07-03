@@ -1,6 +1,6 @@
 # 25-07 SUMMARY — cutover fan-in (CUT-01)
 
-**Status:** Complete (2026-07-04)
+**Status:** Complete (2026-07-03)
 
 ## What shipped
 
@@ -17,7 +17,7 @@
   never emit the new INCLUDES lines — a definitionally expected divergence) and
   `FREEZE_ALLOW_REBASE=1` (golden change), immediately followed by the baseline
   re-pin and a full three-leg certification run that replaces the skipped gate.
-- **Decision record:** `wiki-cloud/decisions/dr-2026-07-04-python-migration.md`
+- **Decision record:** `wiki-cloud/decisions/dr-2026-07-03-python-migration.md`
   (reflect workflow; trigger_type schema-update) + index and log entries;
   `validate-op UPDATE` and `lint --category linkres` clean. The DR ships in the
   template (decisions/ is allowlisted) — written placeholder-clean.
