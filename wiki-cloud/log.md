@@ -836,15 +836,9 @@ findings: 92 total (0 errors, 83 warnings, 9 info)
 auto_fixes: 0 applied
 report: wiki-cloud/maintenance/lint-report.md
 
-## [2026-07-04] reflect | bash-to-python migration decision
+## [2026-07-03] reflect | bash-to-python migration decision
 
-Created decision record [[dr-2026-07-04-python-migration|Bash-to-Python Migration: Shim-and-Swap Behind a Byte-Parity Oracle]] (`trigger_type: schema-update`) capturing the v1.5 re-platform: all sixteen in-scope `bin/` tools now run as a Python package behind self-bootstrapping `.sh` exec-shims with every CLI contract byte-preserved (behavior parity enforced by a 4-channel oracle against a held-fixed worktree); the frozen `compendium.common` core retires the lint/audit page-primitive byte-copy; the two-layer test strategy keeps the black-box suites as the parity instrument and grows module-level pytest per cluster; `migrate-privacy-dirs` retired, `install-hooks` stays bash; the release allowlist ships `src/` + `pyproject.toml` + `tests/lib` so template checkouts stay functional; SHIMOUT/LIBSWAP/pytest-conversion deferred. Known tool bugs ported faithfully, not fixed. Indexed under Decisions.
-
-## [2026-07-03] lint | wiki-cloud health check
-
-findings: 0 total (0 errors, 0 warnings, 0 info)
-auto_fixes: 0 applied
-report: wiki-cloud/maintenance/lint-report.md
+Created decision record [[dr-2026-07-03-python-migration|Bash-to-Python Migration: Shim-and-Swap Behind a Byte-Parity Oracle]] (`trigger_type: schema-update`) capturing the v1.5 re-platform: all sixteen in-scope `bin/` tools now run as a Python package behind self-bootstrapping `.sh` exec-shims with every CLI contract byte-preserved (behavior parity enforced by a 4-channel oracle against a held-fixed worktree); the frozen `compendium.common` core retires the lint/audit page-primitive byte-copy; the two-layer test strategy keeps the black-box suites as the parity instrument and grows module-level pytest per cluster; `migrate-privacy-dirs` retired, `install-hooks` stays bash; the release allowlist ships `src/` + `pyproject.toml` + `tests/lib` so template checkouts stay functional; SHIMOUT/LIBSWAP/pytest-conversion deferred. Known tool bugs ported faithfully, not fixed. Indexed under Decisions.
 
 ## [2026-07-03] ingest | Agentic Search for Context Engineering — Leonie Monigatti, Elastic
 

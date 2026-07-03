@@ -1,5 +1,5 @@
 ---
-id: dr-2026-07-04-python-migration
+id: dr-2026-07-03-python-migration
 title: "Bash-to-Python Migration: Shim-and-Swap Behind a Byte-Parity Oracle"
 type: decision
 status: active
@@ -10,8 +10,8 @@ summary: "Records the v1.5 re-platform of the bin/ toolchain from Bash to a Pyth
   template allowlist extension that keeps released checkouts functional, and the
   deliberate deferrals (shim removal, native-library re-platforming, pytest
   conversion)."
-created_at: 2026-07-04
-updated_at: 2026-07-04
+created_at: 2026-07-03
+updated_at: 2026-07-03
 sources: []
 epistemic_status: sourced
 tags:
@@ -22,7 +22,7 @@ domains:
 supersedes: null
 superseded_by: null
 aliases:
-  - dr-2026-07-04-python-migration
+  - dr-2026-07-03-python-migration
 has_contradictions: false
 knowledge_domain: software
 trigger_type: schema-update
