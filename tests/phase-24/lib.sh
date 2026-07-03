@@ -42,6 +42,83 @@ assert_exit_code() {
     fi
 }
 
+# build_parity_gate_scaffold — a mini git repo wired for bin/check-staged-parity.sh:
+# the gate + guard + the frozen seam/runner copied in, a committed bash faketool (= the
+# oracle body), a ported.manifest listing faketool, a pinned freeze baseline, and a tiny
+# routed suite. Callers export WIKI_PARITY_ONLY_SUITES="<sc>/tests/phase-divtest" so the
+# gate's run-all executes ONLY the tiny suite (the runner's frozen --only-suite knob).
+# Prints the scaffold root. Caller cleans up (incl. the scaffold's oracle worktree).
+build_parity_gate_scaffold() {
+    local sc; sc="$(mktemp -d)"
+    mkdir -p "$sc/bin" "$sc/src/compendium" "$sc/tests/lib" "$sc/tests/phase-divtest" "$sc/tests/foot"
+    cp "$REPO_ROOT/bin/check-staged-parity.sh" "$REPO_ROOT/bin/check-common-freeze.sh" "$sc/bin/"
+    cp "$REPO_ROOT/tests/run-all-suites.sh" "$sc/tests/"
+    cp "$REPO_ROOT/tests/lib/invoke_tool.sh" "$REPO_ROOT/tests/lib/oracle-worktree.sh" \
+       "$REPO_ROOT/tests/lib/normalize.sh" "$REPO_ROOT/tests/lib/no-direct-bin-calls.sh" "$sc/tests/lib/"
+    printf '# scaffold manifest\nfaketool\n' > "$sc/tests/ported.manifest"
+    printf '# scaffold exemptions\n' > "$sc/tests/oracle-exempt.txt"
+    printf 'phase-divtest/test_div PASS\n' > "$sc/tests/SUITE_MANIFEST.txt"
+    touch "$sc/src/compendium/__init__.py"
+    scaffold_write_module "$sc" 'OK\n'
+    cat > "$sc/bin/faketool.sh" <<'EOF'
+#!/usr/bin/env bash
+printf 'OK\n'
+EOF
+    chmod +x "$sc/bin/faketool.sh"
+    cat > "$sc/tests/phase-divtest/test_div.sh" <<EOF
+#!/usr/bin/env bash
+set -euo pipefail
+REPO_ROOT="\$(cd "\$(dirname "\${BASH_SOURCE[0]}")/../.." && pwd)"
+source "\$REPO_ROOT/tests/lib/invoke_tool.sh"
+export IT_FOOTPRINT_ROOT="\$REPO_ROOT/tests/foot"
+invoke_tool faketool run-once
+[ "\$IT_EXIT" = "0" ] || { echo "faketool exited \$IT_EXIT" >&2; exit 1; }
+EOF
+    chmod +x "$sc/tests/phase-divtest/test_div.sh"
+    (
+        cd "$sc"
+        git init -q -b main
+        git config user.email fixture@example.com
+        git config user.name Fixture
+        git add -A
+        git -c commit.gpgsign=false commit -qm seed
+        git rev-parse HEAD > tests/freeze-baseline.sha
+        git add tests/freeze-baseline.sha
+        git -c commit.gpgsign=false commit -qm "pin baseline"
+    )
+    printf '%s\n' "$sc"
+}
+
+# scaffold_write_module <sc> <printf-bytes> — (re)write the scaffold's python module.
+scaffold_write_module() {
+    cat > "$1/src/compendium/faketool.py" <<EOF
+import sys
+
+def main(argv=None):
+    sys.stdout.write("$2")
+    return 0
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))
+EOF
+}
+
+# scaffold_write_shim <sc> — the canonical Phase-25 shim form for faketool.
+scaffold_write_shim() {
+    cat > "$1/bin/faketool.sh" <<'EOF'
+#!/usr/bin/env bash
+_REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+export PYTHONPATH="${_REPO_ROOT}/src${PYTHONPATH:+:$PYTHONPATH}"
+exec python3 -m compendium.faketool "$@"
+EOF
+    chmod +x "$1/bin/faketool.sh"
+}
+
+# scaffold_oracle_worktree_dir <sc> — the scaffold's cached oracle worktree path (for cleanup).
+scaffold_oracle_worktree_dir() {
+    WIKI_ORACLE_GIT_ROOT="$1" bash -c "source '$REPO_ROOT/tests/lib/invoke_tool.sh'; _oracle_worktree_dir" 2>/dev/null || true
+}
+
 # seed_valid_page <path> <id> <type> — a page satisfying validate-op's required
 # base fields (id,title,type,status,summary,created_at,updated_at,sources,
 # epistemic_status,tags,domains) with fixed dates (deterministic goldens).

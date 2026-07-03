@@ -54,6 +54,26 @@ jobs:
       - name: Run enumerated suites (per-test no-regression)
         run: WIKI_IMPL=${{ matrix.impl }} bash tests/run-all-suites.sh
 
+  common-freeze:
+    # Phase 24 Plan 06 (D-07/D-08): the frozen-foundation guard in CI. NEW name (not one of
+    # the 6 required checks). fetch-depth: 0 — the guard diffs against the committed baseline
+    # SHA (tests/freeze-baseline.sha; the local-only phase-24-freeze tag is never pushed).
+    # Exit 3 (unreachable baseline) is a NEUTRAL logged skip, never a vacuous pass — captured
+    # with the same non-`!` idiom the hook uses (REVIEWS HIGH#2/HIGH#12).
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Frozen-foundation guard (exit 3 = neutral skip, not a pass)
+        run: |
+          if bash bin/check-common-freeze.sh; then rc=0; else rc=$?; fi
+          if [ "$rc" = "3" ]; then
+            echo "freeze baseline unreachable on this branch — skipping (not a pass)"
+            exit 0
+          fi
+          exit "$rc"
+
   parity-equivalence:
     runs-on: ubuntu-latest
     steps:
