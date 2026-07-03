@@ -1,0 +1,16 @@
+---
+id: sample-page
+title: "A Sample: Page"
+type: concept
+status: active
+privacy: cloud
+created: 2026-01-02
+tags:
+  - alpha
+  - beta
+domains: [general]
+supersedes: null
+aliases: ['The Sample']
+---
+
+Body text stays untouched by the round-trip.
