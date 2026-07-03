@@ -25,8 +25,10 @@ See: .planning/PROJECT.md (updated 2026-07-03)
 
 ## Current Position
 
-Phase: 25 — COMPLETE (2026-07-03). Next: Phase 26 — Wholesale CLI→Pytest Conversion (terminal, deferrable; the milestone ships complete without it)
-Plan: all 7 plans complete (25-01…25-07; SUMMARYs written) + 25-VERIFICATION.md (8/8 reqs) + 25-REVIEW.md (15-finding xhigh review applied). All 16 tools run Python behind `.sh` exec-shims; migrate-privacy-dirs retired; migration DR authored (dr-2026-07-03-python-migration).
+Phase: 25 — COMPLETE (2026-07-03). Next: Phase 26 — Wholesale CLI→Pytest Conversion (DECOMPOSED + baked in for turnkey kickoff; the LAST v1.5 phase)
+Plan: all 7 Phase-25 plans complete (25-01…25-07; SUMMARYs) + 25-VERIFICATION.md (8/8 reqs) + 25-REVIEW.md (15-finding xhigh review). All 16 tools run Python behind `.sh` exec-shims; migrate-privacy-dirs retired; migration DR authored (dr-2026-07-03-python-migration).
+
+>>> KICKOFF: "kick off phase 26" → read `.planning/phases/26-cli-pytest-conversion/26-CONTEXT.md` (strategy + the exact lint-clobber-fix spec + the bridge decision D-26-01 + milestone-close checklist), then execute 26-01 → 26-02 → 26-03 → 26-04 in order to v1.5 milestone completion. Order is load-bearing: 26-02 retires the parity oracle, which is what frees the lint-clobber fix in 26-03 (collision-proof). Bridge, not wholesale rewrite (D-26-01). Preserve the user's concurrent ingest work — stage only phase-26 paths by pathspec.
 Status: Certified post-migration baseline pinned at phase-24-freeze = bb5ba7f. Full three-leg parity green (238 pairs byte-identical); pytest 149 green; freeze guard clean. 5 D-09 rebases over the phase (3 harness gaps at first live channel comparison + review C1/D6), each re-pinned. Known deferred: search/validate/audit faithful-bash divergences, the hook lint-clobber bug (todo), and the cleanup/altitude/efficiency ledger in 25-REVIEW.md.
 Last activity: 2026-07-03
 

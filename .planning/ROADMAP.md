@@ -110,7 +110,11 @@ Re-platform the `bin/` toolchain from Bash to Python behind `.sh` exec-shims (sh
   - [x] 25-05: init-wizard port behind preflight shim (MIG-04 complete; wave 1) — completed 2026-07-03; exit-3 preflight stays in the shim; setup-parity byte-equality holds
   - [x] 25-06: lint + audit-claims port (MIG-02 — long pole; wave 1) — completed 2026-07-03; byte-copy retired onto common.page; 3 impl-assertion rewrites mutation-verified; hook lint step now Python
   - [x] 25-07: cutover fan-in — DR + reference census + certification (CUT-01; wave 2) — completed 2026-07-03; allowlist ships src/pyproject/tests-lib; 1 pre-existing stale doc ref fixed; DR indexed+logged
-- [ ] **Phase 26: Wholesale CLI→Pytest Conversion** (terminal, deferrable) — CUT-02
+- [ ] **Phase 26: Wholesale CLI→Pytest Conversion** (4 plans; decomposed 2026-07-03, baked in for turnkey "kick off phase 26") — CUT-02; the LAST v1.5 phase. Order is load-bearing (26-02 frees 26-03).
+  - [ ] 26-01: pytest bridge — single parallel `pytest` entrypoint over the black-box suite (bridge, not rewrite — D-26-01)
+  - [ ] 26-02: retire the frozen-bash parity oracle + freeze machinery (post-migration; unblocks behavior fixes)
+  - [ ] 26-03: lint/audit `--staged`/`--ci` read-only — ends the pre-commit wiki-clobber (25-REVIEW F15)
+  - [ ] 26-04: milestone close — CUT-02 verification + xhigh review + ship v1.5
 
 ## Backlog
 
