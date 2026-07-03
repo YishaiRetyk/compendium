@@ -12,7 +12,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest==9.0.2"]
+dev = ["pytest==9.0.2", "pytest-xdist==3.8.0"]
 
 [project.scripts]
 compendium-lint                     = "compendium.lint:main"
@@ -37,6 +37,13 @@ where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# `pytest` is the single entrypoint (CUT-02): the unit tests + the black-box bash
+# bridge (tests/test_blackbox_suites.py) collect together. `-n auto` fans the whole
+# run across cores via pytest-xdist; `--dist loadgroup` co-locates the suites that
+# touch shared live state (see SERIAL_SUITES in test_blackbox_suites.py) onto one
+# worker so they run sequentially — the bash runner was serial and never raced.
+# `-p no:cacheprovider` keeps the run from writing a .pytest_cache into the tree.
+addopts = "-n auto --dist loadgroup -p no:cacheprovider"
 markers = [
     "requires_ollama: test needs a reachable Ollama endpoint",
     "requires_network: test needs network egress",

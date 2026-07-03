@@ -21,6 +21,8 @@ import pathlib
 import subprocess
 import sys
 
+import pytest
+
 REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 SRC_DIR = REPO_ROOT / "src"
 sys.path.insert(0, str(SRC_DIR))  # allow running without `pip install -e .`
@@ -111,6 +113,11 @@ def test_body_for_deterministic():
         assert gen_skills.body_for(op) == gen_skills.body_for(op)
 
 
+# Reads the LIVE .claude/skills/ tree, which the black-box phase-18 bridge tests
+# transiently mutate (gen-skills drift injection). `xdist_group` co-locates these on
+# the same worker as that suite under `--dist loadgroup`, so they never observe an
+# in-flight drift. (The bash runner was serial; -n auto introduced the concurrency.)
+@pytest.mark.xdist_group("live_repo")
 def test_body_for_matches_committed_skills():
     """Rendering determinism against the repo: the derived copies ARE the template."""
     for op in OPS:
@@ -160,6 +167,7 @@ def test_gen_skills_help_and_unknown_arg(tmp_path):
     assert p.stderr == "ERROR: unknown arg: --frobnicate\n"
 
 
+@pytest.mark.xdist_group("live_repo")  # runs gen-skills --check on the LIVE repo — see note above
 def test_gen_skills_check_clean_from_foreign_cwd(tmp_path):
     """Root-anchored: --check run from an unrelated cwd still checks the repo."""
     p = _run("gen_skills", ["--check"], tmp_path)
