@@ -19,6 +19,7 @@ sources:
 - src-2026-04-16-claude-code-frameworks-report
 - src-2026-07-03-agentic-search-context-engineering
 - src-2026-07-03-building-great-agent-skills
+- src-2026-07-03-domain-specific-agents
 epistemic_status: sourced
 tags:
 - agent-skills
@@ -73,6 +74,7 @@ Agent Skills are filesystem-based capability packages: a directory containing a 
 - Beyond Anthropic's capability-packaging framing, a skill can serve as *just-in-time tool documentation*: in Elastic's agentic-search demos a small skill supplies the ES|QL syntax an agent needs to write a valid query, loaded on demand and referenced from the search tool's description ("always use the Elasticsearch ES|QL skill first") — using a skill to improve tool-parameter generation rather than to package a capability; LangChain exposes this via a skill-loading tool plus skill middleware [prov:src-2026-07-03-agentic-search-context-engineering#t00:28:17-00:32:38|direct|2026-07-03] [epistemic:: tentative]
 - A skill's *trigger* is a first-class design choice the Anthropic docs under-specify: a skill is always *user-invoked* (invoked manually, often via a `/` command) and is additionally *model-invoked* when its description is placed in the agent's context so the agent can choose to load it — model-invoked adds per-request context load plus the unpredictability that the model may decline to invoke, while user-invoked shifts the burden to the human pilot's cognitive load; a skill can be made user-only by disabling model invocation [prov:src-2026-07-03-building-great-agent-skills#t00:03:39-00:07:24|direct|2026-07-03] [epistemic:: tentative]
 - Practitioner authoring heuristics from Matt Pocock's [[skill-checklist|Skill Checklist]]: compose a skill from *steps* + *reference*, keep `SKILL.md` as small as possible (tokens saved are per-request cost saved), hide branch-specific reference behind *context pointers*, steer with *leading words* (short meaning-dense phrases the agent echoes into its reasoning traces), and prune *sediment* and *no-ops* via deletion tests [prov:src-2026-07-03-building-great-agent-skills#t00:07:30-00:19:05|direct|2026-07-03] [epistemic:: tentative]
+- A dissenting architectural view: [[justin-schroeder|Justin Schroeder]] frames a skill as essentially a markdown *documentation* file and claims that using *too many* skills makes an agent substantially worse — so piling skills, tools, and MCP onto one general-purpose agent is "inheritance" that inflates its context and eventually yields diminishing returns; his alternative, [[domain-specific-agents|Domain-Specific Agents]] (composition over inheritance), moves capability out of the shared context into small isolated agents instead of into more skills [prov:src-2026-07-03-domain-specific-agents#t00:09:17-00:13:34|direct|2026-07-03] [epistemic:: tentative]
 
 ## Detail
 
@@ -140,6 +142,10 @@ Anthropic's best-practices guide describes what a good Skill looks like; [[matt-
 
 - **Authoring heuristics.** Compose a Skill from *steps* and *reference*; keep `SKILL.md` as small as possible and move branch-specific reference behind *context pointers* (the authoring-side statement of [[progressive-disclosure|Progressive Disclosure]]); *steer* with **leading words** — short, meaning-dense phrases like "vertical slice" that the agent repeats into its reasoning traces, verifiable by reading those traces — and tune *legwork per step* by splitting a skill so the agent sees one step at a time; then *prune* duplication, **sediment** (accreted contributor cruft), and **no-ops** (instructions that don't change behavior, caught with a deletion test) [prov:src-2026-07-03-building-great-agent-skills#t00:07:30-00:19:05|direct|2026-07-03] [epistemic:: tentative]. See [[skill-checklist|Skill Checklist]] for the full four-part rubric.
 
+### A dissenting view: skills as context inflation
+
+Both the Anthropic guidance and Pocock's rubric treat "how to write a good skill" as the question. Justin Schroeder's domain-specific-agents talk questions the premise itself. In his framing a skill is fundamentally a markdown *documentation* file, and he claims research shows that loading *very many* skills makes an agent substantially worse — the moon-landing quip is "we didn't land a man on the moon by giving one guy a ton of documentation" [prov:src-2026-07-03-domain-specific-agents#t00:09:17-00:09:57|direct|2026-07-03] [epistemic:: tentative]. Because an agent's runtime stack (model, system prompt, tools, skills, MCP, messages) is *almost all context*, every skill you add is context you pay for on every request; Schroeder names the "keep adding skills/tools/MCP to one agent" habit **inheritance** and argues it hits diminishing returns past roughly a hundred additions [prov:src-2026-07-03-domain-specific-agents#t00:09:57-00:13:34|direct|2026-07-03] [epistemic:: tentative]. His alternative is *composition*: rather than teaching one agent more via more skills, move each capability into its own small isolated agent. This does not contradict the authoring advice above — a well-pruned skill is still better than a bloated one — but it reframes skills as one point on a spectrum whose other end is a purpose-built sub-agent, and it is the sharpest in-wiki articulation of *when not to reach for a skill at all*.
+
 ## Related Pages
 
 - [[anthropic|Anthropic]]
@@ -153,6 +159,8 @@ Anthropic's best-practices guide describes what a good Skill looks like; [[matt-
 - [[skill-checklist|Skill Checklist]] — Matt Pocock's four-part authoring/audit rubric.
 - [[matt-pocock|Matt Pocock]] — author of the Skill Checklist and the Matt Pocock Skills repo.
 - [[superpowers|Superpowers]] — contrasted as a primarily model-invoked skill set.
+- [[domain-specific-agents|Domain-Specific Agents]] — the dissenting "composition over inheritance" view that treats too many skills as context inflation.
+- [[justin-schroeder|Justin Schroeder]] — proponent of that view.
 
 ## Sources
 
@@ -164,3 +172,4 @@ Anthropic's best-practices guide describes what a good Skill looks like; [[matt-
 - [[src-2026-04-16-claude-code-frameworks-report|Claude Code Frameworks & Patterns: A Comparative Report]] — comparative synthesis report, April 2026
 - [[src-2026-07-03-agentic-search-context-engineering|Agentic Search for Context Engineering — Leonie Monigatti, Elastic]] — AI Engineer conference talk, 2026-05-08 (YouTube transcript)
 - [[src-2026-07-03-building-great-agent-skills|Building Great Agent Skills: The Missing Manual — Matt Pocock]] — AI Engineer talk, 2026-06-29 (YouTube transcript)
+- [[src-2026-07-03-domain-specific-agents|The Future Is Domain-Specific Agents — Justin Schroeder, StandardAgents]] — AI Engineer talk, 2026-06-29 (YouTube transcript)

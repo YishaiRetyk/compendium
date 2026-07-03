@@ -9,9 +9,10 @@ summary: "Isolated Claude instances with their own context window, tool allowlis
   context stays clean — making them the substrate for research, code review, and
   parallel execution in Claude Code frameworks."
 created_at: 2026-06-09
-updated_at: 2026-06-09
+updated_at: 2026-07-03
 sources:
 - src-2026-04-16-claude-code-frameworks-report
+- src-2026-07-03-domain-specific-agents
 epistemic_status: mixed
 tags:
 - subagents
@@ -34,7 +35,7 @@ example: false
 
 ## TL;DR
 
-Subagents (`.claude/agents/<name>.md`) are isolated Claude instances, each with its own context window, tool allowlist, and optionally its own model. Their defining benefit is context isolation: a research subagent can churn through 50 files / 100K tokens and return a ~500-token distilled summary, so the parent's context stays clean — a direct application of [[progressive-disclosure|Progressive Disclosure]] across agents. Routing to a subagent depends on its description; the markers "Use PROACTIVELY" and "MUST BE USED" markedly increase auto-delegation, so descriptions should read as routing rules, not capability summaries. Subagents are the shared substrate beneath the [[claude-code-orchestration-frameworks|Claude Code orchestration frameworks]] — [[gsd|GSD (Get-Shit-Done)]]'s fresh-context-per-task and [[superpowers|Superpowers]]' fresh-context code review both rest on them.
+Subagents (`.claude/agents/<name>.md`) are isolated Claude instances, each with its own context window, tool allowlist, and optionally its own model. Their defining benefit is context isolation: a research subagent can churn through 50 files / 100K tokens and return a ~500-token distilled summary, so the parent's context stays clean — a direct application of [[progressive-disclosure|Progressive Disclosure]] across agents. Routing to a subagent depends on its description; the markers "Use PROACTIVELY" and "MUST BE USED" markedly increase auto-delegation, so descriptions should read as routing rules, not capability summaries. Subagents are the shared substrate beneath the [[claude-code-orchestration-frameworks|Claude Code orchestration frameworks]] — [[gsd|GSD (Get-Shit-Done)]]'s fresh-context-per-task and [[superpowers|Superpowers]]' fresh-context code review both rest on them. The same isolation primitive is generalized at the architecture level by [[domain-specific-agents|Domain-Specific Agents]], where sub-agents are *recursive, full agents exposed as tools* — an agent that calls a sub-agent that calls further sub-agents — rather than only context-compression workers.
 
 ## Key Facts
 
@@ -43,6 +44,7 @@ Subagents (`.claude/agents/<name>.md`) are isolated Claude instances, each with 
 - Routing depends on the description; "Use PROACTIVELY" and "MUST BE USED" dramatically increase auto-delegation — write descriptions as routing rules, not capability summaries. [prov:src-2026-04-16-claude-code-frameworks-report#sec:subagents|derived|2026-06-09] [epistemic:: sourced]
 - Best practices: single responsibility with self-contained prompts (subagents see no parent history); least-privilege tools per role (read-only auditors get Read/Grep/Glob, researchers add web tools, implementers add Write/Edit/Bash); explicit output schemas (or agents return one-sentence verdicts); the Explore → Plan → Execute three-phase pipeline is the most reliable pattern. [prov:src-2026-04-16-claude-code-frameworks-report#sec:subagents|derived|2026-06-09] [epistemic:: sourced]
 - Pitfalls: agent sprawl dilutes routing; subagents are black boxes with no mid-stream interaction; over-parallelization wastes tokens; rejected subagent output cannot be iterated — the parent spawns a fresh copy with no internal state. [prov:src-2026-04-16-claude-code-frameworks-report#sec:subagents|derived|2026-06-09] [epistemic:: sourced]
+- Beyond Claude Code's `.claude/agents/*.md`, the sub-agent generalizes to an *agent-as-a-tool* composition primitive: an ideal agent's tools can include functions, prompts, or *another full agent*, so sub-agents nest recursively (a coordinator → a Salesforce agent → a Google Workspace agent, etc.), each keeping a small, minimal context window — the mechanism behind domain-specific agents [prov:src-2026-07-03-domain-specific-agents#t00:24:17-00:30:07|direct|2026-07-03] [epistemic:: tentative]
 
 ## Detail
 
@@ -59,7 +61,9 @@ The failure modes are the mirror image of the benefits. Too many subagents dilut
 - [[claude-code-orchestration-frameworks|Claude Code Orchestration Frameworks]] — all three rest on subagent isolation.
 - [[gsd|GSD (Get-Shit-Done)]] — fresh subagent context per task.
 - [[superpowers|Superpowers]] — fresh subagent context for code review.
+- [[domain-specific-agents|Domain-Specific Agents]] — generalizes sub-agents into recursive, full agents composed as tools.
 
 ## Sources
 
 - [[src-2026-04-16-claude-code-frameworks-report|Claude Code Frameworks & Patterns: A Comparative Report]]: comparative synthesis report (April 2026)
+- [[src-2026-07-03-domain-specific-agents|The Future Is Domain-Specific Agents — Justin Schroeder, StandardAgents]]: AI Engineer talk, 2026-06-29 (YouTube transcript)

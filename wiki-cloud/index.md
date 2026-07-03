@@ -49,6 +49,8 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[openai|OpenAI]] — The AI company behind Symphony, the Codex coding agent, and the "harness engineering" framing; stub sourced via the Symphony spec (mixed, 2026-07-03)
 - [[codex|Codex]] — OpenAI's coding agent, integrated via an app-server protocol (stdio subprocess, thread/turn session model); the agent Symphony drives (mixed, 2026-07-03)
 - [[matt-pocock|Matt Pocock]] — Developer educator and author of the "Matt Pocock Skills" repo; proposed the four-part skill checklist (Trigger/Structure/Steering/Pruning) and a prefer-user-invoked authoring stance (sourced, 2026-07-03)
+- [[justin-schroeder|Justin Schroeder]] — Co-founder of the stealth startup StandardAgents and prolific open-source builder (dmux, ArrowJS); argues the future of agent architecture is domain-specific agents — composition over inheritance (sourced, 2026-07-03)
+- [[standardagents|StandardAgents]] — Stealth startup building a domain-specific-agent ecosystem; source of the >80% token-efficiency and "137× cheaper" small-model claims (tentative, 2026-07-03)
 
 ## Concepts
 
@@ -73,6 +75,7 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[interpretable-context-methodology|Interpretable Context Methodology]] — Replaces framework-level agent orchestration with filesystem structure: numbered folders as stages, markdown CONTEXT.md files as stage contracts, one agent reading the right files at each step; a five-layer context hierarchy for sequential human-reviewed workflows (mixed, 2026-06-17)
 - [[agentic-search|Agentic Search]] — Retrieval driven by the agent: it chooses which search tool to call, with what parameters, and whether to search again; the RAG → agentic RAG → agentic-search arc and a curated low-floor/high-ceiling tool stack (sourced, 2026-07-03)
 - [[skill-checklist|Skill Checklist]] — Matt Pocock's four-part rubric for authoring and auditing agent skills (Trigger, Structure, Steering, Pruning); introduces user-invoked vs model-invoked, context pointers, leading words, sediment, and no-ops (sourced, 2026-07-03)
+- [[domain-specific-agents|Domain-Specific Agents]] — Composition over inheritance for agents: many small isolated agents under a coordinator talking in plain English, vs. inflating one agent's context with tools/skills/MCP; four claimed benefits and a "2027 = year of multi-agent orchestration" prediction (sourced, 2026-07-03)
 
 ## Sources
 
@@ -100,6 +103,7 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[src-2026-07-03-agentic-search-context-engineering|Agentic Search for Context Engineering — Leonie Monigatti, Elastic]] — AI Engineer, 2026-05-08 — YouTube transcript (video sub-case): context engineering as ~80% agentic search, four search-interface demos (semantic, ES|QL, shell, semantic-grep), and low-floor/high-ceiling tool curation (sourced, 2026-07-03)
 - [[src-2026-07-03-openai-symphony-spec|openai/symphony — Symphony Service Specification repository snapshot]] — Snapshot at commit `4cbe3a9` (branch `main`) — OpenAI's spec-first coding-agent orchestration service: long-running Linear-polling daemon, isolated per-issue Codex workspaces, single-authority orchestrator, hot-reloaded WORKFLOW.md contract, filesystem safety invariants; Apache-2.0/Elixir, engineering preview (sourced, 2026-07-03)
 - [[src-2026-07-03-building-great-agent-skills|Building Great Agent Skills: The Missing Manual — Matt Pocock]] — AI Engineer, 2026-06-29 — YouTube transcript (video sub-case): a four-part "skill checklist" (Trigger/Structure/Steering/Pruning) for authoring and auditing agent skills, framed as the way out of "skill hell" (sourced, 2026-07-03)
+- [[src-2026-07-03-domain-specific-agents|The Future Is Domain-Specific Agents — Justin Schroeder, StandardAgents]] — AI Engineer, 2026-06-29 — YouTube transcript (video sub-case): composition over inheritance for agents, four benefits (token efficiency, cheap small models, capability limits, scaling), an ideal-agent anatomy, and 2026–2027 multi-agent-orchestration predictions (sourced, 2026-07-03)
 
 ## Comparisons
 
