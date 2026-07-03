@@ -172,15 +172,17 @@ def test_gen_skills_check_clean_from_foreign_cwd(tmp_path):
 # --------------------------------------------------------------------- release
 
 def test_release_allowlist_verbatim():
-    """Golden-locked arrays (24-REVIEW deferred): do NOT extend with src/ or
-    pyproject.toml in this plan — the INCLUDES/EXCLUDES echo lines are frozen."""
+    """Golden-locked arrays. CUT-01 (25-07) extended the allowlist with the package
+    surfaces (src / pyproject.toml / tests/lib) — a template without src/ ships 16
+    broken shims; the dry-run golden was re-frozen in the same commit."""
     assert release.ALLOWLIST == (
         "README.md", "LICENSE", "PRIVACY.md", "AGENTS.md", "CLAUDE.md",
         ".gitignore", ".gitattributes", ".obsidianignore",
-        ".neutrality-denylist.txt", "bin", "schema", "docs", ".claude/skills",
+        ".neutrality-denylist.txt", "bin", "src", "pyproject.toml",
+        "schema", "docs", ".claude/skills",
         "wiki-cloud/index.md", "wiki-cloud/log.md", "wiki-cloud/decisions",
         "examples/kahneman", ".github", ".githooks",
-        "tests/phase-07", "tests/phase-18",
+        "tests/lib", "tests/phase-07", "tests/phase-18",
     )
     assert release.DENYLIST_PATHS == (
         ".planning", ".brownfield", ".git", ".obsidian/workspace",

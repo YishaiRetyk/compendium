@@ -1,9 +1,12 @@
 """PKG-02 extraction tests (Phase 24 Plan 02) — the TEST-06 seed.
 
 Covers:
-  Test 0  PRECONDITION: audit-claims.sh's inline primitives are byte-identical to
-          lint.sh's (modulo the known "(COPIED from lint.sh)" docstring) BEFORE the
-          single frozen copy is trusted — a pre-existing divergence must fail loudly.
+  Test 0  SINGLE-DECLARATION invariant (post-MIG-02 form): the ported lint/audit
+          modules do NOT re-declare the shared page primitives and reference the
+          very objects common.page declares. (The Phase-24 form of this test proved
+          the audit-claims.sh heredoc was byte-identical to lint.sh's BEFORE the
+          single frozen copy was trusted — proven and committed at extraction time;
+          the heredocs no longer exist, bin/*.sh are exec-shims.)
   Test 1  make_yaml() factory settings (typ='rt', preserve_quotes, block style,
           None->null representer).
   Test 2  make_yaml round-trip over a committed fixture is BYTE-IDENTICAL to the
@@ -12,8 +15,10 @@ Covers:
   Test 4  the 5 lifted common/ modules are byte-identical to their bin/lib sources.
   Tests 5-7  page.py behaviors: parse_frontmatter 3-tuple contract,
           parse_frontmatter_str, regex matches.
-  Test 8  page.py's regex/function source text is byte-identical to the
-          authoritative copy in bin/lint.sh.
+  Test 8  page.py is the SINGLE DECLARATION SITE for the shared primitives
+          (post-MIG-02 form of the lint.sh source-identity check: the authoritative
+          bash heredoc is gone; a re-declaration in either ported module would
+          resurrect the split-brain PKG-02 retired).
 """
 
 import pathlib
@@ -22,8 +27,8 @@ import re
 import pytest
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
-LINT_SH = (REPO_ROOT / "bin" / "lint.sh").read_text(encoding="utf-8")
-AUDIT_SH = (REPO_ROOT / "bin" / "audit-claims.sh").read_text(encoding="utf-8")
+LINT_PY = (REPO_ROOT / "src" / "compendium" / "lint.py").read_text(encoding="utf-8")
+AUDIT_PY = (REPO_ROOT / "src" / "compendium" / "audit_claims.py").read_text(encoding="utf-8")
 PAGE_PY = (REPO_ROOT / "src" / "compendium" / "common" / "page.py").read_text(encoding="utf-8")
 
 LIFT_MAP = {
@@ -63,23 +68,28 @@ def _shared_symbols(text):
     }
 
 
-def test_0_precondition_audit_claims_matches_lint():
-    """REVIEWS LOW/MEDIUM: prove the audit-claims copy == lint copy BEFORE unifying.
+def test_0_single_declaration_and_import_identity():
+    """Post-MIG-02 form: the byte-copy is RETIRED — neither ported module may
+    re-declare the shared primitives, and both must reference the very objects
+    common.page declares (identity, not just equality)."""
+    import compendium.audit_claims as audit
+    import compendium.lint as lint
+    from compendium.common import page
 
-    The only permitted difference is the audit-claims '(COPIED from lint.sh)'
-    docstring suffix. Any other divergence means a pre-existing split-brain that
-    must NOT be silently unified into the frozen surface.
-    """
-    lint_syms = _shared_symbols(LINT_SH)
-    audit_syms = _shared_symbols(AUDIT_SH)
-    for name in lint_syms:
-        audit_text = audit_syms[name].replace(" (COPIED from lint.sh)", "")
-        # Trailing whitespace/newline runs at block edges are not semantic.
-        assert audit_text.rstrip() == lint_syms[name].rstrip(), (
-            f"PRECONDITION FAILED: {name} diverges between bin/lint.sh and "
-            f"bin/audit-claims.sh — do NOT extract; resolve the split-brain first.\n"
-            f"lint:\n{lint_syms[name]}\naudit:\n{audit_syms[name]}"
+    for mod_text, mod_name in ((LINT_PY, "lint.py"), (AUDIT_PY, "audit_claims.py")):
+        for sym in ("PROV_RE", "EPISTEMIC_INLINE_RE", "WIKILINK_RE"):
+            assert not re.search(rf"^{sym}\s*=\s*re\.compile\(", mod_text, re.M), (
+                f"{mod_name} re-declares {sym} — the split-brain PKG-02 retired"
+            )
+        assert not re.search(r"^def parse_frontmatter\(filepath\):", mod_text, re.M), (
+            f"{mod_name} re-declares parse_frontmatter"
         )
+    for holder in (lint, audit):
+        for sym in ("PROV_RE", "EPISTEMIC_INLINE_RE", "WIKILINK_RE"):
+            if hasattr(holder, sym):
+                assert getattr(holder, sym) is getattr(page, sym), (
+                    f"{holder.__name__}.{sym} is not the common.page object"
+                )
 
 
 def test_1_make_yaml_settings():
@@ -171,27 +181,30 @@ def test_7_regexes_match():
     assert BARE_LINK_RE.search("[[bare-target]]")
 
 
-def test_8_page_py_source_identity_with_lint():
-    """page.py's primitives are character-identical to the authoritative lint.sh copy."""
-    anchors = [
-        (r"^WIKILINK_RE = re\.compile\(.*$", r"$"),
-        (r"^PIPED_LINK_RE = re\.compile\(.*$", r"$"),
-        (r"^BARE_LINK_RE  = re\.compile\(.*$", r"$"),
-        (r"^PROV_RE = re\.compile\(", r"^\)$\n"),
-        (r"^EPISTEMIC_INLINE_RE = re\.compile\(.*$", r"$"),
-        (r"^_FENCE_OPEN_RE = re\.compile\(.*$", r"$"),
-        (r"^_HTMLCOM_RE = re\.compile\(.*$", r"$"),
-        (r"^_INLINE_RE  = re\.compile\(.*$", r"$"),
-        (r"^_FM_RE      = re\.compile\(.*$", r"$"),
-        (r"^def _mask_fences\(text\):", r"^\S"),
-        (r"^def mask_markdown\(text\):", r"^\S"),
-        (r"^def parse_frontmatter\(filepath\):", r"^\S"),
-        (r"^EXCLUDE_FILES = .*$", r"$"),
-        (r"^EXCLUDE_DIRS = .*$", r"$"),
+def test_8_page_py_is_single_declaration_site():
+    """Post-MIG-02 form: page.py holds EXACTLY ONE declaration of each shared
+    primitive, and neither ported module declares any of them. (The Phase-24 form
+    byte-compared page.py against the authoritative bin/lint.sh heredoc — that
+    source no longer exists; the identity was proven at extraction time and the
+    guarded risk is now re-declaration drift, not extraction drift.)"""
+    declaration_anchors = [
+        r"^WIKILINK_RE = re\.compile\(",
+        r"^PIPED_LINK_RE = re\.compile\(",
+        r"^BARE_LINK_RE  = re\.compile\(",
+        r"^PROV_RE = re\.compile\(",
+        r"^EPISTEMIC_INLINE_RE = re\.compile\(",
+        r"^_FENCE_OPEN_RE = re\.compile\(",
+        r"^def _mask_fences\(text\):",
+        r"^def mask_markdown\(text\):",
+        r"^def parse_frontmatter\(filepath\):",
+        r"^EXCLUDE_FILES = ",
+        r"^EXCLUDE_DIRS = ",
     ]
-    for start, end in anchors:
-        lint_block = _extract_block(LINT_SH, start, end)
-        page_block = _extract_block(PAGE_PY, start, end)
-        assert page_block.rstrip() == lint_block.rstrip(), (
-            f"page.py drifted from lint.sh for anchor {start!r}"
+    for anchor in declaration_anchors:
+        assert len(re.findall(anchor, PAGE_PY, re.M)) == 1, (
+            f"page.py must declare exactly once: {anchor!r}"
         )
+        for mod_text, mod_name in ((LINT_PY, "lint.py"), (AUDIT_PY, "audit_claims.py")):
+            assert not re.search(anchor, mod_text, re.M), (
+                f"{mod_name} re-declares {anchor!r} — split-brain resurrected"
+            )
