@@ -1,0 +1,1 @@
+tree channel not captured: extracted-tree case (full-repo tree varies with the baseline ref; exit/stdout/stderr are the load-bearing channels)

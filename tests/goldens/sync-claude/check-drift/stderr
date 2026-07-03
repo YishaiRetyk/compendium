@@ -1,0 +1,1 @@
+DRIFT: CLAUDE.md differs from AGENTS.md. Run: bash bin/sync-claude.sh && git add CLAUDE.md

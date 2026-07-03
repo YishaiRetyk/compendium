@@ -1,0 +1,27 @@
+=== Source Scaffolded ===
+
+  File:    sources/2026/2026-01/2026-01-02-sample-note/source.md
+  Slug:    sample-note
+  Hash:    sha256:0dc78dc63a0eaa5d239416f3a712f005bfc56389c5eb33284c084c9b2d1f0037
+  Date:    2026-01-02 (UTC)
+
+=== Ready to Ingest ===
+
+Tell your LLM agent:
+
+  Ingest the source at sources/2026/2026-01/2026-01-02-sample-note/source.md
+
+  Source metadata:
+    content_hash: "sha256:0dc78dc63a0eaa5d239416f3a712f005bfc56389c5eb33284c084c9b2d1f0037"
+    ingested_at: 2026-01-02
+    path: sources/2026/2026-01/2026-01-02-sample-note/source.md
+
+  Follow the Ingest Workflow in AGENTS.md section 11.1.
+
+=== Log Entry Template (append to wiki-cloud/log.md) ===
+
+## [2026-01-02] ingest | <source title>
+
+contributor:: @fixture
+
+<what was done, affected pages, rationale>

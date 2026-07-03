@@ -1,0 +1,3 @@
+# tests/oracle-exempt.txt — machine-readable parity-exempt patterns consumed by run-all-suites.sh --require-parity (cycle-6 MEDIUM b).
+# <pattern><TAB><reason>.  <pattern> = a tool name or a capture pairing-key glob.  Keep CONSISTENT with tests/oracle-exempt.md.
+init-wizard	exit-4 already-initialized + exit-3 preflight are $0-relative / dependency-presence paths, not python-module parity-verifiable (exit-3 enforced by test_shim_preflight_exit3.sh)

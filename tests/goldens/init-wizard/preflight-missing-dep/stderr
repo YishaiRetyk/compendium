@@ -1,0 +1,3 @@
+ERROR: pre-flight failed:
+  - python3: not found in PATH
+See: docs/reference/setup-prerequisites.md for install instructions.

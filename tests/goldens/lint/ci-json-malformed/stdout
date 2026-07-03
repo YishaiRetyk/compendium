@@ -1,0 +1,14 @@
+[
+  {
+    "severity": "error",
+    "category": "yaml",
+    "path": "wiki-cloud/concepts/broken.md",
+    "message": "Frontmatter parse error: YAML parse error: while parsing a flow sequence\n  in \"<unicode string>\", line 3, column 8:\n    title: [unclosed\n           ^\nexpected ',' or ']', but got '<stream end>'\n  in \"<unicode string>\", line 4, column 1:\n    \n    ^"
+  },
+  {
+    "severity": "warning",
+    "category": "gap",
+    "path": "maturity",
+    "message": "Sparse coverage check skipped: wiki needs 5+ domains with 3+ having 2+ sources (currently 0 domains, 0 meet threshold)"
+  }
+]

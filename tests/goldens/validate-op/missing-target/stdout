@@ -1,0 +1,9 @@
+=== Validating UPDATE on wiki-cloud/concepts/nonexistent.md ===
+
+  [1/5] Target exists             FAIL
+  [2/5] Frontmatter valid         SKIP (target missing)
+  [3/5] Provenance resolves       SKIP (prior check failed)
+  [4/5] Privacy respected         SKIP (prior check failed)
+  [5/5] MERGE distinct pages      SKIP (not MERGE)
+
+=== RESULT: FAIL ===

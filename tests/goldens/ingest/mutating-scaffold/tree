@@ -1,0 +1,8 @@
+F 644 0dc78dc63a0eaa5d239416f3a712f005bfc56389c5eb33284c084c9b2d1f0037  ./note.md
+D 755 ./sources
+D 755 ./sources/2026
+D 755 ./sources/2026/2026-01
+D 755 ./sources/2026/2026-01/2026-01-02-sample-note
+F 644 0dc78dc63a0eaa5d239416f3a712f005bfc56389c5eb33284c084c9b2d1f0037  ./sources/2026/2026-01/2026-01-02-sample-note/source.md
+D 755 ./wiki-cloud
+F 644 c99f90eaabc29aee18aa9f168f1c1f32e791ab0c351345511934448f2f988506  ./wiki-cloud/log.md

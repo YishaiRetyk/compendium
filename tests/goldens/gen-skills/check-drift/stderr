@@ -1,0 +1,2 @@
+DRIFT: .claude/skills/ingest/SKILL.md differs from template. Run: bash bin/gen-skills.sh && git add .claude/skills/
+ASSERT FAIL: .claude/skills/ingest/SKILL.md body has 4 lines (max 3)

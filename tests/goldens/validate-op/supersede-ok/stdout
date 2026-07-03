@@ -1,0 +1,9 @@
+=== Validating SUPERSEDE on wiki-cloud/concepts/alpha.md ===
+
+  [1/5] Target exists             PASS
+  [2/5] Frontmatter valid         PASS
+  [3/5] Provenance resolves       PASS (no provenance markers found)
+  [4/5] Privacy respected         PASS (privacy: cloud_safe)
+  [5/5] MERGE distinct pages      SKIP (not MERGE)
+
+=== RESULT: PASS ===

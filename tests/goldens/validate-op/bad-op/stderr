@@ -1,0 +1,2 @@
+ERROR: Invalid operation type: 'FROBNICATE'
+Must be one of: UPDATE, MERGE, SUPERSEDE, ARCHIVE

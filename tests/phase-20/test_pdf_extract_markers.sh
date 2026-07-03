@@ -25,14 +25,81 @@ set -e
     exit 1
 }
 
-! grep -q 'ollama run' "$REPO_ROOT/bin/pdf-extract.sh" || {
-    echo "FAIL: bin/pdf-extract.sh uses the 'ollama run' anti-pattern" >&2
-    exit 1
-}
-grep -q 'api/generate' "$REPO_ROOT/bin/pdf-extract.sh" || {
-    echo "FAIL: bin/pdf-extract.sh does not use the /api/generate endpoint" >&2
-    exit 1
-}
+# --- LOCAL HTTP STUB behavior assertion (Phase 24 Plan 04, TEST-04/D-16) -------
+# WAS: two SOURCE-greps (`! grep 'ollama run'` + `grep 'api/generate'`) — implementation
+# assertions that false-fail a correct Python port. NOW: a local HTTP stub bound to a
+# free port records requests; the tool is pointed at it via its OLLAMA_URL env knob and
+# the test asserts the EFFECT — the tool POSTed to /api/generate (impl-agnostic; the
+# 'ollama run' anti-pattern cannot POST to the generate endpoint at all).
+FIXTURE="$SCRIPT_DIR/fixtures/sample.pdf"
+if [ -f "$FIXTURE" ] && command -v pdftoppm >/dev/null 2>&1 && command -v jq >/dev/null 2>&1; then
+    STUB_DIR=$(mktemp -d)
+    python3 - "$STUB_DIR" >"$STUB_DIR/port" 2>"$STUB_DIR/stub.err" <<'PYEOF' &
+import json, sys, http.server
+
+stub_dir = sys.argv[1]
+
+class Handler(http.server.BaseHTTPRequestHandler):
+    def _send(self, payload):
+        body = json.dumps(payload).encode()
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def do_GET(self):
+        with open(f"{stub_dir}/requests.log", "a") as fh:
+            fh.write(f"GET {self.path}\n")
+        self._send({"models": [{"name": "stub-model"}]})
+
+    def do_POST(self):
+        length = int(self.headers.get("Content-Length", 0))
+        self.rfile.read(length)
+        with open(f"{stub_dir}/requests.log", "a") as fh:
+            fh.write(f"POST {self.path}\n")
+        self._send({"response": "STUB-OCR-TEXT"})
+
+    def log_message(self, *a):
+        pass
+
+srv = http.server.HTTPServer(("127.0.0.1", 0), Handler)
+print(srv.server_address[1], flush=True)
+srv.serve_forever()
+PYEOF
+    STUB_PID=$!
+    trap 'kill "$STUB_PID" 2>/dev/null || true; rm -rf "$STUB_DIR"' EXIT
+    for _ in $(seq 1 50); do [ -s "$STUB_DIR/port" ] && break; sleep 0.1; done
+    STUB_PORT=$(cat "$STUB_DIR/port")
+    [ -n "$STUB_PORT" ] || { echo "FAIL: HTTP stub did not start" >&2; exit 1; }
+
+    STUB_OUT=$(mktemp)
+    set +e
+    OLLAMA_URL="http://127.0.0.1:$STUB_PORT" PDF_EXTRACT_MODEL=stub-model \
+        "$REPO_ROOT/bin/pdf-extract.sh" --out "$STUB_OUT" "$FIXTURE" >/dev/null 2>&1
+    stub_rc=$?
+    set -e
+    [ "$stub_rc" -eq 0 ] || {
+        echo "FAIL: pdf-extract against the local stub exited $stub_rc" >&2
+        exit 1
+    }
+    grep -q 'POST /api/generate' "$STUB_DIR/requests.log" || {
+        echo "FAIL: tool never POSTed to /api/generate (the asserted EFFECT)" >&2
+        cat "$STUB_DIR/requests.log" >&2 || true
+        exit 1
+    }
+    grep -q 'STUB-OCR-TEXT' "$STUB_OUT" || {
+        echo "FAIL: stub response text missing from output (generate response not consumed)" >&2
+        exit 1
+    }
+    rm -f "$STUB_OUT"
+    kill "$STUB_PID" 2>/dev/null || true
+    trap - EXIT
+    rm -rf "$STUB_DIR"
+    echo "OK: local-stub behavior assertion (POST /api/generate observed, response consumed)"
+else
+    echo "SKIP: local-stub assertion (fixture PDF or poppler/jq unavailable)"
+fi
 
 # --- MODEL-GATED assertion (skip-not-fail when unavailable) --------------------
 

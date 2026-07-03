@@ -1,0 +1,15 @@
+ERROR: This repo is already initialized.
+       Found .wizard-answers.yaml (setup date: 2026-01-02).
+
+       The wizard does not re-render on an initialized repo. v1.1 does not
+       include a --force or --upgrade flag.
+
+       To re-run from scratch:
+         rm .wizard-answers.yaml AGENTS.md
+         bash bin/init-wizard.sh
+         (or delete .wizard-answers.yaml and AGENTS.md manually)
+
+       To preview what would be written (no mutation):
+         bash bin/init-wizard.sh --dry-run
+
+       Upgrade flow is planned for v1.2 (copier-style 3-way merge).

@@ -1,0 +1,27 @@
+Usage: bin/validate-op.sh <OPERATION> <target-path> [second-path]
+
+Validates a structured wiki operation before it is applied.
+
+Operations:
+  UPDATE    <path>          Validate updating an existing page
+  MERGE     <path-a> <path-b>  Validate merging two pages
+  SUPERSEDE <path>          Validate superseding a page
+  ARCHIVE   <path>          Validate archiving a page
+
+Checks performed (5 mechanical checks per AGENTS.md section 9):
+  [1/5] Target page(s) exist
+  [2/5] YAML frontmatter parses and satisfies schema (enum values, required fields)
+  [3/5] Provenance references resolve to known source IDs in wiki-cloud/sources/
+  [4/5] Privacy flags respected (inheritance: strictest source tier wins)
+  [5/5] MERGE-specific: both pages exist and are distinct
+
+Per-operation rules:
+  - ARCHIVE rejects already-archived pages
+  - SUPERSEDE rejects already-superseded pages
+
+Exit codes:
+  0  All checks PASS
+  1  One or more checks FAIL, or usage error
+
+Options:
+  --help, -h    Show this help message

@@ -1,0 +1,37 @@
+Usage: bin/search.sh [OPTIONS] <keyword>
+       bin/search.sh --query "question"
+
+Search wiki pages by keyword with deterministic output per mode.
+
+Modes:
+  Default                 Index lookup with TL;DR snippets
+  --paths-only            Output file paths only (no headers, no TL;DR)
+  --fulltext              Also search wiki-cloud/ body text (default: index-only)
+  --query "Q"             Generate an LLM-ready prompt from a question
+  --contributor <handle>  Filter wiki-cloud/log.md entries by contributor @handle.
+                          Accepts both @octocat and octocat (leading @ optional).
+
+Options:
+  --help, -h              Show this help message
+
+Output Contracts:
+  Default mode:
+    === Search Results ===
+    wiki-cloud/<subdir>/<slug>.md -- <TL;DR first line>
+    === N result(s) ===
+
+  --paths-only mode:
+    wiki-cloud/<subdir>/<slug>.md
+    (bare paths, one per line, no headers)
+
+  --query mode:
+    === Query Prompt ===
+    ... structured prompt ...
+    === End Query Prompt ===
+
+  No results (any mode):
+    No results found for "<keyword>"
+
+Exit codes:
+  0  Success (including no results — that is informational, not an error)
+  1  Error (no arguments, missing index, invalid flag)
