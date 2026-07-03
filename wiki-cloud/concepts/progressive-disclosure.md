@@ -9,7 +9,7 @@ summary: "Three-level loading pattern at the heart of Anthropic Agent Skills. L1
   and scripts are accessed only as needed, with script source code never entering
   context."
 created_at: 2026-05-06
-updated_at: 2026-06-17
+updated_at: 2026-07-03
 sources:
 - src-2026-05-06-anthropic-agent-skills-overview
 - src-2026-05-06-anthropic-agent-skills-best-practices
@@ -18,6 +18,7 @@ sources:
 - src-2026-05-06-ralph-playbook
 - src-2026-04-16-claude-code-frameworks-report
 - src-2026-06-17-interpretable-context-methodology
+- src-2026-07-03-agentic-search-context-engineering
 epistemic_status: mixed
 tags:
 - progressive-disclosure
@@ -43,7 +44,7 @@ example: false
 
 ## TL;DR
 
-Progressive disclosure is the loading discipline Anthropic uses to let many Agent Skills coexist without paying full token cost upfront. Information loads in three levels: Level 1 metadata (the YAML `name` + `description`, always preloaded into the system prompt at ~100 tokens per Skill); Level 2 instructions (the SKILL.md body, read via bash when the Skill is triggered, kept under ~5k tokens); Level 3 resources (additional `.md` references, datasets, scripts — accessed only when explicitly referenced, with script source code executed via bash so it never enters context). The pattern lets a Skill bundle dozens of reference files, comprehensive API docs, or large datasets without context penalty until something is actually read. The same discipline is a general context-engineering principle, not a Skills-only mechanism: the [[src-2026-05-06-ralph-playbook|The Ralph Playbook]] applies it to autonomous coding loops by keeping its always-loaded `AGENTS.md` minimal and deferring status/detail to a separate on-demand file. More broadly, progressive disclosure — originally a Jakob Nielsen UX pattern (1995) — has become the architectural backbone of Claude Code itself, spanning a full load hierarchy from always-loaded CLAUDE.md down to forked [[subagents|subagent]] contexts, and is the unifying principle behind all three [[claude-code-orchestration-frameworks|Claude Code orchestration frameworks]]. [[interpretable-context-methodology|Interpretable Context Methodology]] pushes the same discipline down to folder granularity — each numbered workflow stage loads only the context layers it needs — making it a structural instance of [[context-engineering|Context Engineering]] rather than a within-context loading trick.
+Progressive disclosure is the loading discipline Anthropic uses to let many Agent Skills coexist without paying full token cost upfront. Information loads in three levels: Level 1 metadata (the YAML `name` + `description`, always preloaded into the system prompt at ~100 tokens per Skill); Level 2 instructions (the SKILL.md body, read via bash when the Skill is triggered, kept under ~5k tokens); Level 3 resources (additional `.md` references, datasets, scripts — accessed only when explicitly referenced, with script source code executed via bash so it never enters context). The pattern lets a Skill bundle dozens of reference files, comprehensive API docs, or large datasets without context penalty until something is actually read. The same discipline is a general context-engineering principle, not a Skills-only mechanism: the [[src-2026-05-06-ralph-playbook|The Ralph Playbook]] applies it to autonomous coding loops by keeping its always-loaded `AGENTS.md` minimal and deferring status/detail to a separate on-demand file. More broadly, progressive disclosure — originally a Jakob Nielsen UX pattern (1995) — has become the architectural backbone of Claude Code itself, spanning a full load hierarchy from always-loaded CLAUDE.md down to forked [[subagents|subagent]] contexts, and is the unifying principle behind all three [[claude-code-orchestration-frameworks|Claude Code orchestration frameworks]]. [[interpretable-context-methodology|Interpretable Context Methodology]] pushes the same discipline down to folder granularity — each numbered workflow stage loads only the context layers it needs — making it a structural instance of [[context-engineering|Context Engineering]] rather than a within-context loading trick. A practitioner account from [[agentic-search|Agentic Search]] adds the mirror-image step the Skills docs leave implicit: long-running agents must not only load skills on demand but *offload* them as the context moves on, applying the same load-then-evict discipline to compaction.
 
 ## Key Facts
 
@@ -63,6 +64,7 @@ Progressive disclosure is the loading discipline Anthropic uses to let many Agen
 - The Claude-Code-wide load hierarchy runs top to bottom: enterprise policy → `~/.claude/CLAUDE.md` (always) → `./CLAUDE.md` (always) → subdir CLAUDE.md (lazy on file access) → skill metadata (always, ~100 tokens each) → skill body (on trigger, <5K) → bundled references/scripts (on demand, unbounded) → subagent contexts (forked, compressed on return) [prov:src-2026-04-16-claude-code-frameworks-report#sec:progressive-disclosure|derived|2026-06-09] [epistemic:: sourced]
 - Key anti-pattern — over-reliance on auto-activation: Vercel found skills were never invoked in 56% of test cases, and explicit "IMPORTANT: read X" pointers outperformed pure auto-discovery; other anti-patterns are bloated CLAUDE.md, monolithic mega-prompts, eager `Read all of docs/`, and accepting context rot instead of externalizing state [prov:src-2026-04-16-claude-code-frameworks-report#sec:progressive-disclosure|derived|2026-06-09] [epistemic:: tentative]
 - The discipline generalizes beyond Claude Code: Interpretable Context Methodology applies it at folder granularity, where each numbered workflow stage loads only the context layers it needs, keeping per-stage context at ~2,000–8,000 tokens versus 30,000–50,000 for a monolithic prompt that loads everything. [prov:src-2026-06-17-interpretable-context-methodology#p7|direct|2026-06-17] [epistemic:: sourced]
+- An independent instance from Elastic's agentic-search practice: an agent that must write an ES|QL query loads a skill whose name and description sit in the system prompt while its body (the ES|QL syntax rules) loads into context only when the query tool is about to be used — progressive disclosure supplying just-in-time documentation to fix tool-parameter generation; Elastic also *offloads* a skill once the context moves past it, extending the same load-then-evict discipline to compaction. [prov:src-2026-07-03-agentic-search-context-engineering#t00:28:17-00:30:24|direct|2026-07-03] [prov:src-2026-07-03-agentic-search-context-engineering#t01:00:26-01:02:25|direct|2026-07-03] [epistemic:: tentative]
 
 ## Detail
 
@@ -111,6 +113,10 @@ Progressive disclosure is not unique to Agent Skills; it is a general context-en
 
 The connection is interpretive rather than a claim either source makes about the other: neither the Ralph playbook nor the Agent Skills docs reference each other [epistemic:: inferred]. What they share is the underlying principle — *defer loading anything not immediately needed, and keep the always-resident layer minimal* — which is why this wiki files both under progressive disclosure rather than treating them as unrelated token-optimization tricks.
 
+### An independent instance: agent skills for search-tool parameters, with an explicit eviction step (Elastic)
+
+A third independent instance appears in [[leonie-monigatti|Leonie Monigatti]]'s agentic-search talk, where progressive disclosure solves a *tool-parameter* problem rather than a documentation-volume one. When an agent must write an entire ES|QL query and keeps getting the syntax wrong, the fix is an agent skill whose name and description live in the system prompt while its body — the ES|QL syntax rules, including the correct wildcard — loads into the context window only when the query tool is about to be used [prov:src-2026-07-03-agentic-search-context-engineering#t00:28:17-00:30:24|direct|2026-07-03] [epistemic:: tentative]. Monigatti's [[elastic|Elastic]] colleague Joe described the *eviction* half of the same discipline, which the Anthropic docs leave implicit: skills are exposed as names, descriptions, and a location in a file store, loaded when needed and offloaded as the context progresses, with the same load-then-evict logic applied to compaction and to re-fetching previous tool results from the file store [prov:src-2026-07-03-agentic-search-context-engineering#t01:00:26-01:02:25|direct|2026-07-03] [epistemic:: tentative]. This closes a loop the Skills documentation frames one-directionally: it specifies how a skill's levels *load*, whereas the Elastic account is explicit that a long-running agent must also *unload* resident skills to keep the window small — the same L1-stays-small / detail-on-demand principle, now with a deliberate eviction step.
+
 ### Progressive disclosure as the architectural backbone of Claude Code
 
 Beyond Skills and the Ralph loop, the [[src-2026-04-16-claude-code-frameworks-report|Claude Code Frameworks report]] frames progressive disclosure as *the* architectural backbone of Claude Code as a whole, with a precise lineage and rationale. The pattern began as a Jakob Nielsen UX principle in 1995 (show only what's needed, reveal advanced options on demand); Anthropic adopted it not merely for human learnability but as an architectural necessity for LLMs, driven by three forces: context rot (quality degrades as the window fills), attention dilution (more loaded context means weaker focus on any part), and cache economics (stable prefixes are cheaper) [prov:src-2026-04-16-claude-code-frameworks-report#sec:progressive-disclosure|derived|2026-06-09] [epistemic:: sourced].
@@ -129,6 +135,7 @@ The report is equally explicit about anti-patterns, the most consequential being
 - [[claude-code-orchestration-frameworks|Claude Code Orchestration Frameworks]]
 - [[context-engineering|Context Engineering]] — the broader discipline this loading pattern serves.
 - [[interpretable-context-methodology|Interpretable Context Methodology]] — the same discipline applied at folder granularity.
+- [[agentic-search|Agentic Search]] — an agent-skill instance of the pattern (load ES|QL docs on demand, offload when done).
 
 ## Sources
 
@@ -139,3 +146,4 @@ The report is equally explicit about anti-patterns, the most consequential being
 - [[src-2026-05-06-ralph-playbook|The Ralph Playbook (Clayton Farr's how-to-ralph-wiggum)]] — Clayton Farr / Geoffrey Huntley, 2026-05-06
 - [[src-2026-04-16-claude-code-frameworks-report|Claude Code Frameworks & Patterns: A Comparative Report]] — comparative synthesis report, April 2026
 - [[src-2026-06-17-interpretable-context-methodology|Interpretable Context Methodology: Folder Structure as Agent Architecture]] — Van Clief & McDermott, arXiv, March 2026
+- [[src-2026-07-03-agentic-search-context-engineering|Agentic Search for Context Engineering — Leonie Monigatti, Elastic]] — AI Engineer conference talk, 2026-05-08 (YouTube transcript)

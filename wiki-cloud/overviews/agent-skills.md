@@ -9,7 +9,7 @@ summary: "Anthropic's Agent Skills are filesystem-based capability packages — 
   API, Claude Code, and Claude.ai. Distinguishes Skills (reusable, on-demand, persisted
   on filesystem) from prompts (one-conversation instructions)."
 created_at: 2026-05-06
-updated_at: 2026-06-09
+updated_at: 2026-07-03
 sources:
 - src-2026-05-06-anthropic-agent-skills-overview
 - src-2026-05-06-anthropic-agent-skills-quickstart
@@ -17,6 +17,7 @@ sources:
 - src-2026-05-06-anthropic-claude-cookbook-skills-introduction
 - src-2026-05-06-anthropic-claude-cookbook-skills-custom-development
 - src-2026-04-16-claude-code-frameworks-report
+- src-2026-07-03-agentic-search-context-engineering
 epistemic_status: sourced
 tags:
 - agent-skills
@@ -68,6 +69,7 @@ Agent Skills are filesystem-based capability packages: a directory containing a 
 - Container reuse via `container.id` (passing the id from a previous response into subsequent requests) is the API-level token-optimization pattern that lets Skills stay loaded across calls without re-paying L2 [prov:src-2026-05-06-anthropic-claude-cookbook-skills-introduction#sec:token-optimization-tips|direct|2026-05-06] [epistemic:: sourced]
 - Skills have become Anthropic's flagship abstraction since Oct 16, 2025 and were opened as a standard at agentskills.io in December 2025; in Claude Code, slash commands and Skills were subsequently merged (v2.1.101, April 2026) with Skills the recommended form — see [[claude-code|Claude Code]] [prov:src-2026-04-16-claude-code-frameworks-report#sec:agent-skills|derived|2026-06-09] [prov:src-2026-04-16-claude-code-frameworks-report#sec:slash-commands|derived|2026-06-09] [epistemic:: tentative]
 - Skills are the building block that the [[claude-code-orchestration-frameworks|Claude Code orchestration frameworks]] (Spec Kit, Superpowers, GSD) assemble into opinionated workflows — all three converge on skill-style packaging over monolithic prompts [prov:src-2026-04-16-claude-code-frameworks-report#sec:cross-cutting-themes|derived|2026-06-09] [epistemic:: sourced]
+- Beyond Anthropic's capability-packaging framing, a skill can serve as *just-in-time tool documentation*: in Elastic's agentic-search demos a small skill supplies the ES|QL syntax an agent needs to write a valid query, loaded on demand and referenced from the search tool's description ("always use the Elasticsearch ES|QL skill first") — using a skill to improve tool-parameter generation rather than to package a capability; LangChain exposes this via a skill-loading tool plus skill middleware [prov:src-2026-07-03-agentic-search-context-engineering#t00:28:17-00:32:38|direct|2026-07-03] [epistemic:: tentative]
 
 ## Detail
 
@@ -123,6 +125,10 @@ The authoring guide ([[src-2026-05-06-anthropic-agent-skills-best-practices|Anth
 
 For SDK call shape (`client.beta.messages.create()` + `betas=[...]`), the minimum SDK version (`anthropic >= 0.71.0`), custom-Skill upload via `client.beta.skills.create()` + `files_from_dir()`, the versioning lifecycle, the `display_title` workspace-uniqueness constraint, the composition pattern (mixing `type: "custom"` + `type: "anthropic"` in one `container.skills` array), observed generation times, file-lifetime caveats, and container reuse via `container.id` — see [[claude-api|Claude API]]. The Key Facts above carry the bullet-form summary; the entity carries the canonical prose, code blocks, and operational nuance.
 
+### Skills as just-in-time tool documentation
+
+Anthropic's docs frame Skills mainly as packaged *capabilities* (document generation, domain workflows). [[leonie-monigatti|Leonie Monigatti]]'s [[agentic-search|Agentic Search]] talk surfaces an adjacent use: a Skill as *just-in-time documentation that improves an agent's tool-parameter generation*. When a general-purpose search tool asks the agent to write an entire ES|QL query and the agent uses SQL's `%` wildcard instead of ES|QL's `*`, the fix is a small custom Skill carrying the ES|QL syntax rules; its `name` and `description` sit in the system prompt (via progressive disclosure) while the body loads only when needed, and the search tool's own description names the relationship — "always use the Elasticsearch ES|QL skill to generate the query before using this tool," reinforced in the system prompt [prov:src-2026-07-03-agentic-search-context-engineering#t00:28:17-00:32:38|direct|2026-07-03] [epistemic:: tentative]. Mechanically this is a skill-loading tool combined with skill middleware (LangChain ships boilerplate for both), and [[elastic|Elastic]] also publishes official Elasticsearch Skills teams can adopt rather than authoring their own [prov:src-2026-07-03-agentic-search-context-engineering#t00:29:00-00:29:17|direct|2026-07-03] [epistemic:: tentative]. The takeaway for authoring: a Skill is not only a capability package but a lever on tool-call *reliability* — the same progressive-disclosure economics, aimed at parameter correctness.
+
 ## Related Pages
 
 - [[anthropic|Anthropic]]
@@ -131,6 +137,8 @@ For SDK call shape (`client.beta.messages.create()` + `betas=[...]`), the minimu
 - [[claude-api|Claude API]]
 - [[anthropic-financial-services|Anthropic Financial Services]]
 - [[claude-code-orchestration-frameworks|Claude Code Orchestration Frameworks]]
+- [[agentic-search|Agentic Search]] — uses a Skill as just-in-time ES|QL documentation to fix tool-parameter generation.
+- [[elastic|Elastic]] — publishes official Elasticsearch Agent Skills.
 
 ## Sources
 
@@ -140,3 +148,4 @@ For SDK call shape (`client.beta.messages.create()` + `betas=[...]`), the minimu
 - [[src-2026-05-06-anthropic-claude-cookbook-skills-introduction|Introduction to Claude Skills (claude-cookbooks notebook 01)]] — Anthropic claude-cookbooks, 2026-05-06
 - [[src-2026-05-06-anthropic-claude-cookbook-skills-custom-development|Building Custom Skills for Claude (claude-cookbooks notebook 03)]] — Anthropic claude-cookbooks, 2026-05-06
 - [[src-2026-04-16-claude-code-frameworks-report|Claude Code Frameworks & Patterns: A Comparative Report]] — comparative synthesis report, April 2026
+- [[src-2026-07-03-agentic-search-context-engineering|Agentic Search for Context Engineering — Leonie Monigatti, Elastic]] — AI Engineer conference talk, 2026-05-08 (YouTube transcript)

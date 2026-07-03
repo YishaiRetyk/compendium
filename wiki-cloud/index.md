@@ -6,7 +6,7 @@ status: active
 summary: "Skeleton index — ingested content will appear here organized by knowledge
   domain."
 created_at: 2026-04-15
-updated_at: 2026-06-17
+updated_at: 2026-07-03
 sources: []
 epistemic_status: sourced
 tags:
@@ -43,6 +43,8 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[gsd|GSD (Get-Shit-Done)]] — Context-engineering orchestrator (originated by TÂCHES, continued as GSD Core under OpenGSD): every task in a fresh 200K subagent context, coordinated via a .planning/ artifact tree (mixed, 2026-07-03)
 - [[demis-hassabis|Demis Hassabis]] — Co-founder and CEO of Google DeepMind; took the more cautious side on AGI timelines in a 2026 stage debate (sourced, 2026-06-14)
 - [[dario-amodei|Dario Amodei]] — Co-founder and CEO of Anthropic; took the faster side on AGI timelines and reiterated his no-chips-to-adversaries policy (sourced, 2026-06-14)
+- [[elastic|Elastic]] — Search company behind Elasticsearch and its ES|QL query language; frames agentic-search tool design around a low-floor/high-ceiling stack (sourced, 2026-07-03)
+- [[leonie-monigatti|Leonie Monigatti]] — Retrieval/search practitioner at Elastic; argued context engineering is "about 80% agentic search" in an AI Engineer conference talk (sourced, 2026-07-03)
 
 ## Concepts
 
@@ -53,7 +55,7 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[ubiquitous-language|Ubiquitous Language]] — DDD artifact: project glossary functioning as a contract between humans, code, and AI (sourced, 2026-05-04)
 - [[bounded-context|Bounded Context]] — DDD artifact: a distinct area of a system with its own rules and stable term meanings (sourced, 2026-05-04)
 - [[documented-contract|Documented Contract]] — DDD artifact: written-down handshake between bounded contexts (sourced, 2026-05-04)
-- [[progressive-disclosure|Progressive Disclosure]] — Three-level loading pattern in Anthropic Agent Skills (metadata always, instructions when triggered, resources as needed); also a general context-engineering principle shared by the Ralph autonomous-loop playbook (sourced, 2026-06-01)
+- [[progressive-disclosure|Progressive Disclosure]] — Three-level loading pattern in Anthropic Agent Skills (metadata always, instructions when triggered, resources as needed); also a general context-engineering principle shared by the Ralph autonomous-loop playbook, now with an explicit skill-eviction step from Elastic's agentic-search practice (mixed, 2026-07-03)
 - [[ralph-loop|Ralph (Autonomous Coding Loop)]] — Geoffrey Huntley's minimal autonomous-coding pattern: bash `while` loop + fixed PROMPT.md + IMPLEMENTATION_PLAN.md on disk as cross-iteration shared state (sourced, 2026-05-06)
 - [[backpressure|Backpressure]] — Downstream rejection signals (tests, typechecks, lints, builds, LLM-as-judge) that block invalid agent output before commit (sourced, 2026-05-06)
 - [[vlm-ocr-hallucination|VLM OCR Hallucination]] — Vision-language models default to linguistic priors on degraded document images, emitting plausible-but-wrong text instead of flagging unreadability (sourced, 2026-06-09)
@@ -63,8 +65,9 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[ai-for-drug-repurposing|AI for Drug Repurposing]] — Using LLM/agentic systems to surface non-obvious new indications for existing drugs by connecting insights already in the literature (sourced, 2026-06-12)
 - [[agi-timelines|AGI Timelines]] — How soon AI will match human capability across domains; Amodei (faster) vs Hassabis (cautious) agree on direction, differ on timescale (mixed, 2026-06-14)
 - [[ai-self-improvement-loop|AI Self-Improvement Loop]] — Models good at coding and AI research help build the next generation, compressing the development cycle; its closure rate sets AGI timelines (mixed, 2026-06-14)
-- [[context-engineering|Context Engineering]] — The discipline of filling an LLM's context window with the right information, structured so the model can use it; named by Karpathy (2025) as a broader frame than prompt engineering, with write/select/compress/isolate strategies (mixed, 2026-06-17)
+- [[context-engineering|Context Engineering]] — The discipline of filling an LLM's context window with the right information, structured so the model can use it; named by Karpathy (2025) as a broader frame than prompt engineering, with write/select/compress/isolate strategies and a practitioner framing as ~80% agentic search (mixed, 2026-07-03)
 - [[interpretable-context-methodology|Interpretable Context Methodology]] — Replaces framework-level agent orchestration with filesystem structure: numbered folders as stages, markdown CONTEXT.md files as stage contracts, one agent reading the right files at each step; a five-layer context hierarchy for sequential human-reviewed workflows (mixed, 2026-06-17)
+- [[agentic-search|Agentic Search]] — Retrieval driven by the agent: it chooses which search tool to call, with what parameters, and whether to search again; the RAG → agentic RAG → agentic-search arc and a curated low-floor/high-ceiling tool stack (sourced, 2026-07-03)
 
 ## Sources
 
@@ -89,6 +92,7 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[src-2026-06-14-hassabis-amodei-day-after-agi|FULL DISCUSSION: Google's Demis Hassabis, Anthropic's Dario Amodei Debate the World After AGI]] — DRM News, 2026-01-20 — YouTube transcript (video sub-case) on AGI timelines, the self-improvement loop, jobs, chip policy, and AI-safety risk; first video-acquired transcript with mended multi-speaker labels (sourced, 2026-06-14)
 - [[src-2026-06-17-interpretable-context-methodology|Interpretable Context Methodology: Folder Structure as Agent Architecture]] — Van Clief & McDermott, arXiv:2603.16021v2 [cs.AI], March 2026 — ICM as filesystem-native orchestration for sequential, human-reviewed workflows; born-digital PDF extracted via pdftotext (tool-agnostic D-04 contract, no OCR needed) (mixed, 2026-06-17)
 - [[src-2026-07-03-gsd-core-repo|open-gsd/gsd-core — GSD Core repository snapshot]] — Snapshot at commit `69fef7c0` (branch `next`) — first repository-type source: rename/lineage evidence (get-shit-done → GSD Core under OpenGSD), v1.7.0-rc.1 package metadata, first-party context-rot docs, curated code excerpts with `#path:` anchors (sourced, 2026-07-03)
+- [[src-2026-07-03-agentic-search-context-engineering|Agentic Search for Context Engineering — Leonie Monigatti, Elastic]] — AI Engineer, 2026-05-08 — YouTube transcript (video sub-case): context engineering as ~80% agentic search, four search-interface demos (semantic, ES|QL, shell, semantic-grep), and low-floor/high-ceiling tool curation (sourced, 2026-07-03)
 
 ## Comparisons
 
@@ -100,7 +104,7 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 
 - [[domain-driven-design|Domain-Driven Design]] — 2003 methodology by Eric Evans, re-discovered for AI-assisted development as a remedy for context loss between AI sessions (mixed, 2026-05-04)
 - [[financial-ai-repository-landscape|Financial AI Repository Landscape]] — Synthesis of six finance-related repositories as a layered ecosystem (mixed, 2026-05-04)
-- [[agent-skills|Agent Skills]] — Filesystem-based capability packages (SKILL.md + bundled code/refs) loaded via three-level progressive disclosure across Claude API, Claude Code, and Claude.ai (sourced, 2026-05-06)
+- [[agent-skills|Agent Skills]] — Filesystem-based capability packages (SKILL.md + bundled code/refs) loaded via three-level progressive disclosure across Claude API, Claude Code, and Claude.ai; also usable as just-in-time tool documentation to fix parameter generation (sourced, 2026-07-03)
 - [[ralph-loop-creator-skill|Ralph Loop Creator Skill]] — Specification for a custom Agent Skill that scaffolds Ralph prompts, loop scripts, specs, implementation-plan state, AGENTS.md operational guidance, and backpressure checks without running the autonomous loop (mixed, 2026-05-06)
 - [[pdf-text-extraction-for-llm-ingestion|PDF-to-Text Extraction for LLM Ingestion]] — 2025–2026 landscape for PDF-to-Markdown: three-camp taxonomy, paradigm debate, self-hosted vs commercial tiers, and a concrete ingestion-pipeline recommendation (mixed, 2026-06-09)
 - [[robin-multi-agent-discovery-system|Robin (Multi-Agent Discovery System)]] — FutureHouse's multi-agent LLM system automating hypothesis generation + experimental data analysis; demonstrated by discovering ROCK-inhibitor phagocytosis enhancers for dry AMD (mixed, 2026-06-12)
