@@ -8,3 +8,4 @@
 # governs appends — the common-freeze guard (Plan 06) excludes this file's content from the freeze (it is
 # a controlled per-port mutation, see Plan 06). N-4: a non-empty manifest with no pinned freeze baseline
 # makes the oracle FAIL LOUDLY rather than silently fall to HEAD (Plan 03).
+brownfield

@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Python Migration
 status: In progress
-stopped_at: Phase 25 decomposed into 7 plans (2026-07-03); executing Wave 1 in order 01→06
-last_updated: 2026-07-03T23:30:00.000Z
-last_activity: 2026-07-03 — Phase 25 plan-phase decomposition: 25-CONTEXT + 7 PLAN docs (6 Wave-1 cluster ports + Wave-2 cutover)
+stopped_at: Phase 25 Wave 1 executing — 25-01 brownfield flipped (first live py parity leg); D-09 seam rebase landed (10afda6, re-pinned 83ca728)
+last_updated: 2026-07-04T01:30:00.000Z
+last_activity: 2026-07-04 — 25-01 complete; 6/6 cluster drafts done (parallel agents); harness gap found+fixed at first live channel comparison
 progress:
   total_phases: 3
   completed_phases: 1
