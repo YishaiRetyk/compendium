@@ -15,3 +15,14 @@ after commits if the mutation is unwanted, or commit it deliberately after a FUL
 **Fix (post-v1.5-parity or as a hook-side change — the hook is NOT parity-frozen):** either
 give lint a `--no-report` flag for gate-mode runs (lint behavior change → after MIG-02 or in
 lockstep both impls), or have the hook snapshot/restore the two files around its lint step.
+
+---
+
+**RESOLVED: 2026-07-03 (Phase 26 / 26-03).** Chose the cleaner root-cause fix over a flag:
+`src/compendium/lint.py` now gates the report+log write block on
+`not STAGED_MODE and not CI_MODE` (a non-interactive VALIDATION run must not mutate the
+wiki; only a plain interactive maintenance `lint` writes them). The migration parity bar
+that forbade this behavior change was retired in 26-02, so no `--no-report` seam or
+hook-side snapshot/restore is needed. Pinned by `tests/test_lint_readonly_modes.py`
+(--staged/--ci byte-unchanged; plain `lint` still writes). The `git checkout --` interim
+dance is retired.

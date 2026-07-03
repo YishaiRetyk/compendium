@@ -2616,7 +2616,13 @@ def _run_checks(wiki_dir, findings_file, dry_run, do_fix, category_filter,
     # still obeys D-05 CI policy.
     # ---------------------------------------------------------------------------
 
-    if not dry_run:
+    # A read-only VALIDATION run — the pre-commit `--staged` write-gate and the `--ci` CI
+    # gate — must NOT mutate the wiki. Only a plain interactive maintenance `lint` writes
+    # the report and appends the log entry. (26-03: ends the per-commit pre-commit clobber —
+    # 25-REVIEW F15 / the 2026-07-03-hook-lint-clobbers-wiki-report todo. `--format json`
+    # already skips the report above; this closes the text-mode `--staged`/`--ci` path.)
+    write_report = not dry_run and not STAGED_MODE and not CI_MODE
+    if write_report:
         maint_dir = os.path.join(wiki_dir, 'maintenance')
         os.makedirs(maint_dir, exist_ok=True)
         report_path = os.path.join(maint_dir, 'lint-report.md')
@@ -2708,7 +2714,7 @@ neutrality_exempt: true
     # ---------------------------------------------------------------------------
 
     autofix_msg = f"{autofix_applied} applied" if (do_fix and not dry_run) else "none -- use --fix to apply"
-    report_msg = "wiki-cloud/maintenance/lint-report.md" if not dry_run else "(dry-run, no report written)"
+    report_msg = "wiki-cloud/maintenance/lint-report.md" if write_report else "(read-only run, no report written)"
 
     print(f"""
 === Wiki Lint Results ===
