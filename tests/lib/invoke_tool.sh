@@ -38,6 +38,20 @@ capture_footprint() {
         printf 'tree channel unavailable: footprint root missing\n' > "$casedir/tree"
         return 0
     fi
+    # D-09 REBASE (2026-07-04): the tree channel is only meaningful over PER-TEST FIXTURE
+    # roots. When the footprint root is the LIVE repo (the PWD-fallback class: tests that
+    # invoke a tool from the repo root without --root), the capture hashes the entire
+    # shared working tree — any concurrent edit (a planning note, an editor save) between
+    # the two capture legs is a guaranteed false divergence carrying zero parity signal.
+    # Emit the same fixed-placeholder treatment the extracted-tree goldens already use;
+    # write-behavior parity for these tools is owned by their fixture-rooted tests.
+    if [ "$(cd "$repo" && pwd)" = "$(cd "$(_oracle_git_root)" && pwd)" ]; then
+        normalize < "$IT_STDOUT" > "$casedir/stdout"
+        normalize < "$IT_STDERR" > "$casedir/stderr"
+        printf '%s\n' "$IT_EXIT" > "$casedir/exit"
+        printf 'tree channel skipped: live-repo footprint root (not a per-test fixture)\n' > "$casedir/tree"
+        return 0
+    fi
     normalize < "$IT_STDOUT" > "$casedir/stdout"
     normalize < "$IT_STDERR" > "$casedir/stderr"
     printf '%s\n' "$IT_EXIT" > "$casedir/exit"
