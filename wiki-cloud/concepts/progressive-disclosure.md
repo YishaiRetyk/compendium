@@ -19,6 +19,7 @@ sources:
 - src-2026-04-16-claude-code-frameworks-report
 - src-2026-06-17-interpretable-context-methodology
 - src-2026-07-03-agentic-search-context-engineering
+- src-2026-07-03-building-great-agent-skills
 epistemic_status: mixed
 tags:
 - progressive-disclosure
@@ -65,6 +66,7 @@ Progressive disclosure is the loading discipline Anthropic uses to let many Agen
 - Key anti-pattern — over-reliance on auto-activation: Vercel found skills were never invoked in 56% of test cases, and explicit "IMPORTANT: read X" pointers outperformed pure auto-discovery; other anti-patterns are bloated CLAUDE.md, monolithic mega-prompts, eager `Read all of docs/`, and accepting context rot instead of externalizing state [prov:src-2026-04-16-claude-code-frameworks-report#sec:progressive-disclosure|derived|2026-06-09] [epistemic:: tentative]
 - The discipline generalizes beyond Claude Code: Interpretable Context Methodology applies it at folder granularity, where each numbered workflow stage loads only the context layers it needs, keeping per-stage context at ~2,000–8,000 tokens versus 30,000–50,000 for a monolithic prompt that loads everything. [prov:src-2026-06-17-interpretable-context-methodology#p7|direct|2026-06-17] [epistemic:: sourced]
 - An independent instance from Elastic's agentic-search practice: an agent that must write an ES|QL query loads a skill whose name and description sit in the system prompt while its body (the ES|QL syntax rules) loads into context only when the query tool is about to be used — progressive disclosure supplying just-in-time documentation to fix tool-parameter generation; Elastic also *offloads* a skill once the context moves past it, extending the same load-then-evict discipline to compaction. [prov:src-2026-07-03-agentic-search-context-engineering#t00:28:17-00:30:24|direct|2026-07-03] [prov:src-2026-07-03-agentic-search-context-engineering#t01:00:26-01:02:25|direct|2026-07-03] [epistemic:: tentative]
+- The authoring-side restatement of the same discipline is [[matt-pocock|Matt Pocock]]'s **context pointer**: a skill's description is a pointer sitting in the agent's context that names a file (its `SKILL.md`) the agent can read for more; the advice "keep `SKILL.md` as small as possible" and "hide branch-specific reference behind context pointers to bundled files" is the three-level model expressed as heuristics an author applies by hand [prov:src-2026-07-03-building-great-agent-skills#t00:04:26-00:11:39|direct|2026-07-03] [epistemic:: tentative]
 
 ## Detail
 
@@ -117,6 +119,15 @@ The connection is interpretive rather than a claim either source makes about the
 
 A third independent instance appears in [[leonie-monigatti|Leonie Monigatti]]'s agentic-search talk, where progressive disclosure solves a *tool-parameter* problem rather than a documentation-volume one. When an agent must write an entire ES|QL query and keeps getting the syntax wrong, the fix is an agent skill whose name and description live in the system prompt while its body — the ES|QL syntax rules, including the correct wildcard — loads into the context window only when the query tool is about to be used [prov:src-2026-07-03-agentic-search-context-engineering#t00:28:17-00:30:24|direct|2026-07-03] [epistemic:: tentative]. Monigatti's [[elastic|Elastic]] colleague Joe described the *eviction* half of the same discipline, which the Anthropic docs leave implicit: skills are exposed as names, descriptions, and a location in a file store, loaded when needed and offloaded as the context progresses, with the same load-then-evict logic applied to compaction and to re-fetching previous tool results from the file store [prov:src-2026-07-03-agentic-search-context-engineering#t01:00:26-01:02:25|direct|2026-07-03] [epistemic:: tentative]. This closes a loop the Skills documentation frames one-directionally: it specifies how a skill's levels *load*, whereas the Elastic account is explicit that a long-running agent must also *unload* resident skills to keep the window small — the same L1-stays-small / detail-on-demand principle, now with a deliberate eviction step.
 
+### The authoring-side view: context pointers and a minimal SKILL.md
+
+The Anthropic and Elastic accounts describe how progressive disclosure *behaves at runtime*. [[matt-pocock|Matt Pocock]]'s [[skill-checklist|Skill Checklist]] talk restates the same discipline as *authoring heuristics*, which is where the mechanism turns into day-to-day decisions. His unit is the **context pointer**: text resident in the agent's context that points to another file the agent may read for more context [prov:src-2026-07-03-building-great-agent-skills#t00:04:26-00:04:42|direct|2026-07-03] [epistemic:: tentative]. A skill's description is a context pointer to its `SKILL.md`; a bundled "external reference" file is a context pointer one level deeper. Two rules fall out:
+
+- **Keep `SKILL.md` as small as possible.** Fewer words are cheaper to maintain and audit, and every word shaved is tokens shaved from the skill's per-request cost — the L1/L2 economics stated as a maintainer's discipline rather than a platform behavior [prov:src-2026-07-03-building-great-agent-skills#t00:08:52-00:09:33|direct|2026-07-03] [epistemic:: tentative].
+- **Hide branch-specific reference behind context pointers.** Reference material used in only one of a skill's branches should move out of the main file into a bundled file behind a pointer, so a given run pays for only what it needs. His single-branch "2PRD" keeps its reference inline (every run uses it); his multi-branch "domain modeling" pushes its ADR and glossary templates behind pointers [prov:src-2026-07-03-building-great-agent-skills#t00:09:33-00:11:39|direct|2026-07-03] [epistemic:: tentative].
+
+This is the same "defer loading anything not immediately needed, keep the always-resident layer minimal" principle that governs the three-level model — only now aimed at the human deciding what to inline versus what to leave behind a pointer.
+
 ### Progressive disclosure as the architectural backbone of Claude Code
 
 Beyond Skills and the Ralph loop, the [[src-2026-04-16-claude-code-frameworks-report|Claude Code Frameworks report]] frames progressive disclosure as *the* architectural backbone of Claude Code as a whole, with a precise lineage and rationale. The pattern began as a Jakob Nielsen UX principle in 1995 (show only what's needed, reveal advanced options on demand); Anthropic adopted it not merely for human learnability but as an architectural necessity for LLMs, driven by three forces: context rot (quality degrades as the window fills), attention dilution (more loaded context means weaker focus on any part), and cache economics (stable prefixes are cheaper) [prov:src-2026-04-16-claude-code-frameworks-report#sec:progressive-disclosure|derived|2026-06-09] [epistemic:: sourced].
@@ -136,6 +147,7 @@ The report is equally explicit about anti-patterns, the most consequential being
 - [[context-engineering|Context Engineering]] — the broader discipline this loading pattern serves.
 - [[interpretable-context-methodology|Interpretable Context Methodology]] — the same discipline applied at folder granularity.
 - [[agentic-search|Agentic Search]] — an agent-skill instance of the pattern (load ES|QL docs on demand, offload when done).
+- [[skill-checklist|Skill Checklist]] — restates the discipline as authoring heuristics (context pointers, minimal `SKILL.md`).
 
 ## Sources
 
@@ -147,3 +159,4 @@ The report is equally explicit about anti-patterns, the most consequential being
 - [[src-2026-04-16-claude-code-frameworks-report|Claude Code Frameworks & Patterns: A Comparative Report]] — comparative synthesis report, April 2026
 - [[src-2026-06-17-interpretable-context-methodology|Interpretable Context Methodology: Folder Structure as Agent Architecture]] — Van Clief & McDermott, arXiv, March 2026
 - [[src-2026-07-03-agentic-search-context-engineering|Agentic Search for Context Engineering — Leonie Monigatti, Elastic]] — AI Engineer conference talk, 2026-05-08 (YouTube transcript)
+- [[src-2026-07-03-building-great-agent-skills|Building Great Agent Skills: The Missing Manual — Matt Pocock]] — AI Engineer talk, 2026-06-29 (YouTube transcript)

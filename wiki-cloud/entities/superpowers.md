@@ -8,9 +8,10 @@ summary: "Jesse Vincent's Claude Code framework that enforces execution discipli
   ~14 composable skills, plus a SessionStart hook that re-primes after clear/compact.
   Built to stop stock agents skipping steps and lying about success."
 created_at: 2026-06-09
-updated_at: 2026-06-09
+updated_at: 2026-07-03
 sources:
 - src-2026-04-16-claude-code-frameworks-report
+- src-2026-07-03-building-great-agent-skills
 epistemic_status: mixed
 tags:
 - superpowers
@@ -43,6 +44,7 @@ Superpowers (obra/superpowers) is Jesse Vincent's opinionated Claude Code framew
 - Architecture: ~14 skills (brainstorming, writing-plans, executing-plans, test-driven-development, systematic-debugging, verification-before-completion, requesting-code-review, using-git-worktrees, dispatching-parallel-agents, …) + 3 commands (/brainstorm, /write-plan, /execute-plan) + 1 code-reviewer subagent + a SessionStart hook re-injecting priming after clear/compact. [prov:src-2026-04-16-claude-code-frameworks-report#sec:superpowers|derived|2026-06-09] [epistemic:: sourced]
 - Distinctive moves: "invoke a skill whenever there's even a 1% chance one applies — not negotiable"; hard-coded priority (user instructions → Superpowers skills → default behavior); TDD enforcement ("if you didn't watch the test fail, you don't know if it tests the right thing"); skills constrain which skill runs next (brainstorming → writing-plans only); code review in a fresh subagent context; git worktrees for parallel-agent isolation; zero-dependency by design. [prov:src-2026-04-16-claude-code-frameworks-report#sec:superpowers|derived|2026-06-09] [epistemic:: sourced]
 - Strength is disciplined execution; weakness is token-heaviness and redundancy for trivial tasks — Simon Willison likened it to "riding your bike in a higher gear — faster but more effort"; the project advertised a 94% PR rejection rate to deter low-effort agent contributions. [prov:src-2026-04-16-claude-code-frameworks-report#sec:superpowers|derived|2026-06-09] [epistemic:: tentative]
+- [[matt-pocock|Matt Pocock]] characterizes Superpowers as "primarily model-invoked skills" (it "gives the agent superpowers"), contrasting it with his own mostly user-invoked skill set — the trade being that model invocation maximizes flexibility and agent autonomy at the cost of higher context load and the unpredictability of whether the agent invokes a skill at the right time. [prov:src-2026-07-03-building-great-agent-skills#t00:06:02-00:07:15|direct|2026-07-03] [epistemic:: tentative]
 
 ## Detail
 
@@ -60,7 +62,9 @@ The cost of this rigor is tokens and ceremony: Superpowers is heavyweight and ca
 - [[agent-skills|Agent Skills]] — the building block Superpowers is assembled from.
 - [[subagents|Subagents]] — used for isolated code review and parallel agents.
 - [[claude-code|Claude Code]] — the host CLI; distributed via the Anthropic marketplace and obra/superpowers-marketplace.
+- [[matt-pocock|Matt Pocock]] — contrasts his user-invoked skills with Superpowers' model-invoked design.
 
 ## Sources
 
 - [[src-2026-04-16-claude-code-frameworks-report|Claude Code Frameworks & Patterns: A Comparative Report]]: comparative synthesis report (April 2026)
+- [[src-2026-07-03-building-great-agent-skills|Building Great Agent Skills: The Missing Manual — Matt Pocock]] — AI Engineer talk, 2026-06-29 (YouTube transcript)

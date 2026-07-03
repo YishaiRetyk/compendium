@@ -48,6 +48,7 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[symphony|Symphony]] — OpenAI's spec-first coding-agent orchestration service: a long-running daemon that turns Linear issues into isolated per-issue Codex runs via a single-authority orchestrator; shipped as a SPEC.md you regenerate into code (mixed, 2026-07-03)
 - [[openai|OpenAI]] — The AI company behind Symphony, the Codex coding agent, and the "harness engineering" framing; stub sourced via the Symphony spec (mixed, 2026-07-03)
 - [[codex|Codex]] — OpenAI's coding agent, integrated via an app-server protocol (stdio subprocess, thread/turn session model); the agent Symphony drives (mixed, 2026-07-03)
+- [[matt-pocock|Matt Pocock]] — Developer educator and author of the "Matt Pocock Skills" repo; proposed the four-part skill checklist (Trigger/Structure/Steering/Pruning) and a prefer-user-invoked authoring stance (sourced, 2026-07-03)
 
 ## Concepts
 
@@ -71,6 +72,7 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[context-engineering|Context Engineering]] — The discipline of filling an LLM's context window with the right information, structured so the model can use it; named by Karpathy (2025) as a broader frame than prompt engineering, with write/select/compress/isolate strategies and a practitioner framing as ~80% agentic search (mixed, 2026-07-03)
 - [[interpretable-context-methodology|Interpretable Context Methodology]] — Replaces framework-level agent orchestration with filesystem structure: numbered folders as stages, markdown CONTEXT.md files as stage contracts, one agent reading the right files at each step; a five-layer context hierarchy for sequential human-reviewed workflows (mixed, 2026-06-17)
 - [[agentic-search|Agentic Search]] — Retrieval driven by the agent: it chooses which search tool to call, with what parameters, and whether to search again; the RAG → agentic RAG → agentic-search arc and a curated low-floor/high-ceiling tool stack (sourced, 2026-07-03)
+- [[skill-checklist|Skill Checklist]] — Matt Pocock's four-part rubric for authoring and auditing agent skills (Trigger, Structure, Steering, Pruning); introduces user-invoked vs model-invoked, context pointers, leading words, sediment, and no-ops (sourced, 2026-07-03)
 
 ## Sources
 
@@ -97,6 +99,7 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[src-2026-07-03-gsd-core-repo|open-gsd/gsd-core — GSD Core repository snapshot]] — Snapshot at commit `69fef7c0` (branch `next`) — first repository-type source: rename/lineage evidence (get-shit-done → GSD Core under OpenGSD), v1.7.0-rc.1 package metadata, first-party context-rot docs, curated code excerpts with `#path:` anchors (sourced, 2026-07-03)
 - [[src-2026-07-03-agentic-search-context-engineering|Agentic Search for Context Engineering — Leonie Monigatti, Elastic]] — AI Engineer, 2026-05-08 — YouTube transcript (video sub-case): context engineering as ~80% agentic search, four search-interface demos (semantic, ES|QL, shell, semantic-grep), and low-floor/high-ceiling tool curation (sourced, 2026-07-03)
 - [[src-2026-07-03-openai-symphony-spec|openai/symphony — Symphony Service Specification repository snapshot]] — Snapshot at commit `4cbe3a9` (branch `main`) — OpenAI's spec-first coding-agent orchestration service: long-running Linear-polling daemon, isolated per-issue Codex workspaces, single-authority orchestrator, hot-reloaded WORKFLOW.md contract, filesystem safety invariants; Apache-2.0/Elixir, engineering preview (sourced, 2026-07-03)
+- [[src-2026-07-03-building-great-agent-skills|Building Great Agent Skills: The Missing Manual — Matt Pocock]] — AI Engineer, 2026-06-29 — YouTube transcript (video sub-case): a four-part "skill checklist" (Trigger/Structure/Steering/Pruning) for authoring and auditing agent skills, framed as the way out of "skill hell" (sourced, 2026-07-03)
 
 ## Comparisons
 

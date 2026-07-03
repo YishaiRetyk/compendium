@@ -18,6 +18,7 @@ sources:
 - src-2026-05-06-anthropic-claude-cookbook-skills-custom-development
 - src-2026-04-16-claude-code-frameworks-report
 - src-2026-07-03-agentic-search-context-engineering
+- src-2026-07-03-building-great-agent-skills
 epistemic_status: sourced
 tags:
 - agent-skills
@@ -45,7 +46,7 @@ example: false
 
 ## TL;DR
 
-Agent Skills are filesystem-based capability packages: a directory containing a `SKILL.md` instructions file with YAML frontmatter (`name`, `description`) plus optional bundled scripts and reference materials. Claude pre-loads only the metadata into the system prompt at startup (~100 tokens per Skill) and reads the body and bundled files via bash when a request matches the description. This three-level progressive-disclosure model lets Skills include comprehensive references, large datasets, and many utility scripts without context penalty until something is actually read. Skills work across three Anthropic surfaces — the Claude API, Claude Code, and Claude.ai — with surface-specific runtime, sharing, and pre-built/custom rules. Anthropic ships four pre-built Skills (`pptx`, `xlsx`, `docx`, `pdf`) and supports custom Skills via uploads (API, Claude.ai) or filesystem placement (Claude Code).
+Agent Skills are filesystem-based capability packages: a directory containing a `SKILL.md` instructions file with YAML frontmatter (`name`, `description`) plus optional bundled scripts and reference materials. Claude pre-loads only the metadata into the system prompt at startup (~100 tokens per Skill) and reads the body and bundled files via bash when a request matches the description. This three-level progressive-disclosure model lets Skills include comprehensive references, large datasets, and many utility scripts without context penalty until something is actually read. Skills work across three Anthropic surfaces — the Claude API, Claude Code, and Claude.ai — with surface-specific runtime, sharing, and pre-built/custom rules. Anthropic ships four pre-built Skills (`pptx`, `xlsx`, `docx`, `pdf`) and supports custom Skills via uploads (API, Claude.ai) or filesystem placement (Claude Code). Alongside Anthropic's official authoring guidance, a practitioner rubric — [[matt-pocock|Matt Pocock]]'s four-part [[skill-checklist|Skill Checklist]] (Trigger, Structure, Steering, Pruning) — supplies a working vocabulary for judging and shrinking skills, including the *user-invoked vs model-invoked* trigger distinction the Anthropic docs leave implicit.
 
 ## Key Facts
 
@@ -70,6 +71,8 @@ Agent Skills are filesystem-based capability packages: a directory containing a 
 - Skills have become Anthropic's flagship abstraction since Oct 16, 2025 and were opened as a standard at agentskills.io in December 2025; in Claude Code, slash commands and Skills were subsequently merged (v2.1.101, April 2026) with Skills the recommended form — see [[claude-code|Claude Code]] [prov:src-2026-04-16-claude-code-frameworks-report#sec:agent-skills|derived|2026-06-09] [prov:src-2026-04-16-claude-code-frameworks-report#sec:slash-commands|derived|2026-06-09] [epistemic:: tentative]
 - Skills are the building block that the [[claude-code-orchestration-frameworks|Claude Code orchestration frameworks]] (Spec Kit, Superpowers, GSD) assemble into opinionated workflows — all three converge on skill-style packaging over monolithic prompts [prov:src-2026-04-16-claude-code-frameworks-report#sec:cross-cutting-themes|derived|2026-06-09] [epistemic:: sourced]
 - Beyond Anthropic's capability-packaging framing, a skill can serve as *just-in-time tool documentation*: in Elastic's agentic-search demos a small skill supplies the ES|QL syntax an agent needs to write a valid query, loaded on demand and referenced from the search tool's description ("always use the Elasticsearch ES|QL skill first") — using a skill to improve tool-parameter generation rather than to package a capability; LangChain exposes this via a skill-loading tool plus skill middleware [prov:src-2026-07-03-agentic-search-context-engineering#t00:28:17-00:32:38|direct|2026-07-03] [epistemic:: tentative]
+- A skill's *trigger* is a first-class design choice the Anthropic docs under-specify: a skill is always *user-invoked* (invoked manually, often via a `/` command) and is additionally *model-invoked* when its description is placed in the agent's context so the agent can choose to load it — model-invoked adds per-request context load plus the unpredictability that the model may decline to invoke, while user-invoked shifts the burden to the human pilot's cognitive load; a skill can be made user-only by disabling model invocation [prov:src-2026-07-03-building-great-agent-skills#t00:03:39-00:07:24|direct|2026-07-03] [epistemic:: tentative]
+- Practitioner authoring heuristics from Matt Pocock's [[skill-checklist|Skill Checklist]]: compose a skill from *steps* + *reference*, keep `SKILL.md` as small as possible (tokens saved are per-request cost saved), hide branch-specific reference behind *context pointers*, steer with *leading words* (short meaning-dense phrases the agent echoes into its reasoning traces), and prune *sediment* and *no-ops* via deletion tests [prov:src-2026-07-03-building-great-agent-skills#t00:07:30-00:19:05|direct|2026-07-03] [epistemic:: tentative]
 
 ## Detail
 
@@ -129,6 +132,14 @@ For SDK call shape (`client.beta.messages.create()` + `betas=[...]`), the minimu
 
 Anthropic's docs frame Skills mainly as packaged *capabilities* (document generation, domain workflows). [[leonie-monigatti|Leonie Monigatti]]'s [[agentic-search|Agentic Search]] talk surfaces an adjacent use: a Skill as *just-in-time documentation that improves an agent's tool-parameter generation*. When a general-purpose search tool asks the agent to write an entire ES|QL query and the agent uses SQL's `%` wildcard instead of ES|QL's `*`, the fix is a small custom Skill carrying the ES|QL syntax rules; its `name` and `description` sit in the system prompt (via progressive disclosure) while the body loads only when needed, and the search tool's own description names the relationship — "always use the Elasticsearch ES|QL skill to generate the query before using this tool," reinforced in the system prompt [prov:src-2026-07-03-agentic-search-context-engineering#t00:28:17-00:32:38|direct|2026-07-03] [epistemic:: tentative]. Mechanically this is a skill-loading tool combined with skill middleware (LangChain ships boilerplate for both), and [[elastic|Elastic]] also publishes official Elasticsearch Skills teams can adopt rather than authoring their own [prov:src-2026-07-03-agentic-search-context-engineering#t00:29:00-00:29:17|direct|2026-07-03] [epistemic:: tentative]. The takeaway for authoring: a Skill is not only a capability package but a lever on tool-call *reliability* — the same progressive-disclosure economics, aimed at parameter correctness.
 
+### A practitioner authoring rubric (Matt Pocock's Skill Checklist)
+
+Anthropic's best-practices guide describes what a good Skill looks like; [[matt-pocock|Matt Pocock]]'s [[skill-checklist|Skill Checklist]] adds a diagnostic *process* for getting there, motivated by "skill hell" — an abundance of shareable skills with no shared rubric to tell good from bad [prov:src-2026-07-03-building-great-agent-skills#t00:00:49-00:02:11|direct|2026-07-03] [epistemic:: tentative]. Two of its ideas extend this page's coverage rather than restate it:
+
+- **Trigger (a design axis the docs leave implicit).** Anthropic's model is that a Skill's metadata is always resident and its body loads when the description matches — i.e. Skills are *model-invoked*. Pocock names the other half: a Skill is *always* user-invocable (invoke it manually, harness-dependent, often via `/`), and model-invocation is an *optional* layer added by exposing the description to the agent. Disabling model invocation (his "grill me" skill uses `disable model invocation: true`) makes a Skill user-only [prov:src-2026-07-03-building-great-agent-skills#t00:03:39-00:05:07|direct|2026-07-03] [epistemic:: tentative]. The trade is symmetric: model-invoked scales badly in *context load* (every description is resident and each costs the unpredictability that the model may not follow the pointer), while user-invoked scales badly in the human pilot's *cognitive load*. This is the frame in which he contrasts his mostly user-invoked skills with [[superpowers|Superpowers]] (primarily model-invoked) [prov:src-2026-07-03-building-great-agent-skills#t00:05:12-00:07:24|direct|2026-07-03] [epistemic:: tentative].
+
+- **Authoring heuristics.** Compose a Skill from *steps* and *reference*; keep `SKILL.md` as small as possible and move branch-specific reference behind *context pointers* (the authoring-side statement of [[progressive-disclosure|Progressive Disclosure]]); *steer* with **leading words** — short, meaning-dense phrases like "vertical slice" that the agent repeats into its reasoning traces, verifiable by reading those traces — and tune *legwork per step* by splitting a skill so the agent sees one step at a time; then *prune* duplication, **sediment** (accreted contributor cruft), and **no-ops** (instructions that don't change behavior, caught with a deletion test) [prov:src-2026-07-03-building-great-agent-skills#t00:07:30-00:19:05|direct|2026-07-03] [epistemic:: tentative]. See [[skill-checklist|Skill Checklist]] for the full four-part rubric.
+
 ## Related Pages
 
 - [[anthropic|Anthropic]]
@@ -139,6 +150,9 @@ Anthropic's docs frame Skills mainly as packaged *capabilities* (document genera
 - [[claude-code-orchestration-frameworks|Claude Code Orchestration Frameworks]]
 - [[agentic-search|Agentic Search]] — uses a Skill as just-in-time ES|QL documentation to fix tool-parameter generation.
 - [[elastic|Elastic]] — publishes official Elasticsearch Agent Skills.
+- [[skill-checklist|Skill Checklist]] — Matt Pocock's four-part authoring/audit rubric.
+- [[matt-pocock|Matt Pocock]] — author of the Skill Checklist and the Matt Pocock Skills repo.
+- [[superpowers|Superpowers]] — contrasted as a primarily model-invoked skill set.
 
 ## Sources
 
@@ -149,3 +163,4 @@ Anthropic's docs frame Skills mainly as packaged *capabilities* (document genera
 - [[src-2026-05-06-anthropic-claude-cookbook-skills-custom-development|Building Custom Skills for Claude (claude-cookbooks notebook 03)]] — Anthropic claude-cookbooks, 2026-05-06
 - [[src-2026-04-16-claude-code-frameworks-report|Claude Code Frameworks & Patterns: A Comparative Report]] — comparative synthesis report, April 2026
 - [[src-2026-07-03-agentic-search-context-engineering|Agentic Search for Context Engineering — Leonie Monigatti, Elastic]] — AI Engineer conference talk, 2026-05-08 (YouTube transcript)
+- [[src-2026-07-03-building-great-agent-skills|Building Great Agent Skills: The Missing Manual — Matt Pocock]] — AI Engineer talk, 2026-06-29 (YouTube transcript)
