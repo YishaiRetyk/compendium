@@ -65,10 +65,10 @@ gen_skills_in_sync() {
 gen_skills_drift() {
     local ext out err rc skill
     ext="$(extract_writable_tree)"
-    skill="$(ls -d "$ext"/.claude/skills/*/ | head -1)SKILL.md"
+    skill="$(LC_ALL=C ls -d "$ext"/.claude/skills/*/ | head -1)SKILL.md"
     printf '\ndrift-injected line\n' >> "$skill"
     out="$(mktemp)"; err="$(mktemp)"
-    if bash "$ext/bin/gen-skills.sh" --check >"$out" 2>"$err"; then rc=0; else rc=$?; fi
+    if LC_ALL=C TZ=UTC bash "$ext/bin/gen-skills.sh" --check >"$out" 2>"$err"; then rc=0; else rc=$?; fi
     local actual="$(mktemp -d)/case"
     write_channels_manual "$actual" "$out" "$err" "$rc"
     golden_check_or_freeze "$GOLD/gen-skills/check-drift" "$actual" || return 1
@@ -89,7 +89,7 @@ init_wizard_exit4() {
     # never widen the shared normalizer for a single tool's date).
     touch -d '2026-01-02 00:00:00 UTC' "$ext/.wizard-answers.yaml"
     out="$(mktemp)"; err="$(mktemp)"
-    if bash "$ext/bin/init-wizard.sh" </dev/null >"$out" 2>"$err"; then rc=0; else rc=$?; fi
+    if LC_ALL=C TZ=UTC bash "$ext/bin/init-wizard.sh" </dev/null >"$out" 2>"$err"; then rc=0; else rc=$?; fi
     local actual="$(mktemp -d)/case"
     write_channels_manual "$actual" "$out" "$err" "$rc"
     golden_check_or_freeze "$GOLD/init-wizard/already-initialized" "$actual" || return 1
@@ -112,7 +112,7 @@ init_wizard_exit3() {
     [ ! -e "$farm/python3" ] || { echo "FAIL: farm must NOT contain python3" >&2; return 1; }
     out="$(mktemp)"; err="$(mktemp)"
     set +e
-    ( PATH="$farm"; export PATH; bash "$ext/bin/init-wizard.sh" --dry-run </dev/null >"$out" 2>"$err" )
+    ( PATH="$farm"; export PATH LC_ALL=C TZ=UTC; bash "$ext/bin/init-wizard.sh" --dry-run </dev/null >"$out" 2>"$err" )
     rc=$?
     set -e
     local actual="$(mktemp -d)/case"
@@ -154,7 +154,11 @@ lint_dual_mode() {
             invoke_tool lint
         fi
         actual="$(mktemp -d)/case"
-        capture_footprint "$PWD" "$actual"
+        # REVIEW FIX (verified breaker): text-mode lint WRITES wiki-cloud/maintenance/lint-report.md
+        # with TODAY'S date inside — a full-fixture tree channel byte-pins that report's hash and
+        # breaks the golden the next day. The load-bearing channels for the dual-mode contract are
+        # stdout/stderr/exit; the tree channel is narrowed to the input page dir (deterministic).
+        capture_footprint "$PWD/wiki-cloud/concepts" "$actual"
         golden_check_or_freeze "$GOLD/lint/$case_name" "$actual"
     ) || return 1
     rm -rf "$fixture"

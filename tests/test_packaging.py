@@ -13,9 +13,12 @@ import pathlib
 import subprocess
 import sys
 
+from conftest import requires_network
+
 REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 
+@requires_network  # pip must resolve the pinned deps unless a warm cache exists
 def test_editable_install_and_imports(tmp_path):
     venv_dir = tmp_path / ".venv"
     proc = subprocess.run(

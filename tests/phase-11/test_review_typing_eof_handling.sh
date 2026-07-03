@@ -21,7 +21,7 @@ if ! invoke_tool_compat brownfield suggest --root "$TMP" >/dev/null 2>&1; then
 fi
 
 set +e
-timeout 3 bash -c "bash \"$REPO_ROOT/bin/brownfield.sh\" review-typing --root \"$TMP\" </dev/null" >/dev/null 2>stderr.txt
+timeout 3 bash -c 'export REPO_ROOT="$1"; source "$REPO_ROOT/tests/lib/invoke_tool.sh"; invoke_tool_compat brownfield review-typing --root "$2" </dev/null' _ "$REPO_ROOT" "$TMP" >/dev/null 2>stderr.txt
 ec=$?
 set -e
 

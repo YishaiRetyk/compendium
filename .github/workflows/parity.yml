@@ -34,6 +34,12 @@ jobs:
         impl: [bash, py]
     steps:
       - uses: actions/checkout@v6
+        with:
+          # REVIEW FIX: the worktree oracle resolves tests/freeze-baseline.sha (the local-only
+          # tag is never pushed); a depth-1 clone cannot reach that commit — today the oracle
+          # would silently fall back to HEAD (not held-fixed), and the first Phase-25 manifest
+          # append would hard-fail every job on the N-4 guard.
+          fetch-depth: 0
       - uses: actions/setup-python@v6
         with:
           python-version: '3.14'
@@ -78,6 +84,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          # REVIEW FIX: the worktree oracle resolves tests/freeze-baseline.sha (the local-only
+          # tag is never pushed); a depth-1 clone cannot reach that commit — today the oracle
+          # would silently fall back to HEAD (not held-fixed), and the first Phase-25 manifest
+          # append would hard-fail every job on the N-4 guard.
+          fetch-depth: 0
       - uses: actions/setup-python@v6
         with:
           python-version: '3.14'

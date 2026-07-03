@@ -41,6 +41,14 @@ case "${1:-}" in --help|-h) usage; exit 0 ;; esac
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
+# REVIEW FIX (template-public integrity): bin/ ships in the release allowlist but the parity
+# harness (tests/run-all-suites.sh + tests/lib/) does NOT — on a template checkout this gate
+# must be a neutral skip, not a permanent commit block.
+if [ ! -f "$REPO_ROOT/tests/run-all-suites.sh" ] || [ ! -f "$REPO_ROOT/tests/lib/invoke_tool.sh" ]; then
+    echo "parity harness not present (template checkout) — parity gate skipped" >&2
+    exit 0
+fi
+
 if [ "${PARITY_GATE_SKIP:-0}" = "1" ]; then
     echo "WARNING: PARITY GATE SKIPPED (PARITY_GATE_SKIP=1) — WIP only; record this in the plan SUMMARY (N-7)." >&2
     exit 0
@@ -75,14 +83,55 @@ git checkout-index -a -f --prefix="$STAGED_EXEC_ROOT/"
 # suite; its goldens are the richest parity signal on private branches).
 EXCL="--exclude-test test_precommit_hooks.sh --exclude-test test_staged_parity_index.sh"
 
+# REVIEW FIX (ambient-knob gutting): run-all reads WIKI_PARITY_ONLY_SUITES /
+# WIKI_PARITY_EXCLUDE_TESTS from the environment — a leftover exported var in a dev shell
+# would silently narrow THE gate to one suite. The gate UNSETS the ambient knobs for its
+# run-all invocations; the ONLY sanctioned narrowing is the gate-scoped
+# WIKI_PARITY_GATE_ONLY_SUITES (used by the hook self-tests' scaffolds), which is mapped
+# to explicit --only-suite flags here and is visibly logged.
+ONLY_ARGS=()
+if [ -n "${WIKI_PARITY_GATE_ONLY_SUITES:-}" ]; then
+    echo "parity gate: NARROWED to suites: $WIKI_PARITY_GATE_ONLY_SUITES (WIKI_PARITY_GATE_ONLY_SUITES)" >&2
+    for s in ${WIKI_PARITY_GATE_ONLY_SUITES//:/ }; do ONLY_ARGS+=(--only-suite "$s"); done
+fi
+
+# REVIEW FIX (hook-env leakage — reproduced corruption): pre-commit exports GIT_INDEX_FILE
+# (an absolute temp-index path for `git commit -a`/`-o`/pathspec commits) + GIT_DIR/GIT_PREFIX.
+# Suite fixtures run their own `git add/commit/reset`, which would read/WRITE the PARENT
+# repo's temp commit index (fixture blobs entering the real commit, or 'Error building trees').
+# The staged detection + checkout-index above already consumed the hook's index; everything
+# below runs with the git env SCRUBBED.
+# Also scrubbed: the OVERRIDE/escape-hatch envs. A commit-level FREEZE_ALLOW_REBASE=1 (the
+# D-09 flow) must not leak into the SUITE run — test_freeze_guard's drift case then sees the
+# guard exit 0 and false-fails (observed live on the first hooked commit); GOLDEN_FREEZE
+# leaking would let goldens silently re-freeze mid-gate.
+GIT_ENV_SCRUB=(env -u GIT_INDEX_FILE -u GIT_DIR -u GIT_WORK_TREE -u GIT_PREFIX
+               -u WIKI_PARITY_ONLY_SUITES -u WIKI_PARITY_EXCLUDE_TESTS
+               -u FREEZE_ALLOW_REBASE -u PARITY_GATE_SKIP -u GOLDEN_FREEZE)
+
+# REVIEW FIX (empty-manifest short-circuit — definitionally sound): with zero non-comment
+# entries in the STAGED tests/ported.manifest, the py leg falls through to the identical
+# worktree-oracle bytes for every tool (the seam's documented semantics) — the py leg and
+# the channel comparison are green by construction. Skip them and say so. This
+# auto-reactivates the moment Phase 25 stages the first manifest append.
+staged_manifest_nonempty() {
+    local mf="$STAGED_EXEC_ROOT/tests/ported.manifest"
+    [ -f "$mf" ] && grep -qvE '^[[:space:]]*#|^[[:space:]]*$' "$mf"
+}
+
 # bash leg: exec-root = the real repo (frozen bash bodies via the worktree oracle); git-root = the real repo.
 if WIKI_IMPL=bash WIKI_EXEC_ROOT="$ORACLE_GIT_ROOT" WIKI_ORACLE_GIT_ROOT="$ORACLE_GIT_ROOT" \
-     bash "$ORACLE_GIT_ROOT/tests/run-all-suites.sh" --capture-channels "$BASHCH" $EXCL >&2; then bl_rc=0; else bl_rc=$?; fi
-# py leg: exec-root = the STAGED index (staged shim + src + ported.manifest); git-root = the real repo (.git for the oracle).
-if WIKI_IMPL=py WIKI_EXEC_ROOT="$STAGED_EXEC_ROOT" WIKI_ORACLE_GIT_ROOT="$ORACLE_GIT_ROOT" \
-     bash "$ORACLE_GIT_ROOT/tests/run-all-suites.sh" --capture-channels "$PYCH" $EXCL >&2; then py_rc=0; else py_rc=$?; fi
-# channel comparison (pid-independent pairing — cycle-6 #4): fails on byte-divergence OR unpaired keys.
-if bash "$ORACLE_GIT_ROOT/tests/run-all-suites.sh" --require-parity "$BASHCH" "$PYCH" >&2; then rp_rc=0; else rp_rc=$?; fi
+     "${GIT_ENV_SCRUB[@]}" bash "$ORACLE_GIT_ROOT/tests/run-all-suites.sh" --capture-channels "$BASHCH" $EXCL ${ONLY_ARGS[@]+"${ONLY_ARGS[@]}"} >&2; then bl_rc=0; else bl_rc=$?; fi
+py_rc=0; rp_rc=0
+if staged_manifest_nonempty; then
+    # py leg: exec-root = the STAGED index (staged shim + src + ported.manifest); git-root = the real repo (.git for the oracle).
+    if WIKI_IMPL=py WIKI_EXEC_ROOT="$STAGED_EXEC_ROOT" WIKI_ORACLE_GIT_ROOT="$ORACLE_GIT_ROOT" \
+         "${GIT_ENV_SCRUB[@]}" bash "$ORACLE_GIT_ROOT/tests/run-all-suites.sh" --capture-channels "$PYCH" $EXCL ${ONLY_ARGS[@]+"${ONLY_ARGS[@]}"} >&2; then py_rc=0; else py_rc=$?; fi
+    # channel comparison (pid-independent pairing — cycle-6 #4): fails on byte-divergence OR unpaired keys.
+    if "${GIT_ENV_SCRUB[@]}" bash "$ORACLE_GIT_ROOT/tests/run-all-suites.sh" --require-parity "$BASHCH" "$PYCH" >&2; then rp_rc=0; else rp_rc=$?; fi
+else
+    echo "parity gate: staged tests/ported.manifest has no ported tools — py leg + channel comparison are green-by-fallthrough (skipped; auto-reactivates on the first Phase-25 manifest append)" >&2
+fi
 
 if [ "$bl_rc" != "0" ] || [ "$py_rc" != "0" ] || [ "$rp_rc" != "0" ]; then
     echo "" >&2

@@ -91,7 +91,12 @@ fi
 
 # --- Diff the frozen surface (stderr NEVER swallowed) ---
 if [ "$STAGED" = "1" ]; then
-    CHANGED="$(git diff --cached --name-only "${BASELINE}^{commit}" -- "${FROZEN_PATHS[@]}")"
+    # REVIEW FIX: staged mode diffs the index against HEAD (what THIS commit changes), not
+    # against the old baseline — diffing the whole index vs the baseline re-flags frozen
+    # files landed by an EARLIER sanctioned FREEZE_ALLOW_REBASE commit on every subsequent
+    # commit (a block loop no commit can satisfy). "Does THIS commit touch the frozen
+    # surface?" is the hook's question; baseline..HEAD accountability is the full mode's.
+    CHANGED="$(git diff --cached --name-only -- "${FROZEN_PATHS[@]}")"
 else
     CHANGED="$(git diff --name-only "${BASELINE}^{commit}..HEAD" -- "${FROZEN_PATHS[@]}")"
 fi
@@ -100,7 +105,9 @@ if [ -n "$CHANGED" ]; then
     if [ "$ALLOW" = "1" ]; then
         echo "FREEZE OVERRIDDEN (FREEZE_ALLOW_REBASE — D-09 ownership-rebase): the following frozen paths changed:" >&2
         printf '  %s\n' $CHANGED >&2
-        echo "  REQUIRED: bump tests/freeze-baseline.sha + 'git tag -f phase-24-freeze' in this same plan and record the override in its SUMMARY (N-7)." >&2
+        echo "  REQUIRED (same plan, as a FOLLOW-UP commit — a commit cannot contain its own SHA):" >&2
+        echo "    1. land this change; 2. write the new HEAD SHA into tests/freeze-baseline.sha," >&2
+        echo "       'git tag -f phase-24-freeze <that SHA>', commit; 3. record the override in the plan SUMMARY (N-7)." >&2
         exit 0
     fi
     echo "FROZEN SURFACE CHANGED vs baseline ${BASELINE} (D-07/D-08 — exit 2):" >&2

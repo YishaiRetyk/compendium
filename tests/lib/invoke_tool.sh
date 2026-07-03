@@ -28,11 +28,21 @@ _IT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 capture_footprint() {
     local repo="$1" casedir="$2"
     mkdir -p "$casedir"
+    # REVIEW FIX: a missing footprint root must not abort the calling test under set -e
+    # (only capture runs would die, making failures unreproducible in plain runs). Both
+    # legs get the same deterministic placeholder, so parity still pairs.
+    if [ ! -d "$repo" ]; then
+        normalize < "$IT_STDOUT" > "$casedir/stdout"
+        normalize < "$IT_STDERR" > "$casedir/stderr"
+        printf '%s\n' "$IT_EXIT" > "$casedir/exit"
+        printf 'tree channel unavailable: footprint root missing\n' > "$casedir/tree"
+        return 0
+    fi
     normalize < "$IT_STDOUT" > "$casedir/stdout"
     normalize < "$IT_STDERR" > "$casedir/stderr"
     printf '%s\n' "$IT_EXIT" > "$casedir/exit"
     ( cd "$repo" && find . -path './.git' -prune -o -print 2>/dev/null \
-        | sort \
+        | LC_ALL=C sort \
         | while IFS= read -r e; do
               [ "$e" = "." ] && continue
               if [ -L "$e" ]; then
@@ -64,7 +74,6 @@ _it_capture_key() {
     local base; base="$(basename "${0:-shell}" .sh)"
     printf '%s-%s\n' "$base" "$$"
 }
-_IT_CALL_N=0                              # per-process call counter (disambiguates calls WITHIN one test file)
 invoke_tool() {
     local tool="$1"; shift
     local impl="${WIKI_IMPL:-bash}"
@@ -88,10 +97,19 @@ invoke_tool() {
         IT_EXIT=$?
     fi
     # FINDING #2 + CYCLE-4 finding #1: per-call self-record into IT_CAPTURE_DIR under a COLLISION-PROOF key, if requested.
+    # REVIEW FIX (2026-07-03): the per-call counter is FILESYSTEM-derived (count of existing
+    # <tool>-* capture dirs under this key), NOT a shell variable — a shell counter is lost when
+    # the call happens inside a command substitution / cd-subshell (the dominant compat shape:
+    # `out="$(... invoke_tool_compat tool ...)"`), so every same-tool subshell call re-used -001
+    # and silently OVERWROTE earlier captures (verified). Numbering is per-tool and derived from
+    # committed-on-disk state, so it survives subshells AND stays deterministic across the two
+    # capture runs (same call order → same counts → pairing keys align).
     if [ -n "${IT_CAPTURE_DIR:-}" ]; then
-        _IT_CALL_N=$((_IT_CALL_N + 1))
         local key; key="$(_it_capture_key)"
-        local cdir="$IT_CAPTURE_DIR/${key}/${tool}-$(printf '%03d' "$_IT_CALL_N")"
+        mkdir -p "$IT_CAPTURE_DIR/$key"      # find on a missing dir would abort a set -e caller (pipefail)
+        local n_prev
+        n_prev="$(find "$IT_CAPTURE_DIR/$key" -mindepth 1 -maxdepth 1 -type d -name "${tool}-*" | wc -l)"
+        local cdir="$IT_CAPTURE_DIR/${key}/${tool}-$(printf '%03d' "$((n_prev + 1))")"
         # CYCLE-6 fix #4: snapshot the REAL fixture root, not $PWD. 86 parity invocations pass their fixture via
         # `--root <tmp>` WITHOUT cd-ing, so $PWD is the test's own dir, NOT the tree the tool mutated.
         capture_footprint "$(_it_footprint_root "$@")" "$cdir"
@@ -106,7 +124,10 @@ _it_footprint_root() {
     if [ -n "${IT_FOOTPRINT_ROOT:-}" ]; then printf '%s\n' "$IT_FOOTPRINT_ROOT"; return 0; fi
     local a prev=""
     for a in "$@"; do
-        case "$a" in --root=*) printf '%s\n' "${a#--root=}"; return 0 ;; esac
+        # REVIEW FIX: the --root=<dir> spelling now gets the same -d existence check as the
+        # two-arg form (a nonexistent root previously flowed into capture_footprint's cd and
+        # killed the calling test under set -e in capture runs only).
+        case "$a" in --root=*) if [ -d "${a#--root=}" ]; then printf '%s\n' "${a#--root=}"; return 0; fi ;; esac
         if [ "$prev" = "--root" ] && [ -d "$a" ]; then printf '%s\n' "$a"; return 0; fi
         prev="$a"
     done

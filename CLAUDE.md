@@ -99,6 +99,9 @@ life/                               # repo root
 ├── docs/                           # User-facing docs (quickstart, guided setup, manual setup, reference)
 ├── .github/                        # CI workflows, issue templates
 ├── bin/                            # Helper scripts (lint.sh, ingest.sh, sync-claude.sh, etc.)
+├── src/                            # Installable Python package (v1.5 migration; src-layout)
+├── tests/                          # Test suites (per-phase bash suites + pytest harness)
+├── pyproject.toml                  # Python package metadata (pinned deps + entry points)
 └── .githooks/                      # Repo-local git hooks (e.g., pre-commit sync check)
 ```
 

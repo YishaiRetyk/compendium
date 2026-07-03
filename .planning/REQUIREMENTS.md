@@ -12,18 +12,18 @@ Design lineage: the 7-agent codebase assessment (2026-06-18) — ~10.2k lines of
 
 ### Packaging & Shared Core (PKG)
 
-- [ ] **PKG-01**: An installable Python package exists (`pyproject.toml` with pinned runtime deps `PyYAML` + `ruamel.yaml` and `console_scripts` entry points); `pip install -e .` succeeds and exposes each migrated tool as an importable module
-- [ ] **PKG-02**: A shared `common/` package is extracted from the existing `bin/lib/*.py` — privacy resolver, YAML round-trip (the `make_yaml` canonicalization chokepoint), vault walker, and wiki-page primitives (`parse_frontmatter`, provenance/wikilink regexes) — as a single source of truth, eliminating the `lint`↔`audit-claims` byte-copy and the duplicated "is-under-`wiki-local/`" predicates
-- [ ] **PKG-03**: Every migrated `bin/<name>.sh` becomes a thin shim that `exec`s its Python entry point, preserving the exact argv / exit-code / stdout-vs-stderr contract; all existing callers (CI, pre-commit, schema docs, `.claude/settings.local.json`) invoke it unchanged
-- [ ] **PKG-04**: CI installs the package (additive edit to the three workflows); all existing CI gates (`lint`, `privacy-leak`, `strict`, `skills-check`, `neutrality`, `setup-parity`) stay green and their required-check names are unchanged
+- [x] **PKG-01**: An installable Python package exists (`pyproject.toml` with pinned runtime deps `PyYAML` + `ruamel.yaml` and `console_scripts` entry points); `pip install -e .` succeeds and exposes each migrated tool as an importable module
+- [x] **PKG-02**: A shared `common/` package is extracted from the existing `bin/lib/*.py` — privacy resolver, YAML round-trip (the `make_yaml` canonicalization chokepoint), vault walker, and wiki-page primitives (`parse_frontmatter`, provenance/wikilink regexes) — as a single source of truth, eliminating the `lint`↔`audit-claims` byte-copy and the duplicated "is-under-`wiki-local/`" predicates
+- [x] **PKG-03**: Every migrated `bin/<name>.sh` becomes a thin shim that `exec`s its Python entry point, preserving the exact argv / exit-code / stdout-vs-stderr contract; all existing callers (CI, pre-commit, schema docs, `.claude/settings.local.json`) invoke it unchanged
+- [x] **PKG-04**: CI installs the package (additive edit to the three workflows); all existing CI gates (`lint`, `privacy-leak`, `strict`, `skills-check`, `neutrality`, `setup-parity`) stay green and their required-check names are unchanged
 
 ### Parity Harness & Test Infrastructure (TEST)
 
-- [ ] **TEST-01**: The shared test harness routes every script-under-test invocation through one `invoke_tool` seam selectable by `WIKI_IMPL=bash|py`, so the existing black-box suite can run against either implementation and diff byte-for-byte
-- [ ] **TEST-02**: All phase test suites (09–20) are wired into CI, so the parity net is enforced rather than merely runnable locally (today only phases 07–08 gate in CI)
-- [ ] **TEST-03**: Before any script is ported, its behavior is frozen as a characterization golden (full stdout + exit code + resulting file tree); missing coverage is backfilled first — `validate-op.sh` (zero tests today) and the untested `search.sh` modes get characterization tests before they are touched
-- [ ] **TEST-04**: Implementation-asserting tests (e.g. the `hashlib`-not-`sha256sum` grep, the `pdf-extract` `api/generate` body-grep) are quarantined or rewritten to assert behavior, so they neither block nor invert under the Python implementation
-- [ ] **TEST-05**: A pytest harness is stood up — `conftest.py` with a `git_repo`/`tmp_path` fixture replicating `make_bare_repo`/`make_fixture_repo`, a golden-tree comparison helper, and `skipif` markers for the Ollama/network tests
+- [x] **TEST-01**: The shared test harness routes every script-under-test invocation through one `invoke_tool` seam selectable by `WIKI_IMPL=bash|py`, so the existing black-box suite can run against either implementation and diff byte-for-byte
+- [x] **TEST-02**: All phase test suites (09–20) are wired into CI, so the parity net is enforced rather than merely runnable locally (today only phases 07–08 gate in CI)
+- [x] **TEST-03**: Before any script is ported, its behavior is frozen as a characterization golden (full stdout + exit code + resulting file tree); missing coverage is backfilled first — `validate-op.sh` (zero tests today) and the untested `search.sh` modes get characterization tests before they are touched
+- [x] **TEST-04**: Implementation-asserting tests (e.g. the `hashlib`-not-`sha256sum` grep, the `pdf-extract` `api/generate` body-grep) are quarantined or rewritten to assert behavior, so they neither block nor invert under the Python implementation
+- [x] **TEST-05**: A pytest harness is stood up — `conftest.py` with a `git_repo`/`tmp_path` fixture replicating `make_bare_repo`/`make_fixture_repo`, a golden-tree comparison helper, and `skipif` markers for the Ollama/network tests
 - [ ] **TEST-06**: Net-new pytest unit tests cover the extracted `common/` core and each cluster's modules (e.g. `make_yaml`, `resolve_effective_claim_privacy`, `classify_page`, the lint check functions) — direct module-level coverage that does not exist today
 
 ### Script Migration (MIG) — parity-gated, cluster by cluster
@@ -71,15 +71,15 @@ Which phases cover which requirements. Filled during roadmap creation. Phase num
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PKG-01 | Phase 24 | Pending |
-| PKG-02 | Phase 24 | Pending |
-| PKG-03 | Phase 24 | Pending |
-| PKG-04 | Phase 24 | Pending |
-| TEST-01 | Phase 24 | Pending |
-| TEST-02 | Phase 24 | Pending |
-| TEST-03 | Phase 24 | Pending |
-| TEST-04 | Phase 24 | Pending |
-| TEST-05 | Phase 24 | Pending |
+| PKG-01 | Phase 24 | Complete |
+| PKG-02 | Phase 24 | Complete |
+| PKG-03 | Phase 24 | Complete |
+| PKG-04 | Phase 24 | Complete |
+| TEST-01 | Phase 24 | Complete |
+| TEST-02 | Phase 24 | Complete |
+| TEST-03 | Phase 24 | Complete |
+| TEST-04 | Phase 24 | Complete |
+| TEST-05 | Phase 24 | Complete |
 | MIG-01 | Phase 25 (Wave 1 — brownfield) | Pending |
 | MIG-02 | Phase 25 (Wave 1 — lint + audit-claims) | Pending |
 | MIG-03 | Phase 25 (Wave 1 — checkers) | Pending |

@@ -24,7 +24,10 @@ SC="$(mktemp -d)"
 SUITE="$(mktemp -d)/phase-divtest"
 BASHCH="$(mktemp -d)"; PYCH="$(mktemp -d)"
 FOOT="$(mktemp -d)"   # stable footprint root for the divtest (empty dir)
-trap 'rm -rf "$SC" "$(dirname "$SUITE")" "$BASHCH" "$PYCH" "$FOOT"; git -C "$REPO_ROOT" worktree prune >/dev/null 2>&1 || true' EXIT
+SC_WT=""              # set later; declared now so the SINGLE trap below covers every exit path
+# REVIEW FIX: ONE trap only — a later `trap ... EXIT` REPLACES the earlier one wholesale
+# (the second trap silently dropped the first's cleanup during the early-failure window).
+trap 'rm -rf "$SC" "$(dirname "$SUITE")" "$BASHCH" "$PYCH" "$FOOT" ${SC_WT:+"$SC_WT"}' EXIT
 
 mkdir -p "$SC/bin" "$SC/src/compendium" "$SC/tests"
 touch "$SC/src/compendium/__init__.py"
@@ -47,9 +50,9 @@ printf '# divtest manifest\nfaketool\n' > "$SC/tests/ported.manifest"
 # seed commit so the bash leg runs the COMMITTED bash body from the worktree.
 git -C "$SC" rev-parse HEAD > "$SC/tests/freeze-baseline.sha"
 # Pre-compute the scaffold's oracle-worktree path for trap cleanup (do NOT glob-delete
-# /tmp/wiki-oracle-worktree-* — that would nuke the real repo's cached oracle).
+# /tmp/wiki-oracle-worktree-* — that would nuke the real repo's cached oracle). The single
+# trap installed above already covers SC_WT via its deferred expansion.
 SC_WT="$(WIKI_ORACLE_GIT_ROOT="$SC" bash -c 'source "'"$REPO_ROOT"'/tests/lib/invoke_tool.sh"; _oracle_worktree_dir')"
-trap 'rm -rf "$SC" "$(dirname "$SUITE")" "$BASHCH" "$PYCH" "$FOOT" "$SC_WT"' EXIT
 # NOW flip the WORKING-TREE faketool.sh into the canonical shim -> python module.
 # bash leg = worktree at HEAD (the committed bash body, prints "OK");
 # py leg   = the working-tree shim -> python (prints a DIVERGENT byte).

@@ -12,6 +12,11 @@
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib.sh"
+# Env hygiene: these self-tests assert the gates' DEFAULT behavior — a commit-level
+# escape hatch (FREEZE_ALLOW_REBASE on a D-09 commit, PARITY_GATE_SKIP) or GOLDEN_FREEZE
+# leaking in from the invoking environment would invert the expected exits.
+unset FREEZE_ALLOW_REBASE PARITY_GATE_SKIP GOLDEN_FREEZE
+
 
 fail() { echo "FAIL: $1" >&2; exit 1; }
 
@@ -74,7 +79,7 @@ trap 'rm -rf "$SC" "$SC_WT"' EXIT
 scaffold_write_shim "$SC"                      # working faketool = the canonical shim -> python
 ( cd "$SC" && printf '# staged tweak\n' >> src/compendium/faketool.py && git add bin/faketool.sh src/compendium/faketool.py )
 rc=0
-out="$( cd "$SC" && WIKI_PARITY_ONLY_SUITES="$SC/tests/phase-divtest" bash bin/check-staged-parity.sh 2>&1 )" || rc=$?
+out="$( cd "$SC" && WIKI_PARITY_GATE_ONLY_SUITES="$SC/tests/phase-divtest" bash bin/check-staged-parity.sh 2>&1 )" || rc=$?
 [ "$rc" = "0" ] || fail "parity gate blocked a parity-green staged change (rc=$rc): $out"
 echo "$out" | grep -q 'materializing the STAGED index' || fail "gate did NOT reach the materialize path: $out"
 echo "$out" | grep -qE 'PARITY OK|staged-index parity green' || fail "gate did NOT reach the compare path: $out"

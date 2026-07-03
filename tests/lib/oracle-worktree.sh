@@ -68,16 +68,35 @@ _oracle_worktree_dir() {
 }
 
 # Ensure the cached worktree exists at the resolved ref (idempotent; re-points if the ref changed).
+# REVIEW FIXES (2026-07-03):
+#  - REUSE now requires the cached worktree to be CLEAN (git status --porcelain empty): a tool
+#    that mutated the shared worktree (e.g. a $0-relative writer) would otherwise be silently
+#    reused as the "held-fixed" oracle by every later run — the corruption is invisible to the
+#    HEAD-sha check alone. A dirty cache is recreated.
+#  - Stale-registration recovery: a /tmp-cleaned worktree leaves a .git/worktrees registration
+#    that makes every future `worktree add` at that path fail; `git worktree prune` runs before add.
+#  - `git worktree add` failures are NO LONGER swallowed: the function fails LOUDLY (stderr +
+#    return 1) instead of printing a nonexistent path that surfaces as misleading 127s downstream.
 ensure_oracle_worktree() {
-    local wt ref cur
+    local wt ref cur gr
     ref="$(_oracle_baseline_ref)" || return 1
     wt="$(_oracle_worktree_dir)" || return 1
+    gr="$(_oracle_git_root)"
     if [ -d "$wt/.git" ] || [ -f "$wt/.git" ]; then
         cur="$(git -C "$wt" rev-parse -q --verify HEAD 2>/dev/null || echo none)"
-        [ "$cur" = "$ref" ] && { printf '%s\n' "$wt"; return 0; }
-        git -C "$(_oracle_git_root)" worktree remove --force "$wt" 2>/dev/null || rm -rf "$wt"
+        if [ "$cur" = "$ref" ] && [ -z "$(git -C "$wt" status --porcelain 2>/dev/null)" ]; then
+            printf '%s\n' "$wt"
+            return 0
+        fi
+        git -C "$gr" worktree remove --force "$wt" 2>/dev/null || rm -rf "$wt"
+    elif [ -d "$wt" ]; then
+        rm -rf "$wt"    # half-populated leftover (crash mid-add) — must not be accepted as the oracle
     fi
-    git -C "$(_oracle_git_root)" worktree add --quiet --detach "$wt" "$ref" >/dev/null 2>&1
+    git -C "$gr" worktree prune >/dev/null 2>&1 || true
+    if ! git -C "$gr" worktree add --quiet --detach "$wt" "$ref" >/dev/null 2>&1; then
+        echo "ORACLE FATAL: 'git worktree add $wt $ref' failed (stale registration? try 'git worktree prune' in $gr)" >&2
+        return 1
+    fi
     printf '%s\n' "$wt"
 }
 

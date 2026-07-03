@@ -206,5 +206,18 @@ done
 if [ "${#NEW_PASS[@]}" -gt 0 ] && [ -z "${ONLY_SUITES// /}" ]; then
     echo "note: ${#NEW_PASS[@]} new passing test(s) not yet in the manifest (append them): ${NEW_PASS[*]}"
 fi
+
+# REVIEW FIX: a pinned test whose FILE vanished must not disappear silently — deleting an
+# inconvenient parity-carrying test would shrink the net with every gate green. Removing a
+# test requires a deliberate manifest edit in the same change. (Skipped under --only-suite.)
+if [ -z "${ONLY_SUITES// /}" ] && [ -f "$MANIFEST" ]; then
+    while read -r name status; do
+        case "$name" in \#*|"") continue ;; esac
+        if [ ! -f "$REPO_ROOT/tests/$(dirname "$name")/$(basename "$name").sh" ]; then
+            echo "MANIFEST ROW WITHOUT A TEST FILE (deleted test? remove the row deliberately): $name" >&2
+            RC=1
+        fi
+    done < "$MANIFEST"
+fi
 [ "$RC" = "0" ] && echo "RUN-ALL OK (WIKI_IMPL=${WIKI_IMPL:-bash}): no new per-test regression"
 exit "$RC"

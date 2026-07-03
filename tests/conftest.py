@@ -71,9 +71,15 @@ def assert_golden_tree(actual_dir: Path, golden_dir: Path):
 
 
 def _ollama_up():
+    # REVIEW FIX: honor NO_NETWORK before probing (a sandboxed run must not open sockets at
+    # collection time) and take the endpoint from OLLAMA_URL (this environment tunnels Ollama
+    # on a non-default port; the tool itself honors the same variable).
+    if os.environ.get("NO_NETWORK") == "1":
+        return False
     import urllib.request
+    base = os.environ.get("OLLAMA_URL", "http://localhost:11434").rstrip("/")
     try:
-        urllib.request.urlopen("http://localhost:11434/api/tags", timeout=2)
+        urllib.request.urlopen(f"{base}/api/tags", timeout=2)
         return True
     except Exception:
         return False

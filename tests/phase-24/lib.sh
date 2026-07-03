@@ -21,14 +21,21 @@ extract_writable_tree() {
 }
 
 # golden_check_or_freeze <golden-case-dir> <actual-case-dir>
-# First capture: freeze (copy actual -> golden; commit it). Later runs: byte-assert.
+# REVIEW FIX: freezing a first capture now requires an EXPLICIT GOLDEN_FREEZE=1 — a missing
+# golden (forgotten `git add`, dropped in a rebase, typo'd path) previously auto-froze the
+# CURRENT behavior and passed green in CI forever, silently converting the byte-assert into
+# self-certification. Missing golden without the flag = loud FAILURE with the recipe.
 golden_check_or_freeze() {
     local golden="$1" actual="$2"
     if [ ! -d "$golden" ]; then
-        mkdir -p "$(dirname "$golden")"
-        cp -r "$actual" "$golden"
-        echo "GOLDEN FROZEN: $golden (first capture — commit it)"
-        return 0
+        if [ "${GOLDEN_FREEZE:-0}" = "1" ]; then
+            mkdir -p "$(dirname "$golden")"
+            cp -r "$actual" "$golden"
+            echo "GOLDEN FROZEN: $golden (first capture — commit it)"
+            return 0
+        fi
+        echo "FAIL: golden missing: $golden — if this is a NEW case, re-run with GOLDEN_FREEZE=1 and commit the result; if not, the committed golden was lost (do NOT blindly re-freeze)" >&2
+        return 1
     fi
     assert_parity "$golden" "$actual"
 }

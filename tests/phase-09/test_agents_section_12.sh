@@ -21,7 +21,7 @@ echo "$SECTION" | grep -q "\.git-author-map\.txt" \
     || { echo "FAIL: §12 missing .git-author-map.txt reference" >&2; exit 1; }
 
 # CLAUDE.md byte-equality still holds
-(cd "$REPO_ROOT" && bash bin/sync-claude.sh --check) \
+(cd "$REPO_ROOT" && invoke_tool_compat sync-claude --check) \
     || { echo "FAIL: CLAUDE.md drifted from AGENTS.md after amendments" >&2; exit 1; }
 
 echo "PASS: AGENTS.md §12 + CLAUDE.md sync"

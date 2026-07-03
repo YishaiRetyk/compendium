@@ -6,7 +6,14 @@
 # tool's characterization test (Plan 04) with a CASE-SPECIFIC normalizer extension or a frozen `now`
 # — never by widening this shared normalizer.
 normalize() {
+    # REVIEW FIX (2026-07-03): mktemp honors $TMPDIR — on hosts where TMPDIR != /tmp (or is
+    # nested under /tmp) fixture paths would escape the literal /tmp pattern and the two capture
+    # legs could never byte-match. The current TMPDIR root is redacted too (sed-escaped).
+    local _tmproot _tmproot_esc
+    _tmproot="${TMPDIR:-/tmp}"; _tmproot="${_tmproot%/}"
+    _tmproot_esc="$(printf '%s' "$_tmproot" | sed -e 's/[][(){}.*^$+?|#\\/]/\\&/g')"
     sed -E \
+      -e "s#${_tmproot_esc}/[A-Za-z0-9._-]+#<TMP>#g" \
       -e 's#/tmp/[A-Za-z0-9._-]+#<TMP>#g' \
       -e 's#phase[0-9]+(\.[0-9]+)?-fixture-[A-Za-z0-9]+#<FIXTURE>#g' \
       -e 's#[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(Z|[+-][0-9]{2}:?[0-9]{2})?#<TS>#g'

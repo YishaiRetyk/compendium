@@ -13,19 +13,24 @@ fail() { echo "FAIL: $1" >&2; exit 1; }
 CLEAN=()
 trap 'rm -rf "${CLEAN[@]:-}"' EXIT
 
-# 1. Per-call keying within one test file: two calls -> same <testbasename>-<pid> key,
-#    distinct <tool>-NNN counters, each with all 4 channels.
+# 1. Per-call keying within one test file: numbering is PER-TOOL and FILESYSTEM-derived
+#    (REVIEW FIX: a shell counter was lost inside command substitutions — the dominant
+#    compat call shape — so same-tool subshell calls overwrote <tool>-001). Two direct
+#    calls + one SUBSHELL call of the same tool must yield lint-001, validate-op-001,
+#    lint-002 (the subshell call must NOT collide with lint-001).
 export IT_CAPTURE_DIR="$(mktemp -d)"; CLEAN+=("$IT_CAPTURE_DIR")
 invoke_tool lint --help
 invoke_tool validate-op
+out_sub="$(invoke_tool_compat lint --help)"   # subshell call — the cycle-4 collision shape
 key="$(_it_capture_key)"
 test -d "$IT_CAPTURE_DIR/$key/lint-001" || fail "first call not recorded under $key/lint-001"
-test -d "$IT_CAPTURE_DIR/$key/validate-op-002" || fail "second call not recorded under $key/validate-op-002"
+test -d "$IT_CAPTURE_DIR/$key/validate-op-001" || fail "validate-op call not recorded under $key/validate-op-001 (per-tool numbering)"
+test -d "$IT_CAPTURE_DIR/$key/lint-002" || fail "SUBSHELL lint call collided with lint-001 (fs-derived counter regressed)"
 for ch in stdout stderr exit tree; do
     test -f "$IT_CAPTURE_DIR/$key/lint-001/$ch" || fail "channel $ch missing in lint-001"
-    test -f "$IT_CAPTURE_DIR/$key/validate-op-002/$ch" || fail "channel $ch missing in validate-op-002"
+    test -f "$IT_CAPTURE_DIR/$key/lint-002/$ch" || fail "channel $ch missing in lint-002"
 done
-echo "ok: per-call keyed self-record (4 channels each)"
+echo "ok: per-call keyed self-record (per-tool numbering; subshell calls do not collide)"
 
 # 2. CROSS-TEST-FILE collision-proofing (cycle-4 finding #1 — the core proof): two DIFFERENT
 #    simulated test-file subprocesses share ONE IT_CAPTURE_DIR and both record the same tool's

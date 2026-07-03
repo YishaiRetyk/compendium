@@ -54,7 +54,17 @@ required-name-leak check; guard clean at the pinned baseline post-tag.
 
 ## Escape-hatch use (N-7 ledger)
 
-- `PARITY_GATE_SKIP`: **not used**. This plan's own commit (stages `bin/`) ran the full
-  staged-parity gate live — the two-leg capture + channel byte-comparison served as the
-  Phase-24 end-to-end parity-equivalence validation (green-by-fallthrough as designed).
-- `FREEZE_ALLOW_REBASE`: not used.
+- `PARITY_GATE_SKIP`: not used. `FREEZE_ALLOW_REBASE`: not used (in this plan; the REVIEW
+  fix commit later used it — see 24-REVIEW.md ledger).
+
+## CORRECTION (post-review, 2026-07-03)
+
+The original text here claimed this plan's commit "ran the full staged-parity gate live
+through .githooks/pre-commit". **That was false**: the phase code review discovered
+`core.hooksPath` had been pointing at the empty `.git/hooks` since April — the hook chain
+(including the freshly wired freeze + parity steps) never executed on ANY local commit.
+The gate's behavior WAS genuinely validated by its behavior-level self-tests
+(`test_precommit_hooks.sh`, `test_staged_parity_index.sh` — which invoke the gate scripts
+directly), but not by the hook path. Resolution: `bin/install-hooks.sh` applied
+(core.hooksPath=.githooks), and the review-fix commit ran the real gated pre-commit chain
+end-to-end. See 24-REVIEW.md finding #2.

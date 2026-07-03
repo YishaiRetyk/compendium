@@ -5,6 +5,11 @@
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+# Env hygiene: these self-tests assert the gates' DEFAULT behavior — a commit-level
+# escape hatch (FREEZE_ALLOW_REBASE on a D-09 commit, PARITY_GATE_SKIP) or GOLDEN_FREEZE
+# leaking in from the invoking environment would invert the expected exits.
+unset FREEZE_ALLOW_REBASE PARITY_GATE_SKIP GOLDEN_FREEZE
+
 
 fail() { echo "FAIL: $1" >&2; exit 1; }
 

@@ -47,7 +47,7 @@ test -f "$REPO_ROOT/docs/reference/commit-examples.md" \
     || { echo "FAIL: docs/reference/commit-examples.md missing (Appendix B target)" >&2; exit 1; }
 
 # ASSERTION 4: CLAUDE.md sync check
-(cd "$REPO_ROOT" && bash bin/sync-claude.sh --check) \
+(cd "$REPO_ROOT" && invoke_tool_compat sync-claude --check) \
     || { echo "FAIL: CLAUDE.md drifted from AGENTS.md" >&2; exit 1; }
 
 echo "PASS: §16 absent; QRC rule homes verified in §3 + privacy.md; Appendix A/B docs on disk; CLAUDE.md synced"

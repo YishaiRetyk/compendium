@@ -204,9 +204,12 @@ phase-22/test_lint_repository_fields PASS
 phase-22/test_repo_snapshot PASS
 phase-23/test_network_drift PASS
 phase-24/test_error_path_footprints PASS
+phase-24/test_freeze_guard PASS
 phase-24/test_impl_assertion_inventory PASS
 phase-24/test_mutating_footprint_characterization PASS
+phase-24/test_precommit_hooks PASS
 phase-24/test_release_reqsync_characterization PASS
 phase-24/test_search_modes_characterization PASS
 phase-24/test_shim_preflight_exit3 PASS
+phase-24/test_staged_parity_index PASS
 phase-24/test_validate_op_characterization PASS
