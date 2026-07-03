@@ -44,13 +44,20 @@ def test_editable_install_and_imports(tmp_path):
     )
     assert proc.returncode == 0, f"package import failed: {proc.stderr}"
 
-    # D-04 module-invocation form works AND the stub fails loudly (exit 70).
+    # D-04 module-invocation form works. Pre-MIG-02 this asserted the stub
+    # sentinel (exit 70 + "not yet implemented"); compendium.lint is now the
+    # PORTED tool, so a bare run would lint the caller's cwd (and write the
+    # report/log side effects) -- probe the read-only --version contract
+    # instead: exit 0 + the LINT_VERSION semver on stdout.
     proc = subprocess.run(
-        [str(py), "-m", "compendium.lint"],
+        [str(py), "-m", "compendium.lint", "--version"],
         capture_output=True, text=True, check=False,
     )
-    assert proc.returncode == 70, (
-        f"stub sentinel: expected exit 70, got {proc.returncode}; "
+    assert proc.returncode == 0, (
+        f"module invocation: expected exit 0, got {proc.returncode}; "
         f"stderr: {proc.stderr}"
     )
-    assert "not yet implemented" in proc.stderr, f"stub stderr: {proc.stderr}"
+    import re
+    assert re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", proc.stdout.strip()), (
+        f"--version stdout not a semver: {proc.stdout!r}"
+    )

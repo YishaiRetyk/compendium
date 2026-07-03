@@ -22,3 +22,5 @@ requirements-sync
 pdf-extract
 repo-snapshot
 init-wizard
+lint
+audit-claims

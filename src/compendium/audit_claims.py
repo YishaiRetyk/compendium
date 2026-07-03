@@ -1,16 +1,1265 @@
-# src/compendium/audit_claims.py  (STUB — Phase 24; filled in Phase 25 MIG-02)
-import sys
+"""bin/audit-claims.sh port (Phase 25 MIG-02) -- Claim Faithfulness Audit.
 
-NOT_IMPLEMENTED_EXIT = 70  # EX_SOFTWARE sentinel — distinct from every real tool code (0/1/2/3)
+Byte-parity port of the frozen bash implementation (AUDIT_VERSION 0.1.0):
+the bash arg-parse becomes main(); the monolithic python3 heredoc becomes
+_run_audit() with its logic lifted VERBATIM (indentation aside). The wiki-page
+primitives previously "COPIED FROM bin/lint.sh" (parse_frontmatter,
+parse_frontmatter_str, PROV_RE, EPISTEMIC_INLINE_RE, WIKILINK_RE,
+EXCLUDE_FILES/EXCLUDE_DIRS, _FENCE_OPEN_RE) are now IMPORTED from
+compendium.common.page -- this port retires the lint<->audit byte-copy.
+The privacy resolvers come from compendium.common.privacy (the verbatim lift
+of bin/lib/privacy_resolve.py), replacing the AUDIT_LIB_DIR sys.path insert.
+
+_fence_mask_lines stays HERE: it is an intentionally distinct API from
+common.page._mask_fences (returns (lines, fenced-flags) for boundary-scanning
+resolvers, vs the length-preserving text mask) -- see
+docs/reference/common-api-inventory.md section 2.
+
+The page-walk + source-registry block is audit's own DIVERGENT variant of
+lint's walk (two-tier wiki-cloud/ + wiki-local/ universe; registry values are
+{'fm': sfm, 'summary_rel_path': rel} rather than bare fm dicts) and is kept
+separate from compendium.lint by design.
+
+Verifier contract (REVIEW HIGH-1 / T-13-09): the payload goes to the verifier
+on STDIN ONLY via shlex.split(cmd) + shell=False -- never interpolated into
+argv, never through a shell.
+"""
+import json
+import os
+import re
+import shlex
+import subprocess
+import sys
+from datetime import date
+
+import yaml
+
+from compendium.common.page import (
+    _FENCE_OPEN_RE,
+    EPISTEMIC_INLINE_RE,
+    EXCLUDE_DIRS,
+    EXCLUDE_FILES,
+    PROV_RE,
+    WIKILINK_RE,
+    parse_frontmatter,
+    parse_frontmatter_str,
+)
+from compendium.common.privacy import (
+    resolve_effective_claim_privacy,
+    resolve_source_privacy,
+)
+# lint-owned constant inventoried among the copied symbols the heredoc carried;
+# imported (not re-declared) so the single copy stays in compendium.lint.
+from compendium.lint import SOURCE_EXTRA_FIELDS
+
+AUDIT_VERSION = "0.1.0"
+
+USAGE = """\
+Usage: bin/audit-claims.sh [options]
+
+Claim Faithfulness Audit -- deterministic core (Plan 13-02).
+
+Options:
+  --since <ref>          Recency base ref (default: last_audit_commit from
+                         audit-state.md; fallback: wiki-wide selection).
+  --sample N             Max claims to audit after priority-rank (default 20).
+  --select <csv>         Subset of selectors: stale,epistemic,recency,fanout,
+                         derived-report (default: all five). Unknown names
+                         are an error, not silently ignored.
+  --format json|report   Output format (default: report).
+  --emit-worklist        Emit the resolved {claim,passage,...} worklist as JSON
+                         to stdout (no verdict). local_only passages are withheld
+                         absent --allow-local (interim privacy guard).
+  --apply-verdicts <f>   Read a verdicts JSON back and merge into findings
+                         (Plan 03 consumes; parse-and-merge stub here).
+  --verifier <cmd>       Verifier command (CLOUD/egress by default). Verdict
+                         dispatch lands in Plan 03.
+  --allow-local          Opt-in: admit local_only passages to passage-bearing
+                         output. Required for any local-only egress.
+  --local-verifier <cmd> Sugar: same as that command plus the allow opt-in flag.
+  --version              Print AUDIT_VERSION and exit.
+  --help, -h             Show this help.
+"""
+
+
+# ----------------------------------------------------------------------------
+# resolve_locator (FAITH-02 deterministic crux, D-11).
+# Reads the RAW source file at the source page's path:, NEVER the summary's
+# ## Extracted Claims. Returns (passage_text | None, verdict_override | None).
+#   - passage_text is the resolved slice (str) on success.
+#   - verdict_override is set for the operational degrades:
+#       'insufficient-locator' (no passage extractable / bad locator / missing raw)
+#       'skipped-nontext'      (#img)
+# ----------------------------------------------------------------------------
+ATX_RE = re.compile(r'^(#{1,6})\s+(.*?)\s*#*\s*$')
+
+
+def _slugify(text):
+    """lowercase, trim, collapse internal whitespace to '-', strip non [a-z0-9-]."""
+    t = text.strip().lower()
+    t = re.sub(r'\s+', '-', t)
+    t = re.sub(r'[^a-z0-9-]', '', t)
+    return t
+
+
+def _strip_frontmatter(raw_text):
+    """Return the body of a raw source, skipping a leading ---...--- YAML fence."""
+    if raw_text.startswith('---'):
+        try:
+            end = raw_text.index('\n---', 3)
+            # advance past the closing fence line
+            nl = raw_text.find('\n', end + 1)
+            if nl != -1:
+                return raw_text[nl + 1:]
+            return raw_text[end + 4:]
+        except ValueError:
+            return raw_text
+    return raw_text
+
+
+
+def _fence_mask_lines(text):
+    """Shared fence tracker for every boundary-scanning resolver (Phase 22
+    review: _resolve_sec/_resolve_ref/_resolve_path/_resolve_commit each need
+    it — quoted markdown inside fenced blocks must never read as a heading or
+    section boundary, or a claim gets verified against text the source merely
+    QUOTES). Returns (lines, fenced) where fenced[i] is True when lines[i] is
+    a fence delimiter or inside a fenced block. CommonMark rules matching
+    bin/lint.sh's _mask_fences: opener = column-0 run of >=3 backticks or
+    tildes (info string allowed); closes ONLY on a same-char run of at least
+    opener length followed by nothing but spaces/tabs (an info-string
+    "closer" does not close; nested shorter fences do not close a longer
+    opener); an unclosed fence extends to EOF."""
+    lines = text.splitlines()
+    fenced = [False] * len(lines)
+    fence_char = None
+    fence_len = 0
+    for i, line in enumerate(lines):
+        if fence_char is None:
+            m = _FENCE_OPEN_RE.match(line)
+            if m:
+                fence_char = m.group(1)[0]
+                fence_len = len(m.group(1))
+                fenced[i] = True
+        else:
+            fenced[i] = True
+            stripped = line.rstrip(' \t')
+            if stripped and set(stripped) == {fence_char} and len(stripped) >= fence_len:
+                fence_char = None
+                fence_len = 0
+    return lines, fenced
+
+
+def _resolve_sec(raw_text, name):
+    """Resolve a #sec:<name> locator against the raw source's ATX headings.
+    Exact slug match is preferred; fallback is a contiguous hyphen-token
+    subsequence match (a short authored slug matches a longer heading slug
+    that contains its tokens in order, e.g. a two-token name against a
+    heading slug carrying extra prefix/suffix tokens). First match in
+    document order wins within each tier. Headings inside fenced code blocks
+    are ignored for both matching and slice-end detection (fence-aware)."""
+    target = _slugify(name)
+    target_tokens = [t for t in target.split('-') if t]
+    lines, fenced = _fence_mask_lines(raw_text)
+    start = None
+    start_level = None
+    fallback = None
+    fallback_level = None
+    for i, line in enumerate(lines):
+        if fenced[i]:
+            continue
+        m = ATX_RE.match(line)
+        if not m:
+            continue
+        slug = _slugify(m.group(2))
+        if slug == target:
+            start = i
+            start_level = len(m.group(1))
+            break
+        if fallback is None and target_tokens:
+            heading_tokens = [t for t in slug.split('-') if t]
+            n = len(target_tokens)
+            if any(heading_tokens[j:j + n] == target_tokens
+                   for j in range(len(heading_tokens) - n + 1)):
+                fallback = i
+                fallback_level = len(m.group(1))
+    if start is None:
+        start, start_level = fallback, fallback_level
+    if start is None:
+        return None
+    # slice to the line before the next NON-FENCED heading of same-or-higher level
+    end = len(lines)
+    for j in range(start + 1, len(lines)):
+        if fenced[j]:
+            continue
+        m = ATX_RE.match(lines[j])
+        if m and len(m.group(1)) <= start_level:
+            end = j
+            break
+    return '\n'.join(lines[start:end]).strip() or None
+
+
+def _resolve_para(raw_text, n):
+    """n-th (1-indexed) blank-line-delimited paragraph of the BODY only.
+    ATX headings are skipped (not paragraphs). Fenced code blocks count as ONE
+    paragraph (internal blank lines do not split). List blocks count as one."""
+    body = _strip_frontmatter(raw_text)
+    lines = body.splitlines()
+    paras = []
+    cur = []
+    in_fence = False
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith('```'):
+            in_fence = not in_fence
+            cur.append(line)
+            continue
+        if in_fence:
+            cur.append(line)
+            continue
+        if stripped == '':
+            if cur:
+                paras.append(cur)
+                cur = []
+            continue
+        if ATX_RE.match(line):
+            # heading terminates the current paragraph and is itself skipped
+            if cur:
+                paras.append(cur)
+                cur = []
+            continue
+        cur.append(line)
+    if cur:
+        paras.append(cur)
+    if n < 1 or n > len(paras):
+        return None
+    return '\n'.join(paras[n - 1]).strip() or None
+
+
+TS_RE = re.compile(r'^\s*\[?(\d{1,2}:\d{2}(?::\d{2})?)\]?')
+
+
+def _ts_to_secs(ts):
+    parts = [int(p) for p in ts.split(':')]
+    if len(parts) == 3:
+        h, m, s = parts
+    else:
+        h, m, s = 0, parts[0], parts[1]
+    return h * 3600 + m * 60 + s
+
+
+def _resolve_t(raw_text, start, end):
+    lines = raw_text.splitlines()
+    any_ts = False
+    s0 = _ts_to_secs(start)
+    e0 = _ts_to_secs(end)
+    out = []
+    for line in lines:
+        m = TS_RE.match(line)
+        if m:
+            any_ts = True
+            secs = _ts_to_secs(m.group(1))
+            if s0 <= secs <= e0:
+                out.append(line)
+    if not any_ts:
+        return None  # no recognizable timestamps -> unbounded -> insufficient-locator
+    return '\n'.join(out).strip() or None
+
+
+PAGE_MARK_RE = re.compile(r'<!--\s*page:\s*(\d+)\s*-->')
+
+
+def _resolve_page(raw_text, lo, hi):
+    """D-05 <!-- page: N --> slice. #p8 -> page:8 .. before page:9 (exclusive
+    upper). #p12-14 -> page:12 .. page:15 (exclusive). Missing lower marker OR
+    no markers at all -> None -> insufficient-locator. Missing upper -> EOF."""
+    lines = raw_text.splitlines()
+    marks = {}  # page number -> line index of its marker
+    for i, line in enumerate(lines):
+        m = PAGE_MARK_RE.search(line)
+        if m:
+            marks[int(m.group(1))] = i
+    if not marks:
+        return None
+    if lo not in marks:
+        return None  # lower marker absent -> NEVER feed the whole document
+    start = marks[lo]
+    upper_page = hi + 1
+    end = marks.get(upper_page, len(lines))
+    return '\n'.join(lines[start:end]).strip() or None
+
+
+def _resolve_ref(text, n):
+    """Return the Nth bullet in the first bibliography-style section in
+    DOCUMENT order (whichever of ## Source Citations / Sources by Topic /
+    Sources / References appears first in the text wins — the header list is
+    an alternation, not a priority order). Positional numbering is sequential
+    across topic sub-groups. Wrapped bullets include their indented
+    continuation lines. Returns None if not found or N out of range.
+    Fence-aware: a quoted '## References' heading inside a fenced excerpt
+    must neither anchor the section nor terminate it, and quoted bullets
+    inside fences do not count (Phase 22 review)."""
+    header_re = re.compile(
+        r'^##\s+(Source Citations|Sources by Topic|Sources|References)\s*$',
+        re.IGNORECASE
+    )
+    lines, fenced = _fence_mask_lines(text)
+    start = None
+    for i, line in enumerate(lines):
+        if not fenced[i] and header_re.match(line):
+            start = i
+            break
+    if start is None:
+        return None
+    end = len(lines)
+    for j in range(start + 1, len(lines)):
+        if not fenced[j] and lines[j].startswith('## '):
+            end = j
+            break
+    bullets = []
+    open_bullet = False
+    for k in range(start + 1, end):
+        line = lines[k]
+        if fenced[k]:
+            open_bullet = False
+            continue
+        if line.startswith('- '):
+            bullets.append(line[2:].strip())
+            open_bullet = True
+        elif open_bullet and line[:1] in (' ', '\t') and line.strip():
+            bullets[-1] += ' ' + line.strip()
+        else:
+            open_bullet = False
+    if not bullets or n < 1 or n > len(bullets):
+        return None
+    return bullets[n - 1]
+
+
+def _resolve_path(text, spec):
+    """Resolve a repository #path: locator against the snapshot's ## Excerpts
+    registry (repository-ingestion.md). `spec` is '<file>', '<file>:L<n>', or
+    '<file>:L<n>-L<m>'. An excerpt heading is '### <file>' (whole-file excerpt,
+    matches any request for that path) or '### <file>:L<a>-L<b>' (matches a
+    path-only request, or a range request contained in [a, b]). Passage = the
+    heading plus its content up to the next heading. None -> insufficient-locator.
+
+    FENCE-AWARE via the shared _fence_mask_lines helper: excerpt bodies quote
+    file content in fenced blocks, and quoted markdown routinely contains
+    '## '/'### ' lines — those must not read as section/entry boundaries
+    (found live on the first real repository ingest: a CHANGELOG excerpt
+    quoting a heading orphaned every excerpt after it). The registry anchors
+    at the LAST non-fenced '## Excerpts' heading (a README that itself
+    contains an '## Excerpts' heading cannot hijack the real registry, which
+    the snapshot convention places last). Containment rules (Phase 22
+    review): a whole-file entry (no declared range) matches PATH-ONLY
+    requests, never range requests; a single-line entry ':L<n>' is valid
+    heading grammar; an inverted request range never resolves."""
+    m_spec = re.fullmatch(r'(.+?)(?::L(\d+)(?:-L(\d+))?)?', spec.strip())
+    if not m_spec or not m_spec.group(1):
+        return None
+    want_path = m_spec.group(1)
+    want_lo = int(m_spec.group(2)) if m_spec.group(2) else None
+    want_hi = int(m_spec.group(3)) if m_spec.group(3) else want_lo
+    if want_lo is not None and want_lo > want_hi:
+        return None
+    lines, fenced = _fence_mask_lines(text)
+    excerpts_re = re.compile(r'^##\s+Excerpts\s*$', re.IGNORECASE)
+    section_start = None
+    for i, line in enumerate(lines):
+        if not fenced[i] and excerpts_re.match(line):
+            section_start = i  # keep scanning: LAST wins
+    if section_start is None:
+        return None
+    entry_re = re.compile(r'^###\s+(.+?)(?::L(\d+)(?:-L(\d+))?)?\s*$')
+    entries = []          # (line_idx, path, lo|None, hi|None)
+    section_end = len(lines)
+    for i in range(section_start + 1, len(lines)):
+        if fenced[i]:
+            continue
+        if re.match(r'^##\s', lines[i]):
+            section_end = i
+            break
+        m = entry_re.match(lines[i])
+        if m:
+            e_lo = int(m.group(2)) if m.group(2) else None
+            e_hi = int(m.group(3)) if m.group(3) else e_lo
+            entries.append((i, m.group(1).strip(), e_lo, e_hi))
+    for j, (idx, path, e_lo, e_hi) in enumerate(entries):
+        if path != want_path:
+            continue
+        if want_lo is not None:
+            # range request: only a ranged entry that CONTAINS it satisfies
+            # (a whole-file entry has no declared range to verify against)
+            if e_lo is None or not (e_lo <= want_lo and want_hi <= e_hi):
+                continue
+        end = entries[j + 1][0] if j + 1 < len(entries) else section_end
+        return '\n'.join(lines[idx:end]).strip()
+    return None
+
+
+def _resolve_commit(text, sha):
+    """Resolve a repository #commit: locator: valid ONLY for the snapshot's own
+    commit — the 40-hex SHA on the '- Commit:' line of the ## Snapshot
+    Metadata section (>=7-hex prefix match). Any other SHA — including other
+    40-hex strings that happen to appear in the metadata (a parent commit, an
+    upstream tag) — returns None: the snapshot documents exactly one commit
+    (Phase 22 review). Fence-aware section slicing via _fence_mask_lines.
+    Passage = the metadata section."""
+    sha = sha.strip().lower()
+    if not re.fullmatch(r'[0-9a-f]{7,40}', sha):
+        return None
+    lines, fenced = _fence_mask_lines(text)
+    header_re = re.compile(r'^##\s+Snapshot Metadata\s*$', re.IGNORECASE)
+    start = None
+    for i, line in enumerate(lines):
+        if not fenced[i] and header_re.match(line):
+            start = i
+            break
+    if start is None:
+        return None
+    end = len(lines)
+    for j in range(start + 1, len(lines)):
+        if not fenced[j] and lines[j].startswith('## '):
+            end = j
+            break
+    section = '\n'.join(lines[start:end]).strip()
+    commit_line_re = re.compile(r'^\s*-\s*Commit:\s*([0-9a-f]{40})\b', re.IGNORECASE)
+    for k in range(start + 1, end):
+        if fenced[k]:
+            continue
+        m = commit_line_re.match(lines[k])
+        if m and m.group(1).lower().startswith(sha):
+            return section
+    return None
+
+
+def resolve_locator(raw_source_text, locator):
+    """Return (passage | None, verdict_override | None).
+
+    PROV_RE captures the locator WITHOUT its leading '#' (e.g. 'sec:introduction',
+    'p8', 'img2'); normalize to the canonical '#'-prefixed form so callers may
+    pass either shape. Defensively strip a trailing backslash (table-cell
+    \\|...\\| escape residue) in case a caller passes an un-normalized locator."""
+    loc = locator.strip().rstrip('\\')
+    if not loc.startswith('#'):
+        loc = '#' + loc
+    try:
+        if loc.startswith('#img'):
+            return None, 'skipped-nontext'
+        if loc.startswith('#sec:'):
+            name = loc[len('#sec:'):]
+            return _resolve_sec(raw_source_text, name), None
+        # #path: MUST be dispatched before #para/#p — it shares the '#p' prefix
+        # and would otherwise be swallowed by the page-range branch (D-11).
+        if loc.startswith('#path:'):
+            return _resolve_path(raw_source_text, loc[len('#path:'):]), None
+        if loc.startswith('#commit:'):
+            return _resolve_commit(raw_source_text, loc[len('#commit:'):]), None
+        if loc.startswith('#para'):
+            num = loc[len('#para'):]
+            if not num.isdigit():
+                return None, None
+            return _resolve_para(raw_source_text, int(num)), None
+        if loc.startswith('#t'):
+            rng = loc[len('#t'):]
+            if '-' in rng:
+                a, b = rng.split('-', 1)
+            else:
+                a = b = rng
+            if not a or not b:
+                return None, None
+            return _resolve_t(raw_source_text, a, b), None
+        if loc.startswith('#p'):
+            rng = loc[len('#p'):]
+            if '-' in rng:
+                a, b = rng.split('-', 1)
+            else:
+                a = b = rng
+            if not a.isdigit() or not b.isdigit():
+                return None, None
+            return _resolve_page(raw_source_text, int(a), int(b)), None
+        if loc.startswith('#r') and loc[2:].isdigit():
+            n = int(loc[2:])
+            return _resolve_ref(raw_source_text, n), None
+    except Exception:
+        return None, None
+    # unknown / malformed locator
+    return None, None
+
+# ----------------------------------------------------------------------------
+# Resolve + build findings (9-key dict, D-14). Severity map:
+#   contradicts -> warning; weak/insufficient/insufficient-locator/
+#   skipped-privacy/skipped-nontext -> info; supports -> info. NEVER error.
+# Deterministic-core stub: a resolved claim has verdict `insufficient` with
+# rationale "verifier not run" (Plan 03 OVERWRITES with the real dispatch).
+# ----------------------------------------------------------------------------
+def severity_for(verdict):
+    if verdict == 'contradicts':
+        return 'warning'
+    return 'info'
+
+VALID_VERDICTS = ('supports', 'weak', 'contradicts', 'insufficient',
+                  'insufficient-locator', 'skipped-privacy', 'skipped-nontext')
+
+# ----------------------------------------------------------------------------
+# Verifier dispatch (THE sole egress, D-01). Invoked per worklist entry via
+# shlex.split(cmd) + shell=False (REVIEW MEDIUM): a command WITH args parses,
+# and NO shell ever runs. The payload {claim,passage,support_type} is passed on
+# STDIN ONLY via input= -- NEVER interpolated into argv (command-injection
+# mitigation, T-13-09). stdout is parsed DEFENSIVELY: a JSONDecodeError or a
+# missing/out-of-enum `verdict` yields an `insufficient` finding, never a crash,
+# never eval (T-13-10).
+# ----------------------------------------------------------------------------
+def run_verifier(verifier_cmd, claim_text, passage, support_type, repo_root):
+    """Return (verdict, rationale). Defensive: malformed -> ('insufficient', ...)."""
+    payload = json.dumps({
+        'claim': claim_text,
+        'passage': passage,
+        'support_type': support_type,
+    })
+    try:
+        proc = subprocess.run(
+            shlex.split(verifier_cmd),
+            input=payload, text=True, capture_output=True, shell=False,
+            cwd=repo_root,
+        )
+    except (OSError, ValueError) as exc:
+        return 'insufficient', f'verifier could not be invoked: {exc}'
+    out = proc.stdout or ''
+    try:
+        parsed = json.loads(out)
+    except (json.JSONDecodeError, ValueError):
+        return 'insufficient', 'verifier returned unparseable output'
+    if not isinstance(parsed, dict) or 'verdict' not in parsed:
+        return 'insufficient', 'verifier returned unparseable output'
+    verdict = parsed.get('verdict')
+    if verdict not in VALID_VERDICTS:
+        return 'insufficient', f'verifier returned out-of-enum verdict: {verdict!r}'
+    rationale = parsed.get('rationale') or ''
+    return verdict, rationale
+
+
+def _run_audit(repo_root, sample, select, fmt, since, emit_worklist,
+               apply_verdicts, allow_local, verifier):
+    """The bin/audit-claims.sh python3 heredoc, verbatim (env-var reads
+    replaced by parameters). Exits via sys.exit() exactly as the heredoc does;
+    main() converts SystemExit into the process exit code."""
+    REPO_ROOT = os.path.abspath(repo_root)
+    WIKI_DIR = os.path.join(REPO_ROOT, 'wiki-cloud')
+    LOCAL_MAINT = os.path.join(REPO_ROOT, 'wiki-local', 'maintenance')
+    SAMPLE = int(sample or '20')
+    SELECT = [s.strip() for s in select.split(',') if s.strip()]
+    FORMAT = fmt
+    SINCE = since or ''
+    EMIT_WORKLIST = emit_worklist
+    APPLY_VERDICTS = apply_verdicts or ''
+    ALLOW_LOCAL = allow_local
+    # AUDIT_VERIFIER is parsed/stored; ALL verifiers are cloud/egress unless
+    # --allow-local is explicitly set -- never infer locality.
+    VERIFIER = verifier or ''
+
+    # ----------------------------------------------------------------------------
+    # Page walk + source registry build (COPIED from lint.sh page walk classifier).
+    # ----------------------------------------------------------------------------
+    all_pages = []      # (path, fm, body, error)
+    source_pages = []   # (path, fm, body)
+
+    # Walk both wiki-cloud/ and wiki-local/ (two-tier page universe, Phase 15 §13 structural model)
+    for tier_dir in [WIKI_DIR, os.path.join(REPO_ROOT, 'wiki-local')]:
+        if not os.path.isdir(tier_dir):
+            continue
+        for root, dirs, files in os.walk(tier_dir):
+            rel_root = os.path.relpath(root, tier_dir)
+            if rel_root.split(os.sep)[0] in EXCLUDE_DIRS:
+                continue
+            for fname in sorted(files):
+                if not fname.endswith('.md'):
+                    continue
+                if fname in EXCLUDE_FILES:
+                    continue
+                fpath = os.path.join(root, fname)
+                fm, body, err = parse_frontmatter(fpath)
+                # example: true suppresses all checks (lint NEUT-04 parity).
+                if isinstance(fm, dict) and fm.get('example') is True:
+                    continue
+                all_pages.append((fpath, fm, body, err))
+                if fm and fm.get('type') == 'source':
+                    source_pages.append((fpath, fm, body))
+
+    # source_registry: source_id -> {'fm': sfm, 'summary_rel_path': rel}
+    # Stores summary page repo-relative path so FAITH-04 can key off source tier (review HIGH #2/#3).
+    source_registry = {}
+    source_summary_path = {}  # source_id -> summary repo-relative path
+    for sp, sfm, sbody in source_pages:
+        if sfm and 'id' in sfm:
+            rel = os.path.relpath(sp, REPO_ROOT)
+            source_registry[sfm['id']] = {'fm': sfm, 'summary_rel_path': rel}
+            source_summary_path[sfm['id']] = rel
+
+
+    # ----------------------------------------------------------------------------
+    # Privacy chokepoint (REVIEW HIGH-A / HIGH-1 / HIGH-2 / HIGH-C, D-02).
+    # The full §13 three-level precedence + the strictest-wins effective-claim
+    # resolver live in bin/lib/privacy_resolve.py (imported above as
+    # resolve_source_privacy / resolve_effective_claim_privacy). The audit partition
+    # gates on resolve_effective_claim_privacy -- the strictest of {claim-page
+    # privacy, source-summary privacy, raw-source privacy, enclosing-dir, default}
+    # -- NOT source privacy alone. There is exactly ONE partition point upstream of
+    # BOTH the verdict dispatch AND --emit-worklist; local_only-effective claims are
+    # WITHHELD (-> skipped-privacy) unless AUDIT_ALLOW_LOCAL=1. Verifier locality is
+    # a FLAG (AUDIT_ALLOW_LOCAL), never inferred from the verifier command string.
+    # ----------------------------------------------------------------------------
+
+
+    def read_raw_source(source_id):
+        """Resolve source_id -> raw file at path:. Returns (raw_text|None, reason).
+        Guards path traversal (T-13-04): a `..`-escaping path is rejected, never opened."""
+        entry = source_registry.get(source_id)
+        if not entry:
+            return None, 'no-registry'
+        sfm = entry['fm'] if isinstance(entry, dict) else entry  # compat
+        if not sfm or 'path' not in sfm:
+            return None, 'no-registry'
+        rel = sfm['path']
+        candidate = os.path.normpath(os.path.join(REPO_ROOT, rel))
+        # path traversal guard: candidate MUST stay under REPO_ROOT
+        if not (candidate == REPO_ROOT or candidate.startswith(REPO_ROOT + os.sep)):
+            return None, 'path-escape'
+        try:
+            return open(candidate, encoding='utf-8').read(), None
+        except FileNotFoundError:
+            return None, 'missing-raw'
+        except OSError:
+            return None, 'missing-raw'
+
+
+    # ----------------------------------------------------------------------------
+    # FAITH-01 selectors. Each yields a set of (page_path, line_no, source_id, locator)
+    # claim tuples. A "claim" = a body line containing >=1 [prov:] marker (§6).
+    # ----------------------------------------------------------------------------
+    def claim_tuples_for_page(fpath, body):
+        """Yield (rel_path, line_no, source_id, locator, support_type, line_text)
+        for each [prov:] on each body line. Multiple markers on one line ->
+        multiple tuples, each carrying ITS OWN support_type (group 3), not the
+        first marker's. Locator and support_type are normalized at extraction so
+        every consumer (findings, worklist, --apply-verdicts join key) sees the
+        clean form: table-cell \\|...\\| escapes inject a trailing backslash into
+        groups 2 and 3, which is stripped here."""
+        rel = os.path.relpath(fpath, REPO_ROOT)
+        out = []
+        if not body:
+            return out
+        # body offset: frontmatter consumed by parse_frontmatter, so line numbers
+        # here are body-relative; that is sufficient and deterministic for findings.
+        for idx, line in enumerate(body.splitlines(), start=1):
+            for m in PROV_RE.finditer(line):
+                sid = m.group(1)
+                loc = m.group(2).rstrip('\\')
+                stype = (m.group(3) or '').rstrip('\\')
+                # canonicalize locator to the '#'-prefixed form (PROV_RE drops the #)
+                if not loc.startswith('#'):
+                    loc = '#' + loc
+                out.append((rel, idx, sid, loc, stype, line))
+        return out
+
+
+    def git_diff_changed_pages(base_ref):
+        """Copied git-diff subprocess shape (lint.sh strict_added_epistemic_claims).
+        Returns set of changed wiki-cloud/ + wiki-local/ file paths (repo-relative)."""
+        try:
+            result = subprocess.run(
+                ['git', 'diff', '--name-only', f'{base_ref}...HEAD', '--', 'wiki-cloud/', 'wiki-local/'],
+                cwd=REPO_ROOT, check=True, capture_output=True, text=True,
+            )
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            return set()
+        return set(p.strip() for p in result.stdout.splitlines() if p.strip())
+
+
+    # Build the universe of claim tuples once.
+    all_claims = []  # list of (rel, line, sid, loc, stype, line_text, fm)
+    for fpath, fm, body, err in all_pages:
+        if fm is None or body is None:
+            continue
+        if fm.get('type') == 'source':
+            continue  # source summaries are registry entries, not audited claims
+        for t in claim_tuples_for_page(fpath, body):
+            all_claims.append(t + (fm,))
+
+    # --- stale-source set (rank 1): claims whose source_id has hash drift. ---
+    drifted_sources = set()
+    for src_id, entry in source_registry.items():
+        sfm = entry['fm'] if isinstance(entry, dict) else entry
+        content_hash = sfm.get('content_hash', '')
+        compiled_hash = sfm.get('compiled_against_hash', '')
+        comp_status = sfm.get('compilation_status', '')
+        if content_hash and compiled_hash and content_hash != compiled_hash and comp_status != 'stale':
+            drifted_sources.add(src_id)
+
+    # --- recency set (rank 3): claims on git-diff-changed pages. ---
+    recency_pages = set()
+    base_ref = SINCE
+    if not base_ref:
+        # checkpoint lookup
+        state_path = os.path.join(LOCAL_MAINT, 'audit-state.md')
+        if os.path.exists(state_path):
+            sfm, _, _ = parse_frontmatter(state_path)
+            if isinstance(sfm, dict) and sfm.get('last_audit_commit'):
+                base_ref = str(sfm['last_audit_commit'])
+    if base_ref:
+        recency_pages = git_diff_changed_pages(base_ref)
+        first_run_wide = False
+    else:
+        # first-run / no-checkpoint fallback: wiki-wide SELECTION only -- bounded by
+        # --sample; NOT a full-vault audit (ROADMAP non-goal preserved).
+        first_run_wide = True
+
+    # --- high-fanout set (rank 4): claims on top-fanout pages. ---
+    resolution_map = {}
+    page_ids = set()
+    for fpath, fm, body, err in all_pages:
+        if fm is None:
+            continue
+        pid = fm.get('id', '')
+        if not pid:
+            continue
+        page_ids.add(pid)
+        variants = {pid.lower()}
+        if fm.get('title'):
+            variants.add(fm['title'].lower())
+        for alias in (fm.get('aliases') or []):
+            if alias:
+                variants.add(str(alias).lower())
+        for v in variants:
+            resolution_map.setdefault(v, set()).add(pid)
+
+    inbound_links = {pid: set() for pid in page_ids}
+    for fpath, fm, body, err in all_pages:
+        if fm is None or body is None:
+            continue
+        linker_id = fm.get('id', '')
+        for target in WIKILINK_RE.findall(body):
+            target_lower = target.strip().lower()
+            for rid in resolution_map.get(target_lower, set()):
+                if rid != linker_id:
+                    inbound_links.setdefault(rid, set()).add(linker_id)
+
+    # Determine high-fanout pages (>=2 inbound links is "high" for the selector).
+    FANOUT_THRESHOLD = 2
+    high_fanout_ids = {pid for pid, linkers in inbound_links.items()
+                       if len(linkers) >= FANOUT_THRESHOLD}
+    # map page id -> rel path
+    id_to_relpath = {}
+    for fpath, fm, body, err in all_pages:
+        if fm and fm.get('id'):
+            id_to_relpath[fm['id']] = os.path.relpath(fpath, REPO_ROOT)
+    high_fanout_paths = {id_to_relpath[pid] for pid in high_fanout_ids if pid in id_to_relpath}
+
+    # --- Classify each claim into selector buckets; assign best (lowest) rank. ---
+    RANK = {'stale': 1, 'epistemic': 2, 'recency': 3, 'fanout': 4, 'derived-report': 5}
+    selected = {}  # key (rel,line,sid,loc) -> (rank, tuple, selectors)
+
+    # Fail fast on unknown selector names: a typo would otherwise silently select
+    # zero claims and the run would complete "successfully" with nothing audited.
+    unknown_selectors = set(SELECT) - set(RANK)
+    if unknown_selectors:
+        print(f"ERROR: unknown selector(s): {', '.join(sorted(unknown_selectors))} "
+              f"(valid: {', '.join(sorted(RANK))})", file=sys.stderr)
+        sys.exit(1)
+
+
+    def selector_active(name):
+        return name in SELECT
+
+
+    for rel, line, sid, loc, stype, line_text, fm in all_claims:
+        key = (rel, line, sid, loc)
+        hits = []
+        if selector_active('stale') and sid in drifted_sources:
+            hits.append('stale')
+        if selector_active('epistemic') and EPISTEMIC_INLINE_RE.search(line_text):
+            ekind = EPISTEMIC_INLINE_RE.search(line_text).group(1)
+            if ekind in ('inferred', 'tentative'):
+                hits.append('epistemic')
+        if selector_active('recency'):
+            if first_run_wide or rel in recency_pages:
+                hits.append('recency')
+        if selector_active('fanout') and rel in high_fanout_paths:
+            hits.append('fanout')
+        if selector_active('derived-report'):
+            entry = source_registry.get(sid, {})
+            src_fm = entry.get('fm', {}) if isinstance(entry, dict) else {}
+            if src_fm.get('source_type') == 'research-report':
+                hits.append('derived-report')
+        if not hits:
+            continue
+        best_rank = min(RANK[h] for h in hits)
+        prev = selected.get(key)
+        if prev is None or best_rank < prev[0]:
+            selected[key] = (best_rank, (rel, line, sid, loc, stype, line_text, fm), hits)
+
+    # Priority-rank order: stale(1) -> epistemic(2) -> recency(3) -> fanout(4)
+    # -> derived-report(5), tie-break by (rel, line) for determinism.
+    ordered = sorted(
+        selected.values(),
+        key=lambda v: (v[0], v[1][0], v[1][1]),
+    )
+    total_selected = len(ordered)
+    capped = ordered[:SAMPLE]
+    skipped_count = total_selected - len(capped)
+
+
+
+
+    findings = []
+    worklist = []                 # the SINGLE partitioned worklist (cloud_safe-effective
+                                  # entries only, unless --allow-local). BOTH the verdict
+                                  # dispatch and --emit-worklist consume THIS object.
+    redacted_skip_count = 0       # REVIEW HIGH-C: count of withheld local_only-effective
+                                  # claims whose per-record metadata is redacted on stdout.
+
+
+
+    def add_finding(verdict, rel, line, sid, loc, message):
+        findings.append({
+            'severity': severity_for(verdict),
+            'category': 'faithfulness',
+            'path': rel,
+            'line': line,
+            'source_id': sid,
+            'locator': loc,
+            'verdict': verdict,
+            'message': message,
+            'rationale': message,
+        })
+
+
+    # no-silent-caps log line (D-09) -- emitted as an info finding.
+    findings.append({
+        'severity': 'info',
+        'category': 'faithfulness',
+        'path': 'wiki-local/maintenance/audit-report.md',
+        'line': 0,
+        'source_id': '',
+        'locator': '',
+        'verdict': 'insufficient',
+        'message': f'selected={len(capped)} skipped={skipped_count}',
+        'rationale': f'selected={len(capped)} skipped={skipped_count} (total pre-cap={total_selected}, sample={SAMPLE})',
+    })
+
+    # Locator-resolution health counters (hollow-audit tripwire). Deliberate skips
+    # (non-text, privacy) are excluded from the base: only claims that ATTEMPTED
+    # passage resolution count, so the ratio measures locator health, not policy.
+    locator_resolved_count = 0
+    locator_failed_count = 0
+
+    for rank, (rel, line, sid, loc, stype, line_text, fm), hits in capped:
+        raw_text, reason = read_raw_source(sid)
+        if raw_text is None:
+            # missing raw / path-escape / no registry entry -> insufficient-locator
+            locator_failed_count += 1
+            add_finding('insufficient-locator', rel, line, sid, loc,
+                        f'could not read raw source ({reason}) for {sid}{loc}')
+            continue
+        passage, override = resolve_locator(raw_text, loc)
+        if override == 'skipped-nontext':
+            add_finding('skipped-nontext', rel, line, sid, loc,
+                        f'non-text locator {loc} ({sid}) -- skipped')
+            continue
+        if passage is None:
+            locator_failed_count += 1
+            add_finding('insufficient-locator', rel, line, sid, loc,
+                        f'no passage extractable for {sid}{loc}')
+            continue
+        locator_resolved_count += 1
+
+        # --- THE single privacy chokepoint (FAITH-04 / Phase 15 structural predicate):
+        #     A claim is effective-local_only iff its page OR any contributing source-summary
+        #     lives under wiki-local/. The collapsed resolver keys off the SUMMARY PAGE PATH
+        #     (not the raw sources/ path -- raw sources/ is cloud-safe-only by structural rule).
+        #     Collapsed from the §13 three-level precedence ladder in Phase 15. ---
+        entry = source_registry.get(sid)
+        sfm = entry['fm'] if isinstance(entry, dict) and 'fm' in entry else entry
+        summary_path = source_summary_path.get(sid, '')
+        effective_priv = resolve_effective_claim_privacy(
+            fm, rel, sfm, None, summary_path)
+
+        # Locality is the AUDIT_ALLOW_LOCAL flag, never inferred from the command
+        # string. local_only-effective claims are admitted ONLY when --allow-local
+        # (or the --local-verifier sugar) set the flag.
+        if effective_priv == 'local_only' and not ALLOW_LOCAL:
+            # WITHHOLD claim text AND passage from the partitioned worklist (the one
+            # gate for BOTH egress surfaces). REVIEW HIGH-C: also redact the per-claim
+            # metadata (source_id/path/line/locator/rationale -- private slugs,
+            # T-13-21) from cloud-facing stdout. The full per-record detail lands ONLY
+            # in the local-control-plane audit-report.md (wiki-local/maintenance/) via add_finding below.
+            add_finding('skipped-privacy', rel, line, sid, loc,
+                        f'local_only-effective claim withheld (no --allow-local)')
+            redacted_skip_count += 1
+            continue
+
+        # Admitted (cloud_safe-effective, OR local_only with --allow-local). The
+        # worklist carries the passage + claim text (the egress surface). effective_priv
+        # is the structural claim privacy (wiki-local/ path-prefix predicate).
+        # support_type is THIS marker's third [prov:] field, carried through the
+        # claim tuple (normalized at extraction) — not re-extracted from the line,
+        # which would grab the FIRST marker's support_type on multi-marker lines.
+        support_type = stype
+        worklist.append({
+            'path': rel, 'line': line, 'source_id': sid, 'locator': loc,
+            'claim': line_text.strip(), 'passage': passage,
+            'support_type': support_type, 'privacy': effective_priv,
+        })
+
+        if VERIFIER:
+            # THE sole egress: dispatch the (already-partitioned) claim to the verifier.
+            verdict, rationale = run_verifier(VERIFIER, line_text.strip(), passage, support_type, REPO_ROOT)
+            add_finding(verdict, rel, line, sid, loc,
+                        rationale or f'verifier verdict: {verdict}')
+        else:
+            # Agent-in-the-loop default (D-01): no --verifier -> the worklist IS the
+            # output. The deterministic core emits no real verdict; carry the
+            # declared-enum `insufficient` placeholder so the finding stays in-enum.
+            add_finding('insufficient', rel, line, sid, loc, 'verifier not run')
+
+
+    # ----------------------------------------------------------------------------
+    # Hollow-audit tripwire. If most sampled claims could not have their cited
+    # passage located, the audit is silently checking almost nothing — the exact
+    # failure mode that once let a majority-unresolvable tier ship undetected.
+    # Review-only contract preserved: a prominent stderr WARNING plus a
+    # warning-severity finding; never an error, never a changed exit code.
+    # Floor: warn when under half of resolution ATTEMPTS succeed, with a minimum
+    # attempt count so tiny samples do not produce noise.
+    # ----------------------------------------------------------------------------
+    LOCATOR_RATIO_FLOOR = 0.5
+    LOCATOR_RATIO_MIN_ATTEMPTS = 5
+    locator_attempts = locator_resolved_count + locator_failed_count
+    if locator_attempts >= LOCATOR_RATIO_MIN_ATTEMPTS:
+        locator_ratio = locator_resolved_count / locator_attempts
+        if locator_ratio < LOCATOR_RATIO_FLOOR:
+            tripwire_msg = (
+                f'locator-resolution ratio {locator_resolved_count}/{locator_attempts} '
+                f'({locator_ratio:.0%}) is below the {LOCATOR_RATIO_FLOOR:.0%} floor — '
+                f'most sampled claims could not be matched to a source passage, so this '
+                f'audit run is largely hollow. Likely causes: locator/heading drift, '
+                f'renamed sections, or a resolver regression. Inspect the '
+                f'insufficient-locator findings before trusting this run.'
+            )
+            print('!' * 72, file=sys.stderr)
+            print(f'WARNING: {tripwire_msg}', file=sys.stderr)
+            print('!' * 72, file=sys.stderr)
+            findings.append({
+                'severity': 'warning',
+                'category': 'faithfulness',
+                'path': 'wiki-local/maintenance/audit-report.md',
+                'line': 0,
+                'source_id': '',
+                'locator': '',
+                'verdict': 'insufficient-locator',
+                'message': tripwire_msg,
+                'rationale': tripwire_msg,
+            })
+
+
+    # ----------------------------------------------------------------------------
+    # --apply-verdicts <file>: parse-and-merge stub (Plan 03 consumes fully).
+    # Match each verdict record to its finding on (path, line, source_id, locator).
+    # ----------------------------------------------------------------------------
+    if APPLY_VERDICTS:
+        try:
+            verdicts = json.loads(open(APPLY_VERDICTS, encoding='utf-8').read())
+        except Exception:
+            verdicts = []
+        vmap = {}
+        for v in (verdicts or []):
+            if not isinstance(v, dict):
+                continue
+            # REVIEW MEDIUM (T-13-20): validate strictly. Reject records whose verdict
+            # is outside the declared enum; key ONLY on (path,line,source_id,locator);
+            # IGNORE any `passage`/`claim` keys (never re-import passage/claim text
+            # from an external verdict file).
+            vv = v.get('verdict')
+            if vv not in VALID_VERDICTS:
+                continue
+            k = (v.get('path'), v.get('line'), v.get('source_id'), v.get('locator'))
+            vmap[k] = v
+        for f in findings:
+            k = (f['path'], f['line'], f['source_id'], f['locator'])
+            if k in vmap:
+                vv = vmap[k]
+                f['verdict'] = vv['verdict']
+                f['severity'] = severity_for(vv['verdict'])
+                if vv.get('rationale'):
+                    f['message'] = vv['rationale']
+                    f['rationale'] = vv['rationale']
+
+
+    # ----------------------------------------------------------------------------
+    # Emit: --emit-worklist (JSON, no verdict) | --format json | report.
+    # ----------------------------------------------------------------------------
+    def head_sha():
+        try:
+            r = subprocess.run(['git', 'rev-parse', '--short', 'HEAD'],
+                               cwd=REPO_ROOT, check=True, capture_output=True, text=True)
+            return r.stdout.strip()
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            return ''
+
+
+    def write_checkpoint():
+        """D-15: advances even on a no-finding run. Under wiki-local/maintenance/ (structural local-only)."""
+        maint = LOCAL_MAINT
+        os.makedirs(maint, exist_ok=True)
+        state_path = os.path.join(maint, 'audit-state.md')
+        created_at = str(date.today())
+        if os.path.exists(state_path):
+            try:
+                efm, _, _ = parse_frontmatter(state_path)
+                if isinstance(efm, dict) and efm.get('created_at'):
+                    created_at = str(efm['created_at'])
+            except Exception:
+                pass
+        today_str = str(date.today())
+        content = f"""---
+id: audit-state
+title: Audit State
+type: overview
+status: active
+summary: "Claim-faithfulness audit checkpoint (control-plane, not indexed)."
+created_at: {created_at}
+updated_at: {today_str}
+sources: []
+epistemic_status: sourced
+tags:
+  - meta
+  - maintenance
+domains: []
+supersedes:
+superseded_by:
+aliases:
+  - Audit State
+has_contradictions: false
+knowledge_domain: ""
+last_audit_commit: {head_sha()}
+last_audit_at: {today_str}
+last_sample_size: {SAMPLE}
+---
+
+# Audit State
+
+Checkpoint for `bin/audit-claims.sh`. Control-plane only; not listed in
+`wiki-cloud/index.md`. Advances on every run, including no-finding runs (D-15).
+"""
+        with open(state_path, 'w', encoding='utf-8') as f:
+            f.write(content)
+
+
+    def write_report():
+        """audit-report.md -- pattern-twin of lint-report.md, grouped by verdict.
+        Under wiki-local/maintenance/ (structural local-only, NOT cloud tier)."""
+        maint = LOCAL_MAINT
+        os.makedirs(maint, exist_ok=True)
+        report_path = os.path.join(maint, 'audit-report.md')
+        created_at = str(date.today())
+        if os.path.exists(report_path):
+            try:
+                efm, _, _ = parse_frontmatter(report_path)
+                if isinstance(efm, dict) and efm.get('created_at'):
+                    created_at = str(efm['created_at'])
+            except Exception:
+                pass
+        today_str = str(date.today())
+
+        from collections import OrderedDict
+        groups = OrderedDict()
+        for f in findings:
+            groups.setdefault(f['verdict'], []).append(f)
+
+        def fmt_group(verdict):
+            items = groups.get(verdict, [])
+            if not items:
+                return '(none)\n'
+            lines = []
+            for f in items:
+                loc = f"{f['source_id']}{f['locator']}" if f['source_id'] else '(meta)'
+                lines.append(f"- **{f['path']}**:{f['line']} | {loc} | {f['message']}")
+            return '\n'.join(lines) + '\n'
+
+        verdict_order = ['contradicts', 'weak', 'supports', 'insufficient',
+                         'insufficient-locator', 'skipped-privacy', 'skipped-nontext']
+        body_sections = []
+        for v in verdict_order:
+            body_sections.append(f"## {v} ({len(groups.get(v, []))})\n\n{fmt_group(v)}")
+        body = '\n'.join(body_sections)
+
+        content = f"""---
+id: audit-report
+title: Audit Report
+type: overview
+status: active
+summary: "Claim-faithfulness audit findings from most recent audit run."
+created_at: {created_at}
+updated_at: {today_str}
+sources: []
+epistemic_status: sourced
+tags:
+  - meta
+  - maintenance
+domains: []
+supersedes:
+superseded_by:
+aliases:
+  - Audit Report
+has_contradictions: false
+knowledge_domain: ""
+---
+
+# Audit Report
+
+**Sample size:** {SAMPLE}
+**Selected/Skipped:** {len(capped)}/{skipped_count} (total pre-cap {total_selected})
+
+{body}"""
+        with open(report_path, 'w', encoding='utf-8') as f:
+            f.write(content)
+
+
+    if EMIT_WORKLIST:
+        # Worklist is a passage-bearing EGRESS surface. The SINGLE chokepoint above
+        # already withheld local_only-effective claims (text AND passage) absent
+        # --allow-local. REVIEW HIGH-C: emit the cloud-facing stdout as the admitted
+        # entries PLUS a single aggregate REDACTED record for the withheld claims --
+        # carrying ONLY a bare count, NO per-record source_id/path/line/locator/
+        # rationale (private slugs, T-13-21). Full per-record detail lands ONLY in
+        # the privacy: local_only audit-report.md (write_report below). cloud_safe
+        # worklist entries are emitted in full and are unaffected.
+        emitted = list(worklist)
+        if redacted_skip_count > 0:
+            emitted.append({
+                'verdict': 'skipped-privacy',
+                'redacted': True,
+                'count': redacted_skip_count,
+            })
+        sys.stdout.write(json.dumps(emitted, indent=2) + '\n')
+        # Still advance the checkpoint + report so the run is auditable.
+        write_report()
+        write_checkpoint()
+    elif FORMAT == 'json':
+        sys.stdout.write(json.dumps(findings, indent=2) + '\n')
+        write_report()
+        write_checkpoint()
+    else:
+        write_report()
+        write_checkpoint()
+        print(f"Audit complete. Selected {len(capped)}, skipped {skipped_count}.", file=sys.stderr)
+        print("Report: wiki-local/maintenance/audit-report.md", file=sys.stderr)
+
+    sys.exit(0)
 
 
 def main(argv=None):
-    # Phase 24: not yet ported. The bin/ shim still runs its bash body;
-    # this stub exists only so the entry point resolves at install time.
-    # It exits NONZERO so an accidentally-activated unfinished module fails loudly
-    # (REVIEWS MEDIUM: a stub that exits 0 could mask a missed Phase-25 port).
-    print("compendium.audit_claims: not yet implemented (Phase 25)", file=sys.stderr)
-    return NOT_IMPLEMENTED_EXIT
+    """bin/audit-claims.sh argument parsing + dispatch, ported line-for-line."""
+    args = list(sys.argv[1:] if argv is None else argv)
+
+    since = ""
+    sample = "20"
+    select = "stale,epistemic,recency,fanout,derived-report"
+    fmt = "report"
+    emit_worklist = "0"
+    apply_verdicts = ""
+    audit_verifier = ""
+    audit_allow_local = "0"
+
+    i = 0
+    n = len(args)
+    while i < n:
+        arg = args[i]
+        if arg in ('--help', '-h'):
+            sys.stdout.write(USAGE)
+            return 0
+        elif arg == '--version':
+            print(AUDIT_VERSION)
+            return 0
+        elif arg == '--since':
+            if n - i < 2:
+                print("ERROR: --since requires a value", file=sys.stderr)
+                return 1
+            since = args[i + 1]
+            i += 2
+        elif arg == '--sample':
+            if n - i < 2:
+                print("ERROR: --sample requires a value", file=sys.stderr)
+                return 1
+            sample = args[i + 1]
+            i += 2
+        elif arg == '--select':
+            if n - i < 2:
+                print("ERROR: --select requires a value", file=sys.stderr)
+                return 1
+            select = args[i + 1]
+            i += 2
+        elif arg == '--format':
+            if n - i < 2:
+                print("ERROR: --format requires a value", file=sys.stderr)
+                return 1
+            if args[i + 1] in ('json', 'report'):
+                fmt = args[i + 1]
+            else:
+                print(f"ERROR: --format must be 'json' or 'report', got '{args[i + 1]}'", file=sys.stderr)
+                return 1
+            i += 2
+        elif arg == '--emit-worklist':
+            emit_worklist = "1"
+            i += 1
+        elif arg == '--apply-verdicts':
+            if n - i < 2:
+                print("ERROR: --apply-verdicts requires a value", file=sys.stderr)
+                return 1
+            apply_verdicts = args[i + 1]
+            i += 2
+        elif arg == '--verifier':
+            if n - i < 2:
+                print("ERROR: --verifier requires a value", file=sys.stderr)
+                return 1
+            # Every verifier command is CLOUD/egress by default; admission is
+            # the allow-local flag, never inferred from the command string.
+            audit_verifier = args[i + 1]
+            i += 2
+        elif arg == '--allow-local':
+            audit_allow_local = "1"
+            i += 1
+        elif arg == '--local-verifier':
+            if n - i < 2:
+                print("ERROR: --local-verifier requires a value", file=sys.stderr)
+                return 1
+            # Sugar that sets the verifier command AND the allow-local flag.
+            audit_verifier = args[i + 1]
+            audit_allow_local = "1"
+            i += 2
+        else:
+            print(f"ERROR: unknown option: {arg}", file=sys.stderr)
+            sys.stderr.write(USAGE)
+            return 1
+
+    repo_root = os.environ.get('AUDIT_REPO_ROOT') or os.getcwd()
+
+    try:
+        _run_audit(
+            repo_root=repo_root,
+            sample=sample,
+            select=select,
+            fmt=fmt,
+            since=since,
+            emit_worklist=(emit_worklist == "1"),
+            apply_verdicts=apply_verdicts,
+            allow_local=(audit_allow_local == "1"),
+            verifier=audit_verifier,
+        )
+    except SystemExit as exc:
+        code = exc.code
+        return code if isinstance(code, int) else (0 if code is None else 1)
+    return 0
 
 
 if __name__ == "__main__":          # enables `python3 -m compendium.audit_claims`
