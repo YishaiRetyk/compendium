@@ -1,0 +1,35 @@
+ERROR: --remote required
+Usage: bin/release.sh --remote <url> [--tag <tag>] [--apply|--dry-run]
+
+Options:
+  --remote URL   Target public remote (required)
+  --tag TAG      Tag to create (default: v1.1)
+  --dry-run      Default; print plan, no mutation
+  --apply        Execute after y/N confirmation
+  --help, -h     Show this help
+
+Env:
+  RELEASE_EMAIL  Email for the single release commit
+                 (default: release@example.invalid — reserved .invalid TLD
+                  per RFC 2606, unambiguously non-routable)
+
+Staging (REVIEWS.md HIGH #1):
+  A fresh temp dir (mktemp -d -t gsd-release-XXXXXX) is created OUTSIDE
+  the live repo; only paths in the ALLOWLIST are copied in; a fresh
+  `git init` + single commit produces the published history. The staged
+  dir is trap-cleaned on EXIT/INT/TERM/ERR. The live working tree is
+  never mutated.
+
+Pre-flight (inside the staged dir):
+  - bash bin/check-neutrality.sh  (hard-fail on denylist hits)
+  - bash bin/sync-claude.sh --check  (hard-fail on AGENTS.md/CLAUDE.md drift)
+  - Programmatic sweep for `privacy: local_only` markers (hard-fail)
+
+Publish (tag-only):
+  Pushes ONLY the immutable version tag; never main (which is a protected,
+  CI-gated PR branch). Each release is a self-contained single-commit orphan
+  snapshot reachable via its tag (git clone --branch <tag>). The single-commit
+  assertion is tag-scoped: `git rev-list --count <tag>` on the remote MUST
+  return 1 (TMPL-11 — REVIEWS.md HIGH #4).
+
+Exit: 0 ok/dry-run/abort, 1 missing args / bad flag, 2 pre-flight failed

@@ -12,7 +12,7 @@ source "$SCRIPT_DIR/lib.sh"
 
 FAIL=0
 
-NEUTRALITY="$REPO_ROOT/bin/check-neutrality.sh"
+NEUTRALITY="$REPO_ROOT/bin/check-neutrality.sh"   # noqa: direct-bin (source-read; inventoried, defer-to-MIG-03)
 test -f "$NEUTRALITY" || { echo "FAIL: bin/check-neutrality.sh missing" >&2; exit 1; }
 
 # (i) Static: dead frontmatter regex MUST be GONE from the leak-source function
@@ -80,7 +80,7 @@ This document contains xkdistinctivetermyz9987 which is a local personal term.
 EOF
 
 set +e
-out_b="$( "$REPO_ROOT/bin/check-neutrality.sh" --root "$repo" 2>&1 )"
+out_b="$( invoke_tool_compat check-neutrality --root "$repo" 2>&1 )"
 rc_b=$?
 set -e
 

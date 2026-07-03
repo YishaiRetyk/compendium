@@ -60,7 +60,7 @@ EOF
 
 # WITHOUT --allow-local: claim text, passage, AND metadata slugs withheld.
 set +e
-wl1="$(cd "$REPO" && AUDIT_REPO_ROOT="$REPO" bash "$REPO_ROOT/bin/audit-claims.sh" --emit-worklist --since "$SEED" --format json 2>/dev/null)"
+wl1="$(cd "$REPO" && AUDIT_REPO_ROOT="$REPO" invoke_tool_compat audit-claims --emit-worklist --since "$SEED" --format json 2>/dev/null)"
 rc=$?; set -e
 assert_exit_code 0 "$rc" "claim-page no-allow-local emit" || { echo "$wl1" >&2; exit 1; }
 
@@ -74,7 +74,7 @@ printf '%s' "$wl1" | python3 -c 'import json,sys; d=json.load(sys.stdin); assert
 
 # WITH --allow-local: marker + metadata appear.
 set +e
-wl2="$(cd "$REPO" && AUDIT_REPO_ROOT="$REPO" bash "$REPO_ROOT/bin/audit-claims.sh" --emit-worklist --allow-local --since "$SEED" --format json 2>/dev/null)"
+wl2="$(cd "$REPO" && AUDIT_REPO_ROOT="$REPO" invoke_tool_compat audit-claims --emit-worklist --allow-local --since "$SEED" --format json 2>/dev/null)"
 rc=$?; set -e
 assert_exit_code 0 "$rc" "claim-page allow-local emit" || { echo "$wl2" >&2; exit 1; }
 printf '%s' "$wl2" | grep -q 'CLAIMPAGE_PASSAGE_MARKER' || { echo "FAIL: --allow-local did not admit the wiki-local/ PAGE's claim" >&2; echo "$wl2" >&2; exit 1; }

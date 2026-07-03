@@ -48,7 +48,7 @@ grep -q 'epistemic:: inferred' wiki-cloud/concepts/attention.md \
     || { echo "FAIL: HEAD missing the inferred claim (fixture setup broken)" >&2; popd >/dev/null; exit 1; }
 
 # --strict should fail: the claim is PR-added and has no matching DR
-if bash "$REPO_ROOT/bin/lint.sh" --strict wiki-cloud/ > /tmp/strict-out 2> /tmp/strict-err; then
+if invoke_tool_compat lint --strict wiki-cloud/ > /tmp/strict-out 2> /tmp/strict-err; then
     echo "FAIL: --strict should fail on PR-added [inferred] without DR" >&2
     cat /tmp/strict-out /tmp/strict-err >&2
     popd >/dev/null; exit 1
@@ -119,7 +119,7 @@ PYEOF
 
 git add . && git -c commit.gpgsign=false commit -q -m "feature: add DR"
 
-bash "$REPO_ROOT/bin/lint.sh" --strict wiki-cloud/ >/dev/null 2>&1 \
+invoke_tool_compat lint --strict wiki-cloud/ >/dev/null 2>&1 \
     || { echo "FAIL: --strict should pass with matching DR" >&2; popd >/dev/null; exit 1; }
 
 popd >/dev/null
@@ -145,7 +145,7 @@ git add unrelated.md
 git -c commit.gpgsign=false commit -q -m "feature: unrelated change"
 
 # The pre-existing [inferred] claim should NOT cause --strict to fail.
-if ! bash "$REPO_ROOT/bin/lint.sh" --strict wiki-cloud/ >/dev/null 2>&1; then
+if ! invoke_tool_compat lint --strict wiki-cloud/ >/dev/null 2>&1; then
     echo "FAIL: --strict must NOT fail on pre-existing [inferred] debt (D-08 PR-diff scope)" >&2
     popd >/dev/null; exit 1
 fi
@@ -168,7 +168,7 @@ git update-ref -d refs/remotes/origin/main 2>/dev/null || true
 git update-ref -d refs/remotes/origin/HEAD 2>/dev/null || true
 
 # Run --strict; capture stderr
-bash "$REPO_ROOT/bin/lint.sh" --strict wiki-cloud/ > /tmp/fb-out 2> /tmp/fb-err || true
+invoke_tool_compat lint --strict wiki-cloud/ > /tmp/fb-out 2> /tmp/fb-err || true
 grep -q "WARN: no origin/main" /tmp/fb-err \
     || { echo "FAIL: missing 'WARN: no origin/main' stderr line" >&2; cat /tmp/fb-err >&2; popd >/dev/null; exit 1; }
 

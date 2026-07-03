@@ -65,7 +65,7 @@ EOF
 # Today this test is RED because the D-09 check does not exist yet -- lint either passes
 # (no error) or errors for a different reason.
 set +e
-LINT_OUT="$( cd "$repo" && WIKI_ROOT="wiki-cloud/" "$REPO_ROOT/bin/lint.sh" --ci --category linkres 2>&1 )"
+LINT_OUT="$( cd "$repo" && WIKI_ROOT="wiki-cloud/" invoke_tool_compat lint --ci --category linkres 2>&1 )"
 rc=$?
 set -e
 

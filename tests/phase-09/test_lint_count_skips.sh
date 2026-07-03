@@ -54,7 +54,7 @@ git add . && git -c commit.gpgsign=false commit -q -m "add 2nd page w/ markers"
 
 # Run --count-skips --format json → expect >= 3 skip-count findings
 # (1 from fixture's attention.md + 2 from new other.md)
-bash "$REPO_ROOT/bin/lint.sh" --count-skips --format json wiki-cloud/ > /tmp/skips.json 2> /tmp/skips.err || true
+invoke_tool_compat lint --count-skips --format json wiki-cloud/ > /tmp/skips.json 2> /tmp/skips.err || true
 
 COUNT="$(python3 -c 'import json; data=json.load(open("/tmp/skips.json")); print(sum(1 for i in data if i["category"]=="skip-count"))')"
 if [ "$COUNT" -lt 3 ]; then

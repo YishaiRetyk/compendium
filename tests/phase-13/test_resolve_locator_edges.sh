@@ -132,13 +132,13 @@ EOF
 (cd "$REPO" && git add -A && git -c commit.gpgsign=false commit -q -m fixture)
 
 set +e
-out="$(cd "$REPO" && AUDIT_REPO_ROOT="$REPO" bash "$REPO_ROOT/bin/audit-claims.sh" --emit-worklist --since "$SEED" --sample 50 --format json 2>/dev/null)"
+out="$(cd "$REPO" && AUDIT_REPO_ROOT="$REPO" invoke_tool_compat audit-claims --emit-worklist --since "$SEED" --sample 50 --format json 2>/dev/null)"
 rc=$?
 set -e
 assert_exit_code 0 "$rc" "edges worklist run" || { echo "$out" >&2; exit 1; }
 
 set +e
-findings="$(cd "$REPO" && AUDIT_REPO_ROOT="$REPO" bash "$REPO_ROOT/bin/audit-claims.sh" --since "$SEED" --sample 50 --format json 2>/dev/null)"
+findings="$(cd "$REPO" && AUDIT_REPO_ROOT="$REPO" invoke_tool_compat audit-claims --since "$SEED" --sample 50 --format json 2>/dev/null)"
 set -e
 
 # (a) slug tolerance resolved

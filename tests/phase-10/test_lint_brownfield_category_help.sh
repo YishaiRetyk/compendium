@@ -7,7 +7,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/lib.sh"
 
-out="$(bash "$REPO_ROOT/bin/lint.sh" --help 2>&1)"
+out="$(invoke_tool_compat lint --help 2>&1)"
 echo "$out" | grep -q 'brownfield' \
     || { echo "FAIL: --help output missing 'brownfield' category" >&2; echo "$out" >&2; exit 1; }
 

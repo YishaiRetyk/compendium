@@ -5,6 +5,7 @@
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+source "$REPO_ROOT/tests/lib/invoke_tool.sh"   # Phase 24 Plan 05: the frozen parity seam
 
 TMP="$(mktemp -d -t phase22-lint-XXXXXX)"
 trap 'rm -rf "$TMP"' EXIT
@@ -62,7 +63,7 @@ default_branch: main" > "$WIKI/sources/src-repo-badsha.md"
 
 src_page src-bogus floppy "" > "$WIKI/sources/src-bogus.md"
 
-bash "$REPO_ROOT/bin/lint.sh" --category yaml --format json "$WIKI" \
+invoke_tool_compat lint --category yaml --format json "$WIKI" \
     > "$TMP/out.json" 2>/dev/null || true
 
 python3 - "$TMP/out.json" <<'PYEOF'

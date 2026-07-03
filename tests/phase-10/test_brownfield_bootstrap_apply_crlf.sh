@@ -10,7 +10,7 @@ FIXTURE="crlf"
 tmp=$(make_fixture_repo "$FIXTURE")
 trap '[ -n "${tmp:-}" ] && [ -d "$tmp" ] && rm -rf "$tmp"' EXIT
 
-bash "$REPO_ROOT/bin/brownfield.sh" bootstrap --apply --root "$tmp/input" >/dev/null 2>&1
+invoke_tool_compat brownfield bootstrap --apply --root "$tmp/input" >/dev/null 2>&1
 
 assert_byte_equal \
     "$REPO_ROOT/tests/phase-10/fixtures/$FIXTURE/expected/page.md" \
@@ -30,7 +30,7 @@ fi
 
 # Idempotency
 snap_before=$(sha256sum "$tmp/input/page.md" | cut -d' ' -f1)
-bash "$REPO_ROOT/bin/brownfield.sh" bootstrap --apply --root "$tmp/input" >/dev/null 2>&1
+invoke_tool_compat brownfield bootstrap --apply --root "$tmp/input" >/dev/null 2>&1
 snap_after=$(sha256sum "$tmp/input/page.md" | cut -d' ' -f1)
 [ "$snap_before" = "$snap_after" ] \
     || { echo "FAIL: re-run mutated $FIXTURE — BRWN-03 violated" >&2; exit 1; }

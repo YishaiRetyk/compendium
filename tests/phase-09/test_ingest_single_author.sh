@@ -12,7 +12,7 @@ pushd "$FIXTURE" >/dev/null
 SRC_DIR="$(mktemp -d)"
 echo "# test source" > "$SRC_DIR/source.md"
 
-OUT="$(bash "$REPO_ROOT/bin/ingest.sh" "$SRC_DIR/source.md" 2>&1 || true)"
+OUT="$(invoke_tool_compat ingest "$SRC_DIR/source.md" 2>&1 || true)"
 
 # Must NOT contain contributor::
 if echo "$OUT" | grep -q "contributor::"; then

@@ -7,6 +7,7 @@
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+source "$REPO_ROOT/tests/lib/invoke_tool.sh"   # Phase 24 Plan 05: the frozen parity seam
 
 TMP="$(mktemp -d -t lint-linkres-XXXXXX)"
 trap 'rm -rf "$TMP"' EXIT
@@ -303,7 +304,7 @@ sys.stdout.write(fm_block)
 # ---------------------------------------------------------------------------
 # Capture PRE-FIX JSON (run before any --fix)
 # ---------------------------------------------------------------------------
-bash "$REPO_ROOT/bin/lint.sh" --category linkres --format json "$WIKI" \
+invoke_tool_compat lint --category linkres --format json "$WIKI" \
     > "$TMP/pre-fix.json" 2>/dev/null; PRE_EXIT=$?
 
 # ---------------------------------------------------------------------------
@@ -426,7 +427,7 @@ PYEOF
 # ---------------------------------------------------------------------------
 # Run --fix on the wiki
 # ---------------------------------------------------------------------------
-bash "$REPO_ROOT/bin/lint.sh" --fix --category linkres "$WIKI" > /dev/null 2>/dev/null || true
+invoke_tool_compat lint --fix --category linkres "$WIKI" > /dev/null 2>/dev/null || true
 
 # ---------------------------------------------------------------------------
 # T6: --fix rewrites bare [[Alpha]] in hub.md to [[alpha|Alpha]]
@@ -453,7 +454,7 @@ PYEOF
 # ---------------------------------------------------------------------------
 # Capture POST-FIX JSON
 # ---------------------------------------------------------------------------
-bash "$REPO_ROOT/bin/lint.sh" --category linkres --format json "$WIKI" \
+invoke_tool_compat lint --category linkres --format json "$WIKI" \
     > "$TMP/post-fix.json" 2>/dev/null || true
 
 # T2 error gone after --fix
@@ -491,7 +492,7 @@ PYEOF
 # T8: --fix is idempotent -- second run produces byte-identical hub.md
 # ---------------------------------------------------------------------------
 SHA_BEFORE=$(python3 -c "import hashlib; print(hashlib.sha256(open('$WIKI/concepts/hub.md','rb').read()).hexdigest())")
-bash "$REPO_ROOT/bin/lint.sh" --fix --category linkres "$WIKI" > /dev/null 2>/dev/null || true
+invoke_tool_compat lint --fix --category linkres "$WIKI" > /dev/null 2>/dev/null || true
 SHA_AFTER=$(python3 -c "import hashlib; print(hashlib.sha256(open('$WIKI/concepts/hub.md','rb').read()).hexdigest())")
 if [ "$SHA_BEFORE" = "$SHA_AFTER" ]; then
     echo "PASS T8: --fix is idempotent (second run produces byte-identical hub.md)"
@@ -596,7 +597,7 @@ example: false
 No one links here.
 EOF
 
-bash "$REPO_ROOT/bin/lint.sh" --category orphan --format json "$ORPHAN_WIKI" \
+invoke_tool_compat lint --category orphan --format json "$ORPHAN_WIKI" \
     > "$TMP/orphan-out.json" 2>/dev/null || true
 
 python3 - "$TMP/orphan-out.json" <<'PYEOF'
@@ -667,7 +668,7 @@ Inline: `[[NonExistent]]` also masked.
 <!-- [[NonExistent]] in HTML comment also masked -->
 EOF
 
-bash "$REPO_ROOT/bin/lint.sh" --category linkres --format json "$MASK_WIKI" \
+invoke_tool_compat lint --category linkres --format json "$MASK_WIKI" \
     > "$TMP/mask-out.json" 2>/dev/null || true
 python3 - "$TMP/mask-out.json" <<'PYEOF'
 import json, sys
@@ -766,7 +767,7 @@ Fenced example block:
 ```
 EOF
 
-bash "$REPO_ROOT/bin/lint.sh" --format json "$MASK_WIKI" \
+invoke_tool_compat lint --format json "$MASK_WIKI" \
     > "$TMP/mask-markers-out.json" 2>/dev/null || true
 python3 - "$TMP/mask-markers-out.json" <<'PYEOF'
 import json, sys

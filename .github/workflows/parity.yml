@@ -1,0 +1,73 @@
+# .github/workflows/parity.yml
+#
+# Phase 24 (TEST-01/TEST-02/PKG-04, D-14): the WIKI_IMPL=[bash,py] parity matrix.
+# NEW jobs with NEW names — none of the 6 required-check names (lint, privacy-leak,
+# strict, skills-check, neutrality, setup-parity) is renamed or matrixed here.
+#
+#   parity-suites (bash) / parity-suites (py)
+#     Runs the ENUMERATED suite list (09 09.1 10 11 12.1 12.2 13 15 18 20 22 23 24 —
+#     REVIEWS HIGH#5/RB-5) under each impl via tests/run-all-suites.sh with the per-test
+#     no-regression check vs tests/SUITE_MANIFEST.txt, plus the no-direct-call gate.
+#     In Phase 24 py is green-by-fallthrough (tests/ported.manifest empty); each Phase-25
+#     port lights its parity up with ZERO edits here (D-14/D-08).
+#
+#   parity-equivalence
+#     Captures per-call channels on BOTH impls (IT_CAPTURE_DIR self-record from black-box
+#     child tests — cycle-3 finding #2) and BYTE-compares stdout/stderr/exit/tree across
+#     impls with pid-independent pairing (REVIEWS HIGH#4 / cycle-6 fix #4 / TEST-01).
+#
+# Python 3.14 on these NEW jobs (RB-2: matches the golden-capture interpreter; the 6
+# required jobs keep their existing 3.12 unchanged — PKG-04 additive-only).
+name: Parity Matrix (WIKI_IMPL bash|py)
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  parity-suites:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        impl: [bash, py]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Install the compendium package (pinned deps)
+        run: pip install -e .
+      - name: Install poppler + jq (suite deps)
+        run: sudo apt-get update -q && sudo apt-get install -y -q poppler-utils jq
+      - name: No-direct-bin-call gate (seam-routing invariant)
+        run: bash tests/lib/no-direct-bin-calls.sh
+      - name: Seam self-tests
+        run: |
+          bash tests/lib/test_normalize.sh
+          bash tests/lib/test_invoke_tool_seterm.sh
+          bash tests/lib/test_capture_dir.sh
+          bash tests/lib/test_shim_smoke.sh
+          bash tests/lib/test_invoke_tool_selfparity.sh
+          bash tests/lib/test_oracle_scriptrelative.sh
+      - name: Run enumerated suites (per-test no-regression)
+        run: WIKI_IMPL=${{ matrix.impl }} bash tests/run-all-suites.sh
+
+  parity-equivalence:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Install the compendium package (pinned deps)
+        run: pip install -e .
+      - name: Install poppler + jq (suite deps)
+        run: sudo apt-get update -q && sudo apt-get install -y -q poppler-utils jq
+      - name: Capture channels (bash leg)
+        run: WIKI_IMPL=bash bash tests/run-all-suites.sh --capture-channels /tmp/bashch
+      - name: Capture channels (py leg)
+        run: WIKI_IMPL=py bash tests/run-all-suites.sh --capture-channels /tmp/pych
+      - name: Byte-compare channels across impls (pid-independent pairing)
+        run: bash tests/run-all-suites.sh --require-parity /tmp/bashch /tmp/pych

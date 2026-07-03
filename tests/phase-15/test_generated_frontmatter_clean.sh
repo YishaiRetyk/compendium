@@ -10,8 +10,8 @@ source "$SCRIPT_DIR/lib.sh"
 
 FAIL=0
 
-AUDIT_CLAIMS="$REPO_ROOT/bin/audit-claims.sh"
-LINT_SH="$REPO_ROOT/bin/lint.sh"
+AUDIT_CLAIMS="$REPO_ROOT/bin/audit-claims.sh"   # noqa: direct-bin (source-read; inventoried, defer-to-MIG-02)
+LINT_SH="$REPO_ROOT/bin/lint.sh"   # noqa: direct-bin (source-read; inventoried, defer-to-MIG-02)
 
 test -f "$AUDIT_CLAIMS" || { echo "FAIL: bin/audit-claims.sh missing" >&2; exit 1; }
 test -f "$LINT_SH" || { echo "FAIL: bin/lint.sh missing" >&2; exit 1; }

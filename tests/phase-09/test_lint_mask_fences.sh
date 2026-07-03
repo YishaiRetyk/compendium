@@ -9,6 +9,7 @@
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+source "$REPO_ROOT/tests/lib/invoke_tool.sh"   # Phase 24 Plan 05: the frozen parity seam
 
 TMP="$(mktemp -d -t lint-mask-fences-XXXXXX)"
 trap 'rm -rf "$TMP"' EXIT
@@ -155,7 +156,7 @@ PSEUDO_PRE="$(sha "$WIKI/concepts/pseudo-closer.md")"
 # ---------------------------------------------------------------------------
 # Run linkres scan -> JSON
 # ---------------------------------------------------------------------------
-bash "$REPO_ROOT/bin/lint.sh" --category linkres --format json "$WIKI" \
+invoke_tool_compat lint --category linkres --format json "$WIKI" \
     > "$TMP/out.json" 2>/dev/null || true
 
 python3 - "$TMP/out.json" <<'PYEOF'
@@ -221,7 +222,7 @@ PYEOF
 # T7: --fix must not mutate files whose only [[...]] tokens are inside
 # (unclosed / pseudo-closed) fences -- content-mutation guard.
 # ---------------------------------------------------------------------------
-bash "$REPO_ROOT/bin/lint.sh" --fix --category linkres "$WIKI" > /dev/null 2>/dev/null || true
+invoke_tool_compat lint --fix --category linkres "$WIKI" > /dev/null 2>/dev/null || true
 UNCLOSED_POST="$(sha "$WIKI/concepts/unclosed.md")"
 PSEUDO_POST="$(sha "$WIKI/concepts/pseudo-closer.md")"
 if [ "$UNCLOSED_PRE" != "$UNCLOSED_POST" ]; then

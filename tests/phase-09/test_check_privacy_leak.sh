@@ -12,7 +12,7 @@ trap 'cleanup_fixture_repo "$FIXTURE"' EXIT
 # 1. Leak case: docs/wiki-local/leaked.md has wiki-local/ in path -> exit 2
 # (The fixture already has docs/wiki-local/leaked.md from test setup.)
 set +e
-bash "$REPO_ROOT/bin/check-privacy.sh" --root "$FIXTURE" 2>/tmp/pv-err >/dev/null
+invoke_tool_compat check-privacy --root "$FIXTURE" 2>/tmp/pv-err >/dev/null
 RC=$?
 set -e
 if [ "$RC" = "0" ]; then
@@ -33,7 +33,7 @@ grep -q "wiki-local" /tmp/pv-err \
 rm -rf "$FIXTURE/docs/wiki-local"
 
 set +e
-bash "$REPO_ROOT/bin/check-privacy.sh" --root "$FIXTURE" 2>/dev/null
+invoke_tool_compat check-privacy --root "$FIXTURE" 2>/dev/null
 RC_CLEAN=$?
 set -e
 if [ "$RC_CLEAN" != "0" ]; then

@@ -10,7 +10,7 @@ source "$SCRIPT_DIR/lib.sh"
 tmp=$(make_fixture_repo scan-vault-basic)
 trap '[ -n "${tmp:-}" ] && [ -d "$tmp" ] && rm -rf "$tmp"' EXIT
 
-bash "$REPO_ROOT/bin/brownfield.sh" scan --root "$tmp" >/dev/null 2>&1
+invoke_tool_compat brownfield scan --root "$tmp" >/dev/null 2>&1
 report="$tmp/.brownfield/REPORT.md"
 
 # Extract the 'Needs human judgment' section content (lines after the heading

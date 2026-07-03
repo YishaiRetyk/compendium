@@ -59,7 +59,7 @@ chmod +x "$REPO/reflect-verifier.sh"
 (cd "$REPO" && git add -A && git -c commit.gpgsign=false commit -q -m fixture)
 
 set +e
-out="$(cd "$REPO" && AUDIT_REPO_ROOT="$REPO" bash "$REPO_ROOT/bin/audit-claims.sh" --verifier "$REPO/reflect-verifier.sh" --since "$SEED" --format json 2>/dev/null)"
+out="$(cd "$REPO" && AUDIT_REPO_ROOT="$REPO" invoke_tool_compat audit-claims --verifier "$REPO/reflect-verifier.sh" --since "$SEED" --format json 2>/dev/null)"
 rc=$?; set -e
 assert_exit_code 0 "$rc" "reflect run" || { echo "$out" >&2; exit 1; }
 printf '%s' "$out" | grep -q 'ROUNDTRIP_CLAIM' || { echo "FAIL: claim text did not round-trip via stdin" >&2; echo "$out" >&2; exit 1; }
@@ -80,7 +80,7 @@ chmod +x "$REPO2/bad-verifier.sh"
 (cd "$REPO2" && git add -A && git -c commit.gpgsign=false commit -q -m fixture)
 
 set +e
-out2="$(cd "$REPO2" && AUDIT_REPO_ROOT="$REPO2" bash "$REPO_ROOT/bin/audit-claims.sh" --verifier "$REPO2/bad-verifier.sh" --since "$SEED2" --format json 2>/dev/null)"
+out2="$(cd "$REPO2" && AUDIT_REPO_ROOT="$REPO2" invoke_tool_compat audit-claims --verifier "$REPO2/bad-verifier.sh" --since "$SEED2" --format json 2>/dev/null)"
 rc2=$?; set -e
 assert_exit_code 0 "$rc2" "malformed-verifier run (must not crash)" || { echo "$out2" >&2; exit 1; }
 hit="$(printf '%s' "$out2" | python3 -c 'import json,sys; d=json.load(sys.stdin); print(sum(1 for f in d if f.get("source_id")=="src-c" and f.get("verdict")=="insufficient" and "unparseable" in f.get("rationale","")))')"

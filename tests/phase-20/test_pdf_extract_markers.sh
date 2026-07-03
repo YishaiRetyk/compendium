@@ -10,14 +10,14 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib.sh"
 
 # --- STATIC assertions (always run, no model needed) ---------------------------
-test -x "$REPO_ROOT/bin/pdf-extract.sh" || {
+test -x "$REPO_ROOT/bin/pdf-extract.sh" || {   # noqa: direct-bin (shim-file executability check)
     echo "FAIL: bin/pdf-extract.sh is missing or not executable" >&2
     exit 1
 }
 
 # No-arg invocation must exit non-zero with a usage message.
 set +e
-"$REPO_ROOT/bin/pdf-extract.sh" >/dev/null 2>&1
+invoke_tool_compat pdf-extract >/dev/null 2>&1
 rc=$?
 set -e
 [ "$rc" -ne 0 ] || {
@@ -76,7 +76,7 @@ PYEOF
     STUB_OUT=$(mktemp)
     set +e
     OLLAMA_URL="http://127.0.0.1:$STUB_PORT" PDF_EXTRACT_MODEL=stub-model \
-        "$REPO_ROOT/bin/pdf-extract.sh" --out "$STUB_OUT" "$FIXTURE" >/dev/null 2>&1
+        invoke_tool_compat pdf-extract --out "$STUB_OUT" "$FIXTURE" >/dev/null 2>&1
     stub_rc=$?
     set -e
     [ "$stub_rc" -eq 0 ] || {
@@ -132,7 +132,7 @@ if [ ! -f "$FIXTURE" ]; then
 fi
 
 OUT=$(mktemp)
-"$REPO_ROOT/bin/pdf-extract.sh" --out "$OUT" "$FIXTURE"
+invoke_tool_compat pdf-extract --out "$OUT" "$FIXTURE"
 
 PAGES=$(pdfinfo "$FIXTURE" | awk '/^Pages:/{print $2}')
 # `|| true` guards grep -c's exit-1-on-zero-matches under set -e.

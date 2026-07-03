@@ -40,7 +40,7 @@ A claim [prov:src-pu#p8|direct|2026-04-15]
 EOF
 
 set +e
-out="$(cd "$REPO" && AUDIT_REPO_ROOT="$REPO" bash "$REPO_ROOT/bin/audit-claims.sh" --format json 2>/dev/null)"
+out="$(cd "$REPO" && AUDIT_REPO_ROOT="$REPO" invoke_tool_compat audit-claims --format json 2>/dev/null)"
 rc=$?
 set -e
 assert_exit_code 0 "$rc" "p-unmarked resolve run" || { echo "$out" >&2; exit 1; }
@@ -51,7 +51,7 @@ if ! printf '%s' "$out" | grep -q 'insufficient-locator'; then
 fi
 # And the worklist must NOT carry the document text.
 set +e
-wl="$(cd "$REPO" && AUDIT_REPO_ROOT="$REPO" bash "$REPO_ROOT/bin/audit-claims.sh" --emit-worklist --format json 2>/dev/null)"
+wl="$(cd "$REPO" && AUDIT_REPO_ROOT="$REPO" invoke_tool_compat audit-claims --emit-worklist --format json 2>/dev/null)"
 set -e
 if printf '%s' "$wl" | grep -q 'WHOLE_DOC_MARKER'; then
     echo "FAIL: unmarked #p leaked the whole document into the worklist" >&2

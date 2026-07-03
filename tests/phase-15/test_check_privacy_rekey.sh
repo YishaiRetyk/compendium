@@ -51,7 +51,7 @@ Some cloud-safe documentation.
 EOF
 
 set +e
-out_a="$( "$REPO_ROOT/bin/check-privacy.sh" --root "$repo" 2>&1 )"
+out_a="$( invoke_tool_compat check-privacy --root "$repo" 2>&1 )"
 rc_a=$?
 set -e
 
@@ -92,7 +92,7 @@ This wiki-local/ content has been copied into a public path.
 EOF
 
 set +e
-out_b="$( "$REPO_ROOT/bin/check-privacy.sh" --root "$repo" 2>&1 )"
+out_b="$( invoke_tool_compat check-privacy --root "$repo" 2>&1 )"
 rc_b=$?
 set -e
 

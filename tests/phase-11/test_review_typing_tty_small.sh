@@ -15,7 +15,7 @@ NAME="$(basename "${BASH_SOURCE[0]}")"
 TMP=$(make_fixture_repo small-vault-ambiguous)
 trap 'rm -rf "$TMP"' EXIT
 
-if ! bash "$REPO_ROOT/bin/brownfield.sh" suggest --root "$TMP" >/dev/null 2>&1; then
+if ! invoke_tool_compat brownfield suggest --root "$TMP" >/dev/null 2>&1; then
     echo "FAIL: bin/brownfield.sh suggest not yet implemented — Plan 11-02 pending" >&2
     exit 1
 fi
@@ -24,7 +24,7 @@ fi
 input_lines=""
 for _ in $(seq 1 20); do input_lines+="a"$'\n'; done
 
-if ! echo -n "$input_lines" | bash "$REPO_ROOT/bin/brownfield.sh" review-typing --root "$TMP" >/dev/null 2>&1; then
+if ! echo -n "$input_lines" | invoke_tool_compat brownfield review-typing --root "$TMP" >/dev/null 2>&1; then
     echo "FAIL: bin/brownfield.sh review-typing not yet implemented — Plan 11-04 pending" >&2
     exit 1
 fi

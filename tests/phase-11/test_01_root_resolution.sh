@@ -21,7 +21,7 @@ trap 'rm -rf "$TMP_A" "$TMP_B"' EXIT
 cp -a "$TMP_B" "$TMP_B.snapshot"
 
 # Suggest into A only
-if ! bash "$REPO_ROOT/bin/brownfield.sh" suggest --root "$TMP_A" >/dev/null 2>&1; then
+if ! invoke_tool_compat brownfield suggest --root "$TMP_A" >/dev/null 2>&1; then
     echo "FAIL: bin/brownfield.sh suggest not yet implemented — Plan 11-02 pending" >&2
     rm -rf "$TMP_B.snapshot"
     exit 1

@@ -39,8 +39,8 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
-      - name: Install PyYAML
-        run: pip install pyyaml
+      - name: Install the compendium package (pinned deps)
+        run: pip install -e .
       - name: Lint (CI mode + JSON, pinned version)
         id: lint_run
         run: bash bin/lint.sh --require-version 1.1.0 --ci --format json > /tmp/lint.json
@@ -61,8 +61,8 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
-      - name: Install PyYAML + ruamel.yaml
-        run: pip install pyyaml ruamel.yaml
+      - name: Install the compendium package (pinned deps)
+        run: pip install -e .
       - name: Privacy-leak guard (CI-07, structural path guard)
         run: bash bin/check-privacy.sh
       - name: Raw-sources cloud-safe guard (PRIV-03, fail-closed)
@@ -81,8 +81,8 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
-      - name: Install PyYAML
-        run: pip install pyyaml
+      - name: Install the compendium package (pinned deps)
+        run: pip install -e .
       - name: Strict quality ratchet (CI-06)
         run: bash bin/lint.sh --require-version 1.1.0 --strict
 
@@ -98,5 +98,12 @@ jobs:
     if: github.event.pull_request.draft == false || github.event_name == 'push'
     steps:
       - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      # Phase 24 (PKG-04, REVIEWS HIGH#10): once gen-skills.sh becomes a python shim,
+      # this required job fails without the package install. Additive; name unchanged.
+      - name: Install the compendium package (pinned deps)
+        run: pip install -e .
       - name: Skills drift + structural assertions (SKILL-02)
         run: bash bin/gen-skills.sh --check

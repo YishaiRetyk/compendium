@@ -21,7 +21,7 @@ SRC_DIR="$(mktemp -d)"
 echo "# test" > "$SRC_DIR/source.md"
 
 ING_ERR="$(mktemp)"
-OUT="$(bash "$REPO_ROOT/bin/ingest.sh" "$SRC_DIR/source.md" 2>"$ING_ERR" || true)"
+OUT="$(invoke_tool_compat ingest "$SRC_DIR/source.md" 2>"$ING_ERR" || true)"
 
 # No contributor:: line
 if echo "$OUT" | grep -q "contributor::"; then

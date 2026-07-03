@@ -16,7 +16,7 @@ TMP=$(make_fixture_repo small-vault-ambiguous)
 trap 'rm -rf "$TMP"' EXIT
 
 set +e
-stdout=$(bash "$REPO_ROOT/bin/brownfield.sh" verify --root "$TMP" 2>&1)
+stdout=$(invoke_tool_compat brownfield verify --root "$TMP" 2>&1)
 ec=$?
 set -e
 

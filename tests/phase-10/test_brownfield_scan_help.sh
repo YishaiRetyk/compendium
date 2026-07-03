@@ -11,7 +11,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib.sh"
 
-out=$(bash "$REPO_ROOT/bin/brownfield.sh" --help)
+out=$(invoke_tool_compat brownfield --help)
 [[ "$out" == *"scan"* ]]      || { echo "FAIL: --help missing scan" >&2; exit 1; }
 [[ "$out" == *"bootstrap"* ]] || { echo "FAIL: --help missing bootstrap" >&2; exit 1; }
 [[ "$out" == *"Skip on parse failure or unsafe structure; merge on parseable metadata; warn whenever preserved values may not satisfy the schema."* ]] \
@@ -32,7 +32,7 @@ out=$(bash "$REPO_ROOT/bin/brownfield.sh" --help)
 # verify-specific behaviour is covered by tests/phase-11/test_verify_*.sh.
 # The dispatcher now accepts all five subcommands (scan|bootstrap|suggest|review-typing|verify).
 set +e
-bash "$REPO_ROOT/bin/brownfield.sh" verify --help >/dev/null 2>ver.err
+invoke_tool_compat brownfield verify --help >/dev/null 2>ver.err
 ver_help_exit=$?
 set -e
 [ "$ver_help_exit" -eq 0 ] \
@@ -41,7 +41,7 @@ rm -f ver.err
 
 # unknown subcommand exits 1 with "unknown subcommand"
 set +e
-bash "$REPO_ROOT/bin/brownfield.sh" notARealSubcmd >/dev/null 2>unk.err
+invoke_tool_compat brownfield notARealSubcmd >/dev/null 2>unk.err
 unk_exit=$?
 set -e
 [ "$unk_exit" -eq 1 ]                                  || { echo "FAIL: unknown-subcmd exit=$unk_exit (want 1)" >&2; rm -f unk.err; exit 1; }

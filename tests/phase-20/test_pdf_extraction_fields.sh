@@ -75,7 +75,7 @@ EOF
 write_fixture "scan.pdf" \
     'extraction_tool: olmocr' \
     'extraction_date: 2026-06-11'
-OUTPUT=$(WIKI_ROOT="$TMP" bash "$REPO_ROOT/bin/lint.sh" --dry-run --category yaml 2>&1)
+OUTPUT=$(WIKI_ROOT="$TMP" invoke_tool_compat lint --dry-run --category yaml 2>&1)
 if ! echo "$OUTPUT" | grep -q 'extraction'; then
     echo "FAIL: Variant A -- expected a missing-extraction-field finding, got none" >&2
     echo "$OUTPUT" >&2
@@ -87,7 +87,7 @@ write_fixture "scan.pdf" \
     'extraction_tool: olmocr' \
     'extraction_model: "richardyoung/olmocr2:7b-q8"' \
     'extraction_date: 2026-06-11'
-OUTPUT=$(WIKI_ROOT="$TMP" bash "$REPO_ROOT/bin/lint.sh" --dry-run --category yaml 2>&1)
+OUTPUT=$(WIKI_ROOT="$TMP" invoke_tool_compat lint --dry-run --category yaml 2>&1)
 if echo "$OUTPUT" | grep -q 'missing.*extraction'; then
     echo "FAIL: Variant B -- a missing-extraction finding fired with all fields present" >&2
     echo "$OUTPUT" >&2
@@ -107,7 +107,7 @@ write_fixture "/tmp/scan.pdf" \
     'extraction_tool: olmocr' \
     'extraction_model: "richardyoung/olmocr2:7b-q8"' \
     'extraction_date: 2026-06-11'
-OUTPUT=$(WIKI_ROOT="$TMP" bash "$REPO_ROOT/bin/lint.sh" --dry-run --category yaml 2>&1)
+OUTPUT=$(WIKI_ROOT="$TMP" invoke_tool_compat lint --dry-run --category yaml 2>&1)
 if ! echo "$OUTPUT" | grep -q 'bare co-located'; then
     echo "FAIL: Variant C -- expected a bare-co-located-filename finding, got none" >&2
     echo "$OUTPUT" >&2

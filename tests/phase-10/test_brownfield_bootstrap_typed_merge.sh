@@ -20,7 +20,7 @@ privacy: cloud_safe
 Body.
 EOF
 
-bash "$REPO_ROOT/bin/brownfield.sh" bootstrap --apply --root "$vault" >/dev/null 2>&1
+invoke_tool_compat brownfield bootstrap --apply --root "$vault" >/dev/null 2>&1
 
 # Class B: existing values preserved (never overwritten).
 grep -qF "type: concept"        "$vault/page.md" \

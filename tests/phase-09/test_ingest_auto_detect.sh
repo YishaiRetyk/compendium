@@ -17,7 +17,7 @@ git config user.email "alice@example.com"
 SRC_DIR="$(mktemp -d)"
 echo "# test" > "$SRC_DIR/source.md"
 
-OUT="$(bash "$REPO_ROOT/bin/ingest.sh" "$SRC_DIR/source.md" 2>&1 || true)"
+OUT="$(invoke_tool_compat ingest "$SRC_DIR/source.md" 2>&1 || true)"
 
 if ! echo "$OUT" | grep -q "contributor:: @alice"; then
     echo "FAIL: expected 'contributor:: @alice', got:" >&2

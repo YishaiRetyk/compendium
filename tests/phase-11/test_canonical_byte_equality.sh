@@ -16,7 +16,7 @@ NAME="$(basename "${BASH_SOURCE[0]}")"
 TMP_REPO=$(make_fixture_repo small-vault-ambiguous)
 trap 'rm -rf "$TMP_REPO"' EXIT
 
-if ! bash "$REPO_ROOT/bin/brownfield.sh" suggest --root "$TMP_REPO" >/dev/null 2>&1; then
+if ! invoke_tool_compat brownfield suggest --root "$TMP_REPO" >/dev/null 2>&1; then
     echo "FAIL: bin/brownfield.sh suggest not yet implemented — Plan 11-02 pending" >&2
     exit 1
 fi

@@ -11,7 +11,7 @@ trap '[ -n "${tmp:-}" ] && [ -d "$tmp" ] && rm -rf "$tmp"' EXIT
 
 snap_before=$(sha256sum "$tmp/input/page.md" | cut -d' ' -f1)
 
-bash "$REPO_ROOT/bin/brownfield.sh" bootstrap --apply --root "$tmp/input" >/dev/null 2>&1
+invoke_tool_compat brownfield bootstrap --apply --root "$tmp/input" >/dev/null 2>&1
 
 snap_after=$(sha256sum "$tmp/input/page.md" | cut -d' ' -f1)
 [ "$snap_before" = "$snap_after" ] \

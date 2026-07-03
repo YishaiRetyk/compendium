@@ -51,7 +51,7 @@ Body content.
 EOF
 
 set +e
-bash "$REPO_ROOT/bin/brownfield.sh" verify --promote --root "$TMP" >/dev/null 2>stderr.txt
+invoke_tool_compat brownfield verify --promote --root "$TMP" >/dev/null 2>stderr.txt
 ec=$?
 set -e
 

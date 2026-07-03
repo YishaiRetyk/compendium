@@ -15,7 +15,7 @@ TMP=$(make_fixture_repo pre-typed-vault)
 trap 'rm -rf "$TMP"' EXIT
 
 set +e
-bash "$REPO_ROOT/bin/brownfield.sh" verify --root "$TMP" >/dev/null 2>stderr.txt
+invoke_tool_compat brownfield verify --root "$TMP" >/dev/null 2>stderr.txt
 ec=$?
 set -e
 

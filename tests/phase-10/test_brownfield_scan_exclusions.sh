@@ -13,7 +13,7 @@ trap '[ -n "${tmp:-}" ] && [ -d "$tmp" ] && rm -rf "$tmp"' EXIT
 # Remove the fixture's .brownfield-ignore so defaults apply.
 rm -f "$tmp/.brownfield-ignore"
 
-bash "$REPO_ROOT/bin/brownfield.sh" scan --root "$tmp" >/dev/null 2>&1
+invoke_tool_compat brownfield scan --root "$tmp" >/dev/null 2>&1
 report="$tmp/.brownfield/REPORT.md"
 assert_file_exists "$report" "REPORT.md was not written"
 

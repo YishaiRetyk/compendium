@@ -17,7 +17,7 @@ TMP=$(make_fixture_repo small-vault-ambiguous)
 trap 'rm -rf "$TMP"' EXIT
 
 # 1. suggest
-if ! bash "$REPO_ROOT/bin/brownfield.sh" suggest --root "$TMP" >/dev/null 2>&1; then
+if ! invoke_tool_compat brownfield suggest --root "$TMP" >/dev/null 2>&1; then
     echo "FAIL: bin/brownfield.sh suggest not yet implemented — Plan 11-02 pending" >&2
     exit 1
 fi
@@ -25,7 +25,7 @@ fi
 # 2. review-typing (approve-all via scripted stdin)
 approve_input=""
 for _ in $(seq 1 20); do approve_input+="a"$'\n'; done
-if ! echo -n "$approve_input" | bash "$REPO_ROOT/bin/brownfield.sh" review-typing --root "$TMP" >/dev/null 2>&1; then
+if ! echo -n "$approve_input" | invoke_tool_compat brownfield review-typing --root "$TMP" >/dev/null 2>&1; then
     echo "FAIL: bin/brownfield.sh review-typing not yet implemented — Plan 11-04 pending" >&2
     exit 1
 fi
@@ -55,13 +55,13 @@ if ! bash "$TMP/.brownfield/migrations/04-privacy-review.sh" >/dev/null 2>&1; th
 fi
 
 # 7. verify (read-only)
-if ! bash "$REPO_ROOT/bin/brownfield.sh" verify --root "$TMP" >/dev/null 2>&1; then
+if ! invoke_tool_compat brownfield verify --root "$TMP" >/dev/null 2>&1; then
     echo "FAIL: verify not yet implemented — Plan 11-04 pending" >&2
     exit 1
 fi
 
 # 8. verify --promote
-if ! bash "$REPO_ROOT/bin/brownfield.sh" verify --promote --root "$TMP" >/dev/null 2>&1; then
+if ! invoke_tool_compat brownfield verify --promote --root "$TMP" >/dev/null 2>&1; then
     echo "FAIL: verify --promote not yet implemented — Plan 11-04 pending" >&2
     exit 1
 fi

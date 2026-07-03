@@ -7,7 +7,7 @@ source "$SCRIPT_DIR/lib.sh"
 FIXTURE="$(make_fixture_repo privacy-ok-wiki)"
 trap 'cleanup_fixture_repo "$FIXTURE"' EXIT
 
-bash "$REPO_ROOT/bin/check-privacy.sh" --root "$FIXTURE" \
+invoke_tool_compat check-privacy --root "$FIXTURE" \
     || { echo "FAIL: wiki-cloud/** privacy: local_only should be exempt (D-15)" >&2; exit 1; }
 
 echo "PASS: check-privacy exempts wiki-cloud/** (D-15)"

@@ -5,6 +5,7 @@
 #   source "$SCRIPT_DIR/lib.sh"
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+source "$REPO_ROOT/tests/lib/invoke_tool.sh"   # Phase 24 Plan 05: the frozen parity seam
 
 # assert_exit_code <expected> <actual> <description>
 assert_exit_code() {

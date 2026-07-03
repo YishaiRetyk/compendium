@@ -5,7 +5,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib.sh"
 export BROWNFIELD_FIXTURE_TODAY="2026-04-17"
 
-out=$(bash "$REPO_ROOT/bin/brownfield.sh" bootstrap --help)
+out=$(invoke_tool_compat brownfield bootstrap --help)
 [[ "$out" == *"--apply"*   ]] || { echo "FAIL: --help missing --apply"   >&2; exit 1; }
 [[ "$out" == *"--dry-run"* ]] || { echo "FAIL: --help missing --dry-run" >&2; exit 1; }
 [[ "$out" == *"--verbose"* ]] || { echo "FAIL: --help missing --verbose" >&2; exit 1; }

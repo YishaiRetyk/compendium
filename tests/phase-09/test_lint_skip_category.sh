@@ -30,7 +30,7 @@ pushd "$FIXTURE" >/dev/null
 # -----------------------------------------------------------------------------
 # 1. --skip-category yaml: no yaml findings in output
 # -----------------------------------------------------------------------------
-bash "$REPO_ROOT/bin/lint.sh" --skip-category yaml --format json wiki-cloud/ > /tmp/skip.json 2>/dev/null
+invoke_tool_compat lint --skip-category yaml --format json wiki-cloud/ > /tmp/skip.json 2>/dev/null
 python3 - <<'PYEOF'
 import json
 data = json.load(open('/tmp/skip.json'))
@@ -45,7 +45,7 @@ PYEOF
 # 'EXTERNAL: ') are dropped; internal drift findings retained.
 # -----------------------------------------------------------------------------
 # --ci on a broken-yaml wiki exits 1; we tolerate the exit via `|| true`.
-bash "$REPO_ROOT/bin/lint.sh" --ci --format json wiki-cloud/ > /tmp/ci.json 2>/dev/null || true
+invoke_tool_compat lint --ci --format json wiki-cloud/ > /tmp/ci.json 2>/dev/null || true
 python3 - <<'PYEOF'
 import json
 data = json.load(open('/tmp/ci.json'))
@@ -59,7 +59,7 @@ PYEOF
 # -----------------------------------------------------------------------------
 # 3. --category filter alone narrows to one category
 # -----------------------------------------------------------------------------
-bash "$REPO_ROOT/bin/lint.sh" --category yaml --format json wiki-cloud/ > /tmp/cat.json 2>/dev/null || true
+invoke_tool_compat lint --category yaml --format json wiki-cloud/ > /tmp/cat.json 2>/dev/null || true
 python3 - <<'PYEOF'
 import json
 data = json.load(open('/tmp/cat.json'))
@@ -72,7 +72,7 @@ PYEOF
 # -----------------------------------------------------------------------------
 # 4. --category X --skip-category X: empty result (narrow-then-subtract = empty)
 # -----------------------------------------------------------------------------
-bash "$REPO_ROOT/bin/lint.sh" --category yaml --skip-category yaml --format json wiki-cloud/ > /tmp/selfskip.json 2>/dev/null || true
+invoke_tool_compat lint --category yaml --skip-category yaml --format json wiki-cloud/ > /tmp/selfskip.json 2>/dev/null || true
 python3 - <<'PYEOF'
 import json
 data = json.load(open('/tmp/selfskip.json'))

@@ -14,7 +14,7 @@ trap '[ -n "${tmp:-}" ] && [ -d "$tmp" ] && rm -rf "$tmp"' EXIT
 
 # --- Part 1: negation lifts the exclude -------------------------------------
 [ -f "$tmp/.brownfield-ignore" ] || { echo "FAIL: fixture .brownfield-ignore missing in temp copy" >&2; exit 1; }
-bash "$REPO_ROOT/bin/brownfield.sh" scan --root "$tmp" >/dev/null 2>&1
+invoke_tool_compat brownfield scan --root "$tmp" >/dev/null 2>&1
 report="$tmp/.brownfield/REPORT.md"
 
 if ! grep -E '`attachments/diagram.md`' "$report" >/dev/null; then
@@ -26,7 +26,7 @@ fi
 # --- Part 2: remove ignore file, re-scan, attachments is back in Excluded ---
 rm -f "$tmp/.brownfield-ignore"
 rm -rf "$tmp/.brownfield"
-bash "$REPO_ROOT/bin/brownfield.sh" scan --root "$tmp" >/dev/null 2>&1
+invoke_tool_compat brownfield scan --root "$tmp" >/dev/null 2>&1
 report2="$tmp/.brownfield/REPORT.md"
 
 if grep -E '^\|\s*`attachments/diagram.md`' "$report2" >/dev/null; then

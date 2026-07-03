@@ -36,7 +36,7 @@ open(p,'w').write(c)
 printf '# Index\n' > "$tmp/wiki-cloud/index.md"
 printf '# Log\n'   > "$tmp/wiki-cloud/log.md"
 
-out="$(bash "$REPO_ROOT/bin/lint.sh" --dry-run --category brownfield "$tmp/wiki-cloud" 2>&1 || true)"
+out="$(invoke_tool_compat lint --dry-run --category brownfield "$tmp/wiki-cloud" 2>&1 || true)"
 
 # 1) Output flags bootstrapped-old.md as stale (>30 days).
 echo "$out" | grep -E 'bootstrapped-old\.md.*bootstrapped [0-9]+ days ago' -q \

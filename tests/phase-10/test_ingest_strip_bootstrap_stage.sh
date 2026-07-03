@@ -22,7 +22,7 @@ mkdir -p inbox
 cp "$REPO_ROOT/tests/phase-10/fixtures/bootstrapped-vault/wiki-cloud/entities/ingest-target.md" inbox/source.md
 
 # Run ingest and capture stderr.
-stderr_out="$(bash "$REPO_ROOT/bin/ingest.sh" inbox/source.md 2>&1 >/dev/null || true)"
+stderr_out="$(invoke_tool_compat ingest inbox/source.md 2>&1 >/dev/null || true)"
 
 # Persist stderr for full-line grep (W-6: single grep binds both halves).
 stderr_file="$tmp/stderr.log"

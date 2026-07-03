@@ -37,19 +37,19 @@ PY
 pushd "$FIXTURE" >/dev/null
 
 # 1. --ci --format json on dirty wiki: exit 1 + yaml error finding
-if bash "$REPO_ROOT/bin/lint.sh" --ci --format json wiki-cloud/ > /tmp/lint-ci.json 2>/dev/null; then
+if invoke_tool_compat lint --ci --format json wiki-cloud/ > /tmp/lint-ci.json 2>/dev/null; then
     echo "FAIL: --ci on broken yaml should exit 1" >&2
     popd >/dev/null; exit 1
 fi
 assert_json_has_finding /tmp/lint-ci.json yaml error || { popd >/dev/null; exit 1; }
 
 # 2. Without --ci on same wiki: exit 0 (no CI remap, so no error-severity exit)
-bash "$REPO_ROOT/bin/lint.sh" --format json wiki-cloud/ > /tmp/lint-nonci.json 2>/dev/null \
+invoke_tool_compat lint --format json wiki-cloud/ > /tmp/lint-nonci.json 2>/dev/null \
     || { echo "FAIL: non-ci mode should exit 0 regardless of findings" >&2; popd >/dev/null; exit 1; }
 
 # 3. --ci on clean wiki (remove broken.md): exit 0
 rm wiki-cloud/concepts/broken.md
-bash "$REPO_ROOT/bin/lint.sh" --ci --format json wiki-cloud/ > /tmp/lint-clean.json 2>/dev/null \
+invoke_tool_compat lint --ci --format json wiki-cloud/ > /tmp/lint-clean.json 2>/dev/null \
     || { echo "FAIL: --ci on clean wiki should exit 0" >&2; popd >/dev/null; exit 1; }
 
 popd >/dev/null

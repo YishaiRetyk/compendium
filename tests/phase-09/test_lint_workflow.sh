@@ -30,7 +30,7 @@ for name in sorted(core_jobs):
     assert any('actions/checkout@v6' in u for u in step_uses), f"{name}: missing actions/checkout@v6"
     assert any('actions/setup-python@v6' in u for u in step_uses), f"{name}: missing actions/setup-python@v6"
     step_runs = [s.get('run', '') for s in steps]
-    assert any('pip install pyyaml' in r for r in step_runs), f"{name}: missing pip install pyyaml"
+    assert any('pip install -e .' in r for r in step_runs), f"{name}: missing pip install -e . (Phase 24 PKG-04: workflows install the pinned package)"
 # strict-specific: fetch-depth: 0 + draft-skip conditional
 strict = jobs['strict']
 cond = strict.get('if', '') or ''

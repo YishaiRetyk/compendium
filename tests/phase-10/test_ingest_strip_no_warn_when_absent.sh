@@ -27,7 +27,7 @@ title: "Greenfield Ingest"
 Body content — no brownfield sentinel fields in frontmatter.
 EOF
 
-stderr_out="$(bash "$REPO_ROOT/bin/ingest.sh" inbox/source.md 2>&1 >/dev/null || true)"
+stderr_out="$(invoke_tool_compat ingest inbox/source.md 2>&1 >/dev/null || true)"
 
 # 1) Stderr MUST NOT contain the D-21 "Note: stripped" template.
 if echo "$stderr_out" | grep -q "Note: stripped"; then

@@ -1,0 +1,8 @@
+Advisory mode — active-phase drift expected. Pass --strict at milestone close.
+
+| REQ-ID    | REQUIREMENTS.md | VERIFICATION.md | Drift | Note |
+|-----------|-----------------|-----------------|-------|------|
+| REQ-1     | Complete        | Complete        | ok    | OK |
+| REQ-2     | Pending         | Complete        | DRIFT | DRIFT |
+
+# 1 drift row(s) of 2 total.

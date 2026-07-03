@@ -18,7 +18,7 @@ trap 'rm -rf "$TMP"' EXIT
 # Count local_only entries before
 before=$(grep -r -c '^privacy: local_only' "$TMP/wiki/" 2>/dev/null | awk -F: '{s+=$2} END {print s+0}')
 
-if ! bash "$REPO_ROOT/bin/brownfield.sh" suggest --root "$TMP" >/dev/null 2>&1; then
+if ! invoke_tool_compat brownfield suggest --root "$TMP" >/dev/null 2>&1; then
     echo "FAIL: bin/brownfield.sh suggest not yet implemented — Plan 11-02 pending" >&2
     exit 1
 fi

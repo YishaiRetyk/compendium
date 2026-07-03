@@ -38,7 +38,7 @@ A claim [prov:src-o#sec:introduction|direct|2026-04-15]
 EOF
 
 set +e
-out="$(cd "$REPO" && AUDIT_REPO_ROOT="$REPO" bash "$REPO_ROOT/bin/audit-claims.sh" --format json 2>/dev/null)"
+out="$(cd "$REPO" && AUDIT_REPO_ROOT="$REPO" invoke_tool_compat audit-claims --format json 2>/dev/null)"
 rc=$?
 set -e
 assert_exit_code 0 "$rc" "schema run" || { echo "$out" >&2; exit 1; }

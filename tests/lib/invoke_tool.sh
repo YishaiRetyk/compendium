@@ -118,4 +118,21 @@ _it_footprint_root() {
 # stable pid-INDEPENDENT cross-run identity (else the two runs' PIDs never match -> vacuous green). This helper
 # strips the -<pid> from a keyed segment; --require-parity uses it (or an equivalent inline strip) to build pairs.
 it_pairing_key() { printf '%s\n' "$1" | sed -E 's/-[0-9]+$//'; }
-export -f invoke_tool _it_is_ported _it_capture_key _it_footprint_root it_pairing_key
+
+# invoke_tool_compat <tool> [args...] — DIRECT-CALL-SEMANTICS wrapper over the seam,
+# used by the mechanical Plan-05 routing of the pre-existing suites. The 204 direct
+# call sites span if-conditions, ||-lists, command substitutions with cd-subshells and
+# env prefixes — shapes whose assertions expect the direct contract (payload on stdout,
+# diagnostics on stderr, the tool's own exit status). This wrapper preserves that
+# contract byte-for-byte while still routing through the seam (WIKI_IMPL branch +
+# worktree oracle + IT_CAPTURE_DIR self-record), so no assertion is rewritten (D-13).
+# NOTE: callers of THIS form rely on its nonzero return; the set -e-safe
+# `invoke_tool X; rc=$IT_EXIT` idiom remains the form for NEW tests. Existing sites
+# already handle direct semantics safely (they pass today with direct calls).
+invoke_tool_compat() {
+    invoke_tool "$@"
+    cat "$IT_STDOUT"
+    cat "$IT_STDERR" >&2
+    return "$IT_EXIT"
+}
+export -f invoke_tool _it_is_ported _it_capture_key _it_footprint_root it_pairing_key invoke_tool_compat

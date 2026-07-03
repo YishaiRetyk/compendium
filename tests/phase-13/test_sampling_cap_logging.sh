@@ -44,7 +44,7 @@ Claim five [prov:src-c#sec:introduction|inferred|2026-04-15] [epistemic:: inferr
 EOF
 
 set +e
-out="$(cd "$REPO" && AUDIT_REPO_ROOT="$REPO" bash "$REPO_ROOT/bin/audit-claims.sh" --select epistemic --sample 2 --format json 2>/dev/null)"
+out="$(cd "$REPO" && AUDIT_REPO_ROOT="$REPO" invoke_tool_compat audit-claims --select epistemic --sample 2 --format json 2>/dev/null)"
 rc=$?
 set -e
 assert_exit_code 0 "$rc" "cap logging run" || { echo "$out" >&2; exit 1; }

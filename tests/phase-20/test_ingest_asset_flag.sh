@@ -19,7 +19,7 @@ TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 printf '# x\n' > "$TMP/extracted.md"
 printf '%%PDF-1.4 fake\n' > "$TMP/original.pdf"
 
-( cd "$TMP" && bash "$REPO_ROOT/bin/ingest.sh" \
+( cd "$TMP" && invoke_tool_compat ingest \
     --slug asset-test \
     --contributor @phase20-test \
     --asset "$TMP/original.pdf" \
@@ -52,7 +52,7 @@ printf '%%PDF-1.4 SOURCE-CONTENT\n' > "$TMP2/mydoc.pdf"
 printf '%%PDF-1.4 ASSET-CONTENT\n'  > "$TMP2/source.pdf"
 
 set +e
-COLLIDE_OUT=$( cd "$TMP2" && bash "$REPO_ROOT/bin/ingest.sh" \
+COLLIDE_OUT=$( cd "$TMP2" && invoke_tool_compat ingest \
     --slug collide-test \
     --contributor @phase20-test \
     --asset "$TMP2/source.pdf" \

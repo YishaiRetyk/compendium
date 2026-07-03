@@ -8,13 +8,13 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib.sh"
 
-EXPECTED="$(sed -n 's/^LINT_VERSION="\([0-9.]*\)"$/\1/p' "$REPO_ROOT/bin/lint.sh")"
+EXPECTED="$(sed -n 's/^LINT_VERSION="\([0-9.]*\)"$/\1/p' "$REPO_ROOT/bin/lint.sh")"   # noqa: direct-bin (source-read; inventoried, defer-to-MIG-02)
 if ! printf '%s' "$EXPECTED" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
     echo "FAIL: could not extract a semver LINT_VERSION from bin/lint.sh (got '$EXPECTED')" >&2
     exit 1
 fi
 
-OUT="$(bash "$REPO_ROOT/bin/lint.sh" --version)"
+OUT="$(invoke_tool_compat lint --version)"
 if [ "$OUT" != "$EXPECTED" ]; then
     echo "FAIL: expected '$EXPECTED' (LINT_VERSION in bin/lint.sh), got '$OUT'" >&2
     exit 1

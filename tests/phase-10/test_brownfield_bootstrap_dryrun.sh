@@ -14,7 +14,7 @@ before_expected=$(sha256sum "$tmp/expected/page.md" | cut -d' ' -f1)
 
 # W-2 isolation: root at $tmp/input, NOT $tmp — avoids walking the expected/ subtree.
 set +e
-out=$(bash "$REPO_ROOT/bin/brownfield.sh" bootstrap --root "$tmp/input" 2> dry.err)
+out=$(invoke_tool_compat brownfield bootstrap --root "$tmp/input" 2> dry.err)
 rc=$?
 set -e
 [ "$rc" -eq 0 ] || { echo "FAIL: dry-run exit=$rc (want 0)" >&2; cat dry.err >&2; exit 1; }

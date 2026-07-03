@@ -6,8 +6,8 @@ source "$SCRIPT_DIR/lib.sh"
 cd "$REPO_ROOT"  # REVIEW WR-02: generator writes cwd-relative; must run from repo root
 
 # RED: bin/gen-skills.sh does not exist yet
-[ -f "$REPO_ROOT/bin/gen-skills.sh" ] || { echo "SKIP (generator not implemented)"; exit 1; }
-bash "$REPO_ROOT/bin/gen-skills.sh"
+[ -f "$REPO_ROOT/bin/gen-skills.sh" ] || { echo "SKIP (generator not implemented)"; exit 1; }   # noqa: direct-bin (shim-file existence check)
+bash "$REPO_ROOT/bin/gen-skills.sh"   # noqa: direct-bin (live-repo state-dependent — mutates the real .claude/skills; the worktree oracle cannot see it)
 for op in ingest query lint reflect; do
     [ -f "$REPO_ROOT/.claude/skills/$op/SKILL.md" ] || { echo "FAIL: missing .claude/skills/$op/SKILL.md"; exit 1; }
 done

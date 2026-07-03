@@ -37,7 +37,7 @@ A claim [prov:src-pr#sec:introduction|direct|2026-04-15]
 EOF
 
 set +e
-(cd "$REPO" && AUDIT_REPO_ROOT="$REPO" bash "$REPO_ROOT/bin/audit-claims.sh" --format report >/dev/null 2>&1)
+(cd "$REPO" && AUDIT_REPO_ROOT="$REPO" invoke_tool_compat audit-claims --format report >/dev/null 2>&1)
 rc=$?
 set -e
 assert_exit_code 0 "$rc" "report privacy run" || exit 1

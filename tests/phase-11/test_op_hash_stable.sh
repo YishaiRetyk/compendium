@@ -16,11 +16,11 @@ TMP1=$(make_fixture_repo small-vault-ambiguous)
 TMP2=$(make_fixture_repo large-vault-ambiguous)
 trap 'rm -rf "$TMP1" "$TMP2"' EXIT
 
-if ! bash "$REPO_ROOT/bin/brownfield.sh" suggest --root "$TMP1" >/dev/null 2>&1; then
+if ! invoke_tool_compat brownfield suggest --root "$TMP1" >/dev/null 2>&1; then
     echo "FAIL: bin/brownfield.sh suggest not yet implemented — Plan 11-02 pending" >&2
     exit 1
 fi
-bash "$REPO_ROOT/bin/brownfield.sh" suggest --root "$TMP2" >/dev/null 2>&1
+invoke_tool_compat brownfield suggest --root "$TMP2" >/dev/null 2>&1
 
 for script in 01-page-typing.sh 02-provenance-bootstrap.sh 03-cross-link-inference.sh 04-privacy-review.sh; do
     h1=$(grep -E '^# op_hash: sha256:[0-9a-f]{64}$' "$TMP1/.brownfield/migrations/$script" | head -1 | awk '{print $3}')

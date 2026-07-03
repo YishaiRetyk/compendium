@@ -25,7 +25,7 @@ pushd "$FIXTURE" >/dev/null
 git config user.email "alice@example.com"  # would map to @alice
 
 # Override with @other
-OUT="$(bash "$REPO_ROOT/bin/ingest.sh" --contributor @other "$SRC_DIR/source.md" 2>&1 || true)"
+OUT="$(invoke_tool_compat ingest --contributor @other "$SRC_DIR/source.md" 2>&1 || true)"
 if ! echo "$OUT" | grep -q "contributor:: @other"; then
     echo "FAIL: explicit --contributor @other should override" >&2
     echo "$OUT" >&2
@@ -45,7 +45,7 @@ popd >/dev/null
 # ---------------------------------------------------------------------------
 FIX2="$(make_fixture_repo contributor-single)"
 pushd "$FIX2" >/dev/null
-OUT2="$(bash "$REPO_ROOT/bin/ingest.sh" --contributor @forced "$SRC_DIR/source.md" 2>&1 || true)"
+OUT2="$(invoke_tool_compat ingest --contributor @forced "$SRC_DIR/source.md" 2>&1 || true)"
 if ! echo "$OUT2" | grep -q "contributor:: @forced"; then
     echo "FAIL: explicit --contributor should force emit on single-author" >&2
     echo "$OUT2" >&2
@@ -61,7 +61,7 @@ FIX3="$(make_fixture_repo contributor-multi)"
 setup_git_author "$FIX3" "X" "x@e.com"
 setup_git_author "$FIX3" "Y" "y@e.com"
 pushd "$FIX3" >/dev/null
-OUT3="$(bash "$REPO_ROOT/bin/ingest.sh" --contributor bare "$SRC_DIR/source.md" 2>&1 || true)"
+OUT3="$(invoke_tool_compat ingest --contributor bare "$SRC_DIR/source.md" 2>&1 || true)"
 if ! echo "$OUT3" | grep -q "contributor:: @bare"; then
     echo "FAIL: bare handle should normalize to @bare" >&2
     echo "$OUT3" >&2

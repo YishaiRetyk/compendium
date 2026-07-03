@@ -18,11 +18,11 @@ snap() {
 }
 
 # First --apply run: populates frontmatter on both files.
-bash "$REPO_ROOT/bin/brownfield.sh" bootstrap --apply --root "$vault" >/dev/null 2>&1
+invoke_tool_compat brownfield bootstrap --apply --root "$vault" >/dev/null 2>&1
 before="$(snap "$vault")"
 
 # Second --apply run: must be byte-equal (D-10 per-file bootstrap_stage guard).
-bash "$REPO_ROOT/bin/brownfield.sh" bootstrap --apply --root "$vault" >/dev/null 2>&1
+invoke_tool_compat brownfield bootstrap --apply --root "$vault" >/dev/null 2>&1
 after="$(snap "$vault")"
 
 if [ "$before" != "$after" ]; then

@@ -43,7 +43,7 @@ VERIFIER="$(make_fake_verifier "$REPO" supports "looks good")"
 
 # WITHOUT --allow-local: skipped-privacy.
 set +e
-out1="$(cd "$REPO" && AUDIT_REPO_ROOT="$REPO" bash "$REPO_ROOT/bin/audit-claims.sh" --verifier "$VERIFIER" --since "$SEED" --format json 2>/dev/null)"
+out1="$(cd "$REPO" && AUDIT_REPO_ROOT="$REPO" invoke_tool_compat audit-claims --verifier "$VERIFIER" --since "$SEED" --format json 2>/dev/null)"
 rc=$?; set -e
 assert_exit_code 0 "$rc" "no-allow-local run" || { echo "$out1" >&2; exit 1; }
 v1="$(printf '%s' "$out1" | python3 -c 'import json,sys; d=json.load(sys.stdin); print(sum(1 for f in d if f.get("source_id")=="src-al" and f.get("verdict")=="skipped-privacy"))')"
@@ -51,7 +51,7 @@ v1="$(printf '%s' "$out1" | python3 -c 'import json,sys; d=json.load(sys.stdin);
 
 # WITH --allow-local: real verdict 'supports'.
 set +e
-out2="$(cd "$REPO" && AUDIT_REPO_ROOT="$REPO" bash "$REPO_ROOT/bin/audit-claims.sh" --verifier "$VERIFIER" --allow-local --since "$SEED" --format json 2>/dev/null)"
+out2="$(cd "$REPO" && AUDIT_REPO_ROOT="$REPO" invoke_tool_compat audit-claims --verifier "$VERIFIER" --allow-local --since "$SEED" --format json 2>/dev/null)"
 rc=$?; set -e
 assert_exit_code 0 "$rc" "allow-local run" || { echo "$out2" >&2; exit 1; }
 v2="$(printf '%s' "$out2" | python3 -c 'import json,sys; d=json.load(sys.stdin); print(sum(1 for f in d if f.get("source_id")=="src-al" and f.get("verdict")=="supports"))')"

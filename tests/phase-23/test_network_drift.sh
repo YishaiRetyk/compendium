@@ -6,6 +6,7 @@
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+source "$REPO_ROOT/tests/lib/invoke_tool.sh"   # Phase 24 Plan 05: the frozen parity seam
 
 TMP="$(mktemp -d -t phase23-drift-XXXXXX)"
 trap 'rm -rf "$TMP"' EXIT
@@ -117,7 +118,7 @@ EOF
 
 run_lint() { # $1=extra flags -> writes JSON to $2
     # shellcheck disable=SC2086
-    PATH="$TMP/bin:$PATH" bash "$REPO_ROOT/bin/lint.sh" --dry-run --category drift \
+    PATH="$TMP/bin:$PATH" invoke_tool_compat lint --dry-run --category drift \
         --format json $1 "$WIKI" > "$2" 2>/dev/null || true
 }
 
@@ -169,7 +170,7 @@ print("PASS T5: citation-registry link-rot ratio (2/4 dead -> warning)")
 PYEOF
 
 # T6 (DRIFT-01): --ci still default-skips drift-external even WITH --network
-PATH="$TMP/bin:$PATH" bash "$REPO_ROOT/bin/lint.sh" --dry-run --ci --category drift \
+PATH="$TMP/bin:$PATH" invoke_tool_compat lint --dry-run --ci --category drift \
     --format json --network "$WIKI" > "$TMP/ci-network.json" 2>/dev/null || true
 python3 - "$TMP/ci-network.json" <<'PYEOF'
 import json, sys

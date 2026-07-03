@@ -22,7 +22,7 @@ git checkout pre-claim -- wiki-cloud/concepts/new-concept.md
 git add wiki-cloud/concepts/new-concept.md
 git -c commit.gpgsign=false commit -q -m "feature: add offender"
 
-if bash "$REPO_ROOT/bin/lint.sh" --strict wiki-cloud/ > /tmp/sn-out 2> /tmp/sn-err; then
+if invoke_tool_compat lint --strict wiki-cloud/ > /tmp/sn-out 2> /tmp/sn-err; then
     echo "FAIL: --strict should fail on new concept page without [prov:]" >&2
     cat /tmp/sn-out /tmp/sn-err >&2
     popd >/dev/null; exit 1
@@ -65,9 +65,9 @@ git -c commit.gpgsign=false commit -q -m "feature: flip to source type + require
 # --category provenance isolates the D-10 strict provenance check so unrelated
 # yaml/drift errors elsewhere in the wiki don't taint the exit-code assertion.
 # (Source pages are exempt per D-10 regardless.)
-bash "$REPO_ROOT/bin/lint.sh" --strict --category provenance wiki-cloud/ >/dev/null 2>&1 \
+invoke_tool_compat lint --strict --category provenance wiki-cloud/ >/dev/null 2>&1 \
     || { echo "FAIL: --strict should exempt type:source pages from provenance check" >&2
-         bash "$REPO_ROOT/bin/lint.sh" --strict --category provenance wiki-cloud/ 2>&1 >&2
+         invoke_tool_compat lint --strict --category provenance wiki-cloud/ 2>&1 >&2
          popd >/dev/null; exit 1; }
 
 popd >/dev/null

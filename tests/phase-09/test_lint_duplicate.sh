@@ -7,6 +7,7 @@
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+source "$REPO_ROOT/tests/lib/invoke_tool.sh"   # Phase 24 Plan 05: the frozen parity seam
 
 TMP="$(mktemp -d -t lint-duplicate-XXXXXX)"
 trap 'rm -rf "$TMP"' EXIT
@@ -238,7 +239,7 @@ PH
 # Run the duplicate check and assert.
 # ---------------------------------------------------------------------------
 EXIT=0
-bash "$REPO_ROOT/bin/lint.sh" --category duplicate --format json "$WIKI" \
+invoke_tool_compat lint --category duplicate --format json "$WIKI" \
     > "$TMP/out.json" 2>/dev/null || EXIT=$?
 if [ "$EXIT" -ne 0 ]; then
     echo "FAIL: lint --category duplicate exited $EXIT (expected 0, report-only)" >&2

@@ -1,0 +1,41 @@
+Target remote: file:///nonexistent-remote.git
+Tag: v1.1
+Release commit email: release@example.invalid
+
+INCLUDES: (allowlist -- ONLY these paths will be copied)
+  INCLUDES: README.md
+  INCLUDES: LICENSE
+  INCLUDES: PRIVACY.md
+  INCLUDES: AGENTS.md
+  INCLUDES: CLAUDE.md
+  INCLUDES: .gitignore
+  INCLUDES: .gitattributes
+  INCLUDES: .obsidianignore
+  INCLUDES: .neutrality-denylist.txt
+  INCLUDES: bin
+  INCLUDES: schema
+  INCLUDES: docs
+  INCLUDES: .claude/skills
+  INCLUDES: wiki-cloud/index.md
+  INCLUDES: wiki-cloud/log.md
+  INCLUDES: wiki-cloud/decisions
+  INCLUDES: examples/kahneman
+  INCLUDES: .github
+  INCLUDES: .githooks
+  INCLUDES: tests/phase-07
+  INCLUDES: tests/phase-18
+
+EXCLUDES: (denylist -- must never ship; hard-fail if found in staged dir)
+  EXCLUDES: .planning
+  EXCLUDES: .brownfield
+  EXCLUDES: .git
+  EXCLUDES: .obsidian/workspace
+  EXCLUDES: .obsidian/cache
+  EXCLUDES: wiki-cloud/entities
+  EXCLUDES: wiki-cloud/concepts
+  EXCLUDES: wiki-cloud/comparisons
+  EXCLUDES: wiki-cloud/overviews
+  EXCLUDES: wiki-cloud/sources
+  EXCLUDES: wiki-cloud/maintenance
+
+(dry-run) Pass --apply to execute.

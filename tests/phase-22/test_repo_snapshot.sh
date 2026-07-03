@@ -5,6 +5,7 @@
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+source "$REPO_ROOT/tests/lib/invoke_tool.sh"   # Phase 24 Plan 05: the frozen parity seam
 
 TMP="$(mktemp -d -t phase22-snap-XXXXXX)"
 trap 'rm -rf "$TMP"' EXIT
@@ -31,7 +32,7 @@ printf 'def helper():\n    return 1\n' > "$UP/src/beta.py"
 EXPECT_SHA="$(git -C "$UP" rev-parse HEAD)"
 
 # --- Run with --dest ---
-bash "$REPO_ROOT/bin/repo-snapshot.sh" "file://$UP" --dest "$TMP/bundle" 2>/dev/null
+invoke_tool_compat repo-snapshot "file://$UP" --dest "$TMP/bundle" 2>/dev/null
 
 OUT="$TMP/bundle/source.md"
 [ -f "$OUT" ] || { echo "FAIL T1: --dest did not write source.md" >&2; exit 1; }
@@ -57,7 +58,7 @@ echo "PASS T4: empty ## Excerpts scaffold present"
 
 # T5: stdout mode (no --dest) emits the same skeleton
 # (capture first: `cmd | grep -q` under pipefail dies of SIGPIPE on early match)
-STDOUT_RUN="$(bash "$REPO_ROOT/bin/repo-snapshot.sh" "file://$UP" 2>/dev/null)"
+STDOUT_RUN="$(invoke_tool_compat repo-snapshot "file://$UP" 2>/dev/null)"
 printf '%s' "$STDOUT_RUN" > "$TMP/stdout-run.md"
 grep -q '^## Snapshot Metadata$' "$TMP/stdout-run.md" || {
     echo "FAIL T5: stdout mode did not emit the skeleton" >&2; exit 1; }
@@ -74,11 +75,11 @@ echo "PASS T6: embedded README H1 demoted (## README section stays sliceable)"
 
 # T7: --dest refuses to clobber an existing (curated) source.md without --force
 set +e
-bash "$REPO_ROOT/bin/repo-snapshot.sh" "file://$UP" --dest "$TMP/bundle" 2>/dev/null
+invoke_tool_compat repo-snapshot "file://$UP" --dest "$TMP/bundle" 2>/dev/null
 rc=$?
 set -e
 [ "$rc" -ne 0 ] || { echo "FAIL T7: re-run over an existing source.md must fail without --force" >&2; exit 1; }
-bash "$REPO_ROOT/bin/repo-snapshot.sh" "file://$UP" --dest "$TMP/bundle" --force 2>/dev/null || {
+invoke_tool_compat repo-snapshot "file://$UP" --dest "$TMP/bundle" --force 2>/dev/null || {
     echo "FAIL T7: --force overwrite should succeed" >&2; exit 1; }
 echo "PASS T7: --dest clobber guard (fails without --force, succeeds with)"
 

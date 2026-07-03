@@ -27,11 +27,11 @@ git checkout pre-claim -- wiki-cloud/concepts/attention.md  # restore marker+cla
 git add -A && git -c commit.gpgsign=false commit -q -m "feature: re-add marker+claim"
 
 # 1. Marker directly above claim → exempt (D-09)
-bash "$REPO_ROOT/bin/lint.sh" --strict wiki-cloud/ >/dev/null 2>&1 \
+invoke_tool_compat lint --strict wiki-cloud/ >/dev/null 2>&1 \
     || { echo "FAIL: marker on line above claim should exempt (D-09)" >&2; popd >/dev/null; exit 1; }
 
 # 1b. Exempted claim surfaces as skip-count info finding in JSON mode
-bash "$REPO_ROOT/bin/lint.sh" --strict --format json wiki-cloud/ > /tmp/eh.json 2>/dev/null || true
+invoke_tool_compat lint --strict --format json wiki-cloud/ > /tmp/eh.json 2>/dev/null || true
 assert_json_has_finding /tmp/eh.json skip-count info \
     || { echo "FAIL: exempted claim should emit skip-count info finding" >&2; popd >/dev/null; exit 1; }
 
@@ -47,7 +47,7 @@ open(p, 'w').write('\n'.join(text) + '\n')
 PYEOF
 git add . && git -c commit.gpgsign=false commit -q -m "insert blank line"
 
-if bash "$REPO_ROOT/bin/lint.sh" --strict wiki-cloud/ >/dev/null 2>&1; then
+if invoke_tool_compat lint --strict wiki-cloud/ >/dev/null 2>&1; then
     echo "FAIL: blank line between marker and claim should invalidate exemption" >&2
     popd >/dev/null; exit 1
 fi
@@ -56,7 +56,7 @@ fi
 git reset --hard HEAD~1 >/dev/null 2>&1
 sed -i 's/id=attention/id=wrong-id/' wiki-cloud/concepts/attention.md
 git add . && git -c commit.gpgsign=false commit -q -m "corrupt id"
-if bash "$REPO_ROOT/bin/lint.sh" --strict wiki-cloud/ >/dev/null 2>&1; then
+if invoke_tool_compat lint --strict wiki-cloud/ >/dev/null 2>&1; then
     echo "FAIL: marker id mismatch should invalidate exemption" >&2
     popd >/dev/null; exit 1
 fi

@@ -8,6 +8,7 @@ set -euo pipefail
 
 # Repo root (run-from-anywhere-safe).
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+source "$REPO_ROOT/tests/lib/invoke_tool.sh"   # Phase 24 Plan 05: the frozen parity seam
 
 # make_bare_repo  -> prints path to a fresh temp repo seeded with one empty commit.
 # Phase 12.2 substitutes phase-09's make_fixture_repo with this simpler helper:

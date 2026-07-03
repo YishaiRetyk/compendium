@@ -118,7 +118,7 @@ Quoted-heading sec [prov:src-repo#sec:quoted-heading-alpha|direct|2026-07-03]
 EOF
 
 set +e
-wl="$(cd "$REPO" && bash "$REPO_ROOT/bin/audit-claims.sh" --emit-worklist --format json 2>/dev/null)"
+wl="$(cd "$REPO" && invoke_tool_compat audit-claims --emit-worklist --format json 2>/dev/null)"
 rc=$?
 set -e
 assert_exit_code 0 "$rc" "worklist run" || { echo "$wl" >&2; exit 1; }
@@ -148,7 +148,7 @@ expect_present UNIQUE_PROSE_MARKER    T6 "#sec: still resolves real (non-fenced)
 # --- Findings run (fresh audit state: the worklist run advanced the D-15 checkpoint) ---
 rm -rf "$REPO/wiki-local/maintenance"
 set +e
-findings="$(cd "$REPO" && bash "$REPO_ROOT/bin/audit-claims.sh" --format json 2>/dev/null)"
+findings="$(cd "$REPO" && invoke_tool_compat audit-claims --format json 2>/dev/null)"
 rc=$?
 set -e
 assert_exit_code 0 "$rc" "findings run" || { echo "$findings" >&2; exit 1; }

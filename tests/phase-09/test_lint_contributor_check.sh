@@ -31,7 +31,7 @@ echo "# Index" > wiki-cloud/index.md
 
 git add . && git -c commit.gpgsign=false commit -q -m "seed log"
 
-LINT_REPO_ROOT="$FIXTURE" bash "$REPO_ROOT/bin/lint.sh" --category contributor --format json wiki-cloud/ > /tmp/ctrb.json 2>/dev/null || true
+LINT_REPO_ROOT="$FIXTURE" invoke_tool_compat lint --category contributor --format json wiki-cloud/ > /tmp/ctrb.json 2>/dev/null || true
 # Expect at least one contributor warning for @bob (no mapping)
 if ! assert_json_has_finding /tmp/ctrb.json contributor warning; then
     echo "FAIL: expected contributor warning for @bob" >&2
@@ -43,7 +43,7 @@ fi
 echo "bob@example.com  ->  @bob" >> .git-author-map.txt
 git add . && git -c commit.gpgsign=false commit -q -m "map bob"
 
-LINT_REPO_ROOT="$FIXTURE" bash "$REPO_ROOT/bin/lint.sh" --category contributor --format json wiki-cloud/ > /tmp/ctrb2.json 2>/dev/null || true
+LINT_REPO_ROOT="$FIXTURE" invoke_tool_compat lint --category contributor --format json wiki-cloud/ > /tmp/ctrb2.json 2>/dev/null || true
 python3 - <<'PYEOF'
 import json, sys
 data = json.load(open('/tmp/ctrb2.json'))
@@ -75,7 +75,7 @@ Body.
 LOG
 git add . && git -c commit.gpgsign=false commit -q -m "seed single-author log"
 
-LINT_REPO_ROOT="$FIXTURE2" bash "$REPO_ROOT/bin/lint.sh" --category contributor --format json wiki-cloud/ > /tmp/ctrb3.json 2>/dev/null || true
+LINT_REPO_ROOT="$FIXTURE2" invoke_tool_compat lint --category contributor --format json wiki-cloud/ > /tmp/ctrb3.json 2>/dev/null || true
 python3 - <<'PYEOF'
 import json, sys
 data = json.load(open('/tmp/ctrb3.json'))

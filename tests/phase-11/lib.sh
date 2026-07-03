@@ -10,6 +10,7 @@
 
 # Repo root (run-from-anywhere-safe).
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+source "$REPO_ROOT/tests/lib/invoke_tool.sh"   # Phase 24 Plan 05: the frozen parity seam
 
 # make_fixture_repo <fixture-name>  -> prints path to a fresh temp repo
 # Copies tests/phase-11/fixtures/<fixture-name>/input/ into a mktemp dir,

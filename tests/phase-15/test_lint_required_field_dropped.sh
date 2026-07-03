@@ -10,7 +10,7 @@ source "$SCRIPT_DIR/lib.sh"
 
 FAIL=0
 
-LINT_SH="$REPO_ROOT/bin/lint.sh"
+LINT_SH="$REPO_ROOT/bin/lint.sh"   # noqa: direct-bin (source-read; inventoried, defer-to-MIG-02)
 test -f "$LINT_SH" || { echo "FAIL: bin/lint.sh missing" >&2; exit 1; }
 
 # bin/lint.sh BASE_FIELDS must NOT include 'privacy'

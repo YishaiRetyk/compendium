@@ -21,7 +21,7 @@ EOF
 HEAD_SHA="$(cd "$REPO" && git rev-parse --short HEAD)"
 
 set +e
-(cd "$REPO" && AUDIT_REPO_ROOT="$REPO" bash "$REPO_ROOT/bin/audit-claims.sh" --format report >/dev/null 2>&1)
+(cd "$REPO" && AUDIT_REPO_ROOT="$REPO" invoke_tool_compat audit-claims --format report >/dev/null 2>&1)
 rc=$?
 set -e
 assert_exit_code 0 "$rc" "no-finding run" || exit 1

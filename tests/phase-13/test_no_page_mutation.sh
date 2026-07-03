@@ -40,7 +40,7 @@ EOF
 (cd "$REPO" && git add -A && git -c commit.gpgsign=false commit -q -m "fixture")
 
 set +e
-(cd "$REPO" && AUDIT_REPO_ROOT="$REPO" bash "$REPO_ROOT/bin/audit-claims.sh" --format json >/dev/null 2>&1)
+(cd "$REPO" && AUDIT_REPO_ROOT="$REPO" invoke_tool_compat audit-claims --format json >/dev/null 2>&1)
 rc=$?
 set -e
 assert_exit_code 0 "$rc" "no-mutation run" || exit 1

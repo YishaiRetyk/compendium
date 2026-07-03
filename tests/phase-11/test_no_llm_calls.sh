@@ -14,7 +14,7 @@ export BROWNFIELD_TOOL_VERSION=1.1.0
 export PYTHONPATH="${PYTHONPATH:-}${PYTHONPATH:+:}$HOME/.local/lib/python3/dist-packages"
 NAME="$(basename "${BASH_SOURCE[0]}")"
 
-files=("$REPO_ROOT/bin/brownfield.sh")
+files=(invoke_tool_compat brownfield)
 for f in "$REPO_ROOT"/bin/lib/brownfield_*.py "$REPO_ROOT"/schema/brownfield/migrations/*.sh; do
     [ -f "$f" ] || continue
     files+=("$f")

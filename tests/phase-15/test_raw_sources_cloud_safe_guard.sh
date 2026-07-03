@@ -19,8 +19,8 @@ FAIL=0
 find_guard() {
     local root="$1"
     # Candidate 1: standalone script
-    if [ -f "$REPO_ROOT/bin/check-sources-cloud-safe.sh" ]; then
-        echo "bash $REPO_ROOT/bin/check-sources-cloud-safe.sh --root $root"
+    if [ -f "$REPO_ROOT/bin/check-sources-cloud-safe.sh" ]; then   # noqa: direct-bin (shim-file existence check)
+        echo "invoke_tool_compat check-sources-cloud-safe --root $root"
         return
     fi
     # Candidate 2: folded into check-privacy.sh (accepts --sources-check flag)
@@ -54,7 +54,7 @@ EOF
     GUARD_CLEAN="${GUARD_CMD/$REPO_ROOT\//$repo_clean/}"
     # Reconstruct for the clean repo
     set +e
-    out_i="$( bash $REPO_ROOT/bin/check-sources-cloud-safe.sh --root "$repo_clean" 2>&1 )"
+    out_i="$( invoke_tool_compat check-sources-cloud-safe --root "$repo_clean" 2>&1 )"
     rc_i=$?
     set -e
     cleanup_fixture_repo "$repo_clean"
@@ -80,7 +80,7 @@ This is a local-only raw source -- should fail the guard.
 EOF
 
     set +e
-    out_ii="$( bash $REPO_ROOT/bin/check-sources-cloud-safe.sh --root "$repo_local" 2>&1 )"
+    out_ii="$( invoke_tool_compat check-sources-cloud-safe --root "$repo_local" 2>&1 )"
     rc_ii=$?
     set -e
     cleanup_fixture_repo "$repo_local"
@@ -105,7 +105,7 @@ Raw source in sources/local-only/ tier.
 EOF
 
     set +e
-    out_iii="$( bash $REPO_ROOT/bin/check-sources-cloud-safe.sh --root "$repo_tier" 2>&1 )"
+    out_iii="$( invoke_tool_compat check-sources-cloud-safe --root "$repo_tier" 2>&1 )"
     rc_iii=$?
     set -e
     cleanup_fixture_repo "$repo_tier"

@@ -31,7 +31,7 @@ LOG
 pushd "$TMP" >/dev/null
 
 # 1. @alice -> only alice entry
-OUT1="$(bash "$REPO_ROOT/bin/search.sh" --contributor @alice 2>&1)"
+OUT1="$(invoke_tool_compat search --contributor @alice 2>&1)"
 if ! echo "$OUT1" | grep -q "alice-work"; then
     echo "FAIL: --contributor @alice should find alice-work" >&2
     echo "$OUT1" >&2
@@ -45,7 +45,7 @@ if echo "$OUT1" | grep -q "bob-work"; then
 fi
 
 # 2. bare `alice` (no @) -> same result
-OUT2="$(bash "$REPO_ROOT/bin/search.sh" --contributor alice 2>&1)"
+OUT2="$(invoke_tool_compat search --contributor alice 2>&1)"
 if ! echo "$OUT2" | grep -q "alice-work"; then
     echo "FAIL: bare handle 'alice' should match same as '@alice'" >&2
     popd >/dev/null
@@ -53,7 +53,7 @@ if ! echo "$OUT2" | grep -q "alice-work"; then
 fi
 
 # 3. @nonexistent -> no results (exit 0 per search.sh convention)
-OUT3="$(bash "$REPO_ROOT/bin/search.sh" --contributor @nonexistent 2>&1 || true)"
+OUT3="$(invoke_tool_compat search --contributor @nonexistent 2>&1 || true)"
 if ! echo "$OUT3" | grep -qi "No results found"; then
     echo "FAIL: empty-result message missing" >&2
     echo "$OUT3" >&2

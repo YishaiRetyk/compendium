@@ -28,7 +28,7 @@ pushd "$FIXTURE" >/dev/null
 # Ensure no stale report before the run
 [ -f wiki-cloud/maintenance/lint-report.md ] && rm wiki-cloud/maintenance/lint-report.md
 
-OUT="$(bash "$REPO_ROOT/bin/lint.sh" --format json wiki-cloud/ 2>/dev/null)"
+OUT="$(invoke_tool_compat lint --format json wiki-cloud/ 2>/dev/null)"
 
 # Write output to a temp file so python can read it cleanly (avoids shell-quoting hell)
 JSON_TMP="$(mktemp)"

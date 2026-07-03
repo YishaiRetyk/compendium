@@ -36,7 +36,7 @@ export WIZARD_TEMPLATE_SHA="<frozen-fixture>"
 WORK="$(mktemp -d -t wz-canon-agents-XXXXXX)"
 trap 'rm -rf "$WORK"' EXIT
 
-bash "$REPO_ROOT/bin/init-wizard.sh" \
+invoke_tool_compat init-wizard \
     --answers-file "$ANSWERS" \
     --render-to "$WORK" >/dev/null
 
