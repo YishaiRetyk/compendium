@@ -8,7 +8,7 @@
 - ✅ **v1.2 Schema Architecture** — Phases 15–18 (shipped 2026-06-08) — [archive](milestones/v1.2-ROADMAP.md)
 - ✅ **v1.3 Source Ingestion** — Phases 19–21 (shipped 2026-06-14) — [archive](milestones/v1.3-ROADMAP.md)
 - ✅ **v1.4 Source Lifecycle** — Phases 22–23 (shipped 2026-07-03) — [archive](milestones/v1.4-ROADMAP.md)
-- 📦 **v1.5 Python Migration** — Phases 24–26 (STAGED — imported from the laptop 2026-07-03, renumbered from its v1.4/22–24; Phase-24 plan hardened through 6 cross-AI review cycles, ready to execute after v1.4 closes with a MANDATORY re-baseline) — [brief](milestones/v1.5-MILESTONE-BRIEF.md) · [requirements](milestones/v1.5-REQUIREMENTS-STAGED.md) · plans in `phases/24-foundation-package-skeleton-frozen-shared-core-parity-oracle/`
+- 🚧 **v1.5 Python Migration** — Phases 24–26 (IN PROGRESS — started 2026-07-03; imported from the laptop, renumbered from its v1.4/22–24; Phase-24 plans hardened through 6 cross-AI review cycles; MANDATORY re-baseline executed at start per the brief) — [brief](milestones/v1.5-MILESTONE-BRIEF.md) · [requirements](REQUIREMENTS.md) · plans in `phases/24-foundation-package-skeleton-frozen-shared-core-parity-oracle/`
 
 ## Phases
 
@@ -90,6 +90,20 @@ Closed the source lifecycle loop: the `repository` source type as the extension 
 Full phase details: [milestones/v1.4-ROADMAP.md](milestones/v1.4-ROADMAP.md)
 
 </details>
+
+### 🚧 v1.5 Python Migration (Phases 24–26) — IN PROGRESS (started 2026-07-03)
+
+Re-platform the `bin/` toolchain from Bash to Python behind `.sh` exec-shims (shim-and-swap): installable package + frozen shared `common/` core + `WIKI_IMPL=bash|py` parity oracle built first (the one hard serialization point), then parallel cluster ports fan out behind the frozen surface and fan back in through a single cutover; the wholesale CLI→pytest conversion is terminal and deferrable. Pure internal refactor — behavior parity is the acceptance bar throughout. Definition: [milestones/v1.5-MILESTONE-BRIEF.md](milestones/v1.5-MILESTONE-BRIEF.md); requirements promoted to [REQUIREMENTS.md](REQUIREMENTS.md) at start; MANDATORY re-baseline (per the brief) executed at milestone start — see `phases/24-.../24-REBASELINE.md`.
+
+- [ ] **Phase 24: Foundation — Package Skeleton + Frozen Shared Core + Parity Oracle** (0/6 plans) — PKG-01..04, TEST-01..05
+  - [ ] 24-01: Package skeleton + shim-contract doc (wave 1)
+  - [ ] 24-02: common/ over-extraction (wave 2)
+  - [ ] 24-03: Parity seam (WIKI_IMPL) + pytest conftest (wave 2)
+  - [ ] 24-04: Characterization-golden backfill + anti-signal rewrite (wave 3)
+  - [ ] 24-05: CI wiring + parity matrix (wave 4)
+  - [ ] 24-06: Freeze guard + baseline pin + phase-24-freeze tag (wave 5)
+- [ ] **Phase 25: Parallel Migration + Cutover** (plans TBD at plan-phase) — MIG-01..06, CUT-01, TEST-06
+- [ ] **Phase 26: Wholesale CLI→Pytest Conversion** (terminal, deferrable) — CUT-02
 
 ## Backlog
 
@@ -278,3 +292,8 @@ The following are intentionally deferred until real usage demands them, captured
 | 19. Extension Contract + Research-Report Type | v1.3 | 5/5 | Complete    | 2026-06-10 |
 | 20. PDF Ingestion | v1.3 | 4/4 | Complete    | 2026-06-12 |
 | 21. Video/YouTube Ingestion | v1.3 | 2/2 | Complete    | 2026-06-14 |
+| 22. Repository Source Type | v1.4 | 3/3 | Complete    | 2026-07-03 |
+| 23. External Source Drift Detection | v1.4 | 2/2 | Complete    | 2026-07-03 |
+| 24. Foundation: Skeleton + Frozen Core + Parity Oracle | v1.5 | 0/6 | In Progress | — |
+| 25. Parallel Migration + Cutover | v1.5 | TBD | Pending | — |
+| 26. Wholesale CLI→Pytest Conversion (deferrable) | v1.5 | TBD | Pending | — |

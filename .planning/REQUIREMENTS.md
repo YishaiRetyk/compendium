@@ -1,6 +1,7 @@
 # Requirements: LLM Wiki Compiler — Milestone v1.5 Python Migration
 
-**Defined:** 2026-06-18 (on the laptop; imported + renumbered 2026-07-03 — see v1.5-MILESTONE-BRIEF.md)
+**Defined:** 2026-06-18 (on the laptop; imported + renumbered 2026-07-03 — see milestones/v1.5-MILESTONE-BRIEF.md)
+**Promoted to active:** 2026-07-03 (milestone start; was milestones/v1.5-REQUIREMENTS-STAGED.md)
 **Core Value:** The wiki is a persistent, compounding artifact — cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested.
 
 ## v1.5 Requirements

@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.4
-milestone_name: Source Lifecycle
-status: Awaiting next milestone
-stopped_at: Milestone v1.4 completed and archived (tag v1.4)
-last_updated: 2026-07-03T07:00:00.000Z
-last_activity: 2026-07-03 — Milestone v1.4 completed and archived; v1.5 Python Migration staged and ready
+milestone: v1.5
+milestone_name: Python Migration
+status: In progress
+stopped_at: Milestone v1.5 started — re-baseline in progress (Phase 24 not yet executing)
+last_updated: 2026-07-03T08:00:00.000Z
+last_activity: 2026-07-03 — v1.5 start ritual (requirements promoted, roadmap flipped); MANDATORY re-baseline next
 progress:
-  total_phases: 2
-  completed_phases: 2
-  total_plans: 5
-  completed_plans: 5
-  percent: 100
+  total_phases: 3
+  completed_phases: 0
+  total_plans: 6
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -21,27 +21,28 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-03)
 
 **Core value:** The wiki is a persistent, compounding artifact -- cross-references are already there, contradictions already flagged, synthesis already reflects everything ingested.
-**Current focus:** v1.4 Source Lifecycle SHIPPED + ARCHIVED (Phases 22–23, 11/11 requirements, tag v1.4). Next milestone: **v1.5 Python Migration** — STAGED and ready (imported from the laptop 2026-07-03, renumbered to Phases 24–26; first-phase plans hardened through 6 cross-AI review cycles). Start by promoting `milestones/v1.5-REQUIREMENTS-STAGED.md` → `.planning/REQUIREMENTS.md` and executing the **MANDATORY re-baseline** in `milestones/v1.5-MILESTONE-BRIEF.md` (tonight's bin/ changes — repo-snapshot.sh, lint 1.12.0, audit resolvers, tests/phase-22+23 — postdate the laptop's 2026-06-18 assessment).
+**Current focus:** **v1.5 Python Migration** (Phases 24–26) — started 2026-07-03. Re-platform `bin/` from Bash to Python behind `.sh` exec-shims: package skeleton + frozen `common/` + `WIKI_IMPL=bash|py` parity oracle first (Phase 24, the one hard serialization point), then parallel cluster ports + cutover (Phase 25), then the deferrable CLI→pytest conversion (Phase 26). Behavior parity is the acceptance bar throughout.
 
 ## Current Position
 
-Phase: Milestone v1.4 complete
-Plan: —
-Status: Awaiting next milestone (v1.5 staged)
+Phase: 24 — Foundation (Package Skeleton + Frozen Shared Core + Parity Oracle)
+Plan: — (re-baseline precedes plan execution)
+Status: Milestone started; executing the MANDATORY re-baseline from `milestones/v1.5-MILESTONE-BRIEF.md` (the imported plans' inventories were derived against the 2026-06-18 laptop tree and predate v1.4's bin/ changes: repo-snapshot.sh, lint 1.12.0, audit fence-aware resolvers, tests/phase-22+23)
 Last activity: 2026-07-03
 
-### v1.4 Phase Summary
+### v1.5 Phase Map
 
 | Phase | Name | Requirements | Status |
 |-------|------|--------------|--------|
-| 22 | Repository Source Type | REPO-01..06 (6 reqs) | ✓ Complete (2026-07-03) |
-| 23 | External Source Drift Detection | DRIFT-01..05 (5 reqs) | ✓ Complete (2026-07-03) |
+| 24 | Foundation: Skeleton + Frozen Core + Parity Oracle | PKG-01..04, TEST-01..05 (9 reqs) | In Progress (6 plans, 5 waves) |
+| 25 | Parallel Migration + Cutover | MIG-01..06, CUT-01, TEST-06 (8 reqs) | Pending (plans TBD) |
+| 26 | Wholesale CLI→Pytest Conversion | CUT-02 (1 req) | Pending (terminal, deferrable) |
 
-**Total:** 11 requirements across 2 phases. 100% Complete (`bin/requirements-sync.sh --strict --require-complete` exits 0 at close).
+**Total:** 18 requirements across 3 phases (REQUIREMENTS.md promoted from staged 2026-07-03).
 
 ## Deferred Items
 
-Items acknowledged and deferred at the v1.4 milestone close (2026-07-03):
+Carried forward from the v1.4 close (2026-07-03):
 
 | Category | Item | Status |
 |----------|------|--------|
@@ -51,10 +52,4 @@ Items acknowledged and deferred at the v1.4 milestone close (2026-07-03):
 | backlog | 999.3 (template placeholder system + Phase D `WIZ`), 999.6 (observed GTD review patterns) | In `.planning/ROADMAP.md` Backlog |
 | v1.2-deferred | Obsidian plugin distribution; one-command installer; hosted docs site; brownfield `--apply` mode | Carried forward per PROJECT.md |
 | tech-debt (pre-existing) | 3 unsummarized Kahneman raw sources (DRFT-01); brownfield WR-*/IN-* nits; Phase 11 human-UAT visual items; stale §11.x prior-phase tests | Non-blocking; the stale-test class shrinks at v1.5 (pytest conversion) |
-
-## Queued Next Milestone
-
-**v1.5 Python Migration** (Phases 24–26) — staged import from the laptop (its independently-defined "v1.4", renumbered at the 2026-07-03 consolidation):
-- Definition: `milestones/v1.5-MILESTONE-BRIEF.md` (version mapping + MANDATORY re-baseline) + `milestones/v1.5-REQUIREMENTS-STAGED.md` (PKG-01..04, TEST-01..06, MIG-01..06, CUT-01..02).
-- Phase 24 plans: `.planning/phases/24-foundation-package-skeleton-frozen-shared-core-parity-oracle/` (6 plans, 5 waves, 6 cross-AI review cycles).
-- Start ritual: promote staged requirements → REQUIREMENTS.md; re-derive the frozen-core inventory / characterization-golden list / CI suite enumeration / freeze-baseline pin against the current tree; then execute.
+| v1.5-future | LIBSWAP (native-lib re-platforming), SHIMOUT (shim retirement) | Named in REQUIREMENTS.md Future Requirements |
