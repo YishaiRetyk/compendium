@@ -45,6 +45,9 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[dario-amodei|Dario Amodei]] — Co-founder and CEO of Anthropic; took the faster side on AGI timelines and reiterated his no-chips-to-adversaries policy (sourced, 2026-06-14)
 - [[elastic|Elastic]] — Search company behind Elasticsearch and its ES|QL query language; frames agentic-search tool design around a low-floor/high-ceiling stack (sourced, 2026-07-03)
 - [[leonie-monigatti|Leonie Monigatti]] — Retrieval/search practitioner at Elastic; argued context engineering is "about 80% agentic search" in an AI Engineer conference talk (sourced, 2026-07-03)
+- [[symphony|Symphony]] — OpenAI's spec-first coding-agent orchestration service: a long-running daemon that turns Linear issues into isolated per-issue Codex runs via a single-authority orchestrator; shipped as a SPEC.md you regenerate into code (mixed, 2026-07-03)
+- [[openai|OpenAI]] — The AI company behind Symphony, the Codex coding agent, and the "harness engineering" framing; stub sourced via the Symphony spec (mixed, 2026-07-03)
+- [[codex|Codex]] — OpenAI's coding agent, integrated via an app-server protocol (stdio subprocess, thread/turn session model); the agent Symphony drives (mixed, 2026-07-03)
 
 ## Concepts
 
@@ -59,7 +62,7 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[ralph-loop|Ralph (Autonomous Coding Loop)]] — Geoffrey Huntley's minimal autonomous-coding pattern: bash `while` loop + fixed PROMPT.md + IMPLEMENTATION_PLAN.md on disk as cross-iteration shared state (sourced, 2026-05-06)
 - [[backpressure|Backpressure]] — Downstream rejection signals (tests, typechecks, lints, builds, LLM-as-judge) that block invalid agent output before commit (sourced, 2026-05-06)
 - [[vlm-ocr-hallucination|VLM OCR Hallucination]] — Vision-language models default to linguistic priors on degraded document images, emitting plausible-but-wrong text instead of flagging unreadability (sourced, 2026-06-09)
-- [[spec-driven-development|Spec-Driven Development]] — Methodology where the spec is the version-controlled source of truth and code is a regenerable expression; implemented by Spec Kit (mixed, 2026-06-09)
+- [[spec-driven-development|Spec-Driven Development]] — Methodology where the spec is the version-controlled source of truth and code is a regenerable expression; implemented by Spec Kit, and taken to the distribution layer by OpenAI's Symphony (mixed, 2026-07-03)
 - [[subagents|Subagents]] — Isolated Claude instances with their own context window; process 100K tokens and return a distilled summary, keeping the parent context clean (mixed, 2026-06-09)
 - [[llm-agent-scientific-discovery|LLM Agents for Scientific Discovery]] — Paradigm of coordinated LLM agents automating the scientific method (hypothesis generation, experiment planning, data analysis) in a human-in-the-loop cycle (sourced, 2026-06-12)
 - [[ai-for-drug-repurposing|AI for Drug Repurposing]] — Using LLM/agentic systems to surface non-obvious new indications for existing drugs by connecting insights already in the literature (sourced, 2026-06-12)
@@ -93,6 +96,7 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[src-2026-06-17-interpretable-context-methodology|Interpretable Context Methodology: Folder Structure as Agent Architecture]] — Van Clief & McDermott, arXiv:2603.16021v2 [cs.AI], March 2026 — ICM as filesystem-native orchestration for sequential, human-reviewed workflows; born-digital PDF extracted via pdftotext (tool-agnostic D-04 contract, no OCR needed) (mixed, 2026-06-17)
 - [[src-2026-07-03-gsd-core-repo|open-gsd/gsd-core — GSD Core repository snapshot]] — Snapshot at commit `69fef7c0` (branch `next`) — first repository-type source: rename/lineage evidence (get-shit-done → GSD Core under OpenGSD), v1.7.0-rc.1 package metadata, first-party context-rot docs, curated code excerpts with `#path:` anchors (sourced, 2026-07-03)
 - [[src-2026-07-03-agentic-search-context-engineering|Agentic Search for Context Engineering — Leonie Monigatti, Elastic]] — AI Engineer, 2026-05-08 — YouTube transcript (video sub-case): context engineering as ~80% agentic search, four search-interface demos (semantic, ES|QL, shell, semantic-grep), and low-floor/high-ceiling tool curation (sourced, 2026-07-03)
+- [[src-2026-07-03-openai-symphony-spec|openai/symphony — Symphony Service Specification repository snapshot]] — Snapshot at commit `4cbe3a9` (branch `main`) — OpenAI's spec-first coding-agent orchestration service: long-running Linear-polling daemon, isolated per-issue Codex workspaces, single-authority orchestrator, hot-reloaded WORKFLOW.md contract, filesystem safety invariants; Apache-2.0/Elixir, engineering preview (sourced, 2026-07-03)
 
 ## Comparisons
 
