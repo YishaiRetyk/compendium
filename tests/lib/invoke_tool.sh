@@ -41,7 +41,16 @@ capture_footprint() {
     normalize < "$IT_STDOUT" > "$casedir/stdout"
     normalize < "$IT_STDERR" > "$casedir/stderr"
     printf '%s\n' "$IT_EXIT" > "$casedir/exit"
-    ( cd "$repo" && find . -path './.git' -prune -o -print 2>/dev/null \
+    # D-09 REBASE (2026-07-03, Phase 25 first live channel-comparison): file hashes are computed
+    # over NORMALIZED content (same treatment as the stdout/stderr channels), because written
+    # artifacts embed (a) second-granularity wall-clock run stamps and (b) the executing
+    # checkout's own root path (oracle worktree vs staged index vs repo) — neither is behavior,
+    # and raw hashing made the tree channel diverge across ANY two runs minutes apart (even
+    # bash-vs-bash). Phase 24 never hit this: the staged-gate's empty-manifest short-circuit
+    # meant the cross-run comparison had never actually executed. normalize is byte-safe here
+    # under the seam's LC_ALL=C. __pycache__/.pytest_cache are generated caches (mtime-bearing
+    # .pyc bytes), pruned like .git.
+    ( cd "$repo" && find . \( -path './.git' -o -name '__pycache__' -o -name '.pytest_cache' \) -prune -o -print 2>/dev/null \
         | LC_ALL=C sort \
         | while IFS= read -r e; do
               [ "$e" = "." ] && continue
@@ -51,7 +60,7 @@ capture_footprint() {
                   printf 'D %s %s\n' "$(stat -c '%a' "$e")" "$e"   # empty dirs recorded too
               elif [ -f "$e" ]; then
                   printf 'F %s %s  %s\n' "$(stat -c '%a' "$e")" \
-                      "$(sha256sum "$e" | cut -d' ' -f1)" "$e"      # MODE captures exec bit
+                      "$(normalize < "$e" | sha256sum | cut -d' ' -f1)" "$e"   # MODE captures exec bit
               fi
           done ) > "$casedir/tree"
 }
@@ -112,7 +121,14 @@ invoke_tool() {
         local cdir="$IT_CAPTURE_DIR/${key}/${tool}-$(printf '%03d' "$((n_prev + 1))")"
         # CYCLE-6 fix #4: snapshot the REAL fixture root, not $PWD. 86 parity invocations pass their fixture via
         # `--root <tmp>` WITHOUT cd-ing, so $PWD is the test's own dir, NOT the tree the tool mutated.
-        capture_footprint "$(_it_footprint_root "$@")" "$cdir"
+        # D-09 REBASE (2026-07-03): hand normalize() the per-lane exec roots so every form of "the
+        # executing checkout's path" (oracle worktree / staged index / repo) collapses to ONE
+        # <EXEC_ROOT> token on BOTH legs — a tool embedding its own location is otherwise a
+        # guaranteed cross-lane divergence. Exported for the capture only; both lanes list BOTH
+        # roots (symmetry is what makes the tokens equal).
+        local _wt=""; _wt="$(_oracle_worktree_dir 2>/dev/null || true)"
+        _NORM_EXEC_ROOTS="${_wt}:$(_oracle_exec_root):$(_oracle_git_root)" \
+            capture_footprint "$(_it_footprint_root "$@")" "$cdir"
     fi
     return 0    # ALWAYS 0 — status is exposed ONLY via $IT_EXIT (REVIEWS HIGH#2)
 }
