@@ -17,10 +17,10 @@ import tempfile
 # Golden-locked: the INCLUDES echo lines freeze this exact order.
 # CUT-01 (Phase 25 cutover): "src" + "pyproject.toml" ship because every bin/<tool>.sh
 # is now an exec-shim over `python3 -m compendium.<tool>` — a template without src/
-# would ship 16 broken tools. "tests/lib" ships because the phase-07/18 suites are
-# seam-routed (Phase 24); tests/ported.manifest and tests/freeze-baseline.sha are
-# deliberately NOT shipped — their absence makes the seam's HEAD-fallback legal on a
-# template checkout (the oracle then runs the checkout's own shims).
+# would ship 16 broken tools. "tests/lib" ships because the shipped suites route tool
+# calls through tests/lib/invoke_tool.sh. (The migration parity apparatus —
+# tests/ported.manifest, tests/freeze-baseline.sha, the frozen-bash worktree oracle —
+# was retired in Phase 26 / 26-02; there is one implementation now.)
 ALLOWLIST = (
     "README.md",
     "LICENSE",

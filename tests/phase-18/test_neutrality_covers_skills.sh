@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Covers: D-10 -- check-neutrality covers .claude/skills in scanned paths.
-# Post-MIG-03 rewrite (tests/impl-assertion-inventory.md): the old static
+# Post-MIG-03 rewrite (impl-agnostic behavior probe): the old static
 # source-grep of bin/check-neutrality.sh for '.claude/skills' is replaced by a
 # BEHAVIOR probe -- plant a denylisted term in <repo>/.claude/skills/**/SKILL.md
 # and assert the scanner flags it (nonzero exit + output names the term/path).

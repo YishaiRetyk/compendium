@@ -3,8 +3,8 @@
 Direct module-level coverage through the public main() dispatch — the heredoc-lifted
 subcommand bodies are deliberately closures (verbatim extraction), so the unit seams
 are the dispatch contract plus real bootstrap/scan runs on tmp fixtures. Byte-level
-behavior parity is owned by the phase-10/11 suites + the WIKI_IMPL oracle; these
-tests exist for fast, localized regression signal (D-18).
+behavior is owned by the phase-10/11 black-box suites; these tests exist for fast,
+localized regression signal (D-18).
 """
 import os
 

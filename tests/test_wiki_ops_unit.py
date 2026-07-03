@@ -13,10 +13,10 @@ Direct module-level coverage of the six ported tools' pure seams:
   - repo_snapshot: license-family heuristic (order is load-bearing) and
     dominant-language heuristic.
 
-Byte-level behavior parity is owned by the phase-24 characterization goldens +
-the WIKI_IMPL oracle; these tests exist for fast, localized regression signal
-(D-18). Helpers that shell out (grep/sed/sort) run against tmp fixtures — that
-is the ported behavior, not a test shortcut.
+Byte-level behavior is owned by the phase-24 characterization goldens; these
+tests exist for fast, localized regression signal (D-18). Helpers that shell out
+(grep/sed/sort) run against tmp fixtures — that is the ported behavior, not a
+test shortcut.
 """
 import textwrap
 

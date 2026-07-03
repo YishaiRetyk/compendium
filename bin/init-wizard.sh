@@ -4,7 +4,7 @@
 # (docs/reference/python-shim-contract.md §4) the exit-3 pre-flight is a
 # dependency-PRESENCE check and stays IN THE SHIM — a Python port cannot detect
 # "python3 missing" from inside python3. Enforced by
-# tests/phase-24/test_shim_preflight_exit3.sh (manifest-driven loop).
+# tests/phase-24/test_shim_preflight_exit3.sh (contract-registry loop).
 # Known narrow divergence vs the retired bash body: bash parsed --help BEFORE
 # pre-flight; the shim pre-flights first, so --help on a dependency-less machine
 # exits 3 instead of printing usage (the usage text lives in the Python module).

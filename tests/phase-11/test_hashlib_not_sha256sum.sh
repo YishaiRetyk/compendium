@@ -19,10 +19,9 @@ export BROWNFIELD_FIXTURE_CREATED_AT=2026-04-20
 export BROWNFIELD_TOOL_VERSION=1.1.0
 NAME="$(basename "${BASH_SOURCE[0]}")"
 
-# The canonical script the oracle's suggest run byte-copies (use the ORACLE's tree so
-# the expected value matches the code actually executed).
-WT="$(ensure_oracle_worktree)"
-CANONICAL="$WT/schema/brownfield/migrations/01-page-typing.sh"
+# The canonical script `brownfield suggest` byte-copies. Post-26-02 there is one impl, so
+# the live repo IS the code actually executed (schema/ was never part of the migration).
+CANONICAL="$REPO_ROOT/schema/brownfield/migrations/01-page-typing.sh"
 [ -f "$CANONICAL" ] || { echo "FAIL: canonical migration script missing: $CANONICAL" >&2; exit 1; }
 
 # Reference computation of the documented op_hash contract (the test's own reference —

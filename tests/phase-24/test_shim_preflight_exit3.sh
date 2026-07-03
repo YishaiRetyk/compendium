@@ -8,13 +8,13 @@
 #      gate) returns exit 3 with python3 stripped, WITHOUT reaching Python;
 #   2) a BARE bootstrap-shim (no preflight) returns 127 (command not found), NOT 3 —
 #      proving the contract is non-trivial (pre-fix-failing);
-#   3) a MANIFEST-DRIVEN loop binds the contract to the REAL shipped shim population:
-#      for each tool in tests/ported.manifest with a declared preflight contract
-#      (registry: init-wizard -> strip python3 -> exit 3), the REAL bin/<tool>.sh shim
-#      is driven with the dependency stripped and must return the contract code before
-#      Python. Empty manifest in Phase 24 -> zero iterations on the real repo; Phase 25
-#      appends light it up with no test edit. The loop mechanism is PROVEN here via a
-#      WIKI_EXEC_ROOT-pointed scaffold with a seeded manifest entry.
+#   3) a CONTRACT-REGISTRY loop binds the contract to the REAL shipped shim population:
+#      for each tool with a declared preflight contract (registry: init-wizard -> strip
+#      python3 -> exit 3), the REAL bin/<tool>.sh shim is driven with the dependency
+#      stripped and must return the contract code before Python. Proven via a scaffold
+#      (bare shim flagged, canonical passes), then run against the real repo shim.
+#      (Pre-26-02 this iterated tests/ported.manifest via the oracle exec-root; the
+#      manifest is retired — all 16 tools ship, so the registry is the source of truth.)
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib.sh"
@@ -108,23 +108,23 @@ set -e
 grep -q 'PY-MODULE-REACHED' "$O" || fail "canonical shim did not reach Python with python3 present"
 echo "ok: preflight gate does not over-block (module reached with python3 present)"
 
-# 4. MANIFEST-DRIVEN per-shim enforcement (cycle-6 fix #5): iterate every ported tool
-#    with a declared preflight contract and assert the REAL shim honors it.
-#    Contract registry: tool -> expected exit with its dependency stripped.
+# 4. CONTRACT-REGISTRY per-shim enforcement (cycle-6 fix #5): iterate every tool with a
+#    declared preflight contract and assert the REAL shim honors it (dependency stripped).
+#    Contract registry: tool -> expected exit. All 16 tools ship post-migration; only
+#    init-wizard carries a preflight (python3-presence) contract.
 preflight_contract_exit() {
     case "$1" in
         init-wizard) printf '3\n' ;;
         *) printf '\n' ;;      # no preflight contract for other tools
     esac
 }
-manifest_preflight_loop() {
-    local exec_root="$1" mf tool want rc o e lrc=0
-    mf="$exec_root/tests/ported.manifest"
-    [ -f "$mf" ] || return 0
-    while IFS= read -r tool; do
-        case "$tool" in \#*|"") continue ;; esac
+CONTRACT_TOOLS="init-wizard"   # the tools with a non-empty preflight_contract_exit
+preflight_loop() {
+    local exec_root="$1" tool want rc o e lrc=0
+    for tool in $CONTRACT_TOOLS; do
         want="$(preflight_contract_exit "$tool")"
         [ -n "$want" ] || continue
+        [ -f "$exec_root/bin/${tool}.sh" ] || continue
         o="$(mktemp)"; e="$(mktemp)"
         rc="$(run_stripped "$exec_root/bin/${tool}.sh" "$o" "$e")"
         if [ "$rc" != "$want" ]; then
@@ -134,21 +134,19 @@ manifest_preflight_loop() {
             echo "SHIM PREFLIGHT CONTRACT VIOLATION: $tool reached Python before the preflight" >&2
             lrc=1
         fi
-    done < "$mf"
+    done
     return "$lrc"
 }
-# (a) scaffold with a BARE shim seeded in its manifest -> loop FLAGS it.
-printf '# scaffold manifest\ninit-wizard\n' > "$SC/tests/ported.manifest"
+# (a) scaffold with a BARE shim -> loop FLAGS it.
 write_bare_bootstrap_shim
-if WIKI_EXEC_ROOT="$SC" manifest_preflight_loop "$(WIKI_EXEC_ROOT="$SC" _oracle_exec_root)" 2>/dev/null; then
-    fail "manifest-driven loop did NOT flag a preflight-free ported shim"
+if preflight_loop "$SC" 2>/dev/null; then
+    fail "contract-registry loop did NOT flag a preflight-free shim"
 fi
 # (b) canonical shim -> loop passes.
 write_canonical_preflight_shim
-WIKI_EXEC_ROOT="$SC" manifest_preflight_loop "$(WIKI_EXEC_ROOT="$SC" _oracle_exec_root)" || \
-    fail "manifest-driven loop flagged the canonical preflight-preserving shim"
-# (c) the REAL repo: manifest empty in Phase 24 -> zero iterations -> passes.
-manifest_preflight_loop "$(_oracle_exec_root)" || fail "manifest-driven loop failed on the real repo"
-echo "ok: manifest-driven per-shim preflight enforcement (flags bare; passes canonical; empty=noop)"
+preflight_loop "$SC" || fail "contract-registry loop flagged the canonical preflight-preserving shim"
+# (c) the REAL repo: the shipped bin/init-wizard.sh shim honors its exit-3 preflight.
+preflight_loop "$REPO_ROOT" || fail "contract-registry loop failed on the real repo shim population"
+echo "ok: contract-registry per-shim preflight enforcement (flags bare; passes canonical; real shim honors it)"
 
 echo "PASS: shim-level exit-3 preflight-preservation contract (cycle-4 #2b + cycle-6 #5)"

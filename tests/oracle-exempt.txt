@@ -1,4 +1,0 @@
-# tests/oracle-exempt.txt — machine-readable parity-exempt patterns consumed by run-all-suites.sh --require-parity (cycle-6 MEDIUM b).
-# <pattern><TAB><reason>.  <pattern> = a tool name or a capture pairing-key glob.  Keep CONSISTENT with tests/oracle-exempt.md.
-init-wizard	exit-4 already-initialized + exit-3 preflight are $0-relative / dependency-presence paths, not python-module parity-verifiable (exit-3 enforced by test_shim_preflight_exit3.sh)
-11/test_end_to_end_happy_path/brownfield-00[34]	applied.log records sha256 of GENERATED_AT-stamped suggest outputs (second-order wall-clock; D-09 2026-07-03) — e2e verify tree not cross-run comparable; verify 4-channel parity owned by the 5 dedicated phase-11 verify tests

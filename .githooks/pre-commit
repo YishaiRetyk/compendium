@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
-# Pre-commit hook: enforce AGENTS.md <-> CLAUDE.md byte-equality (D-03)
-# AND run the local wiki write-gate over staged changes (Phase 12.2).
+# Pre-commit hook: enforce AGENTS.md <-> CLAUDE.md byte-equality (D-03), keep the
+# generated skills in sync (SKILL-02), and run the local wiki write-gate over staged
+# changes (Phase 12.2). A fast unit-test smoke runs only when the commit touches code.
+#
+# The Phase-24/25 migration parity gates (check-common-freeze, check-staged-parity, the
+# frozen-bash worktree oracle) were RETIRED in Phase 26 (26-02): there is one impl now, so
+# the pytest suite is the regression net (locally via the smoke below; fully in CI).
 set -euo pipefail
 
 # Surface real diagnostics rather than swallowing stderr (REVIEW WR-05): a non-drift failure
@@ -49,48 +54,6 @@ if ! bash bin/gen-skills.sh --check; then
     exit 1
 fi
 
-# Phase 24 / D-07: freeze guard over STAGED changes (REVIEWS HIGH#2 + HIGH#12 — the real local gate;
-# CI never runs on the private Phase-25 migration branches). Blocks a commit that touches the frozen
-# foundation surface (src/compendium/common, pyproject.toml, the parity seam/oracle/goldens) unless
-# the ownership-rebase escape hatch (FREEZE_ALLOW_REBASE=1) is set. Do NOT swallow stderr (WR-05).
-# CORRECT exit capture (REVIEWS HIGH#2): `if cmd; then fc_rc=0; else fc_rc=$?; fi` — NOT
-# `if ! cmd; then fc_rc=$?` (under `!`, $? in the then-branch is the negation's status = always 0,
-# so the exit-3 skip path goes DEAD and an unreachable baseline hard-blocks every commit).
-if bash bin/check-common-freeze.sh --staged; then
-    fc_rc=0
-else
-    fc_rc=$?
-fi
-if [ "$fc_rc" = "3" ]; then
-    echo "freeze guard skipped (baseline unreachable) — proceeding." >&2     # neutral SKIP, not a block
-elif [ "$fc_rc" != "0" ]; then
-    echo "" >&2
-    echo "Frozen surface touched (src/compendium/common, pyproject.toml, the parity seam/oracle/goldens)." >&2
-    echo "Phase 24 froze this surface. If this is the sanctioned ownership-rebase addition, re-commit with" >&2
-    echo "FREEZE_ALLOW_REBASE=1, then bump tests/freeze-baseline.sha + 'git tag -f phase-24-freeze' to the" >&2
-    echo "landed SHA in a follow-up commit (same plan; record the override in its SUMMARY — N-7)." >&2
-    exit 1
-fi
-
-# Phase 24 / REVIEWS HIGH#6: LOCAL parity gate. CI parity runs ONLY in GitHub Actions, which never
-# runs on the never-pushed private Phase-25 branches — so a port could commit locally with no parity
-# check. This runs the parity suites against the MATERIALIZED STAGED INDEX (STAGED_EXEC_ROOT — cycle-4
-# finding #4) while the oracle git resolution runs against ORACLE_GIT_ROOT (the real .git), whenever
-# bin/ / src/compendium/ / tests/ported.manifest is staged. Excludes ONLY the two recursive hook
-# self-tests from its fallback (--exclude-test) + re-entrancy-guarded (cycle-6 fix #3).
-# WIP escape hatch: PARITY_GATE_SKIP=1 (record its use in the plan SUMMARY — N-7).
-if bash bin/check-staged-parity.sh; then
-    pg_rc=0
-else
-    pg_rc=$?
-fi
-if [ "$pg_rc" != "0" ]; then
-    echo "" >&2
-    echo "Parity gate failed for a staged migration change (bin/ / src/compendium/ / ported.manifest)." >&2
-    echo "The Python impl diverges from the held-fixed bash oracle. Fix parity or commit with PARITY_GATE_SKIP=1 (WIP only)." >&2
-    exit 1
-fi
-
 # Phase 12.2 / WGATE-01..04: local wiki write-gate over staged changes.
 # Reuses bin/lint.sh --strict policy via the additive --staged flag.
 # See AGENTS.md §11.3 for the normative contract (exemption ordering,
@@ -99,4 +62,19 @@ if ! bash bin/lint.sh --strict --staged --category provenance >&2; then
     echo "" >&2
     echo "Write-gate failed. Add [prov:source_id#locator] markers to the page, set type: source / type: decision in frontmatter if it's not a synthesized page, or run \`git commit --no-verify\` to bypass." >&2
     exit 1
+fi
+
+# Fast regression smoke: run the hermetic UNIT tests ONLY when the commit touches code
+# (bin/ src/ tests/ pyproject.toml). A pure wiki/docs/planning commit skips it entirely, so
+# routine content commits stay fast. The heavy black-box bridge (live-state suites) is left to
+# CI + a manual `pytest`. Opt out with WIKI_SKIP_PYTEST=1 (WIP only).
+if [ "${WIKI_SKIP_PYTEST:-0}" != "1" ] \
+   && git diff --cached --name-only | grep -qE '^(bin/|src/|tests/|pyproject\.toml$)'; then
+    if command -v python3 >/dev/null 2>&1 && python3 -c 'import pytest' >/dev/null 2>&1; then
+        if ! python3 -m pytest -q --ignore=tests/test_blackbox_suites.py >&2; then
+            echo "" >&2
+            echo "Unit-test smoke failed. Fix the regression, or commit with WIKI_SKIP_PYTEST=1 (WIP only)." >&2
+            exit 1
+        fi
+    fi
 fi

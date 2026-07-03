@@ -3,8 +3,9 @@
 Bridges the frozen black-box bash suites onto pytest. It discovers every
 ``tests/phase-<suite>/test_*.sh`` in the enumerated suite set, emits ONE pytest
 case per file (id = ``phase-<suite>/<testname>``), and runs each against the REAL
-Python ``bin/`` — ``WIKI_IMPL=py`` routes every tool call through its
-``bin/<tool>.sh`` shim, which execs ``python3 -m compendium.<tool>``.
+Python ``bin/`` — the seam (``tests/lib/invoke_tool.sh``) runs each tool's
+``bin/<tool>.sh`` shim, which execs ``python3 -m compendium.<tool>``. (Post-26-02
+there is one implementation; the frozen-bash parity oracle is retired.)
 
 The pinned baseline in ``tests/SUITE_MANIFEST.txt`` is the contract: a manifest
 ``FAIL`` row is ``xfail(strict=True)`` (a stale prior-phase test that must keep
@@ -12,15 +13,12 @@ failing — if it starts passing, strict-xfail turns the XPASS into a failure so
 manifest is re-pinned deliberately); every other file must exit 0.
 
 Bridge, NOT rewrite (D-26-01): the bash files ARE the behavioral spec. This
-collector supersedes the bash *runner* (``run-all-suites.sh``); the bash test
-*files* stay as the spec, now driven in parallel by pytest-xdist (``-n auto``).
+collector replaced the retired bash *runner*; the bash test *files* stay as the
+spec, now driven in parallel by pytest-xdist (``-n auto``).
 
-Faithfulness note: the subprocess env mirrors what ``run-all-suites.sh`` set —
-``WIKI_IMPL`` from the caller (pinned to ``py`` here so the bridge exercises the
-shipped Python) and ``PDF_EXTRACT_SKIP_LIVE=1``. The seam (``invoke_tool.sh``)
-pins ``LC_ALL=C``/``TZ=UTC``/``PYTHONPATH`` per tool-call internally, exactly as it
-did under the runner, so the reproduced pass/FAIL baseline is byte-for-byte the
-one measured in ``SUITE_MANIFEST.txt``.
+Faithfulness note: ``PDF_EXTRACT_SKIP_LIVE=1`` mirrors the retired runner's default
+(no live PDF/OCR). The seam pins ``LC_ALL=C``/``TZ=UTC``/``PYTHONPATH`` per tool-call
+internally, so the reproduced pass/FAIL baseline is byte-for-byte SUITE_MANIFEST.txt.
 """
 
 import os
@@ -32,9 +30,9 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parent.parent
 MANIFEST = REPO_ROOT / "tests" / "SUITE_MANIFEST.txt"
 
-# The enumerated suite set — MUST stay in lockstep with run-all-suites.sh's SUITES
-# (an explicit list, never a glob: a phase dir with test_*.sh but absent here is
-# intentionally out of the black-box net, e.g. phase-07/08's superseded suites).
+# The enumerated suite set (inherited from the retired run-all-suites.sh) — an explicit
+# list, never a glob: a phase dir with test_*.sh but absent here is intentionally out of
+# the black-box net (e.g. phase-07/08's setup suites, run by their own CI job).
 SUITES = ["09", "09.1", "10", "11", "12.1", "12.2", "13",
           "15", "18", "20", "22", "23", "24"]
 
@@ -44,8 +42,8 @@ SUITES = ["09", "09.1", "10", "11", "12.1", "12.2", "13",
 # `xdist_group` under `--dist loadgroup`; every other suite parallelizes freely.
 #   18   — mutates the LIVE .claude/skills/ tree (gen-skills injects/restores drift;
 #          two of its tests racing was the concrete flake this guards against).
-#   24   — the parity self-tests drive the shared /tmp oracle worktree
-#          (ensure_oracle_worktree at a repo+ref-keyed path) and the WIKI_IMPL=bash leg.
+#   24   — characterization tests read the LIVE .claude/skills via `gen-skills --check`
+#          (root-anchored, ignores cwd), so they race suite 18's drift injection.
 #   12.2 — clones the live repo and runs the live pre-commit hook (contends on .git).
 SERIAL_SUITES = {"12.2", "18", "24"}
 _LIVE_GROUP = pytest.mark.xdist_group("live_repo")
@@ -90,7 +88,7 @@ def _discover():
 
 @pytest.mark.parametrize("test_path,name", _discover())
 def test_blackbox_suite(test_path, name, tmp_path):
-    """Run one frozen bash suite file against the real Python bin/ (WIKI_IMPL=py).
+    """Run one frozen bash suite file against the real Python bin/.
 
     cwd is a fresh per-test tmp dir, NOT the repo root: a handful of suites write
     relative scratch files (`2>stderr.txt`) into cwd, which under one shared
@@ -99,8 +97,7 @@ def test_blackbox_suite(test_path, name, tmp_path):
     so an isolated cwd is transparent to them while making relative writes race-free.
     """
     env = dict(os.environ)
-    env["WIKI_IMPL"] = "py"                       # exercise the shipped Python via shims
-    env.setdefault("PDF_EXTRACT_SKIP_LIVE", "1")  # the runner's default: no live PDF/OCR
+    env.setdefault("PDF_EXTRACT_SKIP_LIVE", "1")  # retired runner's default: no live PDF/OCR
     result = subprocess.run(
         ["bash", test_path],
         cwd=str(tmp_path),
@@ -117,10 +114,10 @@ def test_blackbox_suite(test_path, name, tmp_path):
 def test_manifest_matches_suite_files():
     """The manifest and the on-disk enumerated-suite files must be in bijection.
 
-    Reproduces run-all-suites.sh's "MANIFEST ROW WITHOUT A TEST FILE" guard (a
-    deleted parity-carrying test must not silently shrink the net) AND the
+    Carries forward the retired runner's "MANIFEST ROW WITHOUT A TEST FILE" guard (a
+    deleted regression-carrying test must not silently shrink the net) AND the
     symmetric direction (a new unpinned test file must be pinned deliberately,
-    not left to pass silently). Currently 209 rows ↔ 209 files.
+    not left to pass silently). Currently 205 rows ↔ 205 files.
     """
     on_disk = {
         f"phase-{suite}/{p.stem}"

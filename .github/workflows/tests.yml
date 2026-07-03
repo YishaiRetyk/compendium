@@ -1,0 +1,30 @@
+# Phase 26 (CUT-02): the pytest regression net. Replaces the retired parity.yml — with
+# one implementation (Python behind the shims), there is nothing to diff, so the single
+# parallel `pytest` entrypoint (unit tests + the black-box bridge) IS the regression net.
+#
+# ENFORCEMENT MODEL (mirrors neutrality.yml / setup-parity.yml):
+#   - `pull_request` is the gate; `push` to main is advisory (post-merge visibility).
+#   - Job name `tests` is NEW — it is NOT one of the 6 branch-protected required checks
+#     (lint, privacy-leak, strict, skills-check, neutrality, setup-parity), so adding it
+#     does not disturb the required-check contract (PKG-04).
+name: Tests (pytest)
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install the compendium package + dev deps (pinned)
+        run: pip install -e .[dev]
+      - name: pytest (unit tests + black-box bridge, parallel)
+        # addopts in pyproject.toml pins `-n auto --dist loadgroup`; the black-box bridge
+        # drives every tests/phase-*/test_*.sh against the real Python bin/.
+        run: python3 -m pytest
