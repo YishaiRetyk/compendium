@@ -7,6 +7,10 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 source "$REPO_ROOT/tests/lib/invoke_tool.sh"   # Phase 24 Plan 05: the frozen parity seam
+# Deterministic fixture commits (Phase 25 25-01 gate finding): this test's inline
+# fixture commits produce runtime-born SHAs that leak into the tool's observable
+# output; pinned dates make the SHAs a pure function of content+parentage.
+export GIT_AUTHOR_DATE="2026-01-02T00:00:00Z" GIT_COMMITTER_DATE="2026-01-02T00:00:00Z"
 
 TMP="$(mktemp -d -t phase23-drift-XXXXXX)"
 trap 'rm -rf "$TMP"' EXIT

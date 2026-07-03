@@ -8,6 +8,13 @@
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 source "$REPO_ROOT/tests/lib/invoke_tool.sh"   # Phase 24 Plan 05: the frozen parity seam
 
+# Deterministic fixture commits (Phase 25 25-01 gate finding): fixture git SHAs are
+# runtime-born without pinned commit dates, and SHAs leak into observable output
+# (contributor detection paths here; audit-state/repo-snapshot/drift elsewhere) — the
+# cross-run channel comparison can then never byte-match. Pinning author+committer
+# dates makes every fixture SHA a pure function of content+parentage.
+export GIT_AUTHOR_DATE="2026-01-02T00:00:00Z" GIT_COMMITTER_DATE="2026-01-02T00:00:00Z"
+
 # make_fixture_repo <fixture-name>  -> prints path to a fresh temp repo
 # Copies tests/phase-09/fixtures/<fixture-name>/ into a mktemp dir,
 # runs `git init -q`, seeds one commit with the copied files, echoes the path.
@@ -31,14 +38,19 @@ make_fixture_repo() {
 
 # setup_git_author <repo-path> <name> <email>
 # Adds one commit as that author (for multi-author fixtures).
-# Uses a UNIQUE per-call filename (email-sanitized + nanoseconds + RANDOM) to
-# avoid the collision Codex LOW flagged with the prior `.ts` scheme.
+# Uses a UNIQUE per-call filename (email-sanitized + per-repo counter) to avoid the
+# collision Codex LOW flagged with the prior `.ts` scheme. DETERMINISTIC (Phase 25
+# 25-01 gate finding): the previous nanoseconds+RANDOM suffix put run-varying names
+# into the fixture tree, so tree captures (and fixture SHAs) could never match across
+# the two parity capture runs. A filesystem-derived counter keeps per-call uniqueness
+# while making names (and therefore SHAs) a pure function of call order.
 setup_git_author() {
     local repo="$1" name="$2" email="$3"
     local email_slug
     email_slug="$(printf '%s' "$email" | tr '[:upper:]@.+' 'a-z___')"
-    # Nanoseconds + RANDOM makes collision in a tight loop effectively impossible.
-    local stamp=".author-${email_slug}-$(date +%s%N 2>/dev/null || date +%s)-${RANDOM}.seed"
+    local n
+    n="$(find "$repo" -maxdepth 1 -name '.author-*.seed' | wc -l)"
+    local stamp=".author-${email_slug}-$(printf '%03d' $((n + 1))).seed"
     (cd "$repo" && git config user.name "$name" && git config user.email "$email" \
         && printf '%s\n' "$email" > "$stamp" \
         && git add "$stamp" \

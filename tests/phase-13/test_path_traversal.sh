@@ -5,16 +5,24 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib.sh"
 
-REPO="$(make_bare_repo)"
-trap 'cleanup_fixture_repo "$REPO"' EXIT
+# DETERMINISTIC LAYOUT (Phase 25 25-01 gate finding): the escape path below is
+# COMMITTED into fixture page content — deriving it from a mktemp basename made the
+# fixture tree (and its capture hash) vary per run. Repo and secret are fixed-name
+# children of ONE per-run mktemp parent: isolation lives in the parent, the embedded
+# relative path is byte-constant.
+PARENT="$(mktemp -d -t phase13trav-XXXXXX)"
+REPO_ORIG="$(make_bare_repo)"
+REPO="$PARENT/repo"
+mv "$REPO_ORIG" "$REPO"
+trap 'rm -rf "$PARENT"' EXIT
 
 # Plant a secret OUTSIDE the repo root that a traversal would read.
-SECRET_DIR="$(mktemp -d -t phase13secret-XXXXXX)"
-trap 'cleanup_fixture_repo "$REPO"; rm -rf "$SECRET_DIR"' EXIT
+SECRET_DIR="$PARENT/secret"
+mkdir "$SECRET_DIR"
 printf 'TRAVERSAL_SECRET_TEXT\n' > "$SECRET_DIR/secret.md"
 
 # Source page path: escapes the repo via ../ to reach the secret.
-ESCAPE_REL="../$(basename "$SECRET_DIR")/secret.md"
+ESCAPE_REL="../secret/secret.md"
 write_page "$REPO" "wiki-cloud/sources/src-tr.md" <<EOF
 ---
 id: src-tr
