@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools==82.0.1"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "compendium"
+version = "1.5.0"
+requires-python = ">=3.11"
+dependencies = [
+    "PyYAML==6.0.3",
+    "ruamel.yaml==0.19.1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest==9.0.2"]
+
+[project.scripts]
+compendium-lint                     = "compendium.lint:main"
+compendium-audit-claims             = "compendium.audit_claims:main"
+compendium-brownfield               = "compendium.brownfield:main"
+compendium-check-neutrality         = "compendium.check_neutrality:main"
+compendium-check-privacy            = "compendium.check_privacy:main"
+compendium-check-sources-cloud-safe = "compendium.check_sources_cloud_safe:main"
+compendium-gen-skills               = "compendium.gen_skills:main"
+compendium-ingest                   = "compendium.ingest:main"
+compendium-init-wizard              = "compendium.init_wizard:main"
+compendium-pdf-extract              = "compendium.pdf_extract:main"
+compendium-release                  = "compendium.release:main"
+compendium-repo-snapshot            = "compendium.repo_snapshot:main"
+compendium-requirements-sync        = "compendium.requirements_sync:main"
+compendium-search                   = "compendium.search:main"
+compendium-sync-claude              = "compendium.sync_claude:main"
+compendium-validate-op              = "compendium.validate_op:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "requires_ollama: test needs a reachable Ollama endpoint",
+    "requires_network: test needs network egress",
+]

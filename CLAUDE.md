@@ -102,7 +102,7 @@ life/                               # repo root
 └── .githooks/                      # Repo-local git hooks (e.g., pre-commit sync check)
 ```
 
-**Permitted top-level directories:** `sources/`, `wiki-cloud/`, `wiki-local/`, `schema/`, `examples/`, `docs/`, `.github/`, `bin/`, `.githooks/`. Content in `examples/` is reference-only (see `example: true` in `schema/reference/frontmatter.md`); it is skipped by lint and excluded from the published wiki.
+**Permitted top-level directories:** `sources/`, `wiki-cloud/`, `wiki-local/`, `schema/`, `examples/`, `docs/`, `.github/`, `bin/`, `src/`, `tests/`, `.githooks/`. Content in `examples/` is reference-only (see `example: true` in `schema/reference/frontmatter.md`); it is skipped by lint and excluded from the published wiki.
 
 **Source directory rules:**
 - Sources use chronological nesting: `YYYY/YYYY-MM/YYYY-MM-DD-slug/`

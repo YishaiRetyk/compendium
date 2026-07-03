@@ -34,3 +34,7 @@ Thumbs.db
 # Python bytecode cache (generated when bin/lib/*.py modules are imported)
 __pycache__/
 *.pyc
+
+# Python packaging build artifacts (v1.5 migration)
+*.egg-info/
+.venv/
