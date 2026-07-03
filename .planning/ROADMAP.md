@@ -109,7 +109,7 @@ Re-platform the `bin/` toolchain from Bash to Python behind `.sh` exec-shims (sh
   - [x] 25-04: wiki-ops port + retirements — 6 tools incl. repo-snapshot (MIG-05, MIG-06; wave 1) — completed 2026-07-04; search bug ported faithfully; migrate-privacy-dirs retired
   - [x] 25-05: init-wizard port behind preflight shim (MIG-04 complete; wave 1) — completed 2026-07-04; exit-3 preflight stays in the shim; setup-parity byte-equality holds
   - [x] 25-06: lint + audit-claims port (MIG-02 — long pole; wave 1) — completed 2026-07-04; byte-copy retired onto common.page; 3 impl-assertion rewrites mutation-verified; hook lint step now Python
-  - [ ] 25-07: cutover fan-in — DR + reference census + certification (CUT-01; wave 2)
+  - [x] 25-07: cutover fan-in — DR + reference census + certification (CUT-01; wave 2) — completed 2026-07-04; allowlist ships src/pyproject/tests-lib; 1 pre-existing stale doc ref fixed; DR indexed+logged
 - [ ] **Phase 26: Wholesale CLI→Pytest Conversion** (terminal, deferrable) — CUT-02
 
 ## Backlog

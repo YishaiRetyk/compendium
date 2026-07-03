@@ -13,6 +13,8 @@ INCLUDES: (allowlist -- ONLY these paths will be copied)
   INCLUDES: .obsidianignore
   INCLUDES: .neutrality-denylist.txt
   INCLUDES: bin
+  INCLUDES: src
+  INCLUDES: pyproject.toml
   INCLUDES: schema
   INCLUDES: docs
   INCLUDES: .claude/skills
@@ -22,6 +24,7 @@ INCLUDES: (allowlist -- ONLY these paths will be copied)
   INCLUDES: examples/kahneman
   INCLUDES: .github
   INCLUDES: .githooks
+  INCLUDES: tests/lib
   INCLUDES: tests/phase-07
   INCLUDES: tests/phase-18
 

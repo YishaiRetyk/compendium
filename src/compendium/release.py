@@ -14,8 +14,13 @@ import sys
 import tempfile
 
 # --- ALLOWLIST (REVIEWS.md HIGH #1). ONLY these paths/globs are copied. ---
-# Golden-locked: the INCLUDES echo lines freeze this exact order. Do NOT extend
-# with src/ or pyproject.toml here — that is a later plan's job.
+# Golden-locked: the INCLUDES echo lines freeze this exact order.
+# CUT-01 (Phase 25 cutover): "src" + "pyproject.toml" ship because every bin/<tool>.sh
+# is now an exec-shim over `python3 -m compendium.<tool>` — a template without src/
+# would ship 16 broken tools. "tests/lib" ships because the phase-07/18 suites are
+# seam-routed (Phase 24); tests/ported.manifest and tests/freeze-baseline.sha are
+# deliberately NOT shipped — their absence makes the seam's HEAD-fallback legal on a
+# template checkout (the oracle then runs the checkout's own shims).
 ALLOWLIST = (
     "README.md",
     "LICENSE",
@@ -27,6 +32,8 @@ ALLOWLIST = (
     ".obsidianignore",
     ".neutrality-denylist.txt",
     "bin",
+    "src",
+    "pyproject.toml",
     "schema",
     "docs",
     ".claude/skills",
@@ -36,6 +43,7 @@ ALLOWLIST = (
     "examples/kahneman",
     ".github",
     ".githooks",
+    "tests/lib",
     "tests/phase-07",
     "tests/phase-18",
 )

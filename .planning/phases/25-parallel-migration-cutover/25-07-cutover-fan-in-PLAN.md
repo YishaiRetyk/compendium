@@ -41,6 +41,16 @@ WIKI_IMPL=py.
 </context>
 
 <tasks>
+0. TEMPLATE-FUNCTIONALITY FIX (found at plan-time, 25-03 read-through): `bin/release.sh`
+   ALLOWLIST ships `bin/` but NOT `src/` + `pyproject.toml` — post-migration the released
+   template's shims would exec a missing package (every tool broken on a template
+   checkout). Extend the ALLOWLIST (+ evaluate `tests/lib/` + `tests/freeze-baseline.sha`
+   for the shipped phase-07/18 suites, which are seam-routed since Phase 24 — verify
+   invoke_tool's empty-manifest/no-baseline fallback on a simulated template checkout).
+   The allowlist INCLUDES lines are golden-locked → this is a sanctioned D-09
+   frozen-surface change: FREEZE_ALLOW_REBASE commit + GOLDEN_FREEZE re-freeze of the
+   release goldens + baseline re-pin follow-up, all recorded in the SUMMARY (N-7).
+   Deliberately deferred OUT of 25-03 (which ports the allowlist VERBATIM to hold parity).
 1. Census: grep all `bin/*.sh` references across schema/, docs/, AGENTS.md, CLAUDE.md,
    .github/, .claude/settings.local.json; table of hits with accurate/stale verdicts;
    fix stale ones (edit AGENTS.md → bin/sync-claude.sh to hold byte-equality).

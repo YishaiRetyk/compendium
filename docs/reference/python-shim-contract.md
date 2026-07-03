@@ -89,7 +89,8 @@ preserved:
 | sync-claude | `--check` exits **2** on drift |
 | gen-skills | `--check` exits **1** on drift |
 | init-wizard | **3** = pre-flight dependency failure; **4** = already-initialized (refused) |
-| checkers (neutrality / privacy / sources-cloud-safe) | **2** on violation |
+| checkers (neutrality / privacy) | **2** on violation |
+| check-sources-cloud-safe | **1** on violation (its own documented contract — corrected at CUT-01; the previous row overgeneralized "2" across all three checkers) |
 | lint | dual-mode exit semantics (text vs `--ci --format json`) |
 
 **init-wizard exit 3 is a Phase-25 COMPAT BOUNDARY the `.sh` shim must preserve BEFORE invoking

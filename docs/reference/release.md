@@ -106,6 +106,6 @@ All three smokes must be green: single commit, clean grep, all allowlist items p
 
 On the public remote: delete the branch via the GitHub UI or `git push --delete <remote> main` (and the tag with `git push --delete <remote> <tag>`). Since the template is generated from the maintainer's live repo via fresh-staging, there is no downstream state to unwind — rerun `bin/release.sh` after fixing whatever tripped the smoke.
 
-## Template upgrades (deferred to v1.2)
+## Template upgrades
 
-Users who fork the template own their fork. Future `bin/upgrade.sh` (v1.2) will provide a migration path for schema bumps. In v1.1, upgrades are manual: users pull from their fork's upstream and resolve conflicts in `AGENTS.md` / `bin/`. Domain content in `wiki/` is never touched by upgrades.
+Users who fork the template own their fork. Upgrades are manual: users pull from their fork's upstream and resolve conflicts in `AGENTS.md` / `bin/` / `src/`. Domain content in `wiki-cloud/` and `wiki-local/` is never touched by upgrades. (A scripted upgrade path was once sketched as `bin/upgrade.sh` for v1.2 but was never built; if it returns it will be a new proposal, not a pending deliverable.)
