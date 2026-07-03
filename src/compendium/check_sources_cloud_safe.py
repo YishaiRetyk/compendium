@@ -35,9 +35,15 @@ import sys
 try:
     from compendium.common.yaml_rt import read_fm_body
 except ImportError:
-    # Unreachable in practice (yaml_rt ships in the same package); kept for
-    # fidelity with the bash heredoc's import-failure branch.
-    print("ERROR: bin/lib/brownfield_yaml.py not found. Ensure LIB_DIR is set or run from repo root.", file=sys.stderr)
+    # REVIEW FIX (finding C2, 2026-07-03): this branch IS reachable — yaml_rt imports
+    # ruamel.yaml, so a missing ruamel lands here. The bash-era "bin/lib/... not found /
+    # set LIB_DIR" message was a red herring (no shim uses bin/lib anymore); point at the
+    # real fix instead.
+    print(
+        "ERROR: ruamel.yaml is required for check-sources-cloud-safe. "
+        "Install: pip install ruamel.yaml (or `pip install -e .`).",
+        file=sys.stderr,
+    )
     sys.exit(1)
 
 # Usage text extracted VERBATIM from the bin/check-sources-cloud-safe.sh usage() heredoc.

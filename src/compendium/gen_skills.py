@@ -201,39 +201,51 @@ def main(argv=None):
     # parents up. Fail loudly if the resolved root does not look like the repo
     # (a workflow file the generator depends on).
     repo_root = Path(__file__).resolve().parent.parent.parent
+    # REVIEW FIX (finding D2, 2026-07-03): restore the caller's cwd on exit. bash `cd` died
+    # with the process; this in-process os.chdir would otherwise leave a pytest interpreter
+    # (which imports and drives main()) rebased onto the live repo, so later cwd-relative
+    # tools scan/mutate the real repo instead of a fixture. Statement order below is byte-
+    # unchanged (--help/guard still run post-chdir exactly as the bash body did).
+    _prev_cwd = os.getcwd()
     os.chdir(repo_root)
-    if not os.path.isfile("schema/workflows/ingest.md"):
-        _err("ERROR: cannot resolve repo root from " + str(repo_root)
-             + " (schema/workflows/ingest.md missing)")
-        return 1
-
-    check_only = False
-    for a in args:
-        if a in ("--help", "-h"):
-            _usage()
-            return 0
-        if a == "--check":
-            check_only = True
-        else:
-            _err("ERROR: unknown arg: " + a)
+    try:
+        if not os.path.isfile("schema/workflows/ingest.md"):
+            _err("ERROR: cannot resolve repo root from " + str(repo_root)
+                 + " (schema/workflows/ingest.md missing)")
             return 1
 
-    if check_only:
-        tmpdir = tempfile.mkdtemp()
-        try:
-            return _check(tmpdir)
-        finally:
-            shutil.rmtree(tmpdir, ignore_errors=True)
+        check_only = False
+        for a in args:
+            if a in ("--help", "-h"):
+                _usage()
+                return 0
+            if a == "--check":
+                check_only = True
+            else:
+                _err("ERROR: unknown arg: " + a)
+                return 1
 
-    # Generate mode: write all four SKILL.md files (idempotent -- re-run overwrites identically)
-    for op in OPS:
-        d = ".claude/skills/" + op
-        os.makedirs(d, exist_ok=True)
-        with open(d + "/SKILL.md", "wb") as f:
-            f.write(body_for(op).encode())
-        _out("Generated " + d + "/SKILL.md")
-    _out("Done. Run 'git add .claude/skills/' to stage.")
-    return 0
+        if check_only:
+            tmpdir = tempfile.mkdtemp()
+            try:
+                return _check(tmpdir)
+            finally:
+                shutil.rmtree(tmpdir, ignore_errors=True)
+
+        # Generate mode: write all four SKILL.md files (idempotent -- re-run overwrites identically)
+        for op in OPS:
+            d = ".claude/skills/" + op
+            os.makedirs(d, exist_ok=True)
+            with open(d + "/SKILL.md", "wb") as f:
+                f.write(body_for(op).encode())
+            _out("Generated " + d + "/SKILL.md")
+        _out("Done. Run 'git add .claude/skills/' to stage.")
+        return 0
+    finally:
+        try:
+            os.chdir(_prev_cwd)
+        except OSError:
+            pass
 
 
 if __name__ == "__main__":          # enables `python3 -m compendium.gen_skills`

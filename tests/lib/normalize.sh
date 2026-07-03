@@ -26,15 +26,20 @@ normalize() {
     local -a _sed_args=()
     # Exec-root unification FIRST (longest, most specific prefixes; see D-09 rebase note).
     if [ -n "${_NORM_EXEC_ROOTS:-}" ]; then
-        local _IFS_saved="$IFS"; IFS=':'
-        for _root in ${_NORM_EXEC_ROOTS}; do
-            IFS="$_IFS_saved"
+        # REVIEW FIX (2026-07-03): split on ':' WITHOUT glob expansion. An exec root
+        # containing a shell metachar (a checkout path with '[' or '*') would otherwise be
+        # pathname-expanded here and corrupt the <EXEC_ROOT> sed program → false parity
+        # divergence. `read -a` under IFS=':' splits on colon and never globs.
+        local _IFS_saved="$IFS" _root
+        local -a _roots=()
+        IFS=':' read -r -a _roots <<< "$_NORM_EXEC_ROOTS"
+        IFS="$_IFS_saved"
+        for _root in ${_roots[@]+"${_roots[@]}"}; do
             _root="${_root%/}"
             [ -n "$_root" ] && [ "$_root" != "/" ] || continue
             _root_esc="$(printf '%s' "$_root" | sed -e 's/[][(){}.*^$+?|#\\/]/\\&/g')"
             _sed_args+=(-e "s#${_root_esc}#<EXEC_ROOT>#g")
         done
-        IFS="$_IFS_saved"
     fi
     sed -E \
       ${_sed_args[@]+"${_sed_args[@]}"} \

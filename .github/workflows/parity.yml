@@ -40,16 +40,32 @@ jobs:
           # would silently fall back to HEAD (not held-fixed), and the first Phase-25 manifest
           # append would hard-fail every job on the N-4 guard.
           fetch-depth: 0
+      - id: harness
+        # REVIEW FIX (finding C3): the release template ships .github wholesale but NOT
+        # tests/run-all-suites.sh + the enumerated suites (only tests/lib rides the allowlist).
+        # On a template fork this maintainer-only parity job must NEUTRAL-SKIP, not fail red.
+        run: |
+          if [ -f tests/run-all-suites.sh ] && [ -f tests/SUITE_MANIFEST.txt ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "parity harness not shipped (template checkout) — skipping (not a failure)"
+          fi
       - uses: actions/setup-python@v6
+        if: steps.harness.outputs.present == 'true'
         with:
           python-version: '3.14'
       - name: Install the compendium package (pinned deps)
+        if: steps.harness.outputs.present == 'true'
         run: pip install -e .
       - name: Install poppler + jq (suite deps)
+        if: steps.harness.outputs.present == 'true'
         run: sudo apt-get update -q && sudo apt-get install -y -q poppler-utils jq
       - name: No-direct-bin-call gate (seam-routing invariant)
+        if: steps.harness.outputs.present == 'true'
         run: bash tests/lib/no-direct-bin-calls.sh
       - name: Seam self-tests
+        if: steps.harness.outputs.present == 'true'
         run: |
           bash tests/lib/test_normalize.sh
           bash tests/lib/test_invoke_tool_seterm.sh
@@ -58,6 +74,7 @@ jobs:
           bash tests/lib/test_invoke_tool_selfparity.sh
           bash tests/lib/test_oracle_scriptrelative.sh
       - name: Run enumerated suites (per-test no-regression)
+        if: steps.harness.outputs.present == 'true'
         run: WIKI_IMPL=${{ matrix.impl }} bash tests/run-all-suites.sh
 
   common-freeze:
@@ -90,16 +107,31 @@ jobs:
           # would silently fall back to HEAD (not held-fixed), and the first Phase-25 manifest
           # append would hard-fail every job on the N-4 guard.
           fetch-depth: 0
+      - id: harness
+        # REVIEW FIX (finding C3): neutral-skip on a template fork that did not ship the harness.
+        run: |
+          if [ -f tests/run-all-suites.sh ] && [ -f tests/SUITE_MANIFEST.txt ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "parity harness not shipped (template checkout) — skipping (not a failure)"
+          fi
       - uses: actions/setup-python@v6
+        if: steps.harness.outputs.present == 'true'
         with:
           python-version: '3.14'
       - name: Install the compendium package (pinned deps)
+        if: steps.harness.outputs.present == 'true'
         run: pip install -e .
       - name: Install poppler + jq (suite deps)
+        if: steps.harness.outputs.present == 'true'
         run: sudo apt-get update -q && sudo apt-get install -y -q poppler-utils jq
       - name: Capture channels (bash leg)
+        if: steps.harness.outputs.present == 'true'
         run: WIKI_IMPL=bash bash tests/run-all-suites.sh --capture-channels /tmp/bashch
       - name: Capture channels (py leg)
+        if: steps.harness.outputs.present == 'true'
         run: WIKI_IMPL=py bash tests/run-all-suites.sh --capture-channels /tmp/pych
       - name: Byte-compare channels across impls (pid-independent pairing)
+        if: steps.harness.outputs.present == 'true'
         run: bash tests/run-all-suites.sh --require-parity /tmp/bashch /tmp/pych

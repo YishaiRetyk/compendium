@@ -194,6 +194,9 @@ def main(argv=None):
 
     # --- ALLOWLIST-BASED FRESH-TEMP-DIR STAGING (REVIEWS.md HIGH #1) ---
     repo_root = os.getcwd()
+    _prev_cwd = repo_root  # REVIEW FIX (finding D1): restore cwd in finally — the
+    # os.chdir(stage) below (bash `cd "$STAGE"`) would otherwise leave an in-process
+    # caller sitting in a directory the finally-block rmtree just deleted.
     stage = tempfile.mkdtemp(prefix="gsd-release-")
     try:
         _out("Staging dir: " + stage)
@@ -285,6 +288,10 @@ def main(argv=None):
         return 0
     finally:
         # trap cleanup EXIT INT TERM ERR equivalent.
+        try:
+            os.chdir(_prev_cwd)   # REVIEW FIX (finding D1): leave cwd valid for in-process callers
+        except OSError:
+            pass
         if stage and os.path.isdir(stage):
             shutil.rmtree(stage, ignore_errors=True)
 
