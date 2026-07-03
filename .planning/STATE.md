@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Python Migration
 status: In progress
-stopped_at: Milestone v1.5 started — re-baseline in progress (Phase 24 not yet executing)
-last_updated: 2026-07-03T08:00:00.000Z
-last_activity: 2026-07-03 — v1.5 start ritual (requirements promoted, roadmap flipped); MANDATORY re-baseline next
+stopped_at: Phase 24 complete (verified + reviewed); Phase 25 needs plan-phase decomposition
+last_updated: 2026-07-03T23:00:00.000Z
+last_activity: 2026-07-03 — Phase 24 shipped: 6/6 plans, 9/9 requirements Complete, 22-finding review applied, freeze baseline re-pinned at 9905bf0
 progress:
   total_phases: 3
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 6
-  completed_plans: 0
-  percent: 0
+  completed_plans: 6
+  percent: 33
 ---
 
 # Project State
@@ -25,16 +25,16 @@ See: .planning/PROJECT.md (updated 2026-07-03)
 
 ## Current Position
 
-Phase: 24 — Foundation (Package Skeleton + Frozen Shared Core + Parity Oracle)
-Plan: — (re-baseline precedes plan execution)
-Status: Milestone started; executing the MANDATORY re-baseline from `milestones/v1.5-MILESTONE-BRIEF.md` (the imported plans' inventories were derived against the 2026-06-18 laptop tree and predate v1.4's bin/ changes: repo-snapshot.sh, lint 1.12.0, audit fence-aware resolvers, tests/phase-22+23)
+Phase: 24 — COMPLETE (2026-07-03). Next: Phase 25 — Parallel Migration + Cutover
+Plan: Phase 25 plans TBD (needs plan-phase decomposition: ~5-6 Wave-1 cluster ports in isolated worktrees [brownfield MIG-01; lint+audit-claims MIG-02; checkers MIG-03; setup/release MIG-04 — init-wizard recommended as its own plan; wiki-ops MIG-05+06 incl. repo-snapshot per RB-1] + the Wave-2 cutover fan-in CUT-01; TEST-06 grown per cluster)
+Status: The frozen foundation is live: 16-stub package, frozen common/ (6 modules), WIKI_IMPL seam + worktree oracle pinned at phase-24-freeze (= 9905bf0), 38 golden case dirs, 228 call sites seam-routed, per-test manifest (209 rows), CI matrix + local freeze/parity gates in the (now actually installed) pre-commit hook
 Last activity: 2026-07-03
 
 ### v1.5 Phase Map
 
 | Phase | Name | Requirements | Status |
 |-------|------|--------------|--------|
-| 24 | Foundation: Skeleton + Frozen Core + Parity Oracle | PKG-01..04, TEST-01..05 (9 reqs) | In Progress (6 plans, 5 waves) |
+| 24 | Foundation: Skeleton + Frozen Core + Parity Oracle | PKG-01..04, TEST-01..05 (9 reqs) | ✓ Complete (2026-07-03) |
 | 25 | Parallel Migration + Cutover | MIG-01..06, CUT-01, TEST-06 (8 reqs) | Pending (plans TBD) |
 | 26 | Wholesale CLI→Pytest Conversion | CUT-02 (1 req) | Pending (terminal, deferrable) |
 

@@ -95,13 +95,13 @@ Full phase details: [milestones/v1.4-ROADMAP.md](milestones/v1.4-ROADMAP.md)
 
 Re-platform the `bin/` toolchain from Bash to Python behind `.sh` exec-shims (shim-and-swap): installable package + frozen shared `common/` core + `WIKI_IMPL=bash|py` parity oracle built first (the one hard serialization point), then parallel cluster ports fan out behind the frozen surface and fan back in through a single cutover; the wholesale CLI→pytest conversion is terminal and deferrable. Pure internal refactor — behavior parity is the acceptance bar throughout. Definition: [milestones/v1.5-MILESTONE-BRIEF.md](milestones/v1.5-MILESTONE-BRIEF.md); requirements promoted to [REQUIREMENTS.md](REQUIREMENTS.md) at start; MANDATORY re-baseline (per the brief) executed at milestone start — see `phases/24-.../24-REBASELINE.md`.
 
-- [ ] **Phase 24: Foundation — Package Skeleton + Frozen Shared Core + Parity Oracle** (0/6 plans) — PKG-01..04, TEST-01..05
-  - [ ] 24-01: Package skeleton + shim-contract doc (wave 1)
-  - [ ] 24-02: common/ over-extraction (wave 2)
-  - [ ] 24-03: Parity seam (WIKI_IMPL) + pytest conftest (wave 2)
-  - [ ] 24-04: Characterization-golden backfill + anti-signal rewrite (wave 3)
-  - [ ] 24-05: CI wiring + parity matrix (wave 4)
-  - [ ] 24-06: Freeze guard + baseline pin + phase-24-freeze tag (wave 5)
+- [x] **Phase 24: Foundation — Package Skeleton + Frozen Shared Core + Parity Oracle** (6/6 plans) — completed 2026-07-03 — PKG-01..04, TEST-01..05; mandatory re-baseline executed (24-REBASELINE.md); 22-finding adversarial review applied (24-REVIEW.md — headline: the routing gate was red at HEAD, local hooks had been disabled since April, and a subshell capture-key collision gutted per-call parity coverage; all fixed + re-verified; baseline re-pinned at 9905bf0 via the D-09 flow)
+  - [x] 24-01: Package skeleton + shim-contract doc (wave 1) — 16 stubs (RB-1)
+  - [x] 24-02: common/ over-extraction (wave 2)
+  - [x] 24-03: Parity seam (WIKI_IMPL) + pytest conftest (wave 2)
+  - [x] 24-04: Characterization-golden backfill + anti-signal rewrite (wave 3)
+  - [x] 24-05: CI wiring + parity matrix (wave 4) — 228 sites seam-routed
+  - [x] 24-06: Freeze guard + baseline pin + phase-24-freeze tag (wave 5)
 - [ ] **Phase 25: Parallel Migration + Cutover** (plans TBD at plan-phase) — MIG-01..06, CUT-01, TEST-06
 - [ ] **Phase 26: Wholesale CLI→Pytest Conversion** (terminal, deferrable) — CUT-02
 
@@ -294,6 +294,6 @@ The following are intentionally deferred until real usage demands them, captured
 | 21. Video/YouTube Ingestion | v1.3 | 2/2 | Complete    | 2026-06-14 |
 | 22. Repository Source Type | v1.4 | 3/3 | Complete    | 2026-07-03 |
 | 23. External Source Drift Detection | v1.4 | 2/2 | Complete    | 2026-07-03 |
-| 24. Foundation: Skeleton + Frozen Core + Parity Oracle | v1.5 | 0/6 | In Progress | — |
+| 24. Foundation: Skeleton + Frozen Core + Parity Oracle | v1.5 | 6/6 | Complete | 2026-07-03 |
 | 25. Parallel Migration + Cutover | v1.5 | TBD | Pending | — |
 | 26. Wholesale CLI→Pytest Conversion (deferrable) | v1.5 | TBD | Pending | — |
