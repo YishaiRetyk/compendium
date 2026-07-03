@@ -1,9 +1,10 @@
-# tests/SUITE_MANIFEST.txt — the pinned PER-TEST baseline (Phase 24 Plan 05; FROZEN surface D-08).
-# One line per test: <phase-NN/test_name> PASS|FAIL. FAIL rows are the PINNED pre-existing
-# state (stale prior-phase tests) and are NOT in-scope to fix in v1.5 — run-all-suites.sh
-# fails ONLY on a NEW failing test or a PASS->FAIL regression vs these rows.
-# Measured 2026-07-03 under WIKI_IMPL=bash (PDF_EXTRACT_SKIP_LIVE=1) after the seam routing;
-# per-test results verified IDENTICAL to the pre-routing baseline.
+# tests/SUITE_MANIFEST.txt — the pinned PER-TEST baseline. Consumed by the pytest bridge
+# (tests/test_blackbox_suites.py) since Phase 26 retired the bash runner + the parity oracle.
+# One line per test: <phase-NN/test_name> PASS|FAIL. The bridge enforces the EXACT per-row
+# state: a PASS row must exit 0; a FAIL row is xfail(strict=True) — a pinned FAIL (stale
+# prior-phase test, NOT in-scope to fix) that starts passing fails the bridge as an XPASS, so
+# it must be re-pinned to PASS deliberately. Row↔file bijection is asserted both directions.
+# The 205 rows are run against the real Python bin/ (PDF_EXTRACT_SKIP_LIVE=1, no live PDF/OCR).
 phase-09/test_agents_section_11_1 FAIL
 phase-09/test_agents_section_11_3 FAIL
 phase-09/test_agents_section_12 FAIL

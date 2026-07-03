@@ -1,5 +1,29 @@
 # Milestones
 
+## v1.5 Python Migration (Shipped: 2026-07-03)
+
+**Phases completed:** 3 phases (24–26), 17 plans
+**Requirements:** 18/18 complete (PKG-01..04, TEST-01..06, MIG-01..06, CUT-01..02) — `bin/requirements-sync.sh --strict --require-complete` exits 0 (18/18)
+**Timeline:** 2026-07-03 → 2026-07-03 (imported mid-v1.4 as a staged milestone; foundation hardened through 6 cross-AI review cycles on the laptop before import)
+
+**Delivered:** The `bin/` toolchain was re-platformed from Bash to Python behind `.sh` exec-shims — a pure internal refactor with byte-behavior parity as the acceptance bar throughout. All 16 tools now `exec python3 -m compendium.<tool>`; shared logic consolidated into a frozen `compendium.common` core; the black-box bash suite converted onto a single parallel `pytest` entrypoint and the migration-only parity apparatus retired. The system's observable behavior is unchanged; its implementation is now Python.
+
+**Key accomplishments:**
+
+- **Foundation (Phase 24, `PKG-01..04` / `TEST-01..05`):** the installable `src/`-layout package + pinned deps + 6 required CI checks; the frozen `compendium.common` core; and the `WIKI_IMPL=bash|py` parity oracle (git-worktree-backed frozen-bash reference + 4-channel byte capture) — the one hard serialization point built first. 22-finding adversarial review applied; baseline re-pinned via the D-09 flow.
+- **Parallel Migration + Cutover (Phase 25, `MIG-01..06` / `CUT-01` / `TEST-06`):** all 16 tools ported cluster-by-cluster behind the frozen surface and fanned back in through a single cutover, each flip gated against the held-fixed bash oracle (238 paired routed calls byte-identical). `migrate-privacy-dirs` retired; the migration decision record authored. 15-finding xhigh review (headline: a greenfield ruamel-import block that failed every commit, fixed via lazy `common` re-export); 5 D-09 rebases.
+- **Wholesale CLI→Pytest Conversion (Phase 26, `CUT-02`):** the black-box bash suites became a pytest collector (`test_blackbox_suites.py`) running each `phase-*/test_*.sh` against the real Python `bin/` — a **bridge, not a rewrite** (D-26-01: the bash files ARE the behavioral spec). A single `pytest -n auto` is now the whole net (~4× faster than the retired serial bash runner). With one implementation left, the frozen-bash parity oracle + freeze/staged gates + `parity.yml` were **retired** (22 files deleted), which unblocked the headline behavior fix: `lint --staged`/`--ci` are now **read-only**, ending the per-commit pre-commit wiki-clobber the user hit all through the migration. The characterization goldens were preserved by rewiring to direct-Python capture (Python ≡ the retired oracle). The xhigh review (independent subagent, 60+ probing runs) returned "safe to ship" — 2 low doc/robustness fixes applied (manifest header, hook dep-probe); its one HIGH catch (a phase-08 wizard test that corrupts the live repo) is PRE-EXISTING and off the pytest path, ledgered as a v1.6 test-hygiene landmine.
+
+**Known deferred items at close:** SHIMOUT (shim retirement) + LIBSWAP (native-lib re-platforming) in REQUIREMENTS.md Future Requirements; the optional full file-by-file idiomatic rewrite of the bash suites (beyond the sanctioned bridge — a v1.6 test-hygiene follow-on); the cheap 25-REVIEW faithful-bash items (validate_op/check_privacy `encoding=` guard, release.py SIGTERM cleanup, search byte-vs-char, audit except→None) deferred to that same pass; the phase-08 setup-parity test's non-hermetic live-repo writes (pre-existing nit).
+
+**Archives:**
+
+- `milestones/v1.5-MILESTONE-BRIEF.md`
+- `milestones/v1.5-MILESTONE-AUDIT.md`
+- `REQUIREMENTS.md` / `ROADMAP.md` remain the live v1.5 artifacts (snapshotted to `milestones/v1.5-*` at the next milestone's start, per the established pattern)
+
+---
+
 ## v1.4 Source Lifecycle (Shipped: 2026-07-03)
 
 **Phases completed:** 2 phases (22–23), 5 plans

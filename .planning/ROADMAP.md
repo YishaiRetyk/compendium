@@ -8,7 +8,7 @@
 - ✅ **v1.2 Schema Architecture** — Phases 15–18 (shipped 2026-06-08) — [archive](milestones/v1.2-ROADMAP.md)
 - ✅ **v1.3 Source Ingestion** — Phases 19–21 (shipped 2026-06-14) — [archive](milestones/v1.3-ROADMAP.md)
 - ✅ **v1.4 Source Lifecycle** — Phases 22–23 (shipped 2026-07-03) — [archive](milestones/v1.4-ROADMAP.md)
-- 🚧 **v1.5 Python Migration** — Phases 24–26 (IN PROGRESS — started 2026-07-03; imported from the laptop, renumbered from its v1.4/22–24; Phase-24 plans hardened through 6 cross-AI review cycles; MANDATORY re-baseline executed at start per the brief) — [brief](milestones/v1.5-MILESTONE-BRIEF.md) · [requirements](REQUIREMENTS.md) · plans in `phases/24-foundation-package-skeleton-frozen-shared-core-parity-oracle/`
+- ✅ **v1.5 Python Migration** — Phases 24–26 (SHIPPED 2026-07-03 — 18/18 requirements Complete; `bin/` re-platformed to Python behind `.sh` exec-shims, single parallel `pytest` entrypoint, frozen-bash parity oracle retired) — [brief](milestones/v1.5-MILESTONE-BRIEF.md) · [requirements](REQUIREMENTS.md) · plans in `phases/24-foundation-package-skeleton-frozen-shared-core-parity-oracle/`
 
 ## Phases
 
@@ -91,7 +91,7 @@ Full phase details: [milestones/v1.4-ROADMAP.md](milestones/v1.4-ROADMAP.md)
 
 </details>
 
-### 🚧 v1.5 Python Migration (Phases 24–26) — IN PROGRESS (started 2026-07-03)
+### ✅ v1.5 Python Migration (Phases 24–26) — SHIPPED (2026-07-03)
 
 Re-platform the `bin/` toolchain from Bash to Python behind `.sh` exec-shims (shim-and-swap): installable package + frozen shared `common/` core + `WIKI_IMPL=bash|py` parity oracle built first (the one hard serialization point), then parallel cluster ports fan out behind the frozen surface and fan back in through a single cutover; the wholesale CLI→pytest conversion is terminal and deferrable. Pure internal refactor — behavior parity is the acceptance bar throughout. Definition: [milestones/v1.5-MILESTONE-BRIEF.md](milestones/v1.5-MILESTONE-BRIEF.md); requirements promoted to [REQUIREMENTS.md](REQUIREMENTS.md) at start; MANDATORY re-baseline (per the brief) executed at milestone start — see `phases/24-.../24-REBASELINE.md`.
 
@@ -110,11 +110,11 @@ Re-platform the `bin/` toolchain from Bash to Python behind `.sh` exec-shims (sh
   - [x] 25-05: init-wizard port behind preflight shim (MIG-04 complete; wave 1) — completed 2026-07-03; exit-3 preflight stays in the shim; setup-parity byte-equality holds
   - [x] 25-06: lint + audit-claims port (MIG-02 — long pole; wave 1) — completed 2026-07-03; byte-copy retired onto common.page; 3 impl-assertion rewrites mutation-verified; hook lint step now Python
   - [x] 25-07: cutover fan-in — DR + reference census + certification (CUT-01; wave 2) — completed 2026-07-03; allowlist ships src/pyproject/tests-lib; 1 pre-existing stale doc ref fixed; DR indexed+logged
-- [ ] **Phase 26: Wholesale CLI→Pytest Conversion** (4 plans; decomposed 2026-07-03, baked in for turnkey "kick off phase 26") — CUT-02; the LAST v1.5 phase. Order is load-bearing (26-02 frees 26-03).
-  - [ ] 26-01: pytest bridge — single parallel `pytest` entrypoint over the black-box suite (bridge, not rewrite — D-26-01)
-  - [ ] 26-02: retire the frozen-bash parity oracle + freeze machinery (post-migration; unblocks behavior fixes)
-  - [ ] 26-03: lint/audit `--staged`/`--ci` read-only — ends the pre-commit wiki-clobber (25-REVIEW F15)
-  - [ ] 26-04: milestone close — CUT-02 verification + xhigh review + ship v1.5
+- [x] **Phase 26: Wholesale CLI→Pytest Conversion** (4/4 plans) — completed 2026-07-03 — CUT-02; the LAST v1.5 phase. Single `pytest -n auto` entrypoint (~4× faster than the retired serial bash runner); frozen-bash parity oracle + freeze machinery retired; the pre-commit wiki-clobber killed. xhigh review applied (26-REVIEW.md).
+  - [x] 26-01: pytest bridge — single parallel `pytest` entrypoint over the black-box suite (bridge, not rewrite — D-26-01)
+  - [x] 26-02: retire the frozen-bash parity oracle + freeze machinery (post-migration; unblocked the behavior fix)
+  - [x] 26-03: lint/audit `--staged`/`--ci` read-only — ends the pre-commit wiki-clobber (25-REVIEW F15)
+  - [x] 26-04: milestone close — CUT-02 verification + xhigh review + ship v1.5
 
 ## Backlog
 
@@ -306,5 +306,5 @@ The following are intentionally deferred until real usage demands them, captured
 | 22. Repository Source Type | v1.4 | 3/3 | Complete    | 2026-07-03 |
 | 23. External Source Drift Detection | v1.4 | 2/2 | Complete    | 2026-07-03 |
 | 24. Foundation: Skeleton + Frozen Core + Parity Oracle | v1.5 | 6/6 | Complete | 2026-07-03 |
-| 25. Parallel Migration + Cutover | v1.5 | TBD | Pending | — |
-| 26. Wholesale CLI→Pytest Conversion (deferrable) | v1.5 | TBD | Pending | — |
+| 25. Parallel Migration + Cutover | v1.5 | 7/7 | Complete | 2026-07-03 |
+| 26. Wholesale CLI→Pytest Conversion (deferrable) | v1.5 | 4/4 | Complete | 2026-07-03 |

@@ -70,7 +70,10 @@ fi
 # CI + a manual `pytest`. Opt out with WIKI_SKIP_PYTEST=1 (WIP only).
 if [ "${WIKI_SKIP_PYTEST:-0}" != "1" ] \
    && git diff --cached --name-only | grep -qE '^(bin/|src/|tests/|pyproject\.toml$)'; then
-    if command -v python3 >/dev/null 2>&1 && python3 -c 'import pytest' >/dev/null 2>&1; then
+    # Probe BOTH pytest and xdist: pyproject addopts pins `-n auto`, so pytest without the
+    # xdist plugin dies with "unrecognized arguments: -n" (a missing dep, not a regression).
+    # If either is absent, skip the smoke gracefully rather than block the commit misleadingly.
+    if command -v python3 >/dev/null 2>&1 && python3 -c 'import pytest, xdist' >/dev/null 2>&1; then
         if ! python3 -m pytest -q --ignore=tests/test_blackbox_suites.py >&2; then
             echo "" >&2
             echo "Unit-test smoke failed. Fix the regression, or commit with WIKI_SKIP_PYTEST=1 (WIP only)." >&2

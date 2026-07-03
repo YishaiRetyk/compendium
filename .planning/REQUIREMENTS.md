@@ -38,7 +38,7 @@ Design lineage: the 7-agent codebase assessment (2026-06-18) — ~10.2k lines of
 ### Cutover & Documentation (CUT)
 
 - [x] **CUT-01**: A decision record documents the migration (shim-and-swap, `common/` consolidation, the two-layer test strategy, the retirements); all `bin/*.sh` references across `schema/`, `docs/`, `CLAUDE.md`/`AGENTS.md`, and `.claude/settings.local.json` are verified accurate post-migration (and `AGENTS.md ≡ CLAUDE.md` byte-equality held)
-- [ ] **CUT-02** *(terminal, deferrable)*: The existing black-box CLI/characterization tests are converted onto the established pytest harness, the bash test suite is retired, and a single `pytest` entrypoint runs the full suite in parallel — depends on all MIG phases being parity-green; cleanly cut if timeline slips (the system ships complete without it, with tests still running via the instrumented-bash oracle)
+- [x] **CUT-02** *(terminal, deferrable)*: The existing black-box CLI/characterization tests are converted onto the established pytest harness, the bash test suite is retired, and a single `pytest` entrypoint runs the full suite in parallel — depends on all MIG phases being parity-green; cleanly cut if timeline slips (the system ships complete without it, with tests still running via the instrumented-bash oracle)
 
 ## Future Requirements
 
@@ -80,15 +80,15 @@ Which phases cover which requirements. Filled during roadmap creation. Phase num
 | TEST-03 | Phase 24 | Complete |
 | TEST-04 | Phase 24 | Complete |
 | TEST-05 | Phase 24 | Complete |
-| MIG-01 | Phase 25 (Wave 1 — brownfield) | Complete |
-| MIG-02 | Phase 25 (Wave 1 — lint + audit-claims) | Complete |
-| MIG-03 | Phase 25 (Wave 1 — checkers) | Complete |
-| MIG-04 | Phase 25 (Wave 1 — setup/release) | Complete |
-| MIG-05 | Phase 25 (Wave 1 — wiki-ops) | Complete |
-| MIG-06 | Phase 25 (Wave 1 — folded into wiki-ops) | Complete |
-| TEST-06 | Phase 25 (spans all Wave-1 cluster plans; grown alongside each port) | Complete |
-| CUT-01 | Phase 25 (Wave 2 — cutover fan-in) | Complete |
-| CUT-02 | Phase 26 (terminal, deferrable) | Pending |
+| MIG-01 | Phase 25 | Complete |
+| MIG-02 | Phase 25 | Complete |
+| MIG-03 | Phase 25 | Complete |
+| MIG-04 | Phase 25 | Complete |
+| MIG-05 | Phase 25 | Complete |
+| MIG-06 | Phase 25 | Complete |
+| TEST-06 | Phase 25 | Complete |
+| CUT-01 | Phase 25 | Complete |
+| CUT-02 | Phase 26 | Complete |
 
 **Coverage:**
 - v1.5 requirements: 18 total (PKG ×4, TEST ×6, MIG ×6, CUT ×2)
