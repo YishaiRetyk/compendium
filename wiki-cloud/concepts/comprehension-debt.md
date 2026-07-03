@@ -6,10 +6,11 @@ status: active
 summary: "The cumulative cost of shipping AI-generated code that the team doesn't
   understand — bugs no one remembers writing, behavior no one can explain."
 created_at: 2026-05-04
-updated_at: 2026-05-04
+updated_at: 2026-07-03
 sources:
 - src-2026-05-03-is-this-the-only-skill-left
 - src-2026-05-04-three-artifacts-build-with-ai
+- src-2026-07-03-goodbye-slop-welcome-determinism
 epistemic_status: sourced
 tags:
 - ai-coding
@@ -42,6 +43,7 @@ The tax paid when teams ship AI-generated code that no one on the team understan
 - The terms "comprehension debt" and "cognitive debt" are used interchangeably in the source [prov:src-2026-05-03-is-this-the-only-skill-left#t00:01:34-00:01:42|direct|2026-05-04]
 - Distinct from classical technical debt: technical debt is known shortcuts; comprehension debt is unknown shortcuts the AI took for you [epistemic:: inferred]
 - Compounds across sessions because AI agents do not retain context between runs [prov:src-2026-05-03-is-this-the-only-skill-left#t00:04:46-00:05:01|direct|2026-05-04]
+- Reached from the modeling angle by [[david-khourshid|David Khourshid]] as **"slop code" — code without a reliable model** that you can't fully understand or explain, with no clear domain boundaries and no safe way to change it [prov:src-2026-07-03-goodbye-slop-welcome-determinism#t00:08:31-00:09:16|direct|2026-07-03]
 
 ## Detail
 
@@ -61,14 +63,20 @@ Senior engineers historically carried system context in their heads. AI does not
 
 Comprehension debt is the failure mode; [[systems-thinking|Systems Thinking]] is the discipline that prevents it. The recap framing in [[src-2026-05-04-three-artifacts-build-with-ai|Three artifacts that changed how I build with AI]] is explicit: "comprehension debt told you the cost; systems thinking told you the skill; three artifacts give you the practice" [prov:src-2026-05-04-three-artifacts-build-with-ai#t00:14:18-00:14:40|direct|2026-05-04].
 
+### Parallel framing: "slop code"
+
+[[david-khourshid|David Khourshid]] arrives at the same failure from the modeling side, calling it **"slop code": code without a reliable model** — code you can't fully understand or explain, unsure whether the edge cases are covered, with no clear domain boundaries, implicit invariants, un-inspectable state, and no safe way to change it. Like comprehension debt, he stresses it is not necessarily broken or even bad code, and that it predates LLMs [prov:src-2026-07-03-goodbye-slop-welcome-determinism#t00:08:31-00:09:16|direct|2026-07-03]. Where Hack frames the cost in terms of team knowledge the AI bypassed, Khourshid frames the cause as *unstructured delegation* and prescribes an explicit model — the [[deterministic-core-agentic-shell|deterministic core, agentic shell]] pattern — as the remedy [prov:src-2026-07-03-goodbye-slop-welcome-determinism#t00:06:49-00:07:24|direct|2026-07-03].
+
 ## Related Pages
 
 - [[systems-thinking|Systems Thinking]] — the preventive discipline
 - [[programming-as-theory-building|Programming as Theory Building]] — the conceptual root
 - [[domain-driven-design|Domain-Driven Design]] — the proposed practical method for paying the debt down
 - [[hack-agentive-stack|Hack (Agentive Stack)]] — popularized the framing
+- [[deterministic-core-agentic-shell|Deterministic Core, Agentic Shell]] — the modeling-side remedy for the same failure ("slop code")
 
 ## Sources
 
 - [[src-2026-05-03-is-this-the-only-skill-left|Is this the only skill left?]] — Hack, 2026-05-03 (transcript)
 - [[src-2026-05-04-three-artifacts-build-with-ai|Three artifacts that changed how I build with AI]] — Hack, 2026-05-04 (transcript)
+- [[src-2026-07-03-goodbye-slop-welcome-determinism|Beyond the Prompt: Goodbye Slop, Welcome Determinism — David Khourshid]] — "Beyond the Prompt" talk, 2026-06-26 (YouTube transcript)

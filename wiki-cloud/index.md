@@ -51,6 +51,8 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[matt-pocock|Matt Pocock]] — Developer educator and author of the "Matt Pocock Skills" repo; proposed the four-part skill checklist (Trigger/Structure/Steering/Pruning) and a prefer-user-invoked authoring stance (sourced, 2026-07-03)
 - [[justin-schroeder|Justin Schroeder]] — Co-founder of the stealth startup StandardAgents and prolific open-source builder (dmux, ArrowJS); argues the future of agent architecture is domain-specific agents — composition over inheritance (sourced, 2026-07-03)
 - [[standardagents|StandardAgents]] — Stealth startup building a domain-specific-agent ecosystem; source of the >80% token-efficiency and "137× cheaper" small-model claims (tentative, 2026-07-03)
+- [[david-khourshid|David Khourshid]] — Creator of XState and founder of Stately.ai; argues the cure for AI "slop" is an explicit model of system behavior — determinism at the core, non-determinism at the edges (sourced, 2026-07-03)
+- [[xstate|XState]] — Open-source JavaScript state-machine & statecharts library (commercialized via Stately.ai) for making control flow explicit, visual, and deterministic (sourced, 2026-07-03)
 
 ## Concepts
 
@@ -76,6 +78,7 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[agentic-search|Agentic Search]] — Retrieval driven by the agent: it chooses which search tool to call, with what parameters, and whether to search again; the RAG → agentic RAG → agentic-search arc and a curated low-floor/high-ceiling tool stack (sourced, 2026-07-03)
 - [[skill-checklist|Skill Checklist]] — Matt Pocock's four-part rubric for authoring and auditing agent skills (Trigger, Structure, Steering, Pruning); introduces user-invoked vs model-invoked, context pointers, leading words, sediment, and no-ops (sourced, 2026-07-03)
 - [[domain-specific-agents|Domain-Specific Agents]] — Composition over inheritance for agents: many small isolated agents under a coordinator talking in plain English, vs. inflating one agent's context with tools/skills/MCP; four claimed benefits and a "2027 = year of multi-agent orchestration" prediction (sourced, 2026-07-03)
+- [[deterministic-core-agentic-shell|Deterministic Core, Agentic Shell]] — Put deterministic, explicitly-modeled logic at the core and confine non-determinism (LLM calls) to the edges — write programs that call LLMs, not LLMs that call programs; the remedy for "slop code" (code without a reliable model) (sourced, 2026-07-03)
 
 ## Sources
 
@@ -104,6 +107,7 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[src-2026-07-03-openai-symphony-spec|openai/symphony — Symphony Service Specification repository snapshot]] — Snapshot at commit `4cbe3a9` (branch `main`) — OpenAI's spec-first coding-agent orchestration service: long-running Linear-polling daemon, isolated per-issue Codex workspaces, single-authority orchestrator, hot-reloaded WORKFLOW.md contract, filesystem safety invariants; Apache-2.0/Elixir, engineering preview (sourced, 2026-07-03)
 - [[src-2026-07-03-building-great-agent-skills|Building Great Agent Skills: The Missing Manual — Matt Pocock]] — AI Engineer, 2026-06-29 — YouTube transcript (video sub-case): a four-part "skill checklist" (Trigger/Structure/Steering/Pruning) for authoring and auditing agent skills, framed as the way out of "skill hell" (sourced, 2026-07-03)
 - [[src-2026-07-03-domain-specific-agents|The Future Is Domain-Specific Agents — Justin Schroeder, StandardAgents]] — AI Engineer, 2026-06-29 — YouTube transcript (video sub-case): composition over inheritance for agents, four benefits (token efficiency, cheap small models, capability limits, scaling), an ideal-agent anatomy, and 2026–2027 multi-agent-orchestration predictions (sourced, 2026-07-03)
+- [[src-2026-07-03-goodbye-slop-welcome-determinism|Beyond the Prompt: Goodbye Slop, Welcome Determinism — David Khourshid]] — AG Grid, 2026-06-26 — YouTube transcript (video sub-case): determinism at the core / non-determinism at the edges as the cure for AI "slop code," an explicit-model thesis grounded in state machines, and an XState email-agent demo (sourced, 2026-07-03)
 
 ## Comparisons
 
