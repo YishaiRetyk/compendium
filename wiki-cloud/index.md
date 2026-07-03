@@ -53,11 +53,13 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[standardagents|StandardAgents]] — Stealth startup building a domain-specific-agent ecosystem; source of the >80% token-efficiency and "137× cheaper" small-model claims (tentative, 2026-07-03)
 - [[david-khourshid|David Khourshid]] — Creator of XState and founder of Stately.ai; argues the cure for AI "slop" is an explicit model of system behavior — determinism at the core, non-determinism at the edges (sourced, 2026-07-03)
 - [[xstate|XState]] — Open-source JavaScript state-machine & statecharts library (commercialized via Stately.ai) for making control flow explicit, visual, and deterministic (sourced, 2026-07-03)
+- [[adam-bender|Adam Bender]] — Google software engineer and co-author of the "Flamingo book" (*Software Engineering at Google*); introduced "software ecology" and the "10x moment" at Google I/O 2026 (sourced, 2026-07-03)
+- [[google|Google]] — Its developer ecosystem — monorepo, trunk-based development, shared fate, large-scale changes — used as the worked example of software ecology (sourced, 2026-07-03)
 
 ## Concepts
 
-- [[systems-thinking|Systems Thinking]] — The day-one skill for AI-assisted software development: reasoning about how parts of a system affect each other (sourced, 2026-05-04)
-- [[comprehension-debt|Comprehension Debt]] — Cumulative cost of shipping AI-generated code the team doesn't understand; aliased to "cognitive debt" (sourced, 2026-05-04)
+- [[systems-thinking|Systems Thinking]] — The core skill for AI-assisted software development: reasoning about how parts of a system affect each other over time; two independent sources (Hack; Adam Bender's software ecology) converge on it (sourced, 2026-07-03)
+- [[comprehension-debt|Comprehension Debt]] — Cumulative cost of shipping AI-generated code the team doesn't understand; aliased to "cognitive debt," and to Bender's loss of "intellectual control" (sourced, 2026-07-03)
 - [[programming-as-theory-building|Programming as Theory Building]] — Peter Naur's 1985 paper: the program is the theory in the head, the code is its shadow (mixed, 2026-05-04)
 - [[jagged-frontier|Jagged Frontier]] — AI capability shape: sharp in some places, dull in others, sometimes within a single session (mixed, 2026-05-04)
 - [[ubiquitous-language|Ubiquitous Language]] — DDD artifact: project glossary functioning as a contract between humans, code, and AI (sourced, 2026-05-04)
@@ -79,6 +81,10 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[skill-checklist|Skill Checklist]] — Matt Pocock's four-part rubric for authoring and auditing agent skills (Trigger, Structure, Steering, Pruning); introduces user-invoked vs model-invoked, context pointers, leading words, sediment, and no-ops (sourced, 2026-07-03)
 - [[domain-specific-agents|Domain-Specific Agents]] — Composition over inheritance for agents: many small isolated agents under a coordinator talking in plain English, vs. inflating one agent's context with tools/skills/MCP; four claimed benefits and a "2027 = year of multi-agent orchestration" prediction (sourced, 2026-07-03)
 - [[deterministic-core-agentic-shell|Deterministic Core, Agentic Shell]] — Put deterministic, explicitly-modeled logic at the core and confine non-determinism (LLM calls) to the edges — write programs that call LLMs, not LLMs that call programs; the remedy for "slop code" (code without a reliable model) (sourced, 2026-07-03)
+- [[software-ecology|Software Ecology]] — Adam Bender's "holistic study of the socio-technical ecosystems that produce software": a developer environment as a complex adaptive system whose culture and technology co-produce its emergent capabilities (sourced, 2026-07-03)
+- [[shared-fate|Shared Fate]] — The degree to which an ecosystem and its components are tightly linked; a technical-and-social design choice (monorepo superpower vs. cascading-failure hazard) (sourced, 2026-07-03)
+- [[10x-moment|The 10x Moment]] — Every developer ecosystem faces a 10x–100x jump in code production that non-uniformly stresses every downstream node; generating code 10x faster ≠ engineering 10x faster (sourced, 2026-07-03)
+- [[ai-as-amplifier|AI as Amplifier]] — AI multiplies whatever a team already has ("amplification is a magnitude, not a direction"); good fundamentals set the direction (credited to DORA) (sourced, 2026-07-03)
 
 ## Sources
 
@@ -108,6 +114,7 @@ Content is organized by page type. See `AGENTS.md §2 Directory Structure` for l
 - [[src-2026-07-03-building-great-agent-skills|Building Great Agent Skills: The Missing Manual — Matt Pocock]] — AI Engineer, 2026-06-29 — YouTube transcript (video sub-case): a four-part "skill checklist" (Trigger/Structure/Steering/Pruning) for authoring and auditing agent skills, framed as the way out of "skill hell" (sourced, 2026-07-03)
 - [[src-2026-07-03-domain-specific-agents|The Future Is Domain-Specific Agents — Justin Schroeder, StandardAgents]] — AI Engineer, 2026-06-29 — YouTube transcript (video sub-case): composition over inheritance for agents, four benefits (token efficiency, cheap small models, capability limits, scaling), an ideal-agent anatomy, and 2026–2027 multi-agent-orchestration predictions (sourced, 2026-07-03)
 - [[src-2026-07-03-goodbye-slop-welcome-determinism|Beyond the Prompt: Goodbye Slop, Welcome Determinism — David Khourshid]] — AG Grid, 2026-06-26 — YouTube transcript (video sub-case): determinism at the core / non-determinism at the edges as the cure for AI "slop code," an explicit-model thesis grounded in state machines, and an XState email-agent demo (sourced, 2026-07-03)
+- [[src-2026-07-03-software-engineering-tipping-point|Software Engineering at the Tipping Point — Adam Bender, Google I/O 2026]] — Google for Developers, 2026-05-21 — YouTube transcript (video sub-case): "software ecology," Google's developer ecosystem (monorepo, shared fate, LSCs) as a worked example, and a node-by-node analysis of the AI "10x moment" (sourced, 2026-07-03)
 
 ## Comparisons
 
