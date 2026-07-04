@@ -24,6 +24,17 @@ cp "$REPO_ROOT/bin/sync-claude.sh" "$WORK/bin/sync-claude.sh"
 cp "$REPO_ROOT/schema/AGENTS.template.md" "$WORK/schema/AGENTS.template.md"
 chmod +x "$WORK/bin/init-wizard.sh" "$WORK/bin/sync-claude.sh"
 
+# The scaffold needs its OWN compendium module. The shim sets PYTHONPATH=$WORK/src and
+# execs `python3 -m compendium.init_wizard`, and the wizard anchors REPO_ROOT on its own
+# module's __file__ (init_wizard.py:865). WITHOUT $WORK/src/compendium, Python imports the
+# installed/live module → REPO_ROOT resolves to the REAL repo → real-run mode reads the live
+# (well-formed) index, the duplicate-header guard never fires, and the wizard promotes into
+# the LIVE working tree — this test both self-fails AND corrupts the repo (26-REVIEW F1).
+# init_wizard is self-contained (no compendium.* imports); mirrors the unit-layer
+# tests/test_init_wizard_unit.py::make_scaffold.
+mkdir -p "$WORK/src/compendium"
+cp "$REPO_ROOT/src/compendium/__init__.py" "$REPO_ROOT/src/compendium/init_wizard.py" "$WORK/src/compendium/"
+
 # Induce mid-init failure: wiki-cloud/index.md with TWO `## Decisions` headings.
 cat >"$WORK/wiki-cloud/index.md" <<'EOF'
 ---

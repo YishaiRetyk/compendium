@@ -7,7 +7,7 @@ retirement, lint clobber fix) are correct, non-vacuous, and parallel-stable.
 
 ## Findings & disposition
 
-### F1 — phase-08 wizard test corrupts the LIVE repo + self-fails — CONFIRMED, HIGH-as-bug / **LEDGERED (out of Phase-26 scope)**
+### F1 — phase-08 wizard test corrupts the LIVE repo + self-fails — CONFIRMED, HIGH-as-bug / **FIXED (follow-up, at user request — commit after this close)**
 
 `tests/phase-08/test_wizard_partial_failure.sh` builds a scaffold that copies in
 `bin/init-wizard.sh` but NOT `src/compendium/`, so the shim's `PYTHONPATH=$WORK/src` is empty
@@ -24,11 +24,18 @@ Phase-26 diff), phase-08 is deliberately NOT in the bridge's `SUITES` so `pytest
 it, and its CI runner `setup-parity.yml` is untouched by Phase 26. Bundling a phase-08 fix
 into the milestone-close commit would violate one-commit-per-logical-operation.
 
-**Recommended follow-up (a live landmine on the `setup-parity` CI job + any local run):** copy
-`src/compendium` into the phase-08 scaffold (mirror `test_init_wizard_unit.py::make_scaffold`)
-so the shim resolves the SCAFFOLD module → `REPO_ROOT=$WORK` → the malformed-index guard fires
-and nothing touches the live tree. Tracked as a v1.6 test-hygiene item (with the other
-non-hermetic phase-08 note in 26-VERIFICATION.md).
+**Resolution (fixed at user request, separate `fix(tests)` commit):** the two real-run
+scaffold tests now copy `src/compendium/__init__.py` + `init_wizard.py` (+ a `wiki-cloud/index.md`
+seed) into `$WORK/src`, so the shim resolves the SCAFFOLD module → `REPO_ROOT=$WORK` and the
+malformed-index guard fires against the fixture, not the live tree. This also fixed a hidden
+cascade: `test_wizard_partial_failure`'s corruption had been leaving `.wizard-answers.yaml` in
+the live repo, which is the only reason `test_wizard_idempotent` (same scaffold bug) and the
+`--render-to` tests appeared to pass — with the corruption gone, `idempotent` was fixed the same
+way, and a separately-stale `test_wizard_sync_claude` grep (pointed at the thin shim instead of
+the ported module) was repointed at `init_wizard.py`. **phase-08 is now 21/21 green with zero
+live-tree mutation** (verified). The other pre-existing phase-08/07 nits (non-hermetic-by-design
++ the content-neutralization assertions that flag the user's live wiki vs the template) remain a
+v1.6 test-hygiene item.
 
 ### F2 — dead `_NORM_EXEC_ROOTS` normalization path — CONFIRMED, LOW / **RETAINED (defensive)**
 

@@ -32,10 +32,12 @@ assert_byte_equal "$WORK/AGENTS.md" "$WORK/CLAUDE.md" \
 assert_byte_equal "$CANONICAL_RENDER" "$WORK/AGENTS.md" \
     "rendered AGENTS.md must be byte-equal to canonical fixture (Plan 01/02 contract)"
 
-# Verify wizard source invokes sync-claude OR writes CLAUDE.md via shutil.copyfile
-# (either approach satisfies the byte-equal contract).
-if ! grep -qE '(bash.*sync-claude\.sh|shutil\.copyfile.*CLAUDE\.md)' "$WIZARD"; then
-    echo "ASSERT FAIL: wizard source neither invokes sync-claude.sh nor copies AGENTS.md to CLAUDE.md" >&2
+# Verify the wizard MODULE invokes sync-claude OR writes CLAUDE.md via shutil.copyfile
+# (either approach satisfies the byte-equal contract). Post-migration this logic lives in
+# the Python module (init_wizard.py:626), not the thin preflight shim ($WIZARD) — grep the
+# module, else this impl-assertion goes stale against the shim (a Phase-25-port artifact).
+if ! grep -qE '(bash.*sync-claude\.sh|shutil\.copyfile.*CLAUDE\.md)' "$REPO_ROOT/src/compendium/init_wizard.py"; then
+    echo "ASSERT FAIL: wizard module neither invokes sync-claude.sh nor copies AGENTS.md to CLAUDE.md" >&2
     exit 1
 fi
 

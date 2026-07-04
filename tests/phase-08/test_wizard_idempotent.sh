@@ -21,6 +21,17 @@ cp "$REPO_ROOT/bin/init-wizard.sh" "$WORK/bin/init-wizard.sh"
 cp "$REPO_ROOT/schema/AGENTS.template.md" "$WORK/schema/AGENTS.template.md"
 chmod +x "$WORK/bin/init-wizard.sh"
 
+# Scaffold its OWN compendium module so the shim's PYTHONPATH=$WORK/src anchors the wizard's
+# REPO_ROOT on $WORK (init_wizard.py:865, via __file__), not the installed/live module (which
+# resolves to the REAL repo). Without it the sentinel below is invisible — the wizard checks
+# the LIVE repo's .wizard-answers.yaml, so this test passed only when the live repo happened to
+# be already-initialized (e.g. left dirty by another wizard test), and its real-ish run could
+# touch the live tree (26-REVIEW F1, same root cause as test_wizard_partial_failure).
+# init_wizard is self-contained; mirrors tests/test_init_wizard_unit.py::make_scaffold.
+mkdir -p "$WORK/src/compendium" "$WORK/wiki-cloud"
+cp "$REPO_ROOT/src/compendium/__init__.py" "$REPO_ROOT/src/compendium/init_wizard.py" "$WORK/src/compendium/"
+printf '# Index\n\n## Decisions\n\n- seed entry\n' > "$WORK/wiki-cloud/index.md"
+
 # Create the sentinel at the fake repo root.
 touch "$WORK/.wizard-answers.yaml"
 
