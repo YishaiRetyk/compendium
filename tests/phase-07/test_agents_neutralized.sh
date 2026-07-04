@@ -4,14 +4,12 @@
 # `See: examples/kahneman/...` pointer lines, example: field documented (NEUT-04),
 # and §2 Directory Structure references the new top-level dirs.
 #
-# POST-EXTRACTION (Phase 16): The >=3 See: examples/kahneman/ pointer count
-# threshold was set before §4 was extracted to schema/reference/page-types.md.
-# The §4 type-specific kahneman pointers (entity/concept/source/etc.) now live
-# in page-types.md. AGENTS.md still has 2 kahneman pointers (§11.2, §12).
-# The pointer count check is relaxed to >=1 (at least one pointer must remain
-# per NEUT-04; additional pointers live in the leaf files).
-# Phase 16 precedent (same as 08-04/09-06/13.1): when a successor plan changes
-# the shape, the prior-phase test threshold is updated.
+# POST-EXTRACTION (Phase 16 -> 17): the type-specific `See: examples/kahneman/` pointers were
+# EXTRACTED out of AGENTS.md — §4 to schema/reference/page-types.md (Phase 16), then the §11.2/§12
+# pointers to the workflow/reference leaf files (Phase 17). AGENTS.md is now a pure ROUTER with
+# ZERO inline `See:` pointers; it references the cluster only in its §2 Directory Structure. The
+# pointer-COUNT invariant now lives on page-types.md (>=6, checked at 2b). Precedent
+# (08-04/09-06/16): when a successor plan changes the shape, the prior-phase threshold is updated.
 #
 # The kahneman-leak check (no Kahneman tokens outside See: / examples/ lines)
 # remains unchanged — that is a load-bearing safety invariant.
@@ -36,12 +34,12 @@ if [ -n "$LEAK" ]; then
   FAIL=1
 fi
 
-# 2. At least 1 `See: examples/kahneman/...` pointer in AGENTS.md
-# (>=3 was the pre-extraction threshold; Phase 16 moved §4 type pointers to page-types.md;
-# at least 1 must remain in AGENTS.md for inline-content illustration)
+# 2. AGENTS.md still REFERENCES the examples/kahneman/ cluster. Post-extraction the router
+# carries that reference in §2 Directory Structure rather than inline `See:` pointers (which
+# fully moved to the leaf files); the pointer COUNT invariant is enforced on page-types.md at 2b.
 POINTERS=$(grep -c '^See: examples/kahneman/' AGENTS.md || true)
-if [ "${POINTERS:-0}" -lt 1 ]; then
-  echo "FAIL: expected >=1 See: examples/kahneman/ pointer in AGENTS.md, got $POINTERS"
+if ! grep -qE 'examples/kahneman/' AGENTS.md; then
+  echo "FAIL: AGENTS.md no longer references the examples/kahneman/ cluster at all (neutralization pointer lost)"
   FAIL=1
 fi
 

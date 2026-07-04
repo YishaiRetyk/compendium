@@ -27,8 +27,12 @@ for f in \
   if [ -f "$f" ]; then pass "exists: $f"; else fail "missing: $f"; fi
 done
 
-# 2. Scoped Kahneman-string check on wiki-cloud/ content dirs (not decisions/, not maintenance/).
-KAHN_RE='kahneman|prospect-theory|loss-aversion|cognitive-biases|system-1-vs-system-2|decision-making|thinking-fast'
+# 2. Scoped leak check: DISTINCTIVE Kahneman-cluster markers must not appear in wiki-cloud/
+#    content dirs. Generic terms the live vault legitimately uses in unrelated real pages
+#    (`decision-making` — e.g. "decision-making culture"; `cognitive-biases`) are NOT
+#    distinctive leak signals and are excluded — a genuine cluster-page leak still carries
+#    `kahneman` + the distinctive concept names. (check-neutrality.sh is the primary guard.)
+KAHN_RE='kahneman|prospect-theory|loss-aversion|system-1-vs-system-2|thinking-fast'
 HITS=""
 for d in wiki-cloud/entities wiki-cloud/concepts wiki-cloud/comparisons wiki-cloud/overviews wiki-cloud/sources; do
   if [ -d "$d" ]; then
@@ -51,7 +55,12 @@ bad = []
 for p in root.rglob("*.md"):
     for m in re.finditer(r"\[\[([a-z0-9-]+)(?:\|[^\]]*)?\]\]", p.read_text()):
         target = m.group(1)
-        if target not in slugs and target not in {"index","log"}:
+        # amos-tversky / bounded-rationality are INTENTIONAL red-links: real referents in
+        # Kahneman's world (his lifelong collaborator; a related concept) that the example
+        # deliberately references without expanding into their own pages. Red-links are a
+        # documented feature (schema/reference/wikilinks.md); the check still catches any
+        # OTHER (typo'd / unexpected) unresolved in-cluster link.
+        if target not in slugs and target not in {"index", "log", "amos-tversky", "bounded-rationality"}:
             bad.append((str(p), target))
 if bad:
     for b in bad: print("UNRESOLVED:", b, file=sys.stderr)

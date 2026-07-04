@@ -12,6 +12,21 @@ SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 REPO_ROOT=$(cd "$SCRIPT_DIR/../.." && pwd)
 cd "$REPO_ROOT"
 
+# TEMPLATE-ONLY (TMPL-05): these assert the RELEASED TEMPLATE's empty wiki-cloud/ skeleton
+# (index.md + log.md + decisions/, a short index). They are meaningful only against the
+# neutralized template — the setup-parity CI checkout — NOT a populated live vault, which
+# legitimately carries content subdirs (entities/concepts/…) and a grown index.md.
+# Discriminator: `.planning/` exists in the dev repo but is NEVER in the released template
+# (excluded from the release allowlist). Its presence ⇒ dev vault ⇒ SKIP. Its ABSENCE ⇒ a
+# template/release checkout ⇒ RUN the assertions, so template-pollution is still caught (a
+# content-dir-based skip would wrongly pass a POLLUTED template — the exact bug this guards).
+if [ -d "$REPO_ROOT/.planning" ]; then
+  echo "SKIP: dev vault detected (.planning/ present) — the empty-skeleton assertions (TMPL-05)"
+  echo "      apply only to the released template, which has neither .planning/ nor content subdirs."
+  echo "test_wiki_skeleton: skipped (template-only, N/A on the dev vault)"
+  exit 0
+fi
+
 UNEXPECTED=$(find wiki-cloud -mindepth 1 -maxdepth 1 ! -name 'index.md' ! -name 'log.md' ! -name 'decisions' -print)
 if [ -z "$UNEXPECTED" ]; then
   pass "wiki-cloud/ top level clean (index.md, log.md, decisions/ only)"
