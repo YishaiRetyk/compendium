@@ -436,6 +436,33 @@ def main(argv=None):
         _err(f"Co-located asset: {asset_dest}\n")
 
     # -----------------------------------------------------------------------
+    # C-1 cross-cutting ledger emission (life-system-spec 10 §C-1). Deterministic
+    # script-side vault writes emit their own ledger lines; the PostToolUse hook
+    # cannot see them. Fail-open: must never affect ingest's exit code (C-1
+    # failure rule). No-op when cc-ledger is absent on this host.
+    # -----------------------------------------------------------------------
+
+    def _emit_ledger(target, op):
+        try:
+            root = os.environ.get("CC_LEDGER_ROOT",
+                                  os.path.expanduser("~/Documents/cc-ledger"))
+            emitter = os.path.join(root, "bin", "emit_op_line.py")
+            if os.path.isfile(emitter):
+                subprocess.run(
+                    [sys.executable, emitter, "--store", "knowledge",
+                     "--op", op, "--target", os.path.abspath(target),
+                     "--agent", "compendium-ingest",
+                     "--session", os.environ.get("CLAUDE_SESSION_ID", "batch")],
+                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                    timeout=10)
+        except Exception:
+            pass
+
+    _emit_ledger(dest_file, "edit" if force == 1 else "create")
+    if asset_file:
+        _emit_ledger(asset_dest, "edit" if force == 1 else "create")
+
+    # -----------------------------------------------------------------------
     # BRWN-10: strip brownfield-scoped fields to prevent pollution
     # -----------------------------------------------------------------------
 
