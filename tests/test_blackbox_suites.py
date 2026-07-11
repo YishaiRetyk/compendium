@@ -34,7 +34,7 @@ MANIFEST = REPO_ROOT / "tests" / "SUITE_MANIFEST.txt"
 # list, never a glob: a phase dir with test_*.sh but absent here is intentionally out of
 # the black-box net (e.g. phase-07/08's setup suites, run by their own CI job).
 SUITES = ["09", "09.1", "10", "11", "12.1", "12.2", "13",
-          "15", "18", "20", "22", "23", "24"]
+          "15", "18", "20", "22", "23", "24", "c1"]
 
 # Suites whose tests touch SHARED live state and therefore cannot run concurrently
 # with each other under pytest-xdist (the bash runner was strictly serial, so these
@@ -98,6 +98,13 @@ def test_blackbox_suite(test_path, name, tmp_path):
     """
     env = dict(os.environ)
     env.setdefault("PDF_EXTRACT_SKIP_LIVE", "1")  # retired runner's default: no live PDF/OCR
+    # C-1 emission hermeticity (ADR-008): ingest emits ledger lines to the real
+    # cc-ledger when present, and otherwise appends to the fallback file under
+    # $XDG_STATE_HOME. Neither the developer's real ledger nor their real
+    # ~/.local/state is a test sink — pin both seams to per-test scratch
+    # (setdefault: a deliberate caller override still wins).
+    env.setdefault("CC_LEDGER_ROOT", str(tmp_path / "cc-ledger-absent"))
+    env.setdefault("XDG_STATE_HOME", str(tmp_path / "state"))
     result = subprocess.run(
         ["bash", test_path],
         cwd=str(tmp_path),
@@ -117,7 +124,7 @@ def test_manifest_matches_suite_files():
     Carries forward the retired runner's "MANIFEST ROW WITHOUT A TEST FILE" guard (a
     deleted regression-carrying test must not silently shrink the net) AND the
     symmetric direction (a new unpinned test file must be pinned deliberately,
-    not left to pass silently). Currently 205 rows ↔ 205 files.
+    not left to pass silently). Currently 208 rows ↔ 208 files.
     """
     on_disk = {
         f"phase-{suite}/{p.stem}"

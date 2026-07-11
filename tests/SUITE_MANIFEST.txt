@@ -4,7 +4,7 @@
 # state: a PASS row must exit 0; a FAIL row is xfail(strict=True) — a pinned FAIL (stale
 # prior-phase test, NOT in-scope to fix) that starts passing fails the bridge as an XPASS, so
 # it must be re-pinned to PASS deliberately. Row↔file bijection is asserted both directions.
-# The 205 rows are run against the real Python bin/ (PDF_EXTRACT_SKIP_LIVE=1, no live PDF/OCR).
+# The 208 rows are run against the real Python bin/ (PDF_EXTRACT_SKIP_LIVE=1, no live PDF/OCR).
 phase-09/test_agents_section_11_1 FAIL
 phase-09/test_agents_section_11_3 FAIL
 phase-09/test_agents_section_12 FAIL
@@ -210,3 +210,6 @@ phase-24/test_release_reqsync_characterization PASS
 phase-24/test_search_modes_characterization PASS
 phase-24/test_shim_preflight_exit3 PASS
 phase-24/test_validate_op_characterization PASS
+phase-c1/test_ingest_c1_fallback_emit_failure PASS
+phase-c1/test_ingest_c1_fallback_failopen PASS
+phase-c1/test_ingest_c1_fallback_ledger_absent PASS

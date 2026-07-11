@@ -436,27 +436,72 @@ def main(argv=None):
         _err(f"Co-located asset: {asset_dest}\n")
 
     # -----------------------------------------------------------------------
-    # C-1 cross-cutting ledger emission (life-system-spec 10 §C-1). Deterministic
-    # script-side vault writes emit their own ledger lines; the PostToolUse hook
-    # cannot see them. Fail-open: must never affect ingest's exit code (C-1
-    # failure rule). No-op when cc-ledger is absent on this host.
+    # C-1 cross-cutting ledger emission (life-system-spec 10 §C-1; ADR-008).
+    # Deterministic script-side vault writes emit their own ledger lines; the
+    # PostToolUse hook cannot see them. Fail-open: must never affect ingest's
+    # exit code (C-1 failure rule). NON-SILENT (ADR-008 failure handling): when
+    # the emit fails (nonzero exit, timeout, exec error) or cc-ledger is absent
+    # on this host, the same C-1-shaped record is appended to a local
+    # append-only fallback file OUTSIDE the repo tree:
+    #     $XDG_STATE_HOME/compendium/ledger-fallback.jsonl
+    #     (default: ~/.local/state/compendium/ledger-fallback.jsonl)
+    # The file's line depth is the visible metric; the cc-ledger replayer
+    # sweeps it (adding refs ["replayed:<source>"] — this side writes plain
+    # C-1 lines with refs []). The fallback write is itself fail-open: it must
+    # never break ingest either.
     # -----------------------------------------------------------------------
+
+    def _fallback_ledger(target, op):
+        # Mirror of the record cc-ledger's bin/emit_op_line.py constructs
+        # (same shape, same 0600 append-only semantics; no flock — one short
+        # O_APPEND write per record is interleave-safe).
+        try:
+            import json
+            from datetime import datetime, timezone
+            state_home = (os.environ.get("XDG_STATE_HOME")
+                          or os.path.expanduser("~/.local/state"))
+            path = os.path.join(state_home, "compendium", "ledger-fallback.jsonl")
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            line = {
+                "v": 1,
+                "ts": datetime.now(timezone.utc).isoformat(
+                    timespec="seconds").replace("+00:00", "Z"),
+                "store": "knowledge",
+                "target": os.path.abspath(target),
+                "op": op,
+                "agent": "compendium-ingest",
+                "session": os.environ.get("CLAUDE_SESSION_ID", "batch"),
+                "refs": [],
+            }
+            data = (json.dumps(line, separators=(",", ":"), ensure_ascii=False)
+                    + "\n").encode("utf-8")
+            fd = os.open(path, os.O_WRONLY | os.O_APPEND | os.O_CREAT, 0o600)
+            try:
+                os.write(fd, data)
+            finally:
+                os.close(fd)
+        except Exception:
+            pass
 
     def _emit_ledger(target, op):
         try:
             root = os.environ.get("CC_LEDGER_ROOT",
                                   os.path.expanduser("~/Documents/cc-ledger"))
             emitter = os.path.join(root, "bin", "emit_op_line.py")
-            if os.path.isfile(emitter):
-                subprocess.run(
-                    [sys.executable, emitter, "--store", "knowledge",
-                     "--op", op, "--target", os.path.abspath(target),
-                     "--agent", "compendium-ingest",
-                     "--session", os.environ.get("CLAUDE_SESSION_ID", "batch")],
-                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                    timeout=10)
+            if not os.path.isfile(emitter):
+                _fallback_ledger(target, op)   # cc-ledger absent on this host
+                return
+            p = subprocess.run(
+                [sys.executable, emitter, "--store", "knowledge",
+                 "--op", op, "--target", os.path.abspath(target),
+                 "--agent", "compendium-ingest",
+                 "--session", os.environ.get("CLAUDE_SESSION_ID", "batch")],
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                timeout=10)
+            if p.returncode != 0:
+                _fallback_ledger(target, op)   # emit ran and failed
         except Exception:
-            pass
+            _fallback_ledger(target, op)       # timeout / exec error
 
     _emit_ledger(dest_file, "edit" if force == 1 else "create")
     if asset_file:
