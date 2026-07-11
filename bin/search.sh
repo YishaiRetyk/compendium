@@ -4,4 +4,5 @@
 # works on a bare checkout (no `pip install -e .` required).
 _REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 export PYTHONPATH="${_REPO_ROOT}/src${PYTHONPATH:+:$PYTHONPATH}"
+cd "$_REPO_ROOT"   # search resolves wiki paths against cwd; pin it so C-8 callers (gtd-seam) work from any dir
 exec python3 -m compendium.search "$@"
