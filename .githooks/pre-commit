@@ -74,7 +74,10 @@ if [ "${WIKI_SKIP_PYTEST:-0}" != "1" ] \
     # xdist plugin dies with "unrecognized arguments: -n" (a missing dep, not a regression).
     # If either is absent, skip the smoke gracefully rather than block the commit misleadingly.
     if command -v python3 >/dev/null 2>&1 && python3 -c 'import pytest, xdist' >/dev/null 2>&1; then
-        if ! python3 -m pytest -q --ignore=tests/test_blackbox_suites.py >&2; then
+        # env -u GIT_*: inside a linked-worktree commit, git exports GIT_DIR/GIT_INDEX_FILE
+        # to hooks; fixture tests that shell out to git inherit them and hit the REAL repo
+        # (2026-07-12 incident: a rogue test git-init flipped core.bare on the shared config).
+        if ! env -u GIT_DIR -u GIT_INDEX_FILE -u GIT_WORK_TREE python3 -m pytest -q --ignore=tests/test_blackbox_suites.py >&2; then
             echo "" >&2
             echo "Unit-test smoke failed. Fix the regression, or commit with WIKI_SKIP_PYTEST=1 (WIP only)." >&2
             exit 1
