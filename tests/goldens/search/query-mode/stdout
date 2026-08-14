@@ -1,0 +1,14 @@
+=== Query Prompt ===
+
+Question: How do widgets relate to gadgets?
+
+Relevant wiki pages (read in this order, TL;DR first, drill into Detail only if needed):
+
+1. wiki-cloud/concepts/gadget-theory.md -- - Gadgets compose into assemblies.
+
+Instructions:
+- Read TL;DR and Key Facts sections first (progressive disclosure).
+- Read Detail sections only where shallow content is insufficient.
+- Cite specific wiki pages and provenance markers in your answer.
+- If the answer produces novel synthesis, write it back to the wiki per AGENTS.md section 11.2.
+=== End Query Prompt ===

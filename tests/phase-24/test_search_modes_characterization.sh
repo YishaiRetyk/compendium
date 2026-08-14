@@ -48,15 +48,15 @@ EOF
     chmod 644 wiki-cloud/index.md wiki-cloud/concepts/*.md
 }
 
-# A BARE-link index ([[id]] without pipe) — the only index shape whose title
-# extraction resolves a page path today. CHARACTERIZATION FINDING (frozen, not
-# fixed — behavior parity bar): on the convention-conforming PIPED index
-# ([[id|Title]]), keyword/--paths-only/--query silently exit 1 with empty
-# output — the title extraction keeps "id|Title", the slug never resolves, and
-# the fallback `grep|head` under pipefail aborts the script. Broken on the real
-# wiki since the Phase-14 piped-link migration; the piped-index goldens freeze
-# that real behavior, the bare-index goldens exercise the working result path.
-# Post-migration fix tracked in .planning/todos/pending/.
+# A BARE-link index ([[id]] without pipe) — the legacy shape. It used to be the
+# ONLY shape that resolved: on the convention-conforming PIPED index
+# ([[id|Title]]) keyword/--paths-only/--query silently exited 1 with empty
+# output, because title extraction kept "id|Title", the slug never resolved, and
+# the fallback `grep|head` under pipefail aborted the script. FIXED at wayfinder
+# ticket 24 (2026-08-14): the target side of the pipe is now the resolution key,
+# so both shapes resolve and the piped goldens carry real results. Both index
+# shapes are kept as cases — piped is the mandated convention (AGENTS.md §8
+# rule 3) and bare must keep working for legacy indexes.
 seed_bare_index() {
     cat > wiki-cloud/index.md <<'EOF'
 # Index
@@ -104,11 +104,17 @@ done
 grep -qx '0' "$GOLD/keyword-bare-index/exit" || { echo "FAIL: keyword-bare-index exit golden != 0" >&2; RC=1; }
 grep -q 'Search Results' "$GOLD/keyword-bare-index/stdout" || { echo "FAIL: keyword-bare-index stdout is hollow" >&2; RC=1; }
 grep -q 'Query Prompt' "$GOLD/query-mode-bare-index/stdout" || { echo "FAIL: query-mode-bare-index stdout is hollow" >&2; RC=1; }
-# The piped-index cases freeze today's LATENT-BUG behavior (exit 1, empty channels):
-grep -qx '1' "$GOLD/keyword/exit" || { echo "FAIL: keyword (piped index) exit golden != 1 (latent-bug freeze)" >&2; RC=1; }
+# The PIPED index is the mandated convention (AGENTS.md §8 rule 3), so its cases
+# must carry real results — not the pre-ticket-24 exit-1/empty freeze. These
+# assertions are the regression guard: if alias parsing breaks again, the goldens
+# would re-freeze to empty and these lines fail loudly.
+grep -qx '0' "$GOLD/keyword/exit" || { echo "FAIL: keyword (piped index) exit golden != 0 — alias parsing regressed" >&2; RC=1; }
+grep -q 'Search Results' "$GOLD/keyword/stdout" || { echo "FAIL: keyword (piped index) stdout is hollow — alias parsing regressed" >&2; RC=1; }
+grep -q 'gadget-theory.md' "$GOLD/paths-only/stdout" || { echo "FAIL: paths-only (piped index) did not resolve the piped link" >&2; RC=1; }
+grep -q 'Query Prompt' "$GOLD/query-mode/stdout" || { echo "FAIL: query-mode (piped index) stdout is hollow" >&2; RC=1; }
 
 grep -qx '1' "$GOLD/query-missing-value/exit" || { echo "FAIL: query-missing-value exit golden != 1" >&2; RC=1; }
 grep -qx '1' "$GOLD/no-args/exit" || { echo "FAIL: no-args exit golden != 1" >&2; RC=1; }
 
-[ "$RC" = "0" ] && echo "PASS: search modes characterization (9 cases incl. the piped-index latent-bug freeze)"
+[ "$RC" = "0" ] && echo "PASS: search modes characterization (9 cases; piped + bare index both resolve)"
 exit "$RC"

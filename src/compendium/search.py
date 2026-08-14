@@ -4,13 +4,22 @@
 # with identical argv — grep -r traversal order and BRE pattern semantics are
 # observable). The contributor-mode python3 heredoc is lifted verbatim.
 #
-# KNOWN-BROKEN BEHAVIOR PINNED ON PURPOSE (goldens freeze it; fix tracked for
-# post-migration): on a convention-conforming PIPED index ([[id|Title]]), the
-# title extraction keeps "id|Title", the slug never resolves, and the fallback
-# `grep -rl ... | head -1` fails under `set -euo pipefail` — the bash script
-# aborts at the `path=$(resolve_page_path ...)` assignment with the pipeline's
-# status and EMPTY output. This port replicates that abort exactly (exit 1,
-# nothing printed). Do NOT fix here — behavior parity bar (D-15).
+# PIPED-INDEX FIX (wayfinder ticket 24, 2026-08-14). Previously this port froze a
+# known-broken behavior for bash parity: on a convention-conforming PIPED index
+# ([[id|Title]] — mandated by AGENTS.md §8 rule 3) the title extraction kept the
+# whole "id|Title" inner text, the slug never resolved, and the fallback
+# `grep -rl ... | head -1` aborted the caller under `set -euo pipefail` with exit 1
+# and EMPTY output. Every index entry in the real wiki is piped, so C-8 consult was
+# dead end-to-end. The parity bar was retired with the bash implementation
+# (Phase 26 / 26-02: "there is one implementation now"), so the fix lands here.
+#
+# NO SILENT SEAMS (cross-contract rule; store-connection model C-8). Two rules now
+# hold everywhere in this module:
+#   1. An unresolvable index entry is REPORTED on stderr and skipped — never an
+#      empty abort, and never silently dropped from the result set.
+#   2. Every consult records a consult-health outcome (see _emit_consult_health)
+#      so a degraded or failing C-8 seam is visible in the digest rather than
+#      being discovered by an agent getting empty results.
 import glob
 import os
 import re
@@ -19,6 +28,15 @@ import sys
 
 WIKI_INDEX = "wiki-cloud/index.md"
 WIKI_DIR = "wiki-cloud"
+
+# The six canonical page-type subdirectories (schema/AGENTS.template.md §"both
+# tiers use the same six page-type subdirectories"). `decisions` was missing
+# here, so every indexed decision record was unreachable through consult even
+# after alias parsing was fixed — the resolver has to know the whole schema, not
+# a subset of it. `maintenance/` is deliberately absent: it is wiki bookkeeping,
+# not a page type.
+PAGE_TYPE_DIRS = ("entities", "concepts", "sources", "comparisons",
+                  "overviews", "decisions")
 
 USAGE = """Usage: bin/search.sh [OPTIONS] <keyword>
        bin/search.sh --query "question"
@@ -56,7 +74,14 @@ Output Contracts:
 
 Exit codes:
   0  Success (including no results — that is informational, not an error)
-  1  Error (no arguments, missing index, invalid flag)
+  1  Error (no arguments, missing index, invalid flag, or the index matched
+     entries but NONE resolved to a page — always with a stderr diagnostic)
+
+Failure visibility:
+  Unresolvable index entries are always named on stderr, and every consult
+  overwrites a one-line health record (`ok <ts>` / `fail <ts> <reason>`) at
+  $COMPENDIUM_CONSULT_HEALTH, else
+  $XDG_STATE_HOME/compendium/consult-health.status.
 """
 
 
@@ -114,6 +139,52 @@ def _pipestatus(*rcs):
 
 
 # ---------------------------------------------------------------------------
+# Consult health (C-8 failure visibility)
+# ---------------------------------------------------------------------------
+# The digest must never have to infer that knowledge consult is broken. This
+# writes ONE line, fully overwritten on every consult, in the same status
+# grammar the GTD digest already parses for job health:
+#     ok <iso-ts>                 consult resolved everything it matched
+#     fail <iso-ts> <reason>      consult failed or resolved only part of it
+# Overwrite-per-run is deliberate: the file's content at digest-build time IS
+# the current state, so a fixed seam stops reporting without history to chase.
+#
+# The record lands OUTSIDE every sovereign store (life-system INV-2: no
+# store->store code paths — Compendium must not write into the GTD vault), at
+# the same XDG state root ingest.py already uses for its ledger fallback:
+#     $XDG_STATE_HOME/compendium/consult-health.status
+# Consuming it into the digest is the GTD-engine half of this contract and is
+# NOT implemented here; see the ticket-24 report.
+#
+# Fail-open in both directions: a health-write failure must never change what a
+# consult returns, and must never mask the consult's own diagnostics.
+
+def _health_path():
+    override = os.environ.get("COMPENDIUM_CONSULT_HEALTH")
+    if override:
+        return override
+    state_home = (os.environ.get("XDG_STATE_HOME")
+                  or os.path.expanduser("~/.local/state"))
+    return os.path.join(state_home, "compendium", "consult-health.status")
+
+
+def _emit_consult_health(status, reason=""):
+    try:
+        from datetime import datetime, timezone
+        ts = datetime.now(timezone.utc).isoformat(
+            timespec="seconds").replace("+00:00", "Z")
+        # Newlines would forge extra status records; collapse to one line.
+        reason = " ".join(str(reason).split())
+        line = f"{status} {ts}" + (f" {reason}" if reason else "") + "\n"
+        path = _health_path()
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w", encoding="utf-8") as fh:
+            fh.write(line)
+    except Exception:
+        pass                                   # never let health break consult
+
+
+# ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
@@ -124,21 +195,40 @@ def extract_tldr(file):
     return first.decode("utf-8", "surrogateescape"), _pipestatus(rc, 0)
 
 
-def resolve_page_path(title):
-    """Returns (path_text, status). status is the bash function's exit status —
-    a nonzero fallback-grep pipeline status ABORTS the caller (set -e)."""
-    o, _ = _capture(["tr", "[:upper:]", "[:lower:]"], stdin_bytes=_echo_bytes(title))
+def _slugify(text):
+    o, _ = _capture(["tr", "[:upper:]", "[:lower:]"], stdin_bytes=_echo_bytes(text))
     o, _ = _capture(["sed", "-E", "s/[^a-z0-9]+/-/g; s/^-+|-+$//g"], stdin_bytes=o)
-    slug = _cs(o)
-    for d in (f"{WIKI_DIR}/entities", f"{WIKI_DIR}/concepts", f"{WIKI_DIR}/sources",
-              f"{WIKI_DIR}/comparisons", f"{WIKI_DIR}/overviews"):
-        if os.path.isfile(f"{d}/{slug}.md"):
-            return f"{d}/{slug}.md", 0
-    # Fallback: grep for matching title in all wiki files
-    go, grc = _capture(["grep", "-rl", f"^title:.*{title}", WIKI_DIR + "/"],
-                       stderr=subprocess.DEVNULL)
-    first = go.split(b"\n")[0] if go else b""
-    return first.decode("utf-8", "surrogateescape"), _pipestatus(grc, 0)
+    return _cs(o)
+
+
+def resolve_page_path(target, display=None):
+    """Resolve one index entry to a page path; "" means unresolved.
+
+    `target` is the wikilink's target side — already the page `id` on a piped
+    link, so slugifying it is idempotent; a bare link's human title slugifies
+    the same way it always did. `display` is the alias side and is only used
+    for the frontmatter-title fallback, which is where it can actually match.
+
+    Never aborts: an unresolved entry returns "" and the caller reports it.
+    The old contract returned the fallback grep's exit status, which the caller
+    propagated into sys.exit() — that is what made a piped index kill the whole
+    consult with no output.
+    """
+    slug = _slugify(target)
+    for d in PAGE_TYPE_DIRS:
+        if os.path.isfile(f"{WIKI_DIR}/{d}/{slug}.md"):
+            return f"{WIKI_DIR}/{d}/{slug}.md"
+    # Fallback: match the page's frontmatter title. A nonzero grep here means
+    # "no match", which is information, not a fatal error.
+    for probe in (display, target):
+        if not probe:
+            continue
+        go, _grc = _capture(["grep", "-rl", f"^title:.*{probe}", WIKI_DIR + "/"],
+                            stderr=subprocess.DEVNULL)
+        first = go.split(b"\n")[0] if go else b""
+        if first:
+            return first.decode("utf-8", "surrogateescape")
+    return ""
 
 
 def search_index(query):
@@ -159,7 +249,9 @@ def search_fulltext(query):
 def format_result_line(path):
     tldr, rc = extract_tldr(path)
     if rc != 0:
-        sys.exit(rc)  # set -e on the local assignment
+        _err(f"ERROR: could not read TL;DR from {path} (sed exit {rc})\n")
+        _emit_consult_health("fail", f"unreadable page {path}")
+        sys.exit(rc)
     if tldr:
         _out(f"{path} -- {tldr}\n")
     else:
@@ -167,9 +259,67 @@ def format_result_line(path):
 
 
 def _extract_title(line):
-    """title=$(echo "$line" | sed -E 's/.*\\[\\[([^]]+)\\]\\].*/\\1/')"""
+    """The wikilink's inner text, verbatim — still "id|Title" on a piped link."""
     o, _ = _capture(["sed", "-E", r"s/.*\[\[([^]]+)\]\].*/\1/"], stdin_bytes=_echo_bytes(line))
     return _cs(o)
+
+
+def _split_wikilink(inner):
+    """Split a wikilink's inner text into (target, display).
+
+    AGENTS.md §8 rule 3 mandates `[[id|Exact Title]]` for every intra-wiki link,
+    so the target side is the page id and the alias side is the display title.
+    Bare `[[Title]]` links (legacy, and what the old code assumed was the only
+    shape) have no alias: target and display are the same text.
+    """
+    target, sep, display = inner.partition("|")
+    target = target.strip()
+    display = display.strip() if sep else ""
+    return target, display
+
+
+def _resolve_index_entries(index_lines, seen, order, unresolved):
+    """Resolve matched index lines to page paths, in index order.
+
+    An entry that does not resolve is appended to `unresolved` rather than
+    dropped: an index pointing at a page that is missing or misnamed is a real
+    integrity fault in the wiki, and the consult has to say so.
+    """
+    for line in index_lines.split("\n"):
+        if not line:
+            continue
+        inner = _extract_title(line)
+        target, display = _split_wikilink(inner)
+        path = resolve_page_path(target, display)
+        if not path:
+            unresolved.append(target or inner)
+            continue
+        if path not in seen:
+            seen.add(path)
+            order.append(path)
+
+
+def _health_after_results(unresolved):
+    """A consult that returned results but could not resolve every matched
+    entry is still degraded — the agent silently got less than the index
+    promised, which is exactly the failure C-8 must surface."""
+    if unresolved:
+        n = len(unresolved)
+        _emit_consult_health(
+            "fail", f"{n} index entr{'y' if n == 1 else 'ies'} did not resolve "
+                    f"to a page — wiki index and pages disagree")
+    else:
+        _emit_consult_health("ok")
+
+
+def _report_unresolved(unresolved):
+    """Name every unresolvable entry on stderr — stdout stays a clean result
+    contract, but the failure is never invisible."""
+    if not unresolved:
+        return
+    _err(f"WARNING: {len(unresolved)} index entr"
+         f"{'y' if len(unresolved) == 1 else 'ies'} did not resolve to a page "
+         f"(wiki index and pages disagree): {', '.join(unresolved)}\n")
 
 
 def _contributor_mode(log_path, handle):
@@ -289,7 +439,13 @@ def main(argv=None):
     # -----------------------------------------------------------------------
 
     if not os.path.isfile(WIKI_INDEX):
-        _err(f"ERROR: {WIKI_INDEX} not found\n")
+        # The seam is pointed at something that is not a wiki — the single most
+        # likely deploy misconfiguration, and previously indistinguishable from
+        # "this wiki has nothing on your topic".
+        _err(f"ERROR: {WIKI_INDEX} not found "
+             f"(searching from {os.getcwd()})\n")
+        _emit_consult_health("fail", f"{WIKI_INDEX} not found under "
+                                     f"{os.getcwd()}")
         return 1
 
     # -----------------------------------------------------------------------
@@ -299,6 +455,7 @@ def main(argv=None):
     if query:
         result_paths = []
         seen_paths = set()
+        unresolved = []
 
         for word in _shell_words(query):
             # Skip short words (articles, prepositions) — ${#word} counts BYTES
@@ -313,17 +470,24 @@ def main(argv=None):
 
             index_lines = search_index(clean_word)
             if index_lines:
-                for line in index_lines.split("\n"):
-                    title = _extract_title(line)
-                    path, rc = resolve_page_path(title)
-                    if rc != 0:
-                        sys.exit(rc)  # set -e: the $() assignment aborts the script
-                    if path and path not in seen_paths:
-                        seen_paths.add(path)
-                        result_paths.append(path)
+                _resolve_index_entries(index_lines, seen_paths, result_paths,
+                                       unresolved)
+
+        _report_unresolved(unresolved)
 
         if len(result_paths) == 0:
+            # Matching the index but resolving nothing is a broken wiki, not an
+            # empty one: say so loudly instead of reporting "no results".
+            if unresolved:
+                _err(f'ERROR: matched {len(unresolved)} index entr'
+                     f"{'y' if len(unresolved) == 1 else 'ies'} for "
+                     f'"{query}" but resolved none to a page\n')
+                _emit_consult_health(
+                    "fail", f"query resolved 0 of {len(unresolved)} matched "
+                            f"index entries — wiki index/pages disagree")
+                return 1
             _out(f'No results found for "{query}"\n')
+            _emit_consult_health("ok")
             return 0
 
         _out("=== Query Prompt ===\n")
@@ -336,6 +500,8 @@ def main(argv=None):
         for path in result_paths:
             tldr, rc = extract_tldr(path)
             if rc != 0:
+                _err(f"ERROR: could not read TL;DR from {path} (sed exit {rc})\n")
+                _emit_consult_health("fail", f"unreadable page {path}")
                 sys.exit(rc)
             if tldr:
                 _out(f"{count}. {path} -- {tldr}\n")
@@ -349,6 +515,7 @@ def main(argv=None):
         _out("- Cite specific wiki pages and provenance markers in your answer.\n")
         _out("- If the answer produces novel synthesis, write it back to the wiki per AGENTS.md section 11.2.\n")
         _out("=== End Query Prompt ===\n")
+        _health_after_results(unresolved)
         return 0
 
     # -----------------------------------------------------------------------
@@ -362,18 +529,13 @@ def main(argv=None):
 
     result_map = set()
     result_order = []
+    unresolved = []
 
     # 1. Index search
     index_lines = search_index(keyword)
     if index_lines:
-        for line in index_lines.split("\n"):
-            title = _extract_title(line)
-            path, rc = resolve_page_path(title)
-            if rc != 0:
-                sys.exit(rc)  # set -e: the $() assignment aborts the script
-            if path and path not in result_map:
-                result_map.add(path)
-                result_order.append(path)
+        _resolve_index_entries(index_lines, result_map, result_order, unresolved)
+    _report_unresolved(unresolved)
 
     # 2. Full-text search (if --fulltext)
     if fulltext == 1:
@@ -386,7 +548,18 @@ def main(argv=None):
 
     # No results
     if len(result_order) == 0:
+        # Same distinction as query mode: "the index has nothing" and "the index
+        # has entries I cannot open" are different answers and must read that way.
+        if unresolved:
+            _err(f'ERROR: matched {len(unresolved)} index entr'
+                 f"{'y' if len(unresolved) == 1 else 'ies'} for "
+                 f'"{keyword}" but resolved none to a page\n')
+            _emit_consult_health(
+                "fail", f"keyword resolved 0 of {len(unresolved)} matched "
+                        f"index entries — wiki index/pages disagree")
+            return 1
         _out(f'No results found for "{keyword}"\n')
+        _emit_consult_health("ok")
         return 0
 
     # Output
@@ -398,6 +571,7 @@ def main(argv=None):
         for path in result_order:
             format_result_line(path)
         _out(f"=== {len(result_order)} result(s) ===\n")
+    _health_after_results(unresolved)
     return 0
 
 

@@ -34,4 +34,11 @@ Output Contracts:
 
 Exit codes:
   0  Success (including no results — that is informational, not an error)
-  1  Error (no arguments, missing index, invalid flag)
+  1  Error (no arguments, missing index, invalid flag, or the index matched
+     entries but NONE resolved to a page — always with a stderr diagnostic)
+
+Failure visibility:
+  Unresolvable index entries are always named on stderr, and every consult
+  overwrites a one-line health record (`ok <ts>` / `fail <ts> <reason>`) at
+  $COMPENDIUM_CONSULT_HEALTH, else
+  $XDG_STATE_HOME/compendium/consult-health.status.
