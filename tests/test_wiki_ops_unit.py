@@ -341,16 +341,21 @@ def test_extract_title_bare_and_piped(tmp_path, monkeypatch):
     assert search._extract_title("- no link here") == "- no link here"
 
 
-def test_resolve_page_path_direct_hit_and_failing_fallback(tmp_path, monkeypatch):
+def test_resolve_page_path_direct_hit_and_unresolved(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     _seed_wiki(tmp_path, BARE_INDEX)
-    path, rc = search.resolve_page_path("gadget-theory")
-    assert (path, rc) == ("wiki-cloud/concepts/gadget-theory.md", 0)
-    # Unresolvable title: the fallback grep pipeline exits 1 — the caller
-    # replicates bash set -e and aborts the whole tool with that status.
-    path, rc = search.resolve_page_path("gadget-theory|Gadget Theory")
-    assert path == ""
-    assert rc == 1
+    # New contract (ticket 24): returns the path string alone; "" means
+    # unresolved — never a status, never an abort.
+    assert (search.resolve_page_path("gadget-theory")
+            == "wiki-cloud/concepts/gadget-theory.md")
+    # A piped index entry resolves via _split_wikilink: the target side is the
+    # resolution key, the display side only feeds the title fallback.
+    target, display = search._split_wikilink("gadget-theory|Gadget Theory")
+    assert (target, display) == ("gadget-theory", "Gadget Theory")
+    assert (search.resolve_page_path(target, display)
+            == "wiki-cloud/concepts/gadget-theory.md")
+    # Unresolvable entry: empty string, no exception, no exit.
+    assert search.resolve_page_path("no-such-page") == ""
 
 
 def test_resolve_page_path_title_grep_fallback(tmp_path, monkeypatch):
@@ -359,8 +364,13 @@ def test_resolve_page_path_title_grep_fallback(tmp_path, monkeypatch):
     (tmp_path / "wiki-cloud" / "overviews").mkdir()
     (tmp_path / "wiki-cloud" / "overviews" / "odd-name.md").write_text(
         "---\ntitle: about weird-slug stuff\n---\n", encoding="utf-8")
-    path, rc = search.resolve_page_path("weird-slug stuff")
-    assert (path, rc) == ("wiki-cloud/overviews/odd-name.md", 0)
+    # Target-side frontmatter-title fallback (bare link, no display alias).
+    assert (search.resolve_page_path("weird-slug stuff")
+            == "wiki-cloud/overviews/odd-name.md")
+    # Display-side fallback: a piped entry whose target has no page file but
+    # whose display title matches page frontmatter still resolves.
+    assert (search.resolve_page_path("missing-id", "about weird-slug stuff")
+            == "wiki-cloud/overviews/odd-name.md")
 
 
 def test_extract_tldr_first_line_only(tmp_path, monkeypatch):
